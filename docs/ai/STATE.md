@@ -29,6 +29,7 @@ CFC Lab Management đang ở Giai đoạn 0: phân tích và thiết kế khởi
 - Tạo custom skill `.agents/skills/backend-api/SKILL.md`.
 - Cập nhật kế hoạch gốc lên bản 1.1 và bổ sung PRD, RBAC, database, API conventions, architecture và roadmap sơ bộ.
 - Hoàn tất deliverables tài liệu Giai đoạn 0; đang chờ LAB xác nhận, chưa chuyển sang code.
+- Cài và validate 5 external skills; danh sách và phạm vi áp dụng nằm trong `docs/ai/SKILLS.md`.
 
 ## In progress / blockers
 
