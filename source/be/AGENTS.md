@@ -1,6 +1,6 @@
 # Backend instructions
 
-- Trong Giai đoạn 0 chỉ cập nhật tài liệu; chưa tạo controller, service, entity, repository, migration, dependency hoặc API runtime.
+- Giai đoạn 0 đã hoàn tất. Khi triển khai, cập nhật tài liệu API và Project Memory sau thay đổi có ý nghĩa.
 - Khi có mã nguồn Java, tổ chức theo package-by-feature trong package root thực tế.
 - `config/` chỉ chứa cấu hình toàn hệ thống; `auth/` chỉ xử lý authentication.
 - Feature có thể chứa controller, service, repository, entity, dto, mapper và exception khi thực sự cần.

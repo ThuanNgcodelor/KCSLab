@@ -1,6 +1,6 @@
 # Frontend instructions
 
-- Trong Giai đoạn 0 chỉ cập nhật tài liệu; chưa tạo component, hook, route, dependency hoặc API client.
+- Giai đoạn 0 đã hoàn tất. Khi triển khai, cập nhật Project Memory sau thay đổi có ý nghĩa.
 - Giữ kiến trúc feature-based trong `src/features/` khi triển khai tính năng.
 - Code dùng chung chỉ đưa vào `src/shared/` khi có nhu cầu tái sử dụng rõ ràng.
 - Tách API calls khỏi UI; mỗi feature sở hữu API, components, hooks, pages và types liên quan.

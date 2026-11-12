@@ -6,7 +6,7 @@ Nếu repository có thư mục `.codegraph/`, hãy dùng CodeGraph trước khi
 
 # Hướng dẫn cho AI Agent
 
-- Hiện tại là Giai đoạn 0: chỉ đọc, phân tích và cập nhật Markdown; không tạo source code, dependency, database, migration hoặc API runtime nếu chưa có yêu cầu chuyển Giai đoạn.
+- Giai đoạn 0 đã hoàn tất; hiện triển khai theo phạm vi được người dùng yêu cầu. Chỉ tạo code trong module liên quan, không mở rộng sang nghiệp vụ ngoài phạm vi.
 - Khi bắt đầu phiên, đọc `docs/ai/STATE.md` và `plans/CURRENT.md`.
 - Chỉ đọc tài liệu và module liên quan trực tiếp đến nhiệm vụ.
 - Kiểm tra cấu trúc hiện hữu trước khi sửa; không tự ý di chuyển, xóa hoặc ghi đè mã nguồn.

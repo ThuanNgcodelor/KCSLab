@@ -1,14 +1,14 @@
-# Current Plan — Giai đoạn 0
+# Current Plan — Giai đoạn 1: User và Login
 
 ## Goal
 
-Hoàn thành phân tích và thiết kế khởi động CFC Lab Management mà không tạo code; hiện chờ LAB phê duyệt trước Giai đoạn 1.
+Triển khai authentication và quản lý tài khoản nhân viên bằng email; không có đăng ký công khai.
 
 ## Scope
 
-- PRD, RBAC, ERD logic, API conventions, kiến trúc, roadmap và open questions.
-- Cập nhật kế hoạch gốc và Project Memory.
-- Không cài dependency, không tạo source, không tạo database/migration/API runtime.
+- Backend Spring Boot: auth, user, JWT cookie, refresh session, CSRF, Admin-only endpoints.
+- Frontend React: login page và user management page.
+- Không triển khai các module LAB khác.
 
 ## Tasks
 
@@ -19,18 +19,28 @@ Hoàn thành phân tích và thiết kế khởi động CFC Lab Management mà 
 - [x] Phân tích kế hoạch gốc và cập nhật định hướng kỹ thuật/nghiệp vụ.
 - [x] Tạo PRD, RBAC, DATABASE, API conventions và roadmap.
 - [x] Ghi nhận open questions và ranh giới chưa xác nhận.
-- [ ] LAB phê duyệt tài liệu Giai đoạn 0.
-- [ ] Chuyển sang Giai đoạn 1 khi có yêu cầu mới.
+- [x] Tạo backend Maven/Spring Boot.
+- [x] Tạo login bằng email, refresh, logout và `/auth/me`.
+- [x] Tạo user management Admin-only; không có registration endpoint.
+- [x] Tạo frontend login/user management.
+- [x] Dùng guideline asset cho visual direction.
+- [x] Chạy backend build/test bằng Docker Maven/JDK 21.
+- [x] Tạo schema MySQL và khởi động backend với profile `mysql`.
+- [x] Smoke-test login bằng email và `/auth/me`.
+- [ ] Kiểm thử refresh, logout, CSRF và Admin-only user endpoints trên browser.
 
 ## Verification
 
-- Đã kiểm tra kế hoạch và tài liệu nền; chưa có source code mới.
-- Không có build/test vì Giai đoạn 0 cấm triển khai và repository chưa có application manifest.
+- Frontend `npm run build`: pass.
+- Frontend `npm audit --omit=dev`: 0 vulnerabilities.
+- Backend `mvn test` trong Docker: pass.
+- Backend MySQL profile: started trên `http://localhost:8080`.
+- Frontend Vite: started trên `http://localhost:5173`.
 
 ## Blockers
 
-- Chưa có xác nhận của LAB về quy trình chuyên môn, quyền duyệt/phát hành, dữ liệu bắt buộc và bảo mật tra cứu.
+- Không còn blocker cho việc kiểm tra local; host vẫn không có Java/Maven nên backend đang chạy qua Docker.
 
 ## Next actions
 
-- Thu thập mẫu biểu và trả lời open questions; chỉ sau đó lập kế hoạch Giai đoạn 1.
+- Mở frontend và kiểm thử login/user trên browser; sau đó bổ sung integration tests.

@@ -1,0 +1,5 @@
+source/fe/node_modules/
+source/fe/dist/
+source/be/target/
+.env
+*.log

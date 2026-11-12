@@ -15,7 +15,7 @@
 
 | Method | Path | Mục đích | Trạng thái |
 |---|---|---|---|
-| POST | `/api/v1/auth/login` | Tạo phiên nhân viên | Đề xuất |
+| POST | `/api/v1/auth/login` | Tạo phiên nhân viên bằng email | Đề xuất |
 | POST | `/api/v1/auth/refresh` | Xoay refresh session | Đề xuất |
 | POST | `/api/v1/auth/logout` | Thu hồi phiên | Đề xuất |
 | GET | `/api/v1/auth/me` | Lấy user hiện tại | Đề xuất |
@@ -25,6 +25,8 @@
 | GET/POST | `/api/v1/samples` | Tìm/tạo mẫu | Đề xuất |
 | GET | `/api/v1/samples/{id}` | Chi tiết mẫu | Đề xuất |
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
+
+Không có `POST /api/v1/auth/register`. Tài khoản chỉ được Admin tạo qua endpoint quản trị `/api/v1/users` sau khi đăng nhập.
 
 ## Response và lỗi
 

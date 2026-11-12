@@ -17,7 +17,7 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Duyệt kết quả | ? | — | ? |
 | Phát hành kết quả | ? | — | — |
 | Quản lý khách hàng | ✓ | ✓ theo phạm vi | — |
-| Quản lý tài khoản nhân viên | ✓ | — | — |
+| Quản lý tài khoản nhân viên (tạo bằng email, khóa/mở khóa) | ✓ | — | — |
 | Gán role/khóa tài khoản | ✓ | — | — |
 | Quản lý danh mục/cấu hình | ✓ | — | — |
 | Xem audit log | ✓ | ? | ? |

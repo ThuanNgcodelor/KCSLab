@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: cfc-lab-management-backend
+  datasource:
+    url: jdbc:h2:mem:cfc_lab;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  security:
+    issuer: ${JWT_ISSUER:cfc-lab-management}
+    jwt-secret: ${JWT_SECRET:dev-only-change-this-secret-to-at-least-32-bytes}
+    access-token-seconds: ${ACCESS_TOKEN_SECONDS:900}
+    secure-cookie: ${SECURE_COOKIE:false}
+    cookie-path: /
+  seed-admin:
+    email: ${ADMIN_EMAIL:admin@example.com}
+    password: ${ADMIN_PASSWORD:}
+
+server:
+  port: ${PORT:8080}
