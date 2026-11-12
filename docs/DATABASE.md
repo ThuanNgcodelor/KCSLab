@@ -1,6 +1,6 @@
 # Mô hình dữ liệu logic sơ bộ
 
-**Phiên bản:** 0.1 · **Trạng thái:** Đề xuất, chưa tạo database/migration
+**Phiên bản:** 0.2 · **Trạng thái:** Đề xuất theo quy trình biểu mẫu 3–5 và CFC-TN-14; chưa tạo migration nghiệp vụ
 
 ## Lựa chọn cơ sở dữ liệu
 
@@ -21,6 +21,13 @@ erDiagram
     USERS ||--o{ AUTH_SESSIONS : opens
     USERS ||--o{ AUDIT_LOGS : performs
     RECEIPTS ||--o{ CUSTOMER_CONFIRMATIONS : receives
+    RECEIPTS ||--o{ RECEIPT_ATTACHMENTS : stores
+    SAMPLES ||--o{ SAMPLE_CUSTODY_EVENTS : transfers
+    SAMPLES ||--o{ SAMPLE_PARTS : splits
+    SAMPLE_TESTS ||--o{ TEST_RECORDS : documents
+    TEST_RECORDS ||--o{ TEST_EQUIPMENT : uses
+    TEST_RECORDS ||--o{ TEST_REAGENTS : uses
+    RECEIPTS ||--o{ RESULT_RELEASES : publishes
 ```
 
 | Thực thể | Trách nhiệm / khóa nghiệp vụ |
@@ -35,6 +42,12 @@ erDiagram
 | Test Results | Giá trị, đơn vị, LOD/ghi chú, người nhập, phiên bản và trạng thái duyệt |
 | Auth Sessions | Refresh/session hash, user, expiry, revokedAt, device metadata tối thiểu |
 | Customer Confirmations | Phiên bản nội dung, người xác nhận, thời điểm và bằng chứng |
+| Receipt Attachments | Bản scan/chụp phiếu 3, phiếu 4, file giấy gốc và checksum/version |
+| Sample Custody Events | Người giao/nhận, thời điểm, nơi chuyển, tình trạng, lý do và chữ ký/bằng chứng |
+| Sample Parts | Các phần vỏ/ruột hoặc nền tách từ mã gốc; hậu tố `-V`, `-R` và liên kết mẫu cha |
+| Test Records | Biên bản 5: thời gian, analyst, checker, công thức, QC, raw data và đánh giá |
+| Test Equipment, Test Reagents | Thiết bị/serial/calibration và hóa chất/code/origin/prep/expiry/storage/concentration |
+| Result Releases | Phiên bản PDF, người duyệt, thời điểm, checksum, trạng thái thu hồi/đính chính |
 | Audit Logs | Actor, action, object, before/after phù hợp, timestamp, trace id |
 
 ## Nguyên tắc dữ liệu
@@ -45,6 +58,9 @@ erDiagram
 - Index cần cân nhắc cho `receipt_code`, `sample_code`, trạng thái, createdAt, customer và các filter đã cho phép.
 - Kết quả nháp/đã duyệt/đã phát hành phải phân biệt; bản đã phát hành bất biến logic.
 - Unique constraints và required fields phải được chốt từ mẫu biểu thật của LAB.
+- `sample_code` phải unique toàn hệ thống; không tái sử dụng mã kể cả khi mẫu bị hủy.
+- Công thức mã gốc đề xuất: `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`; mã phần nền thêm `-V`/`-R`; mã QC dùng hậu tố đã quy định trong CFC-TN-14.
+- File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
 - Chưa tạo SQL, migration hoặc schema runtime trong Giai đoạn 0.
 
 ## Câu hỏi dữ liệu mở

@@ -1,7 +1,7 @@
 # CFC LAB MANAGEMENT 2026 — KẾ HOẠCH VÀ ĐẶC TẢ SƠ BỘ
 
 **Tên dự án:** CFC Lab Management – Hệ thống quản lý mẫu thử nghiệm và tra cứu kết quả trực tuyến  
-**Phiên bản tài liệu:** 1.1 – Bổ sung định hướng Giai đoạn 0, chưa được LAB phê duyệt  
+**Phiên bản tài liệu:** 1.2 – Bổ sung quy trình tiếp nhận/chuyển mẫu/thử nghiệm/tra cứu, cần LAB phê duyệt các điểm mở
 **Ngày lập:** 11/11/2026  
 **Đơn vị đề xuất:** Bộ phận CNTT/AI & Automation (đề xuất)  
 **Đơn vị nghiệp vụ phối hợp:** Phòng LAB, bộ phận quản lý chất lượng và các đơn vị liên quan  
@@ -11,6 +11,22 @@
 > **Lưu ý về mức độ xác thực:** Các màn hình, ví dụ dữ liệu và luồng thể hiện trong video là **tài liệu tham khảo sản phẩm**. Quy trình nội bộ, mẫu biểu, thẩm quyền phê duyệt, hạ tầng đang sử dụng và cơ chế phát hành kết quả thực tế của LAB **chưa được khảo sát/xác nhận**. Các thời hạn, KPI, công nghệ và yêu cầu dưới đây là **đề xuất sơ bộ**, cần thống nhất trước khi khởi động triển khai chính thức.
 
 > **Addendum Giai đoạn 0 (12/11/2026):** Tài liệu này được đối chiếu với yêu cầu khởi động mới. Định hướng kỹ thuật chính để đánh giá tiếp là Java 21 LTS + Spring Boot stable + Spring Security/JPA/Validation/JWT ở backend, React + Vite + JavaScript ES Modules/JSX ở frontend, và MySQL là phương án cơ sở dữ liệu cần đánh giá. Các phần cũ đề xuất Node.js/TypeScript/PostgreSQL không còn là lựa chọn mặc định; nội dung nghiệp vụ phù hợp vẫn được giữ, còn các tính năng nâng cao chuyển sang tương lai hoặc cần xác nhận. Chưa có source code mới trong Giai đoạn 0.
+
+> **Addendum nghiệp vụ 2 (12/11/2026):** Đã đối chiếu các biểu mẫu `3. Phiếu tiếp nhận và bàn giao mẫu.docx`, `4.Phieu chuyen mau.docx`, `5.Bien_ban_thu_nghiem.docx`, tài liệu `CFC14Quy trình mã hóa mẫu trái cây.doc` và màn hình tại giây 29 của `ư.mp4`. Quy trình cốt lõi được chốt để thiết kế hệ thống là **tiếp nhận → mã hóa → chuyển mẫu → thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu**. Các điểm chưa mô tả trong tài liệu vẫn được đánh dấu là câu hỏi cần LAB xác nhận, không tự suy diễn.
+
+### Quy trình nghiệp vụ đã xác nhận
+
+1. **Tiếp nhận:** người giao mang mẫu sầu riêng và phiếu giấy theo biểu mẫu 3; nhân viên tiếp nhận kiểm tra thông tin, tình trạng, bao bì/niêm phong, vận chuyển/bảo quản, chỉ tiêu và thời hạn.
+2. **Lập hồ sơ số:** nhân viên lưu bản scan/chụp phiếu giấy, nhập hồ sơ trên hệ thống, ghi người giao/người nhận/thời điểm và quyết định chấp nhận, chấp nhận có điều kiện hoặc từ chối.
+3. **Mã hóa mẫu:** hệ thống sinh mã duy nhất theo CFC-TN-14, không chứa thông tin nhạy cảm và không đổi trong suốt vòng đời mẫu. Mã mẫu chuẩn gồm `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE` (ví dụ `CT001-SR-23092026-001`); phần nền dùng hậu tố `-V` (vỏ) hoặc `-R` (ruột/thịt). Mẫu QC dùng hậu tố riêng như `-BL`, `-SP`, `-D`.
+4. **Chuyển mẫu lên phòng KCS/PTN:** nhân viên lập phiếu chuyển mẫu theo biểu mẫu 4, liên kết các mã mẫu, khối lượng, số lượng, tình trạng, chỉ tiêu, phương pháp, ngày chuyển, hạn trả kết quả và lưu/hoàn mẫu.
+5. **Thử nghiệm:** phòng phân tích lập biên bản thử nghiệm theo biểu mẫu 5; lưu người phân tích, người kiểm tra, thiết bị/serial/calibration, hóa chất, đường chuẩn, QC, raw data, kết quả và độ lệch.
+6. **Phê duyệt và phát hành:** kết quả phải qua kiểm tra/duyệt trước khi công bố. Phiếu kết quả có phiên bản, người duyệt, thời điểm phát hành và PDF bất biến logic.
+7. **Khách tra cứu:** khách nhập mã phiếu/mã mẫu và phần đuôi số điện thoại theo chính sách được duyệt. Sau khi xác thực, khách xem tiến độ, thông tin được phép công bố, vùng trồng/lịch sử liên quan và tải phiếu PDF kết quả. Màn hình tham chiếu tại giây 29 thể hiện bước “Có kết quả — tải PDF”, kết quả `KPH` và phần mở rộng “Xem phương pháp và chi tiết”.
+
+**Hai kênh tiếp nhận:** hệ thống phải hỗ trợ hồ sơ đi từ phiếu giấy (đã xác nhận) và chừa `intake_channel` cho kênh thứ hai; kênh thứ hai, quy tắc bắt buộc giấy gốc và ai được nhập thay cần LAB xác nhận trước khi xây dựng giao diện cuối.
+
+**Không công bố sớm:** dữ liệu thử nghiệm, kết quả nháp, raw data, thông tin QC và lỗi nội bộ không được đưa vào tra cứu khách hàng. Chỉ kết quả đã duyệt/phát hành mới được hiển thị/tải xuống.
 
 ---
 

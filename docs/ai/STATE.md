@@ -2,7 +2,7 @@
 
 ## Overview
 
-CFC Lab Management đã chuyển sang Giai đoạn 1 cho phạm vi authentication và user management. Các module nghiệp vụ khác chưa triển khai.
+CFC Lab Management đã hoàn tất nền tảng authentication/Admin Portal và chuyển sang chuẩn bị Giai đoạn 2: tiếp nhận, mã hóa, chuyển mẫu, thử nghiệm, phát hành và tra cứu khách.
 
 ## Verified stack
 
@@ -33,6 +33,7 @@ CFC Lab Management đã chuyển sang Giai đoạn 1 cho phạm vi authenticatio
 - Tạo authentication bằng email, JWT cookie, refresh session server-side, logout và CSRF endpoint.
 - Tạo user management Admin-only: list, create, update/lock; không có public registration.
 - Tạo frontend login và quản lý user, dùng visual asset `guideline-assets/cfc-003.jpg`.
+- Đối chiếu biểu mẫu 3/4/5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại giây 29; cập nhật roadmap theo quy trình thực tế.
 
 ## In progress / blockers
 
@@ -51,5 +52,6 @@ CFC Lab Management đã chuyển sang Giai đoạn 1 cho phạm vi authenticatio
 
 ## Next actions
 
-1. Kiểm thử refresh, logout, CSRF và Admin-only user endpoints trên browser.
-2. Chọn migration tool (Flyway/Liquibase) trước khi đưa schema lên production.
+1. Chốt hai kênh tiếp nhận, custody và người duyệt/phát hành với LAB.
+2. Thiết kế ERD/API cho receipt, sample code, transfer, testing record, result release và public lookup.
+3. Chọn migration tool (Flyway/Liquibase) trước khi đưa schema lên production.

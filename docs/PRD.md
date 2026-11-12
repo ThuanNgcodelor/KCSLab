@@ -6,10 +6,15 @@
 
 CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Giai đoạn 0 chỉ phân tích; chưa triển khai chức năng.
 
+**Cập nhật nghiệp vụ 12/11/2026:** Quy trình thực tế được đối chiếu với phiếu tiếp nhận/bàn giao mẫu số 3, phiếu chuyển mẫu số 4, biên bản thử nghiệm số 5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại 00:29. Phạm vi ưu tiên được sắp lại thành: tiếp nhận phiếu giấy và số hóa hồ sơ → mã hóa mẫu → chuyển KCS/PTN → lập biên bản thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu bằng mã và phần đuôi điện thoại.
+
 ### MVP đề xuất (P0)
 
 - Tài khoản nhân viên và RBAC.
-- Quản lý khách hàng, phiếu tiếp nhận, mẫu và chỉ tiêu.
+- Số hóa phiếu tiếp nhận/bàn giao mẫu giấy và quản lý file hồ sơ gốc.
+- Quản lý khách hàng, phiếu tiếp nhận, mẫu, chỉ tiêu và lịch sử bàn giao.
+- Sinh mã mẫu theo CFC-TN-14, gồm nguồn/mã khách hàng, loại sản phẩm, ngày nhận, số thứ tự và hậu tố nền V/R.
+- Quản lý phiếu chuyển mẫu, biên bản thử nghiệm, thiết bị, hóa chất, QC, raw data và kết quả từng chỉ tiêu.
 - Quan hệ một khách hàng — nhiều phiếu; một phiếu — nhiều mẫu.
 - Mã phiếu và mã mẫu duy nhất; QR chỉ là kênh truy cập có kiểm soát.
 - Trạng thái nội bộ chi tiết; khách chỉ thấy `Đã nhận mẫu → Đang thử nghiệm → Có kết quả`.
@@ -54,7 +59,8 @@ Kết quả vừa nhập không tự động được công bố. Hủy, tạm d
 
 - Mã phiếu/mã mẫu + 3–4 số cuối điện thoại chỉ phù hợp cho tiến độ cơ bản sau khi LAB chấp thuận.
 - Dùng token ngẫu nhiên, rate limiting, chống dò mã, thông báo lỗi không phân biệt dữ liệu tồn tại và không đưa số điện thoại đầy đủ vào URL.
-- Kết quả/PDF nhạy cảm cần OTP hoặc mã truy cập bí mật bổ sung, thời hạn và khả năng thu hồi.
+- Kết quả/PDF nhạy cảm cần xác thực bằng mã mẫu/mã phiếu + phần đuôi số điện thoại theo chính sách LAB; cần rate limit, chống dò mã và có thể bổ sung OTP/mã truy cập bí mật.
+- Chỉ kết quả đã duyệt/phát hành mới được xem hoặc tải PDF; không hiển thị raw data, QC và kết quả nháp cho khách.
 - Không lưu access/refresh token nhạy cảm trong localStorage; session refresh phía server phải thu hồi được và có giới hạn tuyệt đối 30 ngày.
 
 ## 6. Tiêu chí giai đoạn 0

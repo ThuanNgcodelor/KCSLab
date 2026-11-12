@@ -20,10 +20,16 @@
 | POST | `/api/v1/auth/logout` | Thu hồi phiên | Đề xuất |
 | GET | `/api/v1/auth/me` | Lấy user hiện tại | Đề xuất |
 | GET/POST | `/api/v1/customers` | Tìm/tạo khách hàng | Đề xuất |
-| GET/POST | `/api/v1/receipts` | Danh sách/tạo phiếu | Đề xuất |
+| GET/POST | `/api/v1/receipts` | Danh sách/tạo phiếu tiếp nhận theo biểu mẫu 3 | Đề xuất |
 | GET/PATCH | `/api/v1/receipts/{id}` | Xem/sửa phiếu theo trạng thái | Đề xuất |
+| POST | `/api/v1/receipts/{id}/attachments` | Lưu bản scan/chụp phiếu giấy | Đề xuất |
+| POST | `/api/v1/receipts/{id}/transfer` | Lập phiếu chuyển mẫu theo biểu mẫu 4 | Đề xuất |
 | GET/POST | `/api/v1/samples` | Tìm/tạo mẫu | Đề xuất |
 | GET | `/api/v1/samples/{id}` | Chi tiết mẫu | Đề xuất |
+| POST | `/api/v1/samples/{id}/custody-events` | Ghi nhận bàn giao, tình trạng và người giao/nhận | Đề xuất |
+| GET/POST | `/api/v1/testing-records` | Lập/cập nhật biên bản thử nghiệm biểu mẫu 5 | Đề xuất |
+| POST | `/api/v1/testing-records/{id}/submit-review` | Gửi biên bản/kết quả chờ kiểm tra | Đề xuất |
+| POST | `/api/v1/result-releases` | Duyệt và phát hành PDF kết quả | Đề xuất |
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
 
 Không có `POST /api/v1/auth/register`. Tài khoản chỉ được Admin tạo qua endpoint quản trị `/api/v1/users` sau khi đăng nhập.

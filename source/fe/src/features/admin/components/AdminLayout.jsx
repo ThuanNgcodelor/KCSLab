@@ -23,8 +23,8 @@ export function AdminLayout() {
         <div className="sidebar-brand"><span className="brand-orbit">CFC</span><div><strong>CFC Lab</strong><small>Management system</small></div></div>
         <div className="sidebar-section-label">Không gian quản trị</div>
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
-          <NavLink to="/admin" end className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>
-          <NavLink to="/admin/users" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span><em>3</em></NavLink>
+          <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>
+          <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span><em>3</em></NavLink>
           <a className="nav-item disabled" href="#modules" onClick={(event) => event.preventDefault()}><Icon name="flask" /><span>Quản lý phòng lab</span><small>Sắp tới</small></a>
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
@@ -33,7 +33,7 @@ export function AdminLayout() {
         </nav>
         <div className="sidebar-bottom"><div className="sidebar-status"><span className="pulse-dot" />Hệ thống hoạt động</div><button className="sidebar-profile" onClick={() => navigate('/admin/users')}><span className="avatar">{(user?.displayName ?? 'A').slice(0, 1)}</span><span><strong>{user?.displayName ?? 'Quản trị viên'}</strong><small>Quản trị viên</small></span><span className="profile-more">•••</span></button><button className="sidebar-logout" onClick={signOut}>Đăng xuất</button></div>
       </aside>
-      <main className="admin-main"><header className="admin-mobile-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><span className="brand-orbit">CFC</span>CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-label="Mở menu">☰</button></header><Outlet /></main>
+      <main className="admin-main"><div className="mobile-nav-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><span className="brand-orbit">CFC</span>CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}>{mobileOpen ? '×' : '☰'}</button></div>{mobileOpen && <button className="mobile-nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}<Outlet /></main>
     </div>
   );
 }

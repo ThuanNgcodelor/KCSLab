@@ -1,6 +1,6 @@
 # RBAC sơ bộ
 
-**Phiên bản:** 0.1 · **Trạng thái:** Đề xuất, cần LAB xác nhận
+**Phiên bản:** 0.2 · **Trạng thái:** Đề xuất theo quy trình phiếu 3–5; cần LAB xác nhận người ký/duyệt chính thức
 
 Ký hiệu: `✓` được đề xuất, `—` không được phép mặc định, `?` cần xác nhận theo phạm vi/ủy quyền.
 
@@ -9,6 +9,12 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Xem phiếu/mẫu trong phạm vi | ✓ | ✓ | ✓ |
 | Tạo khách hàng/phiếu/mẫu | ✓ | ✓ | — |
 | Sửa dữ liệu tiếp nhận trước khóa | ✓ | ✓ | — |
+| Lưu file phiếu 3 và hồ sơ tiếp nhận | ✓ | ✓ | — |
+| Sinh/gán mã mẫu CFC-TN-14 | ✓ | ✓ | — |
+| Lập phiếu chuyển mẫu 4 | ✓ | ✓ | ? |
+| Xác nhận bàn giao mẫu | ✓ | ✓ | ✓ theo phân công |
+| Lập biên bản thử nghiệm 5 | ✓ | — | ✓ |
+| Quản lý thiết bị/hóa chất/raw data thử nghiệm | ✓ | — | ✓ |
 | Xóa dữ liệu nghiệp vụ | ? | — | — |
 | Xác nhận đã nhận mẫu | ? | ? | — |
 | Chuyển sang đang thử nghiệm | ✓ | ? | ? |

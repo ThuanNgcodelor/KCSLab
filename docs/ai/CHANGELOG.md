@@ -9,6 +9,12 @@
 - Tạo Admin Portal frontend với dashboard vận hành, hoạt động gần đây, tình trạng phòng lab và quick actions.
 - Bổ sung module quản lý nhân viên: thống kê, danh sách tài khoản, khóa/mở khóa và modal tạo nhân viên.
 - Thêm routing `/admin` và `/admin/users`, giữ `/users` chuyển hướng tương thích.
+- Loại bỏ topbar cũ; mobile navigation chuyển thành drawer có backdrop, trạng thái mở/đóng và đóng sau khi chuyển trang.
+- Bổ sung ma trận quyền cho ba vai trò ADMIN, RECEPTIONIST và TECHNICIAN; hỗ trợ sửa vai trò, bật/tắt tài khoản và cập nhật mật khẩu.
+- Sửa Spring Security JWT converter để claim `role=ADMIN` được map thành `ROLE_ADMIN`; xác minh login, GET users và POST users lần lượt trả 200/200/201.
+- Chuyển luồng thêm/sửa nhân viên từ popup sang `/admin/users/new` và `/admin/users/:id/edit`.
+- Đọc và đối chiếu các biểu mẫu tiếp nhận/chuyển mẫu/biên bản thử nghiệm, quy trình mã hóa CFC-TN-14 và frame video 00:29.
+- Cập nhật kế hoạch, roadmap, PRD, RBAC, database và API conventions theo luồng tiếp nhận → chuyển mẫu → thử nghiệm → duyệt → PDF → tra cứu khách.
 
 - Bắt đầu Giai đoạn 1 theo yêu cầu: triển khai login bằng email và user management Admin-only, không có đăng ký.
 - Frontend build pass; npm audit pass 0 vulnerabilities. Backend chưa xác minh do môi trường thiếu Java/Maven.
