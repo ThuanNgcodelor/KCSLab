@@ -27,6 +27,8 @@ Triển khai authentication và quản lý tài khoản nhân viên bằng email
 - [x] Chạy backend build/test bằng Docker Maven/JDK 21.
 - [x] Tạo schema MySQL và khởi động backend với profile `mysql`.
 - [x] Smoke-test login bằng email và `/auth/me`.
+- [x] Tạo Admin Portal frontend: dashboard tổng quan, sidebar và khu vực quản trị.
+- [x] Tạo module quản lý nhân viên frontend: danh sách, trạng thái tài khoản và modal thêm nhân viên.
 - [ ] Kiểm thử refresh, logout, CSRF và Admin-only user endpoints trên browser.
 
 ## Verification

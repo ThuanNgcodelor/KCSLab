@@ -2,6 +2,8 @@ import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { UsersPage } from '../features/users/pages/UsersPage';
+import { AdminLayout } from '../features/admin/components/AdminLayout';
+import { DashboardPage } from '../features/admin/pages/DashboardPage';
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -16,5 +18,5 @@ function AdminRoute() {
 }
 
 export function App() {
-  return <Routes><Route path="/login" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AdminRoute />}><Route path="/users" element={<UsersPage />} /></Route></Route><Route path="*" element={<Navigate to="/users" replace />} /></Routes>;
+  return <Routes><Route path="/login" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AdminRoute />}><Route element={<AdminLayout />}><Route path="/admin" element={<DashboardPage />} /><Route path="/admin/users" element={<UsersPage />} /><Route path="/users" element={<Navigate to="/admin/users" replace />} /></Route></Route></Route><Route path="*" element={<Navigate to="/admin" replace />} /></Routes>;
 }

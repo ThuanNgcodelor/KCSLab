@@ -6,6 +6,9 @@
 - Tạo database `cfc_lab`, cấp quyền user kết nối hiện tại và xác minh backend kết nối thành công.
 - Backend `mvn test` pass trong Docker Maven/JDK 21; smoke-test login email và `/auth/me` trả HTTP 200.
 - Đã start backend tại `http://localhost:8080` và frontend Vite tại `http://localhost:5173`.
+- Tạo Admin Portal frontend với dashboard vận hành, hoạt động gần đây, tình trạng phòng lab và quick actions.
+- Bổ sung module quản lý nhân viên: thống kê, danh sách tài khoản, khóa/mở khóa và modal tạo nhân viên.
+- Thêm routing `/admin` và `/admin/users`, giữ `/users` chuyển hướng tương thích.
 
 - Bắt đầu Giai đoạn 1 theo yêu cầu: triển khai login bằng email và user management Admin-only, không có đăng ký.
 - Frontend build pass; npm audit pass 0 vulnerabilities. Backend chưa xác minh do môi trường thiếu Java/Maven.
