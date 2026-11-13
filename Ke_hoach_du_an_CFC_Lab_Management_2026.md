@@ -1,11 +1,11 @@
 # CFC LAB MANAGEMENT 2026 — KẾ HOẠCH VÀ ĐẶC TẢ SƠ BỘ
 
 **Tên dự án:** CFC Lab Management – Hệ thống quản lý mẫu thử nghiệm và tra cứu kết quả trực tuyến  
-**Phiên bản tài liệu:** 1.2 – Bổ sung quy trình tiếp nhận/chuyển mẫu/thử nghiệm/tra cứu, cần LAB phê duyệt các điểm mở
+**Phiên bản tài liệu:** 1.3 – Cập nhật trạng thái triển khai auth/Admin/phiếu tiếp nhận số 3
 **Ngày lập:** 11/11/2026  
 **Đơn vị đề xuất:** Bộ phận CNTT/AI & Automation (đề xuất)  
 **Đơn vị nghiệp vụ phối hợp:** Phòng LAB, bộ phận quản lý chất lượng và các đơn vị liên quan  
-**Trạng thái:** Đặc tả sơ bộ; chưa phê duyệt quy trình, phạm vi, công nghệ, nguồn lực, ngân sách và tiến độ  
+**Trạng thái:** Đang triển khai theo vertical slice; phiếu 3 đã chạy, phiếu 4 trở đi còn cần LAB xác nhận
 **Tài liệu tham khảo:** Video mẫu CFC Lab (~49 giây) do người đề xuất cung cấp; [video YouTube Shorts](https://www.youtube.com/shorts/MxDb3vp0pVE).
 
 > **Lưu ý về mức độ xác thực:** Các màn hình, ví dụ dữ liệu và luồng thể hiện trong video là **tài liệu tham khảo sản phẩm**. Quy trình nội bộ, mẫu biểu, thẩm quyền phê duyệt, hạ tầng đang sử dụng và cơ chế phát hành kết quả thực tế của LAB **chưa được khảo sát/xác nhận**. Các thời hạn, KPI, công nghệ và yêu cầu dưới đây là **đề xuất sơ bộ**, cần thống nhất trước khi khởi động triển khai chính thức.
@@ -13,6 +13,8 @@
 > **Addendum Giai đoạn 0 (12/11/2026):** Tài liệu này được đối chiếu với yêu cầu khởi động mới. Định hướng kỹ thuật chính để đánh giá tiếp là Java 21 LTS + Spring Boot stable + Spring Security/JPA/Validation/JWT ở backend, React + Vite + JavaScript ES Modules/JSX ở frontend, và MySQL là phương án cơ sở dữ liệu cần đánh giá. Các phần cũ đề xuất Node.js/TypeScript/PostgreSQL không còn là lựa chọn mặc định; nội dung nghiệp vụ phù hợp vẫn được giữ, còn các tính năng nâng cao chuyển sang tương lai hoặc cần xác nhận. Chưa có source code mới trong Giai đoạn 0.
 
 > **Addendum nghiệp vụ 2 (12/11/2026):** Đã đối chiếu các biểu mẫu `3. Phiếu tiếp nhận và bàn giao mẫu.docx`, `4.Phieu chuyen mau.docx`, `5.Bien_ban_thu_nghiem.docx`, tài liệu `CFC14Quy trình mã hóa mẫu trái cây.doc` và màn hình tại giây 29 của `ư.mp4`. Quy trình cốt lõi được chốt để thiết kế hệ thống là **tiếp nhận → mã hóa → chuyển mẫu → thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu**. Các điểm chưa mô tả trong tài liệu vẫn được đánh dấu là câu hỏi cần LAB xác nhận, không tự suy diễn.
+
+> **Addendum triển khai 3 (13/11/2026):** Đã có runtime Spring Boot/React/MySQL cho login email, session/CSRF, quản lý nhân viên Admin-only và vertical slice phiếu tiếp nhận số 3. Hệ thống đã lưu customer/receipt/sample/attachment, sinh mã CFC-TN-14 và được smoke-test bằng Playwright với MySQL. Giai đoạn kế tiếp là phiếu chuyển mẫu số 4 và custody; biên bản số 5, phát hành PDF và tra cứu khách chưa triển khai. Snapshot kỹ thuật ngắn nằm tại `docs/ai/CONTEXT.md`.
 
 ### Quy trình nghiệp vụ đã xác nhận
 

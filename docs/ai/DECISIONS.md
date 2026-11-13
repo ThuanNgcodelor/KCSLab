@@ -1,26 +1,31 @@
 # Architecture Decisions
 
-## 2026-11-12 — Giai đoạn 0 không tạo code
+## 13/11/2026 — Context tối giản cho AI
 
-- Quyết định: chỉ cập nhật Markdown; chưa tạo application, dependency, database, migration hoặc API runtime.
-- Lý do: yêu cầu giai đoạn hiện tại là phân tích/thiết kế và quy trình LAB chưa được xác nhận.
-- Tác động: mọi module, endpoint và schema trong tài liệu đều là đề xuất.
+- `docs/ai/CONTEXT.md` là nguồn tổng quan ngắn mặc định.
+- CodeGraph được dùng trước grep/read cho câu hỏi về source; tài liệu chuyên biệt chỉ đọc khi task cần.
+- Changelog và toàn bộ skill references không được nạp mặc định để tránh tốn token.
 
-## 2026-11-12 — Định hướng kỹ thuật mới
+## 12/11/2026 — Stack và cấu trúc đã chốt
 
-- Quyết định đề xuất: Java 21 LTS + Spring Boot stable + Spring Security/JPA/Validation/JWT; React + Vite + JavaScript/JSX; MySQL cần đánh giá.
-- Lý do: yêu cầu Giai đoạn 0 mới thay thế định hướng Node.js/TypeScript/PostgreSQL trong tài liệu cũ.
-- Tác động: chưa cài dependency; version Spring Boot và database vẫn cần phê duyệt.
+- Java 21 + Spring Boot 4.1.2 + Maven; React 19 + Vite 6 + JSX; MySQL profile cho dữ liệu thực.
+- Giữ `source/be` và `source/fe`; backend package-by-feature, frontend feature-based.
+- Kiến trúc modular monolith, chưa tách microservice.
 
-## 2026-11-12 — Giữ nguyên vùng source hiện có
+## 12/11/2026 — Authentication và tài khoản
 
-- Quyết định: dùng `source/fe` và `source/be` làm vùng frontend/backend hiện tại.
-- Lý do: repository đã có hai thư mục này; chưa có code để biện minh cho việc đổi tên hoặc di chuyển.
-- Phương án khác: đổi thành `frontend` và `backend`, nhưng có rủi ro phá đường dẫn tooling tương lai.
-- Tác động: tài liệu scoped instructions trỏ theo đường dẫn thực tế.
+- Login bằng email; access JWT cookie ngắn hạn, refresh session hash phía server, CSRF cookie và logout revoke.
+- Không có public registration; chỉ Admin tạo tài khoản.
+- Role hiện có: `ADMIN`, `RECEPTIONIST`, `TECHNICIAN`.
 
-## 2026-11-12 — Chưa tạo module nghiệp vụ rỗng
+## 12/11/2026 — Tiếp nhận mẫu
 
-- Quyết định: chưa tạo `auth`, `user`, `employee`, `booking` khi chưa có application source.
-- Lý do: tránh tạo cấu trúc giả và giữ module map trung thực.
-- Tác động: các module sẽ được tạo khi có feature thực tế và stack đã xác minh.
+- Phiếu 3 là vertical slice nghiệp vụ đầu tiên.
+- Mã mẫu dạng `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`, unique và không tái sử dụng.
+- Attachment lưu local trong dev, có metadata và SHA-256 checksum; production cần object storage/backup.
+
+## Quyết định còn mở
+
+- Người ký/xác nhận phiếu 4 và người duyệt/phát hành kết quả.
+- Có thêm role `LAB_MANAGER`/`REVIEWER` hay không.
+- Flyway hay Liquibase; object storage và chính sách retention/backup.

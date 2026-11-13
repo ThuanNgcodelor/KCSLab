@@ -1,26 +1,33 @@
 # Architecture
 
-**Phiên bản:** 0.1 · **Ngày:** 12/11/2026 · **Trạng thái:** Thiết kế sơ bộ, chưa phê duyệt
+**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Đang triển khai
 
-## Current state
+## Runtime hiện tại
 
-Repository hiện mới có khung thư mục và tài liệu; chưa có backend/frontend implementation để mô tả luồng tích hợp cụ thể. Giai đoạn 0 không tạo code.
+- Backend: Java 21, Spring Boot 4.1.2, Maven, Spring MVC/Security/JPA/Validation, JWT resource server.
+- Frontend: React 19, Vite 6, JavaScript/JSX, React Router 7.
+- Database: H2 `create-drop` cho profile mặc định; MySQL 8.4 + Hibernate `validate` cho profile `mysql`.
+- Dev runtime: backend có thể chạy bằng Docker Maven/JDK vì host không bắt buộc cài Java/Maven.
 
-## Target direction
+## Biên module
 
-- Backend: Java 21 LTS + Spring Boot stable là định hướng; modular monolith, package-by-feature. `config/` chứa cấu hình toàn hệ thống; `auth/` chỉ authentication; feature nghiệp vụ sở hữu controller/service/repository/entity/dto khi cần.
-- Frontend: React + Vite + JavaScript ES Modules/JSX; feature-based. Mỗi feature sở hữu API, components, hooks, pages và validation; `shared/` chỉ chứa phần tái sử dụng rõ ràng.
-- Database: MySQL là phương án chính cần đánh giá; PostgreSQL là phương án thay thế. Chưa tạo database.
-- Public API: `/api/v1`, resource số nhiều, pagination và error contract được mô tả trong `docs/API_CONVENTIONS.md`.
+- Backend package-by-feature: `auth`, `user`, `intake`; `config` và `common` chỉ chứa cross-cutting concerns.
+- Frontend feature-based: `auth`, `users`, `intake`, `admin`; HTTP client dùng chung ở `shared/api`.
+- Auth stateless bằng access JWT trong cookie; refresh token được hash và lưu server-side để rotation/revoke.
+- CSRF dùng cookie token; login và refresh được bỏ qua CSRF, các mutation đã đăng nhập gửi CSRF header.
+- Attachment dev lưu local, metadata/checksum lưu DB. Production chưa chốt object storage và backup.
 
-## Xác minh công nghệ tại Giai đoạn 0
+## Luồng hiện có
 
-Tài liệu Spring chính thức hiện liệt kê Spring Boot 4.1.2; trang system requirements ghi Java tối thiểu 17 và tương thích đến Java 27. Đây chỉ là thông tin tham khảo tại ngày 12/11/2026, không phải quyết định cài đặt. Dự án vẫn phải chốt version stable, Maven và compatibility matrix trước Giai đoạn 1.
+```text
+Browser → React/Vite → /api/v1 → Spring Security → feature controller/service/repository → MySQL
+                                      └────────── attachment metadata → MySQL
+                                                   file bytes → local storage (dev)
+```
 
-- [Spring Boot system requirements](https://docs.spring.io/spring-boot/system-requirements.html)
-- [Spring Boot 3.5 system requirements](https://docs.spring.io/spring-boot/3.5/system-requirements.html)
-- Project Memory là snapshot và kế hoạch hỗ trợ Agent, không thay thế source code hoặc Git history.
+## Quy tắc thay đổi
 
-## Migration rule
-
-Không di chuyển hoặc refactor hàng loạt để khớp sơ đồ. Chỉ tạo module khi có feature thực tế, xác minh stack trước và kiểm tra behavior/API contract sau mỗi thay đổi.
+- Giữ package-by-feature và API contract hiện có; chỉ tạo module khi có vertical slice thực tế.
+- Dùng CodeGraph trước khi đọc nhiều source file hoặc đánh giá blast radius.
+- Schema mới phải chuyển dần sang Flyway/Liquibase trước production; không tiếp tục phụ thuộc vào SQL chạy thủ công lâu dài.
+- Không ghi secrets vào source/tài liệu; `.env` chỉ dùng local và phải nằm ngoài Git.

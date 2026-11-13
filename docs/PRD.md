@@ -1,10 +1,10 @@
 # CFC Lab Management — PRD sơ bộ
 
-**Phiên bản:** 0.1 · **Ngày:** 12/11/2026 · **Trạng thái:** Đề xuất, chưa được LAB phê duyệt
+**Phiên bản:** 0.2 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Đang triển khai theo vertical slice
 
 ## 1. Mục tiêu và phạm vi
 
-CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Giai đoạn 0 chỉ phân tích; chưa triển khai chức năng.
+CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Nền tảng auth/Admin và vertical slice phiếu tiếp nhận số 3 đã triển khai; phiếu 4 trở đi chưa có runtime.
 
 **Cập nhật nghiệp vụ 12/11/2026:** Quy trình thực tế được đối chiếu với phiếu tiếp nhận/bàn giao mẫu số 3, phiếu chuyển mẫu số 4, biên bản thử nghiệm số 5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại 00:29. Phạm vi ưu tiên được sắp lại thành: tiếp nhận phiếu giấy và số hóa hồ sơ → mã hóa mẫu → chuyển KCS/PTN → lập biên bản thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu bằng mã và phần đuôi điện thoại.
 

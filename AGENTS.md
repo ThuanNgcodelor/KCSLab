@@ -7,7 +7,7 @@ Nếu repository có thư mục `.codegraph/`, hãy dùng CodeGraph trước khi
 # Hướng dẫn cho AI Agent
 
 - Giai đoạn 0 đã hoàn tất; hiện triển khai theo phạm vi được người dùng yêu cầu. Chỉ tạo code trong module liên quan, không mở rộng sang nghiệp vụ ngoài phạm vi.
-- Khi bắt đầu phiên, đọc `docs/ai/STATE.md` và `plans/CURRENT.md`.
+- Khi cần tổng quan dự án, đọc `docs/ai/CONTEXT.md`; chỉ đọc tài liệu chuyên biệt theo tác vụ.
 - Chỉ đọc tài liệu và module liên quan trực tiếp đến nhiệm vụ.
 - Kiểm tra cấu trúc hiện hữu trước khi sửa; không tự ý di chuyển, xóa hoặc ghi đè mã nguồn.
 - Backend dùng package-by-feature; frontend dùng feature-based khi bắt đầu có mã nguồn.
@@ -23,3 +23,4 @@ Tài liệu chi tiết:
 - Backend: `source/be/AGENTS.md`
 - Bản đồ module: `docs/ai/MODULE_MAP.md`
 - Quyết định kiến trúc: `docs/ai/DECISIONS.md`
+- Kế hoạch hiện tại: `plans/CURRENT.md`

@@ -1,5 +1,14 @@
 # Project Changelog
 
+## 2026-11-13
+
+- Đồng bộ toàn bộ Project Memory theo source hiện tại; loại bỏ mô tả cũ “placeholder/chưa có runtime”.
+- Thêm `docs/ai/CONTEXT.md` làm nguồn context ngắn mặc định và đổi `AGENTS.md` sang đọc tài liệu theo nhu cầu.
+- Cập nhật architecture, API, database, RBAC, roadmap và current plan; giai đoạn tiếp theo là phiếu chuyển mẫu số 4.
+- Đánh giá chiến lược token: ưu tiên CodeGraph + progressive disclosure; chưa thêm Gravity vì trùng chức năng nếu mục tiêu chỉ là codebase retrieval.
+- Tối ưu giao diện Admin trên mobile: container intake responsive, timeline dọc, bảng cuộn trong card, nút full-width và drawer đóng đúng.
+- Playwright viewport 390px cho `/admin`, `/admin/users`, `/admin/intake`, `/admin/intake/new`: không còn horizontal overflow; frontend build pass.
+
 ## 2026-11-12
 
 - Triển khai module tiếp nhận mẫu đầu tiên: customer, receipt, sample, attachment; API tạo/list/detail/upload và giao diện Admin `/admin/intake`.

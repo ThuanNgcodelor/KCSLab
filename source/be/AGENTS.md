@@ -1,7 +1,7 @@
 # Backend instructions
 
-- Giai đoạn 0 đã hoàn tất. Khi triển khai, cập nhật tài liệu API và Project Memory sau thay đổi có ý nghĩa.
-- Khi có mã nguồn Java, tổ chức theo package-by-feature trong package root thực tế.
+- Backend hiện dùng Java 21 + Spring Boot 4.1.2 + Maven. Đọc `docs/ai/CONTEXT.md` khi cần tổng quan.
+- Tổ chức theo package-by-feature trong `com.example.app`.
 - `config/` chỉ chứa cấu hình toàn hệ thống; `auth/` chỉ xử lý authentication.
 - Feature có thể chứa controller, service, repository, entity, dto, mapper và exception khi thực sự cần.
 - Controller không chứa business logic và không trả trực tiếp JPA entity.

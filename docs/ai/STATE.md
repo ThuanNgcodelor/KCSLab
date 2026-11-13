@@ -1,60 +1,29 @@
 # Project State
 
-## Overview
+**Cập nhật:** 13/11/2026
 
-CFC Lab Management đã hoàn tất nền tảng authentication/Admin Portal và chuyển sang chuẩn bị Giai đoạn 2: tiếp nhận, mã hóa, chuyển mẫu, thử nghiệm, phát hành và tra cứu khách.
+## Đã hoàn thành
 
-## Verified stack
+- Nền tảng Spring Boot 4.1.2/Java 21, React 19/Vite 6 và MySQL profile.
+- Login email, JWT cookie, refresh session, CSRF, logout, `/auth/me`; không có registration.
+- Quản lý nhân viên Admin-only: danh sách, tạo, sửa role/mật khẩu, khóa/mở khóa.
+- Admin Portal responsive; mobile viewport 390px đã kiểm tra bằng Playwright.
+- Vertical slice tiếp nhận phiếu 3: customer, receipt, sample, attachment, mã CFC-TN-14 và lưu file local trong dev.
+- Schema MySQL hiện có 6 bảng: users, auth_sessions, customers, receipts, samples, receipt_attachments.
 
-- Backend: Maven + Spring Boot 4.1.2, Java 21 target, Spring Security, JPA, Validation, OAuth2 Resource Server JWT.
-- Frontend: React 19 + Vite 6 + JavaScript/JSX + React Router.
-- Dev database: H2 in-memory; MySQL profile đã xác minh với MySQL 8.4 container hiện tại.
+## Đã xác minh
 
-## Current structure
+- Frontend build: pass.
+- Backend Maven test trong Docker: pass.
+- Browser/MySQL smoke test auth, user management và intake/upload: pass.
+- CodeGraph được index và ưu tiên cho khám phá source.
 
-- Frontend placeholder: `source/fe/`
-- Backend placeholder: `source/be/`
-- Project instructions: `AGENTS.md`, `source/fe/AGENTS.md`, `source/be/AGENTS.md`
-- Project memory: `docs/ai/`
-- Skill status: `docs/ai/SKILLS.md`
+## Khoảng trống
 
-## Architecture direction
+- Chưa có phiếu chuyển mẫu 4, custody history, biên bản thử nghiệm 5, review/release PDF, public lookup và audit log.
+- Chưa có migration tool, object storage/backup và bộ integration test nghiệp vụ.
+- Frontend `/admin/*` hiện chỉ cho ADMIN dù backend receipt đã cho RECEPTIONIST.
 
-- Backend: modular monolith, package-by-feature; config/security và common chỉ dùng cho concerns thật sự dùng chung.
-- Frontend: feature-based; API, UI, hooks và types thuộc feature, shared chỉ dành cho phần tái sử dụng rõ ràng.
+## Nguồn đọc mặc định
 
-## Completed
-
-- Tạo khung thư mục frontend/backend và tài liệu AI-first.
-- Tạo custom skill `.agents/skills/backend-api/SKILL.md`.
-- Cập nhật kế hoạch gốc lên bản 1.1 và bổ sung PRD, RBAC, database, API conventions, architecture và roadmap sơ bộ.
-- Hoàn tất deliverables tài liệu Giai đoạn 0; đang chờ LAB xác nhận, chưa chuyển sang code.
-- Cài và validate 5 external skills; danh sách và phạm vi áp dụng nằm trong `docs/ai/SKILLS.md`.
-- Tạo authentication bằng email, JWT cookie, refresh session server-side, logout và CSRF endpoint.
-- Tạo user management Admin-only: list, create, update/lock; không có public registration.
-- Tạo frontend login và quản lý user, dùng visual asset `guideline-assets/cfc-003.jpg`.
-- Đối chiếu biểu mẫu 3/4/5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại giây 29; cập nhật roadmap theo quy trình thực tế.
-- Hoàn tất vertical slice tiếp nhận phiếu 3: API `/api/v1/receipts`, sinh mã mẫu CFC-TN-14, upload file đính kèm và giao diện `/admin/intake` + `/admin/intake/new`.
-- Xác minh persistence trên MySQL cho customer, receipt, sample và attachment; dữ liệu smoke test đã được dọn sau kiểm thử.
-
-## In progress / blockers
-
-- Backend đang chạy qua container Maven/JDK vì host không cài Java/Maven.
-- Chưa có bộ integration test tự động; login, `/auth/me` và luồng tiếp nhận đã smoke-test bằng browser Playwright với MySQL thật.
-
-## Verification
-
-- Frontend `npm run build` đã pass.
-- `npm audit --omit=dev` đã pass với 0 vulnerabilities.
-- `git status` chưa chạy được vì thư mục hiện tại không được Git nhận diện là working tree hợp lệ.
-- Backend `mvn test` chạy trong Docker Maven/JDK 21: pass.
-- MySQL `cfc_lab` đã tạo schema `users` và `auth_sessions`; backend profile `mysql` khởi động thành công.
-- Smoke test login email và `/auth/me`: HTTP 200.
-- Playwright smoke test tiếp nhận: tạo phiếu, upload file DOCX, nhận mã `TN-...` và `CT001-SR-...`, mở lại danh sách: pass.
-- Đã tham chiếu yêu cầu hệ thống Spring Boot chính thức; Spring Boot 4.1.2 hiện yêu cầu Java tối thiểu 17 và tương thích đến Java 27, nhưng chưa chốt version cho dự án.
-
-## Next actions
-
-1. Chốt hai kênh tiếp nhận, custody và người duyệt/phát hành với LAB.
-2. Thiết kế ERD/API cho transfer phiếu 4, testing record phiếu 5, result release và public lookup.
-3. Chọn migration tool (Flyway/Liquibase) trước khi đưa schema lên production.
+Đọc `docs/ai/CONTEXT.md` để lấy context ngắn; dùng file này khi cần snapshot trạng thái chi tiết hơn.

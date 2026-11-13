@@ -1,6 +1,13 @@
-# RBAC sơ bộ
+# RBAC
 
-**Phiên bản:** 0.2 · **Trạng thái:** Đề xuất theo quy trình phiếu 3–5; cần LAB xác nhận người ký/duyệt chính thức
+**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026
+
+## Enforcement hiện tại
+
+- Backend `/api/v1/users/**`: `ADMIN`.
+- Backend `/api/v1/receipts/**`: `ADMIN` hoặc `RECEPTIONIST`.
+- Frontend `/admin/*`: hiện chỉ cho `ADMIN`; đây là khoảng trống cần sửa khi mở giao diện cho Receptionist/Technician.
+- Các quyền transfer/testing/review/release bên dưới vẫn là target và cần LAB xác nhận.
 
 Ký hiệu: `✓` được đề xuất, `—` không được phép mặc định, `?` cần xác nhận theo phạm vi/ủy quyền.
 

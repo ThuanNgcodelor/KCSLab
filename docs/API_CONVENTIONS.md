@@ -1,6 +1,6 @@
-# REST API conventions sơ bộ
+# REST API conventions
 
-**Phiên bản:** 0.1 · **Trạng thái:** Đề xuất; chưa có runtime API
+**Phiên bản:** 0.2 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake đã có runtime API
 
 ## Quy ước chung
 
@@ -15,14 +15,17 @@
 
 | Method | Path | Mục đích | Trạng thái |
 |---|---|---|---|
-| POST | `/api/v1/auth/login` | Tạo phiên nhân viên bằng email | Đề xuất |
-| POST | `/api/v1/auth/refresh` | Xoay refresh session | Đề xuất |
-| POST | `/api/v1/auth/logout` | Thu hồi phiên | Đề xuất |
-| GET | `/api/v1/auth/me` | Lấy user hiện tại | Đề xuất |
+| GET | `/api/v1/auth/csrf` | Lấy CSRF token | Đã triển khai |
+| POST | `/api/v1/auth/login` | Tạo phiên nhân viên bằng email | Đã triển khai |
+| POST | `/api/v1/auth/refresh` | Xoay refresh session | Đã triển khai |
+| POST | `/api/v1/auth/logout` | Thu hồi phiên | Đã triển khai |
+| GET | `/api/v1/auth/me` | Lấy user hiện tại | Đã triển khai |
+| GET/POST | `/api/v1/users` | Danh sách/tạo nhân viên, Admin-only | Đã triển khai |
+| PATCH | `/api/v1/users/{id}` | Sửa role/trạng thái/mật khẩu | Đã triển khai |
 | GET/POST | `/api/v1/customers` | Tìm/tạo khách hàng | Đề xuất |
-| GET/POST | `/api/v1/receipts` | Danh sách/tạo phiếu tiếp nhận theo biểu mẫu 3 | Đề xuất |
-| GET/PATCH | `/api/v1/receipts/{id}` | Xem/sửa phiếu theo trạng thái | Đề xuất |
-| POST | `/api/v1/receipts/{id}/attachments` | Lưu bản scan/chụp phiếu giấy | Đề xuất |
+| GET/POST | `/api/v1/receipts` | Tối đa 50 phiếu mới nhất/tạo phiếu theo biểu mẫu 3 | Đã triển khai |
+| GET | `/api/v1/receipts/{id}` | Xem phiếu theo ID | Đã triển khai |
+| POST | `/api/v1/receipts/{id}/attachments` | Lưu file và metadata/checksum phiếu giấy | Đã triển khai |
 | POST | `/api/v1/receipts/{id}/transfer` | Lập phiếu chuyển mẫu theo biểu mẫu 4 | Đề xuất |
 | GET/POST | `/api/v1/samples` | Tìm/tạo mẫu | Đề xuất |
 | GET | `/api/v1/samples/{id}` | Chi tiết mẫu | Đề xuất |
@@ -36,7 +39,7 @@ Không có `POST /api/v1/auth/register`. Tài khoản chỉ được Admin tạo
 
 ## Response và lỗi
 
-Response thành công đơn lẻ nên có `data`; danh sách nên có `items`, `page`, `size`, `totalItems`, `totalPages`. Tên field chính thức phải chốt cùng frontend.
+Runtime hiện trả object hoặc array trực tiếp. Chuẩn envelope/pagination bên dưới là mục tiêu cho các danh sách tăng trưởng, chưa áp dụng cho user/receipt hiện tại.
 
 Lỗi đề xuất:
 
@@ -53,4 +56,4 @@ HTTP status: `200/201/204` thành công; `400` input sai; `401` chưa xác thự
 
 ## Cookie/JWT đề xuất
 
-Access JWT ngắn hạn; refresh session lưu phía server, refresh token rotation và thu hồi khi logout/khóa tài khoản. Cookie refresh `HttpOnly`, `Secure`, `SameSite` theo deployment; CSRF protection phù hợp với cookie authentication. Phiên có hạn tuyệt đối 30 ngày, không gia hạn vô hạn. Cần chốt domain, cross-origin, CSRF strategy và OTP trước implementation.
+Runtime dùng access JWT cookie `access_token`, refresh session phía server, rotation và thu hồi khi logout. CSRF dùng `CookieCsrfTokenRepository`; login/refresh được miễn CSRF. `Secure` được điều khiển bằng cấu hình deployment. Domain/cross-origin production và thời hạn tuyệt đối cần được kiểm tra lại trước phát hành.

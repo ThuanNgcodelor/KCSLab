@@ -1,10 +1,16 @@
-# Mô hình dữ liệu logic sơ bộ
+# Mô hình dữ liệu
 
-**Phiên bản:** 0.2 · **Trạng thái:** Đề xuất theo quy trình biểu mẫu 3–5 và CFC-TN-14; chưa tạo migration nghiệp vụ
+**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake đã có schema; phần còn lại là target model
 
 ## Lựa chọn cơ sở dữ liệu
 
-MySQL là lựa chọn chính cần đánh giá vì nghiệp vụ quan hệ, transaction, khóa ngoại, tìm kiếm/phân trang và năng lực vận hành phổ biến. PostgreSQL vẫn là phương án thay thế tốt về tính năng SQL và truy vấn; chưa chốt trước khi khảo sát backup/restore, phiên bản được phép vận hành, nhân sự và hạ tầng.
+MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc định. Schema hiện tạo bằng `db/schema.sql`, backend dùng Hibernate `validate`. Cần chọn Flyway/Liquibase trước production.
+
+## Bảng đã triển khai
+
+`users`, `auth_sessions`, `customers`, `receipts`, `samples`, `receipt_attachments`.
+
+Các bảng history/custody/testing/result/audit trong ERD dưới đây chưa được triển khai.
 
 ## Thực thể và quan hệ
 
@@ -61,7 +67,7 @@ erDiagram
 - `sample_code` phải unique toàn hệ thống; không tái sử dụng mã kể cả khi mẫu bị hủy.
 - Công thức mã gốc đề xuất: `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`; mã phần nền thêm `-V`/`-R`; mã QC dùng hậu tố đã quy định trong CFC-TN-14.
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
-- Chưa tạo SQL, migration hoặc schema runtime trong Giai đoạn 0.
+- SQL runtime đã có cho 6 bảng đầu tiên; chưa có migration versioned.
 
 ## Câu hỏi dữ liệu mở
 

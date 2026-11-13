@@ -22,3 +22,5 @@ Tất cả `SKILL.md` còn lại đã vượt qua kiểm tra format. Skill Verce
 - Chỉ dùng skill phù hợp với request; không tải toàn bộ references vào context.
 - `java-spring-best-practices` hỗ trợ Spring Boot 3.5.x/4.x. Phải kiểm tra version thực tế trước khi code.
 - `frontend-design` và `web-design-guidelines` có thể dùng cho React/Vite; bỏ qua phần Next.js-specific của `react-best-practices` nếu không có Next.js.
+- Để tiết kiệm token, chỉ giữ tên/mô tả skill trong context ban đầu; chỉ đọc `SKILL.md` khi task kích hoạt và chỉ mở reference được skill chỉ định.
+- Không cài thêm skill hoặc MCP có cùng nhiệm vụ với CodeGraph nếu chưa có thiếu hụt đo được.

@@ -144,3 +144,31 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Mobile refinement: keep the lab workflow readable and touch-friendly. */
+.intake-page { width: min(1280px, calc(100% - 96px)); margin: 0 auto; padding: 48px 0 70px; }
+
+@media (max-width: 820px) {
+  .admin-sidebar.mobile-open { width: min(290px, calc(100vw - 48px)); padding: 24px 16px 18px; }
+  .mobile-nav-bar { position: sticky; top: 0; z-index: 30; background: rgba(255, 255, 255, .96); backdrop-filter: blur(12px); }
+  .mobile-menu { width: 40px; height: 40px; }
+  .dashboard-page, .staff-page, .intake-page { width: calc(100% - 40px); padding-top: 37px; }
+}
+
+@media (max-width: 520px) {
+  .dashboard-page, .staff-page, .intake-page { width: calc(100% - 32px); padding-top: 29px; }
+  .admin-heading { margin-bottom: 27px; }
+  .admin-heading h1 { font-size: 35px; }
+  .heading-copy { max-width: 31ch; line-height: 1.5; }
+  .admin-heading .primary-button, .admin-heading .outline-button, .add-staff-button { width: 100%; margin-top: 19px; }
+  .intake-guide { display: grid; gap: 0; padding: 8px 16px; overflow: visible; }
+  .guide-step { min-height: 56px; }
+  .guide-step strong { font-size: 12px; }
+  .guide-step small { font-size: 10px; }
+  .guide-line { width: 1px; height: 18px; margin: 0 0 0 13px; }
+  .intake-list-card { padding: 18px 14px 8px; }
+  .intake-list-card .panel-heading { align-items: center; }
+  .intake-list-card .panel-heading h2 { font-size: 18px; }
+  .intake-list-card .table-wrap { margin: 0 -14px; padding: 0 14px 5px; }
+  .intake-table { min-width: 650px; }
+}
