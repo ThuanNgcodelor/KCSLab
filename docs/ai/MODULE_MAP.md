@@ -1,18 +1,20 @@
 # Module Map
 
-**Ngày cập nhật:** 12/11/2026 · **Trạng thái:** Cập nhật sau Giai đoạn 1, phạm vi auth/user
+**Ngày cập nhật:** 12/11/2026 · **Trạng thái:** Cập nhật sau vertical slice tiếp nhận mẫu
 
-Repository hiện chưa có module ứng dụng đã triển khai. Bảng dưới ghi vùng code dự kiến và trách nhiệm ở mức thiết kế; không coi đây là module đã tồn tại.
+Các module auth, user và intake đã có code chạy được; các vùng còn lại vẫn ở mức thiết kế.
 
 | Vùng | Trách nhiệm | Vị trí | API / public interface |
 |---|---|---|---|
-| Frontend app | React/Vite app, router, auth provider | `source/fe/src/app/`, `source/fe/src/main.jsx` | `/login`, `/users` |
+| Frontend app | React/Vite app, router, auth provider | `source/fe/src/app/`, `source/fe/src/main.jsx` | `/login`, `/admin`, `/admin/intake` |
 | Frontend auth | Login bằng email, session state, logout | `source/fe/src/features/auth/` | `/api/v1/auth/*` |
 | Frontend users | Tạo/list/khóa tài khoản Admin-only | `source/fe/src/features/users/` | `/api/v1/users` |
+| Frontend intake | Danh sách và tạo phiếu tiếp nhận, upload file phiếu 3 | `source/fe/src/features/intake/` | `/admin/intake`, `/api/v1/receipts` |
 | Frontend shared | HTTP client, cookie credentials, CSRF header | `source/fe/src/shared/api/` | Dùng bởi features |
 | Backend config/common | Security, JWT, CORS, seed, exception mapping | `source/be/src/main/java/com/example/app/config`, `common` | Cross-cutting |
 | Backend auth | Login email, JWT access cookie, refresh session, logout | `source/be/src/main/java/com/example/app/auth/` | `/api/v1/auth/*` |
 | Backend user | User entity, role, Admin-only management | `source/be/src/main/java/com/example/app/user/` | `/api/v1/users` |
+| Backend intake | Customer, receipt, sample, attachment, mã CFC-TN-14 | `source/be/src/main/java/com/example/app/intake/` | `/api/v1/receipts` |
 | Public lookup | Chưa triển khai | — | Chưa có |
 | Project memory | Trạng thái, quyết định, kế hoạch | `docs/ai/` | Markdown files |
 

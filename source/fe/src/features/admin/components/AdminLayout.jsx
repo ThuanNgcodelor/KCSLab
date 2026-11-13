@@ -25,6 +25,7 @@ export function AdminLayout() {
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
           <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>
           <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span><em>3</em></NavLink>
+          <NavLink to="/admin/intake" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>
           <a className="nav-item disabled" href="#modules" onClick={(event) => event.preventDefault()}><Icon name="flask" /><span>Quản lý phòng lab</span><small>Sắp tới</small></a>
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>

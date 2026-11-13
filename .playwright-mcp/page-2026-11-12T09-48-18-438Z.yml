@@ -1,0 +1,163 @@
+- main [ref=f5e4]:
+  - generic [ref=f5e5]:
+    - button "CFC CFC Lab" [ref=f5e6] [cursor=pointer]:
+      - generic [ref=f5e7]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f5e8] [cursor=pointer]: ☰
+  - generic [ref=f5e9]:
+    - generic [ref=f5e11]:
+      - button "← Quay lại danh sách" [ref=f5e12] [cursor=pointer]
+      - paragraph [ref=f5e13]: Vận hành / Tiếp nhận mẫu
+      - heading "Tạo phiếu tiếp nhận" [level=1] [ref=f5e14]
+      - paragraph [ref=f5e15]: Nhập thông tin theo Phiếu tiếp nhận và bàn giao mẫu số 3.
+    - generic [ref=f5e16]:
+      - generic [ref=f5e17]:
+        - generic [ref=f5e18]:
+          - generic [ref=f5e19]:
+            - generic [ref=f5e20]: "01"
+            - generic [ref=f5e21]:
+              - heading "Thông tin người giao" [level=2] [ref=f5e22]
+              - paragraph [ref=f5e23]: Thông tin dùng để liên hệ và tra cứu hồ sơ.
+          - generic [ref=f5e24]:
+            - generic [ref=f5e25]:
+              - text: Họ tên người giao
+              - textbox "Họ tên người giao" [ref=f5e26]:
+                - /placeholder: Nguyễn Văn B
+            - generic [ref=f5e27]:
+              - text: Số điện thoại
+              - textbox "Số điện thoại" [ref=f5e28]:
+                - /placeholder: 0901 234 567
+            - generic [ref=f5e29]:
+              - text: Tên khách hàng / đơn vị
+              - textbox "Tên khách hàng / đơn vị" [ref=f5e30]:
+                - /placeholder: Hợp tác xã Cần Thơ
+            - generic [ref=f5e31]:
+              - text: Email
+              - textbox "Email" [ref=f5e32]:
+                - /placeholder: khachhang@email.com
+            - generic [ref=f5e33]:
+              - text: Địa chỉ
+              - textbox "Địa chỉ" [ref=f5e34]:
+                - /placeholder: Địa chỉ vùng trồng / đơn vị
+        - generic [ref=f5e35]:
+          - generic [ref=f5e36]:
+            - generic [ref=f5e37]: "02"
+            - generic [ref=f5e38]:
+              - heading "Thông tin mẫu" [level=2] [ref=f5e39]
+              - paragraph [ref=f5e40]: Mã mẫu sẽ được sinh tự động sau khi lưu phiếu.
+          - generic [ref=f5e41]:
+            - generic [ref=f5e42]:
+              - text: Tên mẫu
+              - textbox "Tên mẫu" [ref=f5e43]:
+                - /placeholder: Sầu riêng nguyên trái
+            - generic [ref=f5e44]:
+              - text: Loại sản phẩm
+              - combobox "Loại sản phẩm" [ref=f5e45]:
+                - option "SR — Sầu riêng" [selected]
+                - option "MIT — Mít"
+            - generic [ref=f5e46]:
+              - text: Mã nguồn / vùng trồng
+              - textbox "Mã nguồn / vùng trồng 2 chữ cái viết hoa + 3 số, ví dụ CT001" [ref=f5e47]:
+                - /placeholder: CT001
+                - text: CT001
+              - generic [ref=f5e48]: 2 chữ cái viết hoa + 3 số, ví dụ CT001
+            - generic [ref=f5e49]:
+              - text: Số lượng / khối lượng
+              - textbox "Số lượng / khối lượng" [ref=f5e50]:
+                - /placeholder: 10 kg
+            - generic [ref=f5e51]:
+              - text: Loại bao bì
+              - combobox "Loại bao bì" [ref=f5e52]:
+                - option "Túi PE" [selected]
+                - option "Hộp / thùng"
+                - option "Chai / lọ"
+                - option "Khác"
+            - generic [ref=f5e53]:
+              - text: Số niêm phong
+              - textbox "Số niêm phong" [ref=f5e54]:
+                - /placeholder: Nếu có
+            - generic [ref=f5e55]:
+              - checkbox "Niêm phong còn nguyên" [checked] [ref=f5e56]
+              - text: Niêm phong còn nguyên
+            - generic [ref=f5e57]:
+              - text: Tình trạng mẫu
+              - combobox "Tình trạng mẫu" [ref=f5e58]:
+                - option "Nguyên vẹn" [selected]
+                - option "Rò rỉ"
+                - option "Dập nát"
+                - option "Thiếu lượng"
+                - option "Bất thường"
+            - generic [ref=f5e59]:
+              - text: Mô tả chi tiết
+              - textbox "Mô tả chi tiết" [ref=f5e60]:
+                - /placeholder: Ghi nhận dấu hiệu bất thường nếu có
+        - generic [ref=f5e61]:
+          - generic [ref=f5e62]:
+            - generic [ref=f5e63]: "03"
+            - generic [ref=f5e64]:
+              - heading "Vận chuyển và yêu cầu thử nghiệm" [level=2] [ref=f5e65]
+              - paragraph [ref=f5e66]: Ghi nhận điều kiện mẫu khi đến phòng tiếp nhận.
+          - generic [ref=f5e67]:
+            - generic [ref=f5e68]:
+              - text: Phương tiện / thời gian vận chuyển
+              - textbox "Phương tiện / thời gian vận chuyển" [ref=f5e69]:
+                - /placeholder: Xe tải, 4 giờ
+            - generic [ref=f5e70]:
+              - text: Nhiệt độ khi nhận (°C)
+              - spinbutton "Nhiệt độ khi nhận (°C)" [ref=f5e71]
+            - generic [ref=f5e72]:
+              - text: Điều kiện bảo quản
+              - combobox "Điều kiện bảo quản" [ref=f5e73]:
+                - option "Thường" [selected]
+                - option "Lạnh"
+                - option "Khác"
+            - generic [ref=f5e74]:
+              - text: Thời hạn dự kiến
+              - textbox "Thời hạn dự kiến" [ref=f5e75]
+            - generic [ref=f5e76]:
+              - text: Chỉ tiêu yêu cầu
+              - textbox "Chỉ tiêu yêu cầu" [ref=f5e77]:
+                - /placeholder: Auramine O, Cadimi (Cd), ...
+            - generic [ref=f5e78]:
+              - text: Yêu cầu đặc biệt
+              - textbox "Yêu cầu đặc biệt" [ref=f5e79]:
+                - /placeholder: Thông tin khách hàng cần lưu ý
+        - generic [ref=f5e80]:
+          - generic [ref=f5e81]:
+            - generic [ref=f5e82]: "04"
+            - generic [ref=f5e83]:
+              - heading "Kết luận tiếp nhận" [level=2] [ref=f5e84]
+              - paragraph [ref=f5e85]: Chọn quyết định của nhân viên tiếp nhận.
+          - generic [ref=f5e86]:
+            - generic [ref=f5e87]:
+              - radio "Chấp nhận Đủ điều kiện tiếp nhận" [checked] [ref=f5e88]
+              - generic [ref=f5e89]:
+                - strong [ref=f5e90]: Chấp nhận
+                - generic [ref=f5e91]: Đủ điều kiện tiếp nhận
+            - generic [ref=f5e92]:
+              - radio "Chấp nhận có điều kiện Cần ghi rõ điều kiện" [ref=f5e93]
+              - generic [ref=f5e94]:
+                - strong [ref=f5e95]: Chấp nhận có điều kiện
+                - generic [ref=f5e96]: Cần ghi rõ điều kiện
+            - generic [ref=f5e97]:
+              - radio "Từ chối Ghi rõ lý do từ chối" [ref=f5e98]
+              - generic [ref=f5e99]:
+                - strong [ref=f5e100]: Từ chối
+                - generic [ref=f5e101]: Ghi rõ lý do từ chối
+      - complementary [ref=f5e102]:
+        - generic [ref=f5e103]:
+          - generic [ref=f5e104]:
+            - generic [ref=f5e105]: "05"
+            - generic [ref=f5e106]:
+              - heading "Lưu phiếu giấy" [level=2] [ref=f5e107]
+              - paragraph [ref=f5e108]: Tải ảnh hoặc PDF phiếu số 3 để lưu cùng hồ sơ.
+          - generic [ref=f5e109] [cursor=pointer]:
+            - button "↑ Chọn file phiếu giấy PDF, JPG hoặc PNG · tối đa 10 MB" [ref=f5e110]
+            - generic [ref=f5e111]: ↑
+            - strong [ref=f5e112]: Chọn file phiếu giấy
+            - generic [ref=f5e113]: PDF, JPG hoặc PNG · tối đa 10 MB
+        - generic [ref=f5e114]:
+          - paragraph [ref=f5e115]:
+            - strong [ref=f5e116]: Kiểm tra trước khi lưu
+            - generic [ref=f5e117]: Hệ thống sẽ sinh mã duy nhất theo CFC-TN-14.
+          - button "Lưu phiếu tiếp nhận" [ref=f5e118] [cursor=pointer]

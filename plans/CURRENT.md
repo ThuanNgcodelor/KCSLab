@@ -35,10 +35,10 @@ Hoàn thiện nền tảng Admin và chuẩn bị triển khai quy trình mẫu 
 - [x] Chuyển thêm/sửa nhân viên sang trang riêng, loại bỏ popup.
 - [x] Đọc và đối chiếu biểu mẫu 3, 4, 5, quy trình mã hóa CFC-TN-14 và video tại giây 29.
 - [x] Cập nhật roadmap theo luồng nghiệp vụ thực tế.
-- [ ] Thiết kế ERD/API chi tiết cho receipt, sample, custody, testing record, result, release và public lookup.
+- [x] Thiết kế và triển khai vertical slice tiếp nhận phiếu 3: receipt, customer, sample, attachment và sinh mã CFC-TN-14.
 - [ ] Xác nhận kênh tiếp nhận thứ hai ngoài phiếu giấy.
 - [ ] Xác nhận người có quyền nhận mẫu, kiểm tra, duyệt và phát hành.
-- [ ] Triển khai module tiếp nhận và sinh mã mẫu trước.
+- [x] Triển khai module tiếp nhận và sinh mã mẫu trước.
 - [ ] Kiểm thử refresh, logout, CSRF và Admin-only user endpoints trên browser.
 
 ## Verification
@@ -48,6 +48,7 @@ Hoàn thiện nền tảng Admin và chuẩn bị triển khai quy trình mẫu 
 - Backend `mvn test` trong Docker: pass.
 - Backend MySQL profile: started trên `http://localhost:8080`.
 - Frontend Vite: started trên `http://localhost:5173`.
+- Playwright smoke test: đăng nhập Admin, tạo phiếu tiếp nhận, upload file phiếu 3, kiểm tra mã phiếu/mã mẫu và hiển thị lại trong danh sách: pass.
 
 ## Blockers
 
@@ -55,4 +56,4 @@ Hoàn thiện nền tảng Admin và chuẩn bị triển khai quy trình mẫu 
 
 ## Next actions
 
-- Chốt câu hỏi nghiệp vụ còn mở, sau đó triển khai module tiếp nhận và mã hóa mẫu.
+- Chốt câu hỏi nghiệp vụ còn mở, sau đó triển khai phiếu chuyển mẫu số 4.

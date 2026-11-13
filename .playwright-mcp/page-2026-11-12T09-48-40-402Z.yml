@@ -1,0 +1,64 @@
+- main [ref=f6e4]:
+  - generic [ref=f6e5]:
+    - button "CFC CFC Lab" [ref=f6e6] [cursor=pointer]:
+      - generic [ref=f6e7]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f6e8] [cursor=pointer]: ☰
+  - generic [ref=f6e9]:
+    - generic [ref=f6e10]:
+      - generic [ref=f6e11]:
+        - paragraph [ref=f6e12]: Vận hành / Tiếp nhận mẫu
+        - heading "Tiếp nhận mẫu" [level=1] [ref=f6e13]
+        - paragraph [ref=f6e14]: Ghi nhận mẫu giấy, tạo mã truy xuất và bàn giao đúng người.
+      - button "＋ Tạo phiếu tiếp nhận" [ref=f6e15] [cursor=pointer]
+    - generic [ref=f6e16]:
+      - generic [ref=f6e17]:
+        - generic [ref=f6e18]: "01"
+        - generic [ref=f6e19]:
+          - strong [ref=f6e20]: Tiếp nhận
+          - generic [ref=f6e21]: Phiếu số 3
+      - generic [ref=f6e23]:
+        - generic [ref=f6e24]: "02"
+        - generic [ref=f6e25]:
+          - strong [ref=f6e26]: Chuyển mẫu
+          - generic [ref=f6e27]: Phiếu số 4
+      - generic [ref=f6e29]:
+        - generic [ref=f6e30]: "03"
+        - generic [ref=f6e31]:
+          - strong [ref=f6e32]: Thử nghiệm
+          - generic [ref=f6e33]: Biên bản số 5
+    - generic [ref=f6e34]:
+      - generic [ref=f6e35]:
+        - generic [ref=f6e36]:
+          - paragraph [ref=f6e37]: Hồ sơ mới nhất
+          - heading "Phiếu tiếp nhận" [level=2] [ref=f6e38]
+        - button "↻ Làm mới" [ref=f6e39] [cursor=pointer]
+      - table [ref=f6e42]:
+        - rowgroup [ref=f6e43]:
+          - row [ref=f6e44]:
+            - columnheader "Mã phiếu / khách hàng" [ref=f6e45]
+            - columnheader "Mẫu" [ref=f6e46]
+            - columnheader "Người giao" [ref=f6e47]
+            - columnheader "Trạng thái" [ref=f6e48]
+            - columnheader "Ngày nhận" [ref=f6e49]
+        - rowgroup [ref=f6e50]:
+          - row [ref=f6e51]:
+            - cell "TN-20261112-2F03A7 Hợp tác xã Playwright · 0909123456" [ref=f6e52]:
+              - strong [ref=f6e53]: TN-20261112-2F03A7
+              - generic [ref=f6e54]: Hợp tác xã Playwright · 0909123456
+            - cell "Sầu riêng kiểm thử Playwright CT001-SR-12112026-002" [ref=f6e55]:
+              - strong [ref=f6e56]: Sầu riêng kiểm thử Playwright
+              - generic [ref=f6e57]: CT001-SR-12112026-002
+            - cell "Nguyễn Văn Test" [ref=f6e58]
+            - cell "Đã tiếp nhận" [ref=f6e59]
+            - cell "12/11/2026" [ref=f6e62]
+          - row [ref=f6e63]:
+            - cell "TN-20261112-F901E9 Hợp tác xã Playwright · 0909123456" [ref=f6e64]:
+              - strong [ref=f6e65]: TN-20261112-F901E9
+              - generic [ref=f6e66]: Hợp tác xã Playwright · 0909123456
+            - cell "Sầu riêng kiểm thử Playwright CT001-SR-12112026-001" [ref=f6e67]:
+              - strong [ref=f6e68]: Sầu riêng kiểm thử Playwright
+              - generic [ref=f6e69]: CT001-SR-12112026-001
+            - cell "Nguyễn Văn Test" [ref=f6e70]
+            - cell "Đã tiếp nhận" [ref=f6e71]
+            - cell "12/11/2026" [ref=f6e74]

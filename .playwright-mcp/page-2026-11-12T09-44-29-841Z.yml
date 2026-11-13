@@ -1,0 +1,89 @@
+- main [ref=e20]:
+  - generic [ref=e21]:
+    - button "CFC CFC Lab" [ref=e22] [cursor=pointer]:
+      - generic [ref=e23]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=e24] [cursor=pointer]: ☰
+  - generic [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Không gian quản trị / Nhân viên
+        - heading "Nhân viên" [level=1] [ref=e29]
+        - paragraph [ref=e30]: Quản lý tài khoản, vai trò và quyền truy cập của đội ngũ CFC Lab.
+      - button "＋ Thêm nhân viên" [ref=e31] [cursor=pointer]
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]: Tổng nhân viên
+        - strong [ref=e35]: "1"
+      - generic [ref=e36]:
+        - generic [ref=e37]: Đang hoạt động
+        - strong [ref=e38]: "1"
+      - generic [ref=e39]:
+        - generic [ref=e40]: Quản trị viên
+        - strong [ref=e41]: "1"
+      - generic [ref=e42]:
+        - generic [ref=e43]: Cập nhật gần nhất
+        - strong [ref=e44]: Vừa xong
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - paragraph [ref=e48]: Ma trận quyền
+          - heading "Vai trò trong hệ thống" [level=2] [ref=e49]
+        - generic [ref=e50]: Quyền được áp dụng theo vai trò
+      - generic [ref=e51]:
+        - article [ref=e52]:
+          - generic [ref=e53]: ⌘
+          - heading "Quản trị viên" [level=3] [ref=e54]
+          - paragraph [ref=e55]: Toàn quyền vận hành hệ thống
+          - generic [ref=e56]:
+            - generic [ref=e57]: ✓ Dashboard & báo cáo
+            - generic [ref=e58]: ✓ Quản lý nhân viên
+            - generic [ref=e59]: ✓ Quản lý phòng lab
+            - generic [ref=e60]: ✓ Cấu hình hệ thống
+        - article [ref=e61]:
+          - generic [ref=e62]: ↗
+          - heading "Tiếp nhận" [level=3] [ref=e63]
+          - paragraph [ref=e64]: Tiếp nhận mẫu và theo dõi tiến độ
+          - generic [ref=e65]:
+            - generic [ref=e66]: ✓ Tiếp nhận mẫu
+            - generic [ref=e67]: ✓ Quản lý khách hàng
+            - generic [ref=e68]: ✓ Theo dõi tiến độ
+            - generic [ref=e69]: ✓ Xem báo cáo
+        - article [ref=e70]:
+          - generic [ref=e71]: ⚗
+          - heading "Kỹ thuật viên" [level=3] [ref=e72]
+          - paragraph [ref=e73]: Xử lý phân tích và cập nhật kết quả
+          - generic [ref=e74]:
+            - generic [ref=e75]: ✓ Xem mẫu được giao
+            - generic [ref=e76]: ✓ Cập nhật kết quả
+            - generic [ref=e77]: ✓ Quản lý thiết bị
+            - generic [ref=e78]: ✓ Xem hướng dẫn kỹ thuật
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: Danh sách tài khoản
+          - heading "Đội ngũ CFC Lab" [level=2] [ref=e83]
+        - button "↻ Làm mới" [ref=e84] [cursor=pointer]
+      - table [ref=e86]:
+        - rowgroup [ref=e87]:
+          - row [ref=e88]:
+            - columnheader "Nhân viên" [ref=e89]
+            - columnheader "Vai trò" [ref=e90]
+            - columnheader "Trạng thái" [ref=e91]
+            - columnheader "Lần cập nhật" [ref=e92]
+            - columnheader [ref=e93]
+        - rowgroup [ref=e94]:
+          - row [ref=e95]:
+            - cell "Q Quản trị viên nguyentrungthuan417@gmail.com" [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]: Q
+                - generic [ref=e99]:
+                  - strong [ref=e100]: Quản trị viên
+                  - generic [ref=e101]: nguyentrungthuan417@gmail.com
+            - cell "Quản trị viên" [ref=e102]
+            - cell "Đang hoạt động" [ref=e103]
+            - cell "Vừa cập nhật" [ref=e106]
+            - cell [ref=e107]:
+              - generic [ref=e108]:
+                - button "Sửa quyền" [ref=e109] [cursor=pointer]
+                - button "Khóa" [disabled] [ref=e110]

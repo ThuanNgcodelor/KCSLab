@@ -13,7 +13,7 @@ export async function initializeCsrf() {
 
 export async function request(path, options = {}) {
   const headers = new Headers(options.headers);
-  if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+  if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   const csrf = readCookie('XSRF-TOKEN');
   if (csrf && !['GET', 'HEAD', 'OPTIONS'].includes((options.method ?? 'GET').toUpperCase())) {
     headers.set('X-XSRF-TOKEN', decodeURIComponent(csrf));

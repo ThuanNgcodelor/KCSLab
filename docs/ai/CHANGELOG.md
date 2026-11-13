@@ -2,6 +2,11 @@
 
 ## 2026-11-12
 
+- Triển khai module tiếp nhận mẫu đầu tiên: customer, receipt, sample, attachment; API tạo/list/detail/upload và giao diện Admin `/admin/intake`.
+- Sinh mã mẫu theo CFC-TN-14 dạng `CT001-SR-DDMMYYYY-SEQ`, lưu metadata/checksum file phiếu 3 và liên kết người tiếp nhận.
+- Sửa HTTP client để upload `FormData` không bị gán `Content-Type: application/json`; đổi cột SQL `condition` thành `sample_condition` vì `condition` là từ khóa MySQL.
+- Playwright smoke test pass: login Admin → tạo phiếu → upload DOCX → kiểm tra mã phiếu/mã mẫu → mở danh sách; dữ liệu tạm đã được dọn.
+
 - Tạo schema MySQL tại `source/be/src/main/resources/db/schema.sql` cho `users` và `auth_sessions`.
 - Tạo database `cfc_lab`, cấp quyền user kết nối hiện tại và xác minh backend kết nối thành công.
 - Backend `mvn test` pass trong Docker Maven/JDK 21; smoke-test login email và `/auth/me` trả HTTP 200.

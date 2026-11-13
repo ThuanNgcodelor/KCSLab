@@ -34,11 +34,13 @@ CFC Lab Management đã hoàn tất nền tảng authentication/Admin Portal và
 - Tạo user management Admin-only: list, create, update/lock; không có public registration.
 - Tạo frontend login và quản lý user, dùng visual asset `guideline-assets/cfc-003.jpg`.
 - Đối chiếu biểu mẫu 3/4/5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại giây 29; cập nhật roadmap theo quy trình thực tế.
+- Hoàn tất vertical slice tiếp nhận phiếu 3: API `/api/v1/receipts`, sinh mã mẫu CFC-TN-14, upload file đính kèm và giao diện `/admin/intake` + `/admin/intake/new`.
+- Xác minh persistence trên MySQL cho customer, receipt, sample và attachment; dữ liệu smoke test đã được dọn sau kiểm thử.
 
 ## In progress / blockers
 
 - Backend đang chạy qua container Maven/JDK vì host không cài Java/Maven.
-- Chưa có bộ integration test tự động; login và `/auth/me` đã smoke-test với MySQL thật.
+- Chưa có bộ integration test tự động; login, `/auth/me` và luồng tiếp nhận đã smoke-test bằng browser Playwright với MySQL thật.
 
 ## Verification
 
@@ -48,10 +50,11 @@ CFC Lab Management đã hoàn tất nền tảng authentication/Admin Portal và
 - Backend `mvn test` chạy trong Docker Maven/JDK 21: pass.
 - MySQL `cfc_lab` đã tạo schema `users` và `auth_sessions`; backend profile `mysql` khởi động thành công.
 - Smoke test login email và `/auth/me`: HTTP 200.
+- Playwright smoke test tiếp nhận: tạo phiếu, upload file DOCX, nhận mã `TN-...` và `CT001-SR-...`, mở lại danh sách: pass.
 - Đã tham chiếu yêu cầu hệ thống Spring Boot chính thức; Spring Boot 4.1.2 hiện yêu cầu Java tối thiểu 17 và tương thích đến Java 27, nhưng chưa chốt version cho dự án.
 
 ## Next actions
 
 1. Chốt hai kênh tiếp nhận, custody và người duyệt/phát hành với LAB.
-2. Thiết kế ERD/API cho receipt, sample code, transfer, testing record, result release và public lookup.
+2. Thiết kế ERD/API cho transfer phiếu 4, testing record phiếu 5, result release và public lookup.
 3. Chọn migration tool (Flyway/Liquibase) trước khi đưa schema lên production.
