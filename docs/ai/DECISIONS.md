@@ -1,5 +1,13 @@
 # Architecture Decisions
 
+## 13/11/2026 — Responsive contract cho Admin UI
+
+- Admin page dùng shell chung `admin-page`; các shell cũ `dashboard-page`, `staff-page`, `intake-page` giữ tương thích.
+- Content fluid, tối đa `1680px`, lề ngang dùng `clamp()`; tránh cả hai cực đoan là khóa ở `1280px` trên màn 2K và kéo full-width trên ultrawide.
+- `<=1080px`: sidebar thành drawer để tablet/laptop nhỏ không bị ép nội dung. `<=520px`: bảng dữ liệu chuyển card/stack khi cần.
+- `>=1600px` tăng spacing và vùng tương tác; `>=2200px` tăng typography. Bộ viewport kiểm tra chuẩn: 390, 1024, 1440 và 2560px.
+- Quy tắc chi tiết và checklist bắt buộc nằm tại `source/fe/AGENTS.md`.
+
 ## 13/11/2026 — Context tối giản cho AI
 
 - `docs/ai/CONTEXT.md` là nguồn tổng quan ngắn mặc định.

@@ -1,0 +1,125 @@
+- main [ref=e63]:
+  - generic [ref=e189]:
+    - button "CFC Lab" [ref=e190] [cursor=pointer]
+    - button "Mở menu" [ref=e191] [cursor=pointer]: ☰
+  - generic [ref=e65]:
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - paragraph [ref=e68]: Không gian quản trị / Nhân viên
+        - heading "Nhân viên" [level=1] [ref=e69]
+        - paragraph [ref=e70]: Quản lý tài khoản, vai trò và quyền truy cập của đội ngũ CFC Lab.
+      - button "＋ Thêm nhân viên" [ref=e71] [cursor=pointer]
+    - generic [ref=e72]:
+      - generic [ref=e73]:
+        - generic [ref=e74]: Tổng nhân viên
+        - strong [ref=e75]: "1"
+      - generic [ref=e76]:
+        - generic [ref=e77]: Đang hoạt động
+        - strong [ref=e78]: "1"
+      - generic [ref=e79]:
+        - generic [ref=e80]: Quản trị viên
+        - strong [ref=e81]: "1"
+      - generic [ref=e82]:
+        - generic [ref=e83]: Cập nhật gần nhất
+        - strong [ref=e84]: Vừa xong
+    - generic [ref=e85]:
+      - generic [ref=e87]:
+        - paragraph [ref=e88]: Ma trận quyền
+        - heading "Vai trò trong hệ thống" [level=2] [ref=e89]
+      - generic [ref=e91]:
+        - article [ref=e92]:
+          - generic [ref=e93]: ⌘
+          - heading "Quản trị viên" [level=3] [ref=e94]
+          - paragraph [ref=e95]: Toàn quyền vận hành hệ thống
+          - generic [ref=e96]:
+            - generic [ref=e97]: ✓ Dashboard & báo cáo
+            - generic [ref=e98]: ✓ Quản lý nhân viên
+            - generic [ref=e99]: ✓ Quản lý phòng lab
+            - generic [ref=e100]: ✓ Cấu hình hệ thống
+        - article [ref=e101]:
+          - generic [ref=e102]: ↗
+          - heading "Tiếp nhận" [level=3] [ref=e103]
+          - paragraph [ref=e104]: Tiếp nhận mẫu và theo dõi tiến độ
+          - generic [ref=e105]:
+            - generic [ref=e106]: ✓ Tiếp nhận mẫu
+            - generic [ref=e107]: ✓ Quản lý khách hàng
+            - generic [ref=e108]: ✓ Theo dõi tiến độ
+            - generic [ref=e109]: ✓ Xem báo cáo
+        - article [ref=e110]:
+          - generic [ref=e111]: ⚗
+          - heading "Kỹ thuật viên" [level=3] [ref=e112]
+          - paragraph [ref=e113]: Xử lý phân tích và cập nhật kết quả
+          - generic [ref=e114]:
+            - generic [ref=e115]: ✓ Xem mẫu được giao
+            - generic [ref=e116]: ✓ Cập nhật kết quả
+            - generic [ref=e117]: ✓ Quản lý thiết bị
+            - generic [ref=e118]: ✓ Xem hướng dẫn kỹ thuật
+    - generic [ref=e119]:
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - paragraph [ref=e122]: Danh sách tài khoản
+          - heading "Đội ngũ CFC Lab" [level=2] [ref=e123]
+        - button "↻ Làm mới" [ref=e124] [cursor=pointer]
+      - table [ref=e126]:
+        - rowgroup [ref=e134]:
+          - row [ref=e192]:
+            - cell "Nhân viên Q Quản trị viên nguyentrungthuan417@gmail.com" [ref=e193]:
+              - text: Nhân viên
+              - generic [ref=e137]:
+                - generic [ref=e138]: Q
+                - generic [ref=e139]:
+                  - strong [ref=e140]: Quản trị viên
+                  - generic [ref=e141]: nguyentrungthuan417@gmail.com
+            - cell "Vai trò Quản trị viên" [ref=e194]:
+              - text: Vai trò
+              - generic [ref=e195]: Quản trị viên
+            - cell [ref=e196]:
+              - text: Trạng thái
+              - generic [ref=e144]: Đang hoạt động
+            - cell "Cập nhật Vừa cập nhật" [ref=e197]
+            - cell [ref=e198]:
+              - text: Thao tác
+              - generic [ref=e148]:
+                - button "Sửa quyền" [ref=e149] [cursor=pointer]
+                - button "Khóa" [disabled] [ref=e150]
+  - generic [ref=e151]:
+    - generic [ref=e152]:
+      - generic [ref=e153]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e162] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e163]:
+            - strong [ref=e164]: CFC CÒ BAY
+            - generic [ref=e165]: Agriculture & Technology
+        - paragraph [ref=e166]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e167] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e168]: ↗
+      - generic [ref=e169]:
+        - generic [ref=e170]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e171]
+          - generic [ref=e172]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e173]:
+            - link "1900 5307" [ref=e174] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e175] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e176]:
+          - heading "Về CFC" [level=2] [ref=e177]
+          - link "Giới thiệu" [ref=e178] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e179] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e180] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e181]:
+          - heading "Hỗ trợ" [level=2] [ref=e182]
+          - link "Tìm kiếm" [ref=e183] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e184] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e185] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e186]:
+      - generic [ref=e187]: © 2026 CFC Cò Bay
+      - generic [ref=e188]: CFC Lab Management — hệ thống nội bộ

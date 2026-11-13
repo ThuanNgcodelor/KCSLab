@@ -8,7 +8,7 @@
 - Đã hoàn thành: auth email/session/CSRF; quản lý tài khoản; phiếu tiếp nhận 3; phiếu chuyển mẫu 4; biên bản thử nghiệm 5 đến bước kiểm tra/trả lại.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
 - Frontend mở từng route theo role: `ADMIN` quản lý user/review; `ADMIN|RECEPTIONIST` tiếp nhận; `ADMIN|TECHNICIAN` thử nghiệm. Quyền transfer cho ba role theo cấu hình hiện tại.
-- UI dùng tone sáng CFC, logo từ `guideline-assets/cfc-008.png`; sidebar cố định theo viewport, mobile drawer và footer liên kết website CFC.
+- UI dùng tone sáng CFC, logo từ `guideline-assets/cfc-008.png`; admin shell fluid tối đa 1680px, sidebar cố định ở desktop và chuyển drawer từ 1080px trở xuống, typography tăng trên màn 2K; footer liên kết website CFC.
 
 ## Luồng đã chạy
 
@@ -35,7 +35,7 @@
 - Backend `mvn test` trong Docker Maven/JDK 21: pass.
 - Frontend `npm run build`: pass.
 - Playwright/MySQL: login, intake, transfer, tạo/submit/review biên bản 5 và đồng bộ trạng thái mẫu: pass.
-- Mobile 390px và desktop 1440px: không horizontal overflow; menu mở/đóng, sidebar đúng viewport, footer/logo hiển thị; console không có lỗi.
+- Responsive 390px, 1024px, 1440px và 2560px: không horizontal overflow; menu/sidebar đổi đúng breakpoint, footer/logo hiển thị; console không có lỗi.
 - Có unit test service cho transfer và testing lifecycle; chưa có bộ integration/Testcontainers hoàn chỉnh.
 
 ## Việc tiếp theo
