@@ -1,5 +1,14 @@
 # Architecture Decisions
 
+## 13/11/2026 — Mã mẫu, hồ sơ nguồn và Phiếu kết quả
+
+- Phân biệt ba định danh: mã hồ sơ tiếp nhận, mã mẫu và số Phiếu kết quả; không dùng chung generator.
+- Người dùng đã xác nhận CFC-TN-14 là quy trình chuẩn cho mã mẫu `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`. Phiếu ví dụ dùng `PRODUCT-SOURCE-...` là sai lệch tài liệu, không phải contract cho generator.
+- Ngày trong mã là business date `Asia/Ho_Chi_Minh`; timestamp audit vẫn lưu UTC.
+- Không dùng `COUNT(*) + 1` để cấp sequence; triển khai counter/locking nguyên tử và unique constraint.
+- PDF phát hành phải lấy từ dữ liệu hồ sơ nguồn có cấu trúc và snapshot bất biến. Hoàn thiện `-V/-R`, đối chiếu hai người và lịch sử mã là prerequisite của release.
+- Quy trình đầy đủ và acceptance criteria nằm tại `docs/SAMPLE_CODING.md`.
+
 ## 13/11/2026 — Responsive contract cho Admin UI
 
 - Admin page dùng shell chung `admin-page`; các shell cũ `dashboard-page`, `staff-page`, `intake-page` giữ tương thích.

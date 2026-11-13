@@ -5,7 +5,7 @@
 ## Hiện trạng
 
 - Ứng dụng đang chạy theo modular monolith: Spring Boot 4.1.2/Java 21 ở `source/be`, React 19/Vite 6/JSX ở `source/fe`, MySQL 8.4 cho profile `mysql`.
-- Đã hoàn thành: auth email/session/CSRF; quản lý tài khoản; phiếu tiếp nhận 3; phiếu chuyển mẫu 4; biên bản thử nghiệm 5 đến bước kiểm tra/trả lại.
+- Đã hoàn thành vertical slice: auth email/session/CSRF, user, phiếu 3, phiếu 4 và biên bản 5 đến kiểm tra/trả lại. CFC-TN-14 đã được xác nhận là quy trình chuẩn; runtime hiện mới có mã gốc, chưa đủ `-V/-R`, QC/mã mù và xác minh độc lập.
 - Ranh giới runtime hiện tại là `TEST_REVIEWED`; chưa có `result_releases`, PDF phát hành, thu hồi/đính chính hoặc tra cứu khách.
 - Dashboard Admin đang dùng số liệu/hoạt động mẫu hard-code; không xem đây là báo cáo vận hành thật.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
@@ -42,9 +42,9 @@
 
 ## Việc tiếp theo
 
-1. Chặn người phân tích tự kiểm tra/tự phát hành; mặc định MVP dùng Admin kiểm tra/phát hành bằng tài khoản khác analyst nếu LAB chưa chốt role chuyên biệt.
-2. Triển khai `result_releases`, version/checksum và PDF bất biến.
-3. Sau đó triển khai tra cứu khách bằng mã + đuôi số điện thoại, chỉ trả dữ liệu đã phát hành.
+1. Hoàn thiện gate mã hóa trong `docs/SAMPLE_CODING.md`: hồ sơ nguồn, sequence nguyên tử/ngày Việt Nam, `-V/-R`, xác minh hai người, QC/mã mù.
+2. Chặn người phân tích tự kiểm tra/tự phát hành; mặc định MVP dùng Admin khác analyst nếu LAB chưa chốt role chuyên biệt.
+3. Triển khai `result_releases`, version/checksum và PDF bất biến; sau đó mới làm tra cứu khách.
 4. Trước production: migration tool, object storage/backup, audit log, rate limit và integration tests.
 
 ## Cách nạp ngữ cảnh tiết kiệm token

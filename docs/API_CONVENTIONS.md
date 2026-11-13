@@ -26,6 +26,10 @@
 | GET/POST | `/api/v1/receipts` | Tối đa 50 phiếu mới nhất/tạo phiếu theo biểu mẫu 3 | Đã triển khai |
 | GET | `/api/v1/receipts/{id}` | Xem phiếu theo ID | Đã triển khai |
 | POST | `/api/v1/receipts/{id}/attachments` | Lưu file và metadata/checksum phiếu giấy | Đã triển khai |
+| POST | `/api/v1/receipts/{id}/coding` | Cấp mã mẫu nguyên tử sau khi hồ sơ/mẫu được chấp nhận | Đề xuất theo CFC-TN-14 |
+| POST | `/api/v1/samples/{id}/coding-verification` | Người thứ hai xác minh nhãn, phiếu nguồn và bản ghi | Đề xuất theo CFC-TN-14 |
+| POST | `/api/v1/samples/{id}/parts` | Sinh phần nền `-V/-R` từ mã gốc | Đề xuất theo CFC-TN-14 |
+| GET | `/api/v1/samples/{id}/label` | Tạo/in nhãn mẫu; ghi nhận actor in nhãn | Đề xuất |
 | GET/POST | `/api/v1/transfers` | Danh sách/lập phiếu chuyển mẫu theo biểu mẫu 4 | Đã triển khai |
 | GET | `/api/v1/transfers/{id}` | Chi tiết phiếu chuyển mẫu | Đã triển khai |
 | POST | `/api/v1/transfers/{id}/decision` | KCS/PTN chấp nhận hoặc từ chối bàn giao | Đã triển khai |
@@ -39,6 +43,8 @@
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
 
 Không có `POST /api/v1/auth/register`. Tài khoản chỉ được Admin tạo qua endpoint quản trị `/api/v1/users` sau khi đăng nhập.
+
+API coding phải tách DTO nội bộ: Receptionist/Admin được xem mapping hồ sơ nguồn; Technician mặc định chỉ nhận mã mẫu, phần nền, chỉ tiêu và dữ liệu kỹ thuật cần thiết. Không trả bảng đối chiếu mã mù trong API thử nghiệm thông thường.
 
 ## Response và lỗi
 

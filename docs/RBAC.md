@@ -20,6 +20,9 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Sửa dữ liệu tiếp nhận trước khóa | ✓ | ✓ | — |
 | Lưu file phiếu 3 và hồ sơ tiếp nhận | ✓ | ✓ | — |
 | Sinh/gán mã mẫu CFC-TN-14 | ✓ | ✓ | — |
+| Xác minh mã mẫu của người khác | ✓ | ✓ theo phân công | — |
+| Xem mapping mã mẫu–khách hàng | ✓ | ✓ | — mặc định |
+| Xem bảng đối chiếu mã mù | ? | ? theo ủy quyền | — trước mở mù |
 | Lập phiếu chuyển mẫu 4 | ✓ | ✓ | ? |
 | Xác nhận bàn giao mẫu | ✓ | ✓ | ✓ theo phân công |
 | Lập biên bản thử nghiệm 5 | ✓ | — | ✓ |
@@ -38,6 +41,8 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Xem audit log | ✓ | ? | ? |
 
 Nguyên tắc: người nhập không mặc định được duyệt kết quả của chính mình; quyền chuyên môn của Admin không tự động được giả định; không xóa vật lý dữ liệu đã tạo lịch sử, ưu tiên vô hiệu hóa/đính chính có audit.
+
+Người gán mã không được tự xác minh mã của chính mình. Mẫu chưa xác minh không được chuyển phòng thử nghiệm. Kỹ thuật viên chỉ dùng mã mẫu trên hồ sơ trung gian và dữ liệu thiết bị; thông tin khách/mapping mã gốc chỉ mở khi có quyền nghiệp vụ. Trưởng/Phó phòng QLCLSP kiểm soát, phê duyệt thay đổi và lưu hồ sơ mã hóa theo CFC-TN-14.
 
 ## Quyền tra cứu khách hàng
 

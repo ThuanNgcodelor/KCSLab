@@ -1,7 +1,7 @@
 # CFC LAB MANAGEMENT 2026 — KẾ HOẠCH VÀ ĐẶC TẢ SƠ BỘ
 
 **Tên dự án:** CFC Lab Management – Hệ thống quản lý mẫu thử nghiệm và tra cứu kết quả trực tuyến  
-**Phiên bản tài liệu:** 1.4 – Cập nhật trạng thái đến biên bản thử nghiệm và kế hoạch phát hành kết quả
+**Phiên bản tài liệu:** 1.5 – Bổ sung quy trình hồ sơ nguồn, mã hóa mẫu và gate phát hành
 **Ngày lập:** 11/11/2026  
 **Đơn vị đề xuất:** Bộ phận CNTT/AI & Automation (đề xuất)  
 **Đơn vị nghiệp vụ phối hợp:** Phòng LAB, bộ phận quản lý chất lượng và các đơn vị liên quan  
@@ -20,11 +20,13 @@
 
 > **Addendum báo cáo hiện hành 5 (13/11/2026):** Ranh giới runtime hiện tại dừng ở biên bản `TEST_REVIEWED`; chưa có bảng/API `result_releases`, PDF phát hành, thu hồi/đính chính hoặc cổng tra cứu khách. Dashboard quản trị hiện là giao diện mẫu với số liệu hard-code, không phải báo cáo vận hành. Responsive Admin UI đã được chuẩn hóa cho 390/1024/1440/2560px. Gate đầu tiên của Giai đoạn 5 là chặn người phân tích tự kiểm tra/tự phát hành, sau đó mới triển khai snapshot kết quả, version PDF và checksum bất biến. Báo cáo chi tiết và thứ tự công việc nằm tại `plans/CURRENT.md`.
 
+> **Addendum mã hóa 6 (13/11/2026):** Đã đối chiếu mẫu `1. Phiếu KQKN-DV.docx`, phiếu kết quả đã điền và CFC-TN-14. Người dùng xác nhận CFC-TN-14 là quy trình chuẩn, do đó mã mẫu cố định theo `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`; thứ tự ngược trên phiếu ví dụ là sai lệch cần rà soát, không dùng để đổi generator. Trước phát hành PDF phải hoàn thiện hồ sơ nguồn, sequence nguyên tử theo ngày Việt Nam, phần nền `-V/-R`, QC/mã mù, xác minh độc lập, Sổ theo dõi và lịch sử hiệu chỉnh. Chi tiết tại `docs/SAMPLE_CODING.md`.
+
 ### Quy trình nghiệp vụ đã xác nhận
 
 1. **Tiếp nhận:** người giao mang mẫu sầu riêng và phiếu giấy theo biểu mẫu 3; nhân viên tiếp nhận kiểm tra thông tin, tình trạng, bao bì/niêm phong, vận chuyển/bảo quản, chỉ tiêu và thời hạn.
 2. **Lập hồ sơ số:** nhân viên lưu bản scan/chụp phiếu giấy, nhập hồ sơ trên hệ thống, ghi người giao/người nhận/thời điểm và quyết định chấp nhận, chấp nhận có điều kiện hoặc từ chối.
-3. **Mã hóa mẫu:** hệ thống sinh mã duy nhất theo CFC-TN-14, không chứa thông tin nhạy cảm và không đổi trong suốt vòng đời mẫu. Mã mẫu chuẩn gồm `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE` (ví dụ `CT001-SR-23092026-001`); phần nền dùng hậu tố `-V` (vỏ) hoặc `-R` (ruột/thịt). Mẫu QC dùng hậu tố riêng như `-BL`, `-SP`, `-D`.
+3. **Mã hóa mẫu:** hệ thống sinh mã duy nhất theo CFC-TN-14, không chứa thông tin nhạy cảm và không đổi trong suốt vòng đời mẫu. Mã mẫu chuẩn gồm `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE` (ví dụ `CT001-SR-23092026-001`); phần nền dùng hậu tố `-V` (vỏ) hoặc `-R` (ruột/thịt). Mẫu QC dùng quy ước riêng `BL`, `SP`, `D` kèm ngày/mức nồng độ theo loại QC.
 4. **Chuyển mẫu lên phòng KCS/PTN:** nhân viên lập phiếu chuyển mẫu theo biểu mẫu 4, liên kết các mã mẫu, khối lượng, số lượng, tình trạng, chỉ tiêu, phương pháp, ngày chuyển, hạn trả kết quả và lưu/hoàn mẫu.
 5. **Thử nghiệm:** phòng phân tích lập biên bản thử nghiệm theo biểu mẫu 5; lưu người phân tích, người kiểm tra, thiết bị/serial/calibration, hóa chất, đường chuẩn, QC, raw data, kết quả và độ lệch.
 6. **Phê duyệt và phát hành:** kết quả phải qua kiểm tra/duyệt trước khi công bố. Phiếu kết quả có phiên bản, người duyệt, thời điểm phát hành và PDF bất biến logic.

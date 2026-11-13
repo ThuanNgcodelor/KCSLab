@@ -2,6 +2,11 @@
 
 ## 2026-11-13
 
+- Xác nhận `CFC14Quy trình mã hóa mẫu trái cây.doc` là quy trình chuẩn: khóa cấu trúc `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`, coi thứ tự ngược trên phiếu ví dụ là sai lệch cần rà soát.
+- Bổ sung trách nhiệm tiếp nhận/đối chiếu/kiểm nghiệm/QLCLSP, nhãn không phai, Sổ theo dõi, lưu riêng mã mù và hiệu chỉnh append-only vào coding plan.
+- Phân tích `1. Phiếu KQKN-DV.docx`, phiếu kết quả đã điền và CFC-TN-14; tách mã hồ sơ, mã mẫu và số phiếu kết quả.
+- Thêm `docs/SAMPLE_CODING.md`; phát hiện mâu thuẫn `SOURCE-PRODUCT`/`PRODUCT-SOURCE`, thiếu `-V/-R`, QC/mã mù, xác minh hai người và dữ liệu hồ sơ nguồn.
+- Chuyển kế hoạch trước release sang gate 5A: thay `COUNT + 1`/ngày UTC bằng sequence nguyên tử theo ngày Việt Nam, hoàn thiện truy xuất mã rồi mới tạo PDF.
 - Cập nhật báo cáo sơ bộ hiện hành: xác nhận runtime dừng tại `TEST_REVIEWED`, dashboard còn dữ liệu mẫu và giai đoạn release/PDF chưa có code.
 - Bổ sung rủi ro ưu tiên: `TestingRecordService.review` chưa chặn analyst tự kiểm tra; đưa tách người nhập–người duyệt thành gate đầu tiên của Giai đoạn 5.
 - Chuẩn hóa responsive Admin UI: shell fluid tối đa 1680px, drawer từ 1080px, tỷ lệ riêng cho màn 2K và checklist viewport 390/1024/1440/2560px.
