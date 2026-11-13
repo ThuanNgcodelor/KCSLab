@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
+import cfcLogo from '../../../../../../guideline-assets/cfc-008.png';
 
 function Icon({ name }) {
   const paths = {
@@ -19,19 +20,20 @@ export function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isAdmin = user?.role === 'ADMIN';
   const canReceive = isAdmin || user?.role === 'RECEPTIONIST';
+  const canTest = isAdmin || user?.role === 'TECHNICIAN';
   const roleLabel = { ADMIN: 'Quản trị viên', RECEPTIONIST: 'Nhân viên tiếp nhận', TECHNICIAN: 'Kỹ thuật viên' }[user?.role] ?? 'Nhân viên';
 
   return (
     <div className="admin-shell">
       <aside className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-brand"><span className="brand-orbit">CFC</span><div><strong>CFC Lab</strong><small>Management system</small></div></div>
+        <div className="sidebar-brand"><img className="sidebar-logo" src={cfcLogo} alt="" width="38" height="38" /><div><strong>CFC Lab</strong><small>Management system</small></div></div>
         <div className="sidebar-section-label">Không gian quản trị</div>
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
           <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>
           {isAdmin && <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
           {canReceive && <NavLink to="/admin/intake" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}
           <NavLink to="/admin/transfers" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>Chuyển mẫu</span></NavLink>
-          <a className="nav-item disabled" href="#modules" onClick={(event) => event.preventDefault()}><Icon name="flask" /><span>Quản lý phòng lab</span><small>Sắp tới</small></a>
+          {canTest && <NavLink to="/admin/testing" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Thử nghiệm</span></NavLink>}
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
         <nav className="admin-nav">
@@ -39,7 +41,48 @@ export function AdminLayout() {
         </nav>
         <div className="sidebar-bottom"><div className="sidebar-status"><span className="pulse-dot" />Hệ thống hoạt động</div><button className="sidebar-profile" onClick={() => navigate(isAdmin ? '/admin/users' : '/admin/transfers')}><span className="avatar">{(user?.displayName ?? 'A').slice(0, 1)}</span><span><strong>{user?.displayName ?? roleLabel}</strong><small>{roleLabel}</small></span><span className="profile-more">•••</span></button><button className="sidebar-logout" onClick={signOut}>Đăng xuất</button></div>
       </aside>
-      <main className="admin-main"><div className="mobile-nav-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><span className="brand-orbit">CFC</span>CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}>{mobileOpen ? '×' : '☰'}</button></div>{mobileOpen && <button className="mobile-nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}<Outlet /></main>
+      <main className="admin-main"><div className="mobile-nav-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><img className="mobile-logo" src={cfcLogo} alt="" width="30" height="30" />CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}>{mobileOpen ? '×' : '☰'}</button></div>{mobileOpen && <button className="mobile-nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}<div className="admin-content"><Outlet /></div><AdminFooter /></main>
     </div>
   );
+}
+
+function AdminFooter() {
+  return (
+    <footer className="admin-footer">
+      <div className="footer-frame">
+        <section className="footer-identity">
+          <div className="footer-spectrum" aria-hidden="true">
+            <i /><i /><i /><i /><i /><i /><i />
+          </div>
+          <a className="footer-brand" href="https://www.cfccobay.com/" target="_blank" rel="noreferrer">
+            <img className="footer-logo" src={cfcLogo} alt="" width="42" height="42" loading="lazy" />
+            <span><strong>CFC CÒ BAY</strong><small>Agriculture &amp; Technology</small></span>
+          </a>
+          <p>Từ một mẫu thử đến một quyết định đáng tin cậy.</p>
+          <a className="footer-website" href="https://www.cfccobay.com/" target="_blank" rel="noreferrer">
+            Khám phá CFC Cò Bay <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+
+        <div className="footer-directory">
+          <section className="footer-contact">
+            <h2>Liên hệ phòng LAB</h2>
+            <address>Công ty CP Phân bón &amp; Hóa chất Cần Thơ<br />Trục Chính Khu Công Nghiệp Trà Nóc 1,<br />phường Thới An Đông, thành phố Cần Thơ</address>
+            <div><a href="tel:19005307">1900 5307</a><a href="mailto:info@cfccobay.com">info@cfccobay.com</a></div>
+          </section>
+          <FooterLinks title="Về CFC" links={[['Giới thiệu', '/gioi-thieu'], ['Tin doanh nghiệp', '/tin-tuc'], ['Khảo nghiệm đồng ruộng', '/khao-nghiem-dong-ruong']]} />
+          <FooterLinks title="Hỗ trợ" links={[['Tìm kiếm', '/search'], ['Liên hệ', '/lien-he'], ['Chính sách', '/chinh-sach']]} />
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <span>© 2026 CFC Cò Bay</span>
+        <span>CFC Lab Management — hệ thống nội bộ</span>
+      </div>
+    </footer>
+  );
+}
+
+function FooterLinks({ title, links }) {
+  return <section className="footer-links"><h2>{title}</h2>{links.map(([label, path]) => <a key={path} href={`https://www.cfccobay.com${path}`} target="_blank" rel="noreferrer">{label}</a>)}</section>;
 }

@@ -43,6 +43,9 @@ public class Sample {
     public void markTransferPending() { this.status = ReceiptStatus.TRANSFER_PENDING; }
     public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; }
     public void markTransferRejected() { this.status = ReceiptStatus.RECEIVED; }
+    public void markInTesting() { this.status = ReceiptStatus.IN_TESTING; }
+    public void markAwaitingReview() { this.status = ReceiptStatus.AWAITING_REVIEW; }
+    public void markTestReviewed() { this.status = ReceiptStatus.TEST_REVIEWED; }
     public Long getId() { return id; }
     public String getSampleCode() { return sampleCode; }
     public String getSourceCode() { return sourceCode; }

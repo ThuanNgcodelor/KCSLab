@@ -6,6 +6,14 @@
 - CodeGraph được dùng trước grep/read cho câu hỏi về source; tài liệu chuyên biệt chỉ đọc khi task cần.
 - Changelog và toàn bộ skill references không được nạp mặc định để tránh tốn token.
 
+## 13/11/2026 — Transfer, testing và giao diện CFC
+
+- Phiếu 4 được lưu bằng `sample_transfers` + `sample_transfer_items`; quyết định nhận/từ chối nằm trên transfer, chưa tách bảng custody event tổng quát.
+- Mỗi transfer item có tối đa một biên bản thử nghiệm; biên bản chứa collections thiết bị, hóa chất và measurement QC/raw.
+- Technician/Admin lập và submit; Admin kiểm tra hoặc trả lại. Đây là quyền runtime tạm thời cho đến khi LAB chốt role reviewer chuyên biệt.
+- Admin UI dùng nền trắng ngà, xanh nhạt cho trạng thái và xanh CFC cho hành động; logo chuẩn dùng asset có sẵn thay cho huy hiệu chữ tạm.
+- Frontend mặc định gọi API cùng origin qua Vite proxy để chạy được bằng localhost hoặc IP LAN mà không hard-code địa chỉ máy.
+
 ## 12/11/2026 — Stack và cấu trúc đã chốt
 
 - Java 21 + Spring Boot 4.1.2 + Maven; React 19 + Vite 6 + JSX; MySQL profile cho dữ liệu thực.

@@ -1,0 +1,277 @@
+- generic [ref=f1e4]:
+  - complementary [ref=f1e5]:
+    - generic [ref=f1e6]:
+      - generic [ref=f1e7]: CFC
+      - generic [ref=f1e8]:
+        - strong [ref=f1e9]: CFC Lab
+        - generic [ref=f1e10]: Management system
+    - generic [ref=f1e11]: Không gian quản trị
+    - navigation "Điều hướng quản trị" [ref=f1e12]:
+      - link "Tổng quan" [ref=f1e13] [cursor=pointer]:
+        - /url: /admin
+      - link "Nhân viên" [ref=f1e17] [cursor=pointer]:
+        - /url: /admin/users
+      - link "Tiếp nhận mẫu" [ref=f1e21] [cursor=pointer]:
+        - /url: /admin/intake
+      - link "Chuyển mẫu" [ref=f1e25] [cursor=pointer]:
+        - /url: /admin/transfers
+      - link "Thử nghiệm" [ref=f1e29] [cursor=pointer]:
+        - /url: /admin/testing
+    - generic [ref=f1e33]: Hệ thống
+    - navigation [ref=f1e34]:
+      - link "Cài đặt chung" [ref=f1e35]:
+        - /url: "#settings"
+    - generic [ref=f1e39]:
+      - generic [ref=f1e40]: Hệ thống hoạt động
+      - button "Q Quản trị viên Quản trị viên •••" [ref=f1e42] [cursor=pointer]:
+        - generic [ref=f1e43]: Q
+        - generic [ref=f1e44]:
+          - strong [ref=f1e45]: Quản trị viên
+          - generic [ref=f1e46]: Quản trị viên
+        - generic [ref=f1e47]: •••
+      - button "Đăng xuất" [ref=f1e48] [cursor=pointer]
+  - main [ref=f1e49]:
+    - generic [ref=f1e111]:
+      - generic [ref=f1e113]:
+        - button "← Danh sách biên bản" [ref=f1e114] [cursor=pointer]
+        - paragraph [ref=f1e115]: Biên bản số 5
+        - heading "Lập biên bản thử nghiệm" [level=1] [ref=f1e116]
+        - paragraph [ref=f1e117]: Ghi lại dữ liệu chuyên môn có thể truy xuất và kiểm tra.
+      - generic [ref=f1e118]:
+        - main [ref=f1e119]:
+          - generic [ref=f1e120]:
+            - generic [ref=f1e121]:
+              - generic [ref=f1e122]: I
+              - generic [ref=f1e123]:
+                - heading "Thông tin chung" [level=2] [ref=f1e124]
+                - paragraph [ref=f1e125]: Mẫu, thời gian và người thực hiện.
+            - generic [ref=f1e126]:
+              - text: Mẫu đã bàn giao
+              - combobox "Mẫu đã bàn giao" [ref=f1e127]:
+                - option "CT001-SR-12112026-001 — Sầu riêng kiểm thử Playwright (CM-20261113-B0854D)" [selected]
+            - generic [ref=f1e128]:
+              - generic [ref=f1e129]:
+                - generic [ref=f1e130]: Phiếu yêu cầu
+                - strong [ref=f1e131]: TN-20261112-F901E9
+              - generic [ref=f1e132]:
+                - generic [ref=f1e133]: Chỉ tiêu
+                - strong [ref=f1e134]: Auramine O, Cadimi (Cd)
+              - generic [ref=f1e135]:
+                - generic [ref=f1e136]: Phương pháp
+                - strong [ref=f1e137]: CFC-TN-01 / TCVN
+              - generic [ref=f1e138]:
+                - generic [ref=f1e139]: Hạn trả
+                - strong [ref=f1e140]: 20/11/2026
+            - generic [ref=f1e141]:
+              - generic [ref=f1e142]:
+                - text: Bắt đầu thử nghiệm
+                - textbox "Bắt đầu thử nghiệm" [ref=f1e143]
+              - generic [ref=f1e144]:
+                - text: Kết thúc thử nghiệm
+                - textbox "Kết thúc thử nghiệm" [ref=f1e145]
+              - generic [ref=f1e146]:
+                - text: Ghi chú người phân tích
+                - textbox "Ghi chú người phân tích" [ref=f1e147]:
+                  - /placeholder: Tình trạng mẫu, thao tác đặc biệt hoặc sai lệch
+          - generic [ref=f1e148]:
+            - generic [ref=f1e149]:
+              - generic [ref=f1e150]: II
+              - generic [ref=f1e151]:
+                - heading "Thiết bị phân tích" [level=2] [ref=f1e152]
+                - paragraph [ref=f1e153]: Mã hiệu và tình trạng hiệu chuẩn dùng cho phép thử.
+            - generic [ref=f1e154]:
+              - generic [ref=f1e155]:
+                - strong [ref=f1e156]: Thiết bị 1
+                - button "Xóa" [ref=f1e157] [cursor=pointer]
+              - generic [ref=f1e158]:
+                - generic [ref=f1e159]:
+                  - text: Tên thiết bị
+                  - textbox "Tên thiết bị" [ref=f1e160]:
+                    - /placeholder: ICP-MS
+                - generic [ref=f1e161]:
+                  - text: Mã hiệu / Serial
+                  - textbox "Mã hiệu / Serial" [ref=f1e162]
+                - generic [ref=f1e163]:
+                  - text: Nhà sản xuất
+                  - textbox "Nhà sản xuất" [ref=f1e164]
+                - generic [ref=f1e165]:
+                  - text: Mã nhận dạng
+                  - textbox "Mã nhận dạng" [ref=f1e166]
+                - generic [ref=f1e167]:
+                  - text: Ngày hiệu chuẩn
+                  - textbox "Ngày hiệu chuẩn" [ref=f1e168]
+            - button "＋ Thêm thiết bị" [ref=f1e169] [cursor=pointer]
+          - generic [ref=f1e170]:
+            - generic [ref=f1e171]:
+              - generic [ref=f1e172]: III
+              - generic [ref=f1e173]:
+                - heading "Hóa chất và thuốc thử" [level=2] [ref=f1e174]
+                - paragraph [ref=f1e175]: Nguồn gốc, ngày pha, hạn dùng và điều kiện bảo quản.
+            - generic [ref=f1e176]:
+              - generic [ref=f1e177]:
+                - strong [ref=f1e178]: Hóa chất 1
+                - button "Xóa" [ref=f1e179] [cursor=pointer]
+              - generic [ref=f1e180]:
+                - generic [ref=f1e181]:
+                  - text: Tên hóa chất
+                  - textbox "Tên hóa chất" [ref=f1e182]
+                - generic [ref=f1e183]:
+                  - text: Mã hóa chất
+                  - textbox "Mã hóa chất" [ref=f1e184]
+                - generic [ref=f1e185]:
+                  - text: Nước sản xuất
+                  - textbox "Nước sản xuất" [ref=f1e186]
+                - generic [ref=f1e187]:
+                  - text: Nồng độ
+                  - textbox "Nồng độ" [ref=f1e188]
+                - generic [ref=f1e189]:
+                  - text: Ngày pha
+                  - textbox "Ngày pha" [ref=f1e190]
+                - generic [ref=f1e191]:
+                  - text: Hạn sử dụng
+                  - textbox "Hạn sử dụng" [ref=f1e192]
+                - generic [ref=f1e193]:
+                  - text: Bảo quản
+                  - textbox "Bảo quản" [ref=f1e194]
+            - button "＋ Thêm hóa chất" [ref=f1e195] [cursor=pointer]
+          - generic [ref=f1e196]:
+            - generic [ref=f1e197]:
+              - generic [ref=f1e198]: IV–V
+              - generic [ref=f1e199]:
+                - heading "Đường chuẩn và công thức" [level=2] [ref=f1e200]
+                - paragraph [ref=f1e201]: Ghi nội dung áp dụng cho lần thử nghiệm này.
+            - generic [ref=f1e202]:
+              - text: Đường chuẩn
+              - textbox "Đường chuẩn" [ref=f1e203]:
+                - /placeholder: Phương trình, hệ số tương quan, khoảng tuyến tính…
+            - generic [ref=f1e204]:
+              - text: Công thức tính
+              - textbox "Công thức tính" [ref=f1e205]:
+                - /placeholder: Công thức và diễn giải các biến
+          - generic [ref=f1e206]:
+            - generic [ref=f1e207]:
+              - generic [ref=f1e208]: VI
+              - generic [ref=f1e209]:
+                - heading "Đảm bảo chất lượng" [level=2] [ref=f1e210]
+                - paragraph [ref=f1e211]: Số liệu mẫu QC thực hiện cùng quy trình.
+            - generic [ref=f1e212]:
+              - generic [ref=f1e213]:
+                - strong [ref=f1e214]: Lần lặp 1
+                - button "Xóa" [ref=f1e215] [cursor=pointer]
+              - generic [ref=f1e216]:
+                - generic [ref=f1e217]:
+                  - text: Lần lặp
+                  - textbox "Lần lặp" [ref=f1e218]: "1"
+                - generic [ref=f1e219]:
+                  - text: Lượng mẫu
+                  - textbox "Lượng mẫu" [ref=f1e220]
+                - generic [ref=f1e221]:
+                  - text: Thể tích định mức
+                  - textbox "Thể tích định mức" [ref=f1e222]
+                - generic [ref=f1e223]:
+                  - text: Hệ số pha loãng
+                  - textbox "Hệ số pha loãng" [ref=f1e224]
+                - generic [ref=f1e225]:
+                  - text: Nồng độ phân tích
+                  - textbox "Nồng độ phân tích" [ref=f1e226]
+                - generic [ref=f1e227]:
+                  - text: KQ / lần
+                  - textbox "KQ / lần" [ref=f1e228]
+                - generic [ref=f1e229]:
+                  - text: Kết quả
+                  - textbox "Kết quả" [ref=f1e230]
+                - generic [ref=f1e231]:
+                  - text: Độ lệch
+                  - textbox "Độ lệch" [ref=f1e232]
+            - button "＋ Thêm lần lặp" [ref=f1e233] [cursor=pointer]
+          - generic [ref=f1e234]:
+            - generic [ref=f1e235]:
+              - generic [ref=f1e236]: VII
+              - generic [ref=f1e237]:
+                - heading "Số liệu thực nghiệm" [level=2] [ref=f1e238]
+                - paragraph [ref=f1e239]: Dữ liệu đo và kết quả theo từng lần lặp.
+            - generic [ref=f1e240]:
+              - generic [ref=f1e241]:
+                - strong [ref=f1e242]: Lần lặp 1
+                - button "Xóa" [ref=f1e243] [cursor=pointer]
+              - generic [ref=f1e244]:
+                - generic [ref=f1e245]:
+                  - text: Lần lặp
+                  - textbox "Lần lặp" [ref=f1e246]: "1"
+                - generic [ref=f1e247]:
+                  - text: Lượng mẫu
+                  - textbox "Lượng mẫu" [ref=f1e248]
+                - generic [ref=f1e249]:
+                  - text: Thể tích định mức
+                  - textbox "Thể tích định mức" [ref=f1e250]
+                - generic [ref=f1e251]:
+                  - text: Hệ số pha loãng
+                  - textbox "Hệ số pha loãng" [ref=f1e252]
+                - generic [ref=f1e253]:
+                  - text: Nồng độ phân tích
+                  - textbox "Nồng độ phân tích" [ref=f1e254]
+                - generic [ref=f1e255]:
+                  - text: KQ / lần
+                  - textbox "KQ / lần" [ref=f1e256]
+                - generic [ref=f1e257]:
+                  - text: Kết quả
+                  - textbox "Kết quả" [ref=f1e258]
+                - generic [ref=f1e259]:
+                  - text: Độ lệch
+                  - textbox "Độ lệch" [ref=f1e260]
+            - button "＋ Thêm lần lặp" [ref=f1e261] [cursor=pointer]
+        - complementary [ref=f1e262]:
+          - generic [ref=f1e263]:
+            - generic [ref=f1e264]:
+              - generic [ref=f1e265]: QC
+              - generic [ref=f1e266]:
+                - heading "Đánh giá chất lượng" [level=2] [ref=f1e267]
+                - paragraph [ref=f1e268]: Tóm tắt hiệu suất thu hồi và biểu đồ kiểm soát.
+            - generic [ref=f1e269]:
+              - text: Hiệu suất thu hồi (%)
+              - spinbutton "Hiệu suất thu hồi (%)" [ref=f1e270]
+            - generic [ref=f1e271]:
+              - text: Biểu đồ / nhận xét QC
+              - textbox "Biểu đồ / nhận xét QC" [ref=f1e272]:
+                - /placeholder: Mô tả vị trí biểu đồ hoặc kết luận kiểm soát
+          - generic [ref=f1e273]:
+            - paragraph [ref=f1e274]:
+              - strong [ref=f1e275]: Tạo bản nháp
+              - generic [ref=f1e276]: Sau khi lưu, kỹ thuật viên gửi biên bản sang bước kiểm tra.
+            - button "Tạo biên bản" [ref=f1e277] [cursor=pointer]
+    - generic [ref=f1e87]:
+      - generic [ref=f1e88]:
+        - generic [ref=f1e89]:
+          - link "CFC CFC CÒ BAY" [ref=f1e90] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/
+            - generic [ref=f1e91]: CFC
+            - strong [ref=f1e92]: CFC CÒ BAY
+          - paragraph [ref=f1e93]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - link "1900 5307" [ref=f1e94] [cursor=pointer]:
+            - /url: tel:19005307
+          - link "info@cfccobay.com" [ref=f1e95] [cursor=pointer]:
+            - /url: mailto:info@cfccobay.com
+        - generic [ref=f1e96]:
+          - heading "Thông tin CFC" [level=2] [ref=f1e97]
+          - link "Giới thiệu" [ref=f1e98] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=f1e99] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=f1e100] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+          - link "Homecare / Chất tẩy rửa" [ref=f1e101] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chat-tay-rua
+        - generic [ref=f1e102]:
+          - heading "Tra cứu & hỗ trợ" [level=2] [ref=f1e103]
+          - link "Tìm kiếm" [ref=f1e104] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=f1e105] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=f1e106] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+          - link "Hướng dẫn" [ref=f1e107] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/huong-dan
+      - generic [ref=f1e108]:
+        - generic [ref=f1e109]: © CFC — Công ty Cổ phần Phân bón & Hóa chất Cần Thơ
+        - link "Mở website CFC Cò Bay ↗" [ref=f1e110] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/

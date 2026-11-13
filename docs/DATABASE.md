@@ -1,6 +1,6 @@
 # Mô hình dữ liệu
 
-**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake đã có schema; phần còn lại là target model
+**Phiên bản:** 0.4 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có schema
 
 ## Lựa chọn cơ sở dữ liệu
 
@@ -8,9 +8,9 @@ MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc 
 
 ## Bảng đã triển khai
 
-`users`, `auth_sessions`, `customers`, `receipts`, `samples`, `receipt_attachments`.
+`users`, `auth_sessions`, `customers`, `receipts`, `samples`, `receipt_attachments`, `sample_transfers`, `sample_transfer_items`, `testing_records`, `testing_equipment`, `testing_reagents`, `testing_measurements`.
 
-Các bảng history/custody/testing/result/audit trong ERD dưới đây chưa được triển khai.
+Các bảng status history/custody tổng quát/result release/audit trong ERD mục tiêu dưới đây chưa được triển khai. Custody tối thiểu hiện nằm trực tiếp trên `sample_transfers`.
 
 ## Thực thể và quan hệ
 
@@ -51,6 +51,7 @@ erDiagram
 | Receipt Attachments | Bản scan/chụp phiếu 3, phiếu 4, file giấy gốc và checksum/version |
 | Sample Custody Events | Người giao/nhận, thời điểm, nơi chuyển, tình trạng, lý do và chữ ký/bằng chứng |
 | Sample Parts | Các phần vỏ/ruột hoặc nền tách từ mã gốc; hậu tố `-V`, `-R` và liên kết mẫu cha |
+| Sample Transfers, Transfer Items | Phiếu 4, actor giao/nhận, hạn kết quả, quyết định nhận/từ chối, thông tin lưu/hoàn và snapshot mẫu bàn giao |
 | Test Records | Biên bản 5: thời gian, analyst, checker, công thức, QC, raw data và đánh giá |
 | Test Equipment, Test Reagents | Thiết bị/serial/calibration và hóa chất/code/origin/prep/expiry/storage/concentration |
 | Result Releases | Phiên bản PDF, người duyệt, thời điểm, checksum, trạng thái thu hồi/đính chính |
@@ -67,7 +68,7 @@ erDiagram
 - `sample_code` phải unique toàn hệ thống; không tái sử dụng mã kể cả khi mẫu bị hủy.
 - Công thức mã gốc đề xuất: `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`; mã phần nền thêm `-V`/`-R`; mã QC dùng hậu tố đã quy định trong CFC-TN-14.
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
-- SQL runtime đã có cho 6 bảng đầu tiên; chưa có migration versioned.
+- SQL runtime đã có cho 12 bảng nêu trên; chưa có migration versioned.
 
 ## Câu hỏi dữ liệu mở
 

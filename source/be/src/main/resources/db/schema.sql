@@ -149,3 +149,78 @@ CREATE TABLE IF NOT EXISTS sample_transfer_items (
     CONSTRAINT fk_sample_transfer_items_transfer FOREIGN KEY (transfer_id) REFERENCES sample_transfers(id),
     CONSTRAINT fk_sample_transfer_items_sample FOREIGN KEY (sample_id) REFERENCES samples(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS testing_records (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    record_code VARCHAR(40) NOT NULL,
+    transfer_item_id BIGINT NOT NULL,
+    analyst_user_id BIGINT NOT NULL,
+    checked_by_user_id BIGINT NULL,
+    analysis_start TIMESTAMP(6) NULL,
+    analysis_end TIMESTAMP(6) NULL,
+    calibration_curve TEXT NULL,
+    calculation_formula TEXT NULL,
+    recovery_percent DECIMAL(12,4) NULL,
+    qc_chart_note TEXT NULL,
+    analyst_note TEXT NULL,
+    review_note TEXT NULL,
+    status VARCHAR(30) NOT NULL,
+    submitted_at TIMESTAMP(6) NULL,
+    reviewed_at TIMESTAMP(6) NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_testing_records_code (record_code),
+    UNIQUE KEY uk_testing_records_transfer_item (transfer_item_id),
+    KEY idx_testing_records_status (status),
+    KEY idx_testing_records_analyst (analyst_user_id),
+    CONSTRAINT fk_testing_records_transfer_item FOREIGN KEY (transfer_item_id) REFERENCES sample_transfer_items(id),
+    CONSTRAINT fk_testing_records_analyst FOREIGN KEY (analyst_user_id) REFERENCES users(id),
+    CONSTRAINT fk_testing_records_checker FOREIGN KEY (checked_by_user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS testing_equipment (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    testing_record_id BIGINT NOT NULL,
+    name VARCHAR(160) NOT NULL,
+    serial_number VARCHAR(120) NULL,
+    manufacturer VARCHAR(160) NULL,
+    identification_code VARCHAR(120) NULL,
+    calibration_date DATE NULL,
+    PRIMARY KEY (id),
+    KEY idx_testing_equipment_record (testing_record_id),
+    CONSTRAINT fk_testing_equipment_record FOREIGN KEY (testing_record_id) REFERENCES testing_records(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS testing_reagents (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    testing_record_id BIGINT NOT NULL,
+    name VARCHAR(160) NOT NULL,
+    code VARCHAR(120) NULL,
+    origin VARCHAR(120) NULL,
+    preparation_date DATE NULL,
+    expiry_date DATE NULL,
+    storage_condition VARCHAR(160) NULL,
+    concentration VARCHAR(120) NULL,
+    PRIMARY KEY (id),
+    KEY idx_testing_reagents_record (testing_record_id),
+    CONSTRAINT fk_testing_reagents_record FOREIGN KEY (testing_record_id) REFERENCES testing_records(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS testing_measurements (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    testing_record_id BIGINT NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    row_order INT NOT NULL,
+    replicate VARCHAR(40) NOT NULL,
+    sample_amount VARCHAR(80) NULL,
+    final_volume VARCHAR(80) NULL,
+    dilution_factor VARCHAR(80) NULL,
+    measured_concentration VARCHAR(120) NULL,
+    result_per_replicate VARCHAR(120) NULL,
+    result VARCHAR(120) NULL,
+    deviation VARCHAR(120) NULL,
+    PRIMARY KEY (id),
+    KEY idx_testing_measurements_record_type (testing_record_id, type),
+    CONSTRAINT fk_testing_measurements_record FOREIGN KEY (testing_record_id) REFERENCES testing_records(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -11,11 +11,12 @@
 
 ## Biên module
 
-- Backend package-by-feature: `auth`, `user`, `intake`; `config` và `common` chỉ chứa cross-cutting concerns.
-- Frontend feature-based: `auth`, `users`, `intake`, `admin`; HTTP client dùng chung ở `shared/api`.
+- Backend package-by-feature: `auth`, `user`, `intake`, `transfer`, `testing`; `config` và `common` chỉ chứa cross-cutting concerns.
+- Frontend feature-based: `auth`, `users`, `intake`, `transfers`, `testing`, `admin`; HTTP client dùng chung ở `shared/api`.
 - Auth stateless bằng access JWT trong cookie; refresh token được hash và lưu server-side để rotation/revoke.
 - CSRF dùng cookie token; login và refresh được bỏ qua CSRF, các mutation đã đăng nhập gửi CSRF header.
 - Attachment dev lưu local, metadata/checksum lưu DB. Production chưa chốt object storage và backup.
+- Vite dev lắng nghe `0.0.0.0:5173`; frontend gọi `/api/v1` cùng origin và proxy `/api` đến backend để truy cập qua IP LAN không phụ thuộc hostname.
 
 ## Luồng hiện có
 

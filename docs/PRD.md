@@ -4,7 +4,7 @@
 
 ## 1. Mục tiêu và phạm vi
 
-CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Nền tảng auth/Admin và vertical slice phiếu tiếp nhận số 3 đã triển khai; phiếu 4 trở đi chưa có runtime.
+CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Runtime hiện đã đi hết vertical slice từ phiếu tiếp nhận số 3 qua phiếu chuyển mẫu số 4 đến biên bản thử nghiệm số 5 và bước kiểm tra nội bộ; phát hành PDF và tra cứu khách là phần tiếp theo.
 
 **Cập nhật nghiệp vụ 12/11/2026:** Quy trình thực tế được đối chiếu với phiếu tiếp nhận/bàn giao mẫu số 3, phiếu chuyển mẫu số 4, biên bản thử nghiệm số 5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại 00:29. Phạm vi ưu tiên được sắp lại thành: tiếp nhận phiếu giấy và số hóa hồ sơ → mã hóa mẫu → chuyển KCS/PTN → lập biên bản thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu bằng mã và phần đuôi điện thoại.
 

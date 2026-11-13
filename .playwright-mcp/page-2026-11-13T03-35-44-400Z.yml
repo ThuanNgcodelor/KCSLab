@@ -1,0 +1,18 @@
+- main [ref=f7e3]:
+  - region "Chào mừng trở lại" [ref=f7e4]:
+    - paragraph [ref=f7e6]: LAB MANAGEMENT
+    - heading "Chào mừng trở lại" [level=1] [ref=f7e7]
+    - paragraph [ref=f7e8]: Đăng nhập để làm việc trong hệ thống nội bộ.
+    - generic [ref=f7e9]:
+      - generic [ref=f7e10]:
+        - text: Email công việc
+        - textbox "Email công việc" [ref=f7e11]:
+          - /placeholder: ten@cfc.vn
+      - generic [ref=f7e12]:
+        - text: Mật khẩu
+        - textbox "Mật khẩu" [ref=f7e13]
+      - button "Đăng nhập" [ref=f7e14] [cursor=pointer]
+    - paragraph [ref=f7e15]: Chỉ tài khoản do quản trị viên tạo mới có thể truy cập.
+  - complementary [ref=f7e16]:
+    - paragraph [ref=f7e17]: QUY TRÌNH RÕ RÀNG
+    - heading "Từ tiếp nhận đến kết quả, mọi bước đều có dấu vết." [level=2] [ref=f7e18]

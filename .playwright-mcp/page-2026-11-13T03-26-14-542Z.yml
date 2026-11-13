@@ -1,0 +1,43 @@
+- main [ref=f2e4]:
+  - generic [ref=f2e5]:
+    - button "CFC CFC Lab" [ref=f2e6] [cursor=pointer]:
+      - generic [ref=f2e7]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f2e8] [cursor=pointer]: ☰
+  - paragraph [ref=f2e11]: Đang tải biên bản…
+  - generic [ref=f2e12]:
+    - generic [ref=f2e13]:
+      - generic [ref=f2e14]:
+        - link "CFC CFC CÒ BAY" [ref=f2e15] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=f2e16]: CFC
+          - strong [ref=f2e17]: CFC CÒ BAY
+        - paragraph [ref=f2e18]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+        - link "1900 5307" [ref=f2e19] [cursor=pointer]:
+          - /url: tel:19005307
+        - link "info@cfccobay.com" [ref=f2e20] [cursor=pointer]:
+          - /url: mailto:info@cfccobay.com
+      - generic [ref=f2e21]:
+        - heading "Thông tin CFC" [level=2] [ref=f2e22]
+        - link "Giới thiệu" [ref=f2e23] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/gioi-thieu
+        - link "Tin doanh nghiệp" [ref=f2e24] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/tin-tuc
+        - link "Khảo nghiệm đồng ruộng" [ref=f2e25] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - link "Homecare / Chất tẩy rửa" [ref=f2e26] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/chat-tay-rua
+      - generic [ref=f2e27]:
+        - heading "Tra cứu & hỗ trợ" [level=2] [ref=f2e28]
+        - link "Tìm kiếm" [ref=f2e29] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/search
+        - link "Liên hệ" [ref=f2e30] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/lien-he
+        - link "Chính sách" [ref=f2e31] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/chinh-sach
+        - link "Hướng dẫn" [ref=f2e32] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/huong-dan
+    - generic [ref=f2e33]:
+      - generic [ref=f2e34]: © CFC — Công ty Cổ phần Phân bón & Hóa chất Cần Thơ
+      - link "Mở website CFC Cò Bay ↗" [ref=f2e35] [cursor=pointer]:
+        - /url: https://www.cfccobay.com/

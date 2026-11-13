@@ -1,6 +1,6 @@
 # REST API conventions
 
-**Phiên bản:** 0.2 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake đã có runtime API
+**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có runtime API
 
 ## Quy ước chung
 
@@ -26,12 +26,15 @@
 | GET/POST | `/api/v1/receipts` | Tối đa 50 phiếu mới nhất/tạo phiếu theo biểu mẫu 3 | Đã triển khai |
 | GET | `/api/v1/receipts/{id}` | Xem phiếu theo ID | Đã triển khai |
 | POST | `/api/v1/receipts/{id}/attachments` | Lưu file và metadata/checksum phiếu giấy | Đã triển khai |
-| POST | `/api/v1/receipts/{id}/transfer` | Lập phiếu chuyển mẫu theo biểu mẫu 4 | Đề xuất |
+| GET/POST | `/api/v1/transfers` | Danh sách/lập phiếu chuyển mẫu theo biểu mẫu 4 | Đã triển khai |
+| GET | `/api/v1/transfers/{id}` | Chi tiết phiếu chuyển mẫu | Đã triển khai |
+| POST | `/api/v1/transfers/{id}/decision` | KCS/PTN chấp nhận hoặc từ chối bàn giao | Đã triển khai |
 | GET/POST | `/api/v1/samples` | Tìm/tạo mẫu | Đề xuất |
 | GET | `/api/v1/samples/{id}` | Chi tiết mẫu | Đề xuất |
-| POST | `/api/v1/samples/{id}/custody-events` | Ghi nhận bàn giao, tình trạng và người giao/nhận | Đề xuất |
-| GET/POST | `/api/v1/testing-records` | Lập/cập nhật biên bản thử nghiệm biểu mẫu 5 | Đề xuất |
-| POST | `/api/v1/testing-records/{id}/submit-review` | Gửi biên bản/kết quả chờ kiểm tra | Đề xuất |
+| GET/POST | `/api/v1/testing-records` | Danh sách/lập biên bản thử nghiệm biểu mẫu 5 | Đã triển khai |
+| GET/PUT | `/api/v1/testing-records/{id}` | Xem/cập nhật biên bản nháp hoặc được trả lại | Đã triển khai |
+| POST | `/api/v1/testing-records/{id}/submit` | Gửi biên bản chờ kiểm tra | Đã triển khai |
+| POST | `/api/v1/testing-records/{id}/review` | Admin kiểm tra hoàn tất hoặc trả lại | Đã triển khai |
 | POST | `/api/v1/result-releases` | Duyệt và phát hành PDF kết quả | Đề xuất |
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
 

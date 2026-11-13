@@ -2,6 +2,12 @@
 
 ## 2026-11-13
 
+- Hoàn thành phiếu chuyển mẫu số 4: schema transfer/item, API list/detail/create/decision, giao diện responsive và đồng bộ trạng thái mẫu.
+- Hoàn thành vertical slice biên bản thử nghiệm số 5: thiết bị, hóa chất, đường chuẩn/công thức, QC/raw data, submit, review/return và unit test service.
+- Thêm route `/admin/testing`, Playwright E2E đến trạng thái mẫu `TEST_REVIEWED`, frontend build và backend test pass.
+- Cố định sidebar theo viewport, thêm footer liên kết website CFC; thay huy hiệu chữ bằng logo `guideline-assets/cfc-008.png`.
+- Chuyển Admin Portal sang tone sáng CFC để tăng độ đọc; Vite nghe trên `0.0.0.0` và proxy API cùng origin để hỗ trợ IP LAN.
+- Chuyển kế hoạch hiện tại sang Giai đoạn 5 — duyệt/phát hành PDF.
 - Đồng bộ toàn bộ Project Memory theo source hiện tại; loại bỏ mô tả cũ “placeholder/chưa có runtime”.
 - Thêm `docs/ai/CONTEXT.md` làm nguồn context ngắn mặc định và đổi `AGENTS.md` sang đọc tài liệu theo nhu cầu.
 - Cập nhật architecture, API, database, RBAC, roadmap và current plan; giai đoạn tiếp theo là phiếu chuyển mẫu số 4.

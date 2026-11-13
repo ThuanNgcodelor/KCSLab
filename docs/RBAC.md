@@ -6,8 +6,10 @@
 
 - Backend `/api/v1/users/**`: `ADMIN`.
 - Backend `/api/v1/receipts/**`: `ADMIN` hoặc `RECEPTIONIST`.
-- Frontend `/admin/*`: hiện chỉ cho `ADMIN`; đây là khoảng trống cần sửa khi mở giao diện cho Receptionist/Technician.
-- Các quyền transfer/testing/review/release bên dưới vẫn là target và cần LAB xác nhận.
+- Backend transfer đọc/tạo/quyết định: `ADMIN`, `RECEPTIONIST` hoặc `TECHNICIAN` theo method security hiện tại.
+- Backend testing đọc/lập/cập nhật/submit: `ADMIN` hoặc `TECHNICIAN`; review: `ADMIN`.
+- Frontend route intake mở cho `ADMIN|RECEPTIONIST`, testing cho `ADMIN|TECHNICIAN`, user management chỉ `ADMIN`.
+- Quyền phát hành kết quả vẫn chưa triển khai và cần LAB xác nhận.
 
 Ký hiệu: `✓` được đề xuất, `—` không được phép mặc định, `?` cần xác nhận theo phạm vi/ủy quyền.
 

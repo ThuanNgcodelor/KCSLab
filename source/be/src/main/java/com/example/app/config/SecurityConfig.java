@@ -100,6 +100,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/transfers/*/decision").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/transfers").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/transfers/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/testing-records/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/testing-records/*/review").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/testing-records/*/submit").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/testing-records").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/testing-records/*").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers("/api/v1/testing-records/**").denyAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(bearerTokenResolver)

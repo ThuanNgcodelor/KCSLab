@@ -16,6 +16,8 @@
 
 > **Addendum triển khai 3 (13/11/2026):** Đã có runtime Spring Boot/React/MySQL cho login email, session/CSRF, quản lý nhân viên Admin-only và vertical slice phiếu tiếp nhận số 3. Hệ thống đã lưu customer/receipt/sample/attachment, sinh mã CFC-TN-14 và được smoke-test bằng Playwright với MySQL. Giai đoạn kế tiếp là phiếu chuyển mẫu số 4 và custody; biên bản số 5, phát hành PDF và tra cứu khách chưa triển khai. Snapshot kỹ thuật ngắn nằm tại `docs/ai/CONTEXT.md`.
 
+> **Addendum triển khai 4 (13/11/2026):** Đã hoàn thành vertical slice phiếu chuyển mẫu số 4 và biên bản thử nghiệm số 5: giao/nhận hoặc từ chối mẫu, thiết bị, hóa chất, đường chuẩn/công thức, QC, raw data, submit và kiểm tra/trả lại; trạng thái mẫu được đồng bộ đến `TEST_REVIEWED`. Giao diện quản trị đã chuyển sang tone sáng CFC, dùng logo trong `guideline-assets`, sidebar cố định theo viewport, mobile drawer và footer liên kết website CFC. Giai đoạn kế tiếp là duyệt/phát hành PDF có version/checksum, sau đó mới mở tra cứu khách.
+
 ### Quy trình nghiệp vụ đã xác nhận
 
 1. **Tiếp nhận:** người giao mang mẫu sầu riêng và phiếu giấy theo biểu mẫu 3; nhân viên tiếp nhận kiểm tra thông tin, tình trạng, bao bì/niêm phong, vận chuyển/bảo quản, chỉ tiêu và thời hạn.

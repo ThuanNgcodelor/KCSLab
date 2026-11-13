@@ -64,6 +64,7 @@ public class SampleTransferItem {
     void attachTo(SampleTransfer transfer) { this.transfer = transfer; }
 
     public Long getId() { return id; }
+    public SampleTransfer getTransfer() { return transfer; }
     public Sample getSample() { return sample; }
     public String getSampleName() { return sampleName; }
     public String getSampleCode() { return sampleCode; }

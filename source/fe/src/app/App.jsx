@@ -10,6 +10,9 @@ import { DashboardPage } from '../features/admin/pages/DashboardPage';
 import { TransfersPage } from '../features/transfer/pages/TransfersPage';
 import { TransferCreatePage } from '../features/transfer/pages/TransferCreatePage';
 import { TransferDetailPage } from '../features/transfer/pages/TransferDetailPage';
+import { TestingRecordsPage } from '../features/testing/pages/TestingRecordsPage';
+import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFormPage';
+import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -42,6 +45,12 @@ export function App() {
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST', 'TECHNICIAN']} />}>
           <Route path="/admin/transfers" element={<TransfersPage />} />
           <Route path="/admin/transfers/:id" element={<TransferDetailPage />} />
+        </Route>
+        <Route element={<RoleRoute roles={['ADMIN', 'TECHNICIAN']} />}>
+          <Route path="/admin/testing" element={<TestingRecordsPage />} />
+          <Route path="/admin/testing/new" element={<TestingRecordFormPage />} />
+          <Route path="/admin/testing/:id" element={<TestingRecordDetailPage />} />
+          <Route path="/admin/testing/:id/edit" element={<TestingRecordFormPage />} />
         </Route>
         <Route path="/users" element={<Navigate to="/admin/users" replace />} />
       </Route>
