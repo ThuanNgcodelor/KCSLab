@@ -6,6 +6,8 @@
 
 - Ứng dụng đang chạy theo modular monolith: Spring Boot 4.1.2/Java 21 ở `source/be`, React 19/Vite 6/JSX ở `source/fe`, MySQL 8.4 cho profile `mysql`.
 - Đã hoàn thành: auth email/session/CSRF; quản lý tài khoản; phiếu tiếp nhận 3; phiếu chuyển mẫu 4; biên bản thử nghiệm 5 đến bước kiểm tra/trả lại.
+- Ranh giới runtime hiện tại là `TEST_REVIEWED`; chưa có `result_releases`, PDF phát hành, thu hồi/đính chính hoặc tra cứu khách.
+- Dashboard Admin đang dùng số liệu/hoạt động mẫu hard-code; không xem đây là báo cáo vận hành thật.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
 - Frontend mở từng route theo role: `ADMIN` quản lý user/review; `ADMIN|RECEPTIONIST` tiếp nhận; `ADMIN|TECHNICIAN` thử nghiệm. Quyền transfer cho ba role theo cấu hình hiện tại.
 - UI dùng tone sáng CFC, logo từ `guideline-assets/cfc-008.png`; admin shell fluid tối đa 1680px, sidebar cố định ở desktop và chuyển drawer từ 1080px trở xuống, typography tăng trên màn 2K; footer liên kết website CFC.
@@ -40,7 +42,7 @@
 
 ## Việc tiếp theo
 
-1. Chốt role/người có quyền duyệt và phát hành kết quả.
+1. Chặn người phân tích tự kiểm tra/tự phát hành; mặc định MVP dùng Admin kiểm tra/phát hành bằng tài khoản khác analyst nếu LAB chưa chốt role chuyên biệt.
 2. Triển khai `result_releases`, version/checksum và PDF bất biến.
 3. Sau đó triển khai tra cứu khách bằng mã + đuôi số điện thoại, chỉ trả dữ liệu đã phát hành.
 4. Trước production: migration tool, object storage/backup, audit log, rate limit và integration tests.

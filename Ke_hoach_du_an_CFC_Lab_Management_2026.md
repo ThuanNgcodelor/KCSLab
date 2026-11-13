@@ -1,7 +1,7 @@
 # CFC LAB MANAGEMENT 2026 — KẾ HOẠCH VÀ ĐẶC TẢ SƠ BỘ
 
 **Tên dự án:** CFC Lab Management – Hệ thống quản lý mẫu thử nghiệm và tra cứu kết quả trực tuyến  
-**Phiên bản tài liệu:** 1.3 – Cập nhật trạng thái triển khai auth/Admin/phiếu tiếp nhận số 3
+**Phiên bản tài liệu:** 1.4 – Cập nhật trạng thái đến biên bản thử nghiệm và kế hoạch phát hành kết quả
 **Ngày lập:** 11/11/2026  
 **Đơn vị đề xuất:** Bộ phận CNTT/AI & Automation (đề xuất)  
 **Đơn vị nghiệp vụ phối hợp:** Phòng LAB, bộ phận quản lý chất lượng và các đơn vị liên quan  
@@ -17,6 +17,8 @@
 > **Addendum triển khai 3 (13/11/2026):** Đã có runtime Spring Boot/React/MySQL cho login email, session/CSRF, quản lý nhân viên Admin-only và vertical slice phiếu tiếp nhận số 3. Hệ thống đã lưu customer/receipt/sample/attachment, sinh mã CFC-TN-14 và được smoke-test bằng Playwright với MySQL. Giai đoạn kế tiếp là phiếu chuyển mẫu số 4 và custody; biên bản số 5, phát hành PDF và tra cứu khách chưa triển khai. Snapshot kỹ thuật ngắn nằm tại `docs/ai/CONTEXT.md`.
 
 > **Addendum triển khai 4 (13/11/2026):** Đã hoàn thành vertical slice phiếu chuyển mẫu số 4 và biên bản thử nghiệm số 5: giao/nhận hoặc từ chối mẫu, thiết bị, hóa chất, đường chuẩn/công thức, QC, raw data, submit và kiểm tra/trả lại; trạng thái mẫu được đồng bộ đến `TEST_REVIEWED`. Giao diện quản trị đã chuyển sang tone sáng CFC, dùng logo trong `guideline-assets`, sidebar cố định theo viewport, mobile drawer và footer liên kết website CFC. Giai đoạn kế tiếp là duyệt/phát hành PDF có version/checksum, sau đó mới mở tra cứu khách.
+
+> **Addendum báo cáo hiện hành 5 (13/11/2026):** Ranh giới runtime hiện tại dừng ở biên bản `TEST_REVIEWED`; chưa có bảng/API `result_releases`, PDF phát hành, thu hồi/đính chính hoặc cổng tra cứu khách. Dashboard quản trị hiện là giao diện mẫu với số liệu hard-code, không phải báo cáo vận hành. Responsive Admin UI đã được chuẩn hóa cho 390/1024/1440/2560px. Gate đầu tiên của Giai đoạn 5 là chặn người phân tích tự kiểm tra/tự phát hành, sau đó mới triển khai snapshot kết quả, version PDF và checksum bất biến. Báo cáo chi tiết và thứ tự công việc nằm tại `plans/CURRENT.md`.
 
 ### Quy trình nghiệp vụ đã xác nhận
 

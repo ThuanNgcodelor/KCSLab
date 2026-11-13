@@ -2,6 +2,9 @@
 
 ## 2026-11-13
 
+- Cập nhật báo cáo sơ bộ hiện hành: xác nhận runtime dừng tại `TEST_REVIEWED`, dashboard còn dữ liệu mẫu và giai đoạn release/PDF chưa có code.
+- Bổ sung rủi ro ưu tiên: `TestingRecordService.review` chưa chặn analyst tự kiểm tra; đưa tách người nhập–người duyệt thành gate đầu tiên của Giai đoạn 5.
+- Chuẩn hóa responsive Admin UI: shell fluid tối đa 1680px, drawer từ 1080px, tỷ lệ riêng cho màn 2K và checklist viewport 390/1024/1440/2560px.
 - Hoàn thành phiếu chuyển mẫu số 4: schema transfer/item, API list/detail/create/decision, giao diện responsive và đồng bộ trạng thái mẫu.
 - Hoàn thành vertical slice biên bản thử nghiệm số 5: thiết bị, hóa chất, đường chuẩn/công thức, QC/raw data, submit, review/return và unit test service.
 - Thêm route `/admin/testing`, Playwright E2E đến trạng thái mẫu `TEST_REVIEWED`, frontend build và backend test pass.
