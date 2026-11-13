@@ -2,6 +2,7 @@
 
 ## 2026-11-13
 
+- Khóa quy ước MySQL: chuỗi dùng `VARCHAR`/`TEXT` với `utf8mb4`, không dùng `NVARCHAR`/`NCHAR`; table nghiệp vụ mặc định `utf8mb4_unicode_ci`, giá trị kỹ thuật cần phân biệt hoa-thường dùng binary collation phù hợp.
 - Xác nhận `CFC14Quy trình mã hóa mẫu trái cây.doc` là quy trình chuẩn: khóa cấu trúc `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`, coi thứ tự ngược trên phiếu ví dụ là sai lệch cần rà soát.
 - Bổ sung trách nhiệm tiếp nhận/đối chiếu/kiểm nghiệm/QLCLSP, nhãn không phai, Sổ theo dõi, lưu riêng mã mù và hiệu chỉnh append-only vào coding plan.
 - Phân tích `1. Phiếu KQKN-DV.docx`, phiếu kết quả đã điền và CFC-TN-14; tách mã hồ sơ, mã mẫu và số phiếu kết quả.

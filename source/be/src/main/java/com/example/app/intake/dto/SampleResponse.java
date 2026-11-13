@@ -9,6 +9,7 @@ public record SampleResponse(
         String productType,
         String name,
         String quantity,
+        String packaging,
         String sampleCondition,
         String requestedParameters,
         ReceiptStatus status

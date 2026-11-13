@@ -1,8 +1,12 @@
 import { request } from '../../../shared/api/httpClient';
 
 export function listReceipts() { return request('/receipts'); }
+export function getReceipt(id) { return request(`/receipts/${id}`); }
 export function createReceipt(data) { return request('/receipts', { method: 'POST', body: JSON.stringify(data) }); }
-export function uploadReceiptFile(id, file) {
+export function uploadReceiptFile(id, file, metadata = {}) {
   const formData = new FormData(); formData.append('file', file);
-  return request(`/receipts/${id}/attachments`, { method: 'POST', body: formData });
+  const search = new URLSearchParams({ category: metadata.category ?? 'OTHER' });
+  if (metadata.description) search.set('description', metadata.description);
+  if (metadata.capturedAt) search.set('capturedAt', metadata.capturedAt);
+  return request(`/receipts/${id}/attachments?${search}`, { method: 'POST', body: formData });
 }

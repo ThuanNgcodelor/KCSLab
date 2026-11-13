@@ -12,6 +12,7 @@ public record TransferResponse(
         Long receiptId,
         String receiptCode,
         String customerName,
+        String receivingDepartment,
         String deliveredBy,
         String receivedBy,
         LocalDate transferDate,
@@ -24,6 +25,7 @@ public record TransferResponse(
         String labOpinion,
         boolean labRetain,
         LocalDate labRetentionUntil,
+        Instant submittedAt,
         Instant receivedAt,
         Instant createdAt,
         List<TransferItemResponse> items

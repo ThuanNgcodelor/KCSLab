@@ -5,6 +5,7 @@ import { UsersPage } from '../features/users/pages/UsersPage';
 import { UserFormPage } from '../features/users/pages/UserFormPage';
 import { IntakePage } from '../features/intake/pages/IntakePage';
 import { ReceiptCreatePage } from '../features/intake/pages/ReceiptCreatePage';
+import { ReceiptDetailPage } from '../features/intake/pages/ReceiptDetailPage';
 import { AdminLayout } from '../features/admin/components/AdminLayout';
 import { DashboardPage } from '../features/admin/pages/DashboardPage';
 import { TransfersPage } from '../features/transfer/pages/TransfersPage';
@@ -40,6 +41,7 @@ export function App() {
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST']} />}>
           <Route path="/admin/intake" element={<IntakePage />} />
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />
+          <Route path="/admin/intake/:id" element={<ReceiptDetailPage />} />
           <Route path="/admin/transfers/new" element={<TransferCreatePage />} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST', 'TECHNICIAN']} />}>

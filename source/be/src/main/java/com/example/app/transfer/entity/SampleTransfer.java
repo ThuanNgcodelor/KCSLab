@@ -43,6 +43,9 @@ public class SampleTransfer {
     @JoinColumn(name = "received_by_user_id")
     private User receivedBy;
 
+    @Column(nullable = false, length = 120)
+    private String receivingDepartment;
+
     @Column(nullable = false)
     private LocalDate transferDate;
 
@@ -71,6 +74,7 @@ public class SampleTransfer {
     private boolean labRetain;
 
     private LocalDate labRetentionUntil;
+    private Instant submittedAt;
     private Instant receivedAt;
 
     @Column(nullable = false, updatable = false)
@@ -84,18 +88,20 @@ public class SampleTransfer {
 
     protected SampleTransfer() {}
 
-    public SampleTransfer(String transferCode, Receipt receipt, User deliveredBy, LocalDate transferDate,
+    public SampleTransfer(String transferCode, Receipt receipt, User deliveredBy, String receivingDepartment,
+                          LocalDate transferDate,
                           LocalDate resultsDueDate, boolean returnToCustomer, LocalDate customerReturnDate,
                           String changesNote) {
         this.transferCode = transferCode;
         this.receipt = receipt;
         this.deliveredBy = deliveredBy;
+        this.receivingDepartment = receivingDepartment;
         this.transferDate = transferDate;
         this.resultsDueDate = resultsDueDate;
         this.returnToCustomer = returnToCustomer;
         this.customerReturnDate = customerReturnDate;
         this.changesNote = changesNote;
-        this.status = TransferStatus.PENDING;
+        this.status = TransferStatus.DRAFT;
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
@@ -103,6 +109,28 @@ public class SampleTransfer {
     public void addItem(SampleTransferItem item) {
         items.add(item);
         item.attachTo(this);
+    }
+
+    public void replaceItems(List<SampleTransferItem> replacement) {
+        items.clear();
+        replacement.forEach(this::addItem);
+    }
+
+    public void updateDraft(String receivingDepartment, LocalDate transferDate, LocalDate resultsDueDate,
+                            boolean returnToCustomer, LocalDate customerReturnDate, String changesNote) {
+        this.receivingDepartment = receivingDepartment;
+        this.transferDate = transferDate;
+        this.resultsDueDate = resultsDueDate;
+        this.returnToCustomer = returnToCustomer;
+        this.customerReturnDate = customerReturnDate;
+        this.changesNote = changesNote;
+        this.updatedAt = Instant.now();
+    }
+
+    public void submit() {
+        this.status = TransferStatus.PENDING;
+        this.submittedAt = Instant.now();
+        this.updatedAt = this.submittedAt;
     }
 
     public void decide(TransferStatus decision, User receiver, String receivingNote, String labOpinion,
@@ -122,6 +150,7 @@ public class SampleTransfer {
     public Receipt getReceipt() { return receipt; }
     public User getDeliveredBy() { return deliveredBy; }
     public User getReceivedBy() { return receivedBy; }
+    public String getReceivingDepartment() { return receivingDepartment; }
     public LocalDate getTransferDate() { return transferDate; }
     public LocalDate getResultsDueDate() { return resultsDueDate; }
     public boolean isReturnToCustomer() { return returnToCustomer; }
@@ -132,6 +161,7 @@ public class SampleTransfer {
     public String getLabOpinion() { return labOpinion; }
     public boolean isLabRetain() { return labRetain; }
     public LocalDate getLabRetentionUntil() { return labRetentionUntil; }
+    public Instant getSubmittedAt() { return submittedAt; }
     public Instant getReceivedAt() { return receivedAt; }
     public Instant getCreatedAt() { return createdAt; }
     public List<SampleTransferItem> getItems() { return items; }

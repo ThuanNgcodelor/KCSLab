@@ -67,11 +67,15 @@ class TransferServiceTest {
     }
 
     @Test
-    void createsPendingTransferAndAcceptsIt() {
+    void createsDraftSubmitsAndAcceptsIt() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
 
-        assertThat(created.status()).isEqualTo(TransferStatus.PENDING);
+        assertThat(created.status()).isEqualTo(TransferStatus.DRAFT);
         assertThat(created.items()).hasSize(1);
+        assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.RECEIVED);
+
+        TransferResponse submitted = transferService.submit(created.id());
+        assertThat(submitted.status()).isEqualTo(TransferStatus.PENDING);
         assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.TRANSFER_PENDING);
 
         TransferResponse accepted = transferService.decide(created.id(),
@@ -87,6 +91,7 @@ class TransferServiceTest {
     @Test
     void requiresReasonWhenRejectingTransfer() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
+        transferService.submit(created.id());
 
         assertThatThrownBy(() -> transferService.decide(created.id(),
                 new TransferDecisionRequest(TransferStatus.REJECTED, " ", null,
@@ -98,6 +103,7 @@ class TransferServiceTest {
     @Test
     void allowsCreatingANewTransferAfterRejection() {
         TransferResponse first = transferService.create(createRequest(), receptionist);
+        transferService.submit(first.id());
         transferService.decide(first.id(),
                 new TransferDecisionRequest(TransferStatus.REJECTED, "Bao bì cần đóng lại", null,
                         false, null), technician);
@@ -106,12 +112,33 @@ class TransferServiceTest {
         TransferResponse second = transferService.create(createRequest(), receptionist);
 
         assertThat(second.id()).isNotEqualTo(first.id());
-        assertThat(second.status()).isEqualTo(TransferStatus.PENDING);
+        assertThat(second.status()).isEqualTo(TransferStatus.DRAFT);
+    }
+
+    @Test
+    void hidesDraftTransfersFromTechniciansUntilSubmitted() {
+        TransferResponse created = transferService.create(createRequest(), receptionist);
+
+        assertThat(transferService.findAll(receptionist))
+                .extracting(TransferResponse::id)
+                .contains(created.id());
+        assertThat(transferService.findAll(technician))
+                .extracting(TransferResponse::id)
+                .doesNotContain(created.id());
+        assertThatThrownBy(() -> transferService.findById(created.id(), technician))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Không tìm thấy phiếu chuyển mẫu");
+
+        transferService.submit(created.id());
+
+        assertThat(transferService.findAll(technician))
+                .extracting(TransferResponse::id)
+                .contains(created.id());
     }
 
     private CreateTransferRequest createRequest() {
         return new CreateTransferRequest(
-                receipt.getId(), LocalDate.now(), LocalDate.now().plusDays(4),
+                receipt.getId(), "Phòng KCS", LocalDate.now(), LocalDate.now().plusDays(4),
                 false, null, null,
                 List.of(new CreateTransferItemRequest(
                         sample.getId(), "500 g", "1 túi", "Nguyên vẹn",

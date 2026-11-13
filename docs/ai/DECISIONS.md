@@ -1,5 +1,12 @@
 # Architecture Decisions
 
+## 13/11/2026 — Kiểu chuỗi và Unicode trên MySQL
+
+- Schema MySQL dùng `VARCHAR`/`TEXT`; không dùng `NVARCHAR`/`NCHAR`.
+- Dữ liệu tiếng Việt được lưu bằng charset `utf8mb4`; table nghiệp vụ mặc định dùng `utf8mb4_unicode_ci` và không phụ thuộc default của database.
+- Token, hash, checksum hoặc mã cần phân biệt hoa-thường được phép dùng binary collation phù hợp nhưng vẫn giữ kiểu `VARCHAR`/`CHAR`.
+- JPA map Java `String` theo length/type phù hợp, không hard-code `NVARCHAR` trong `columnDefinition`.
+
 ## 13/11/2026 — Mã mẫu, hồ sơ nguồn và Phiếu kết quả
 
 - Phân biệt ba định danh: mã hồ sơ tiếp nhận, mã mẫu và số Phiếu kết quả; không dùng chung generator.

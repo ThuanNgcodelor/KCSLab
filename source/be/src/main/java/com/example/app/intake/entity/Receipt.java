@@ -33,6 +33,13 @@ public class Receipt {
     private User receivedBy;
     @Column(nullable = false, length = 160) private String deliveredBy;
     @Column(nullable = false) private Instant receivedAt;
+    @Column(length = 160) private String sampledBy;
+    private Instant sampledAt;
+    @Column(length = 255) private String growingArea;
+    @Column(length = 255) private String packingFacility;
+    @Column(length = 80) private String vehicleNumber;
+    @Column(length = 80) private String trailerNumber;
+    @Column(length = 80) private String containerNumber;
     @Column(nullable = false, length = 160) private String sampleName;
     @Column(length = 80) private String quantity;
     @Column(length = 80) private String packaging;
@@ -63,8 +70,24 @@ public class Receipt {
                    String sampleCondition, String conditionDetail, String transportInfo, Double receivedTemperature,
                    String storageCondition, String requestedParameters, LocalDate expectedDate, String specialRequest,
                    AcceptanceDecision decision, String acceptanceReason) {
+        this(receiptCode, customer, receivedBy, deliveredBy, receivedAt, null, null, null, null, null, null, null,
+                sampleName, quantity, packaging, sealNumber, sealIntact, sampleCondition, conditionDetail,
+                transportInfo, receivedTemperature, storageCondition, requestedParameters, expectedDate,
+                specialRequest, decision, acceptanceReason);
+    }
+
+    public Receipt(String receiptCode, Customer customer, User receivedBy, String deliveredBy, Instant receivedAt,
+                   String sampledBy, Instant sampledAt, String growingArea, String packingFacility,
+                   String vehicleNumber, String trailerNumber, String containerNumber,
+                   String sampleName, String quantity, String packaging, String sealNumber, boolean sealIntact,
+                   String sampleCondition, String conditionDetail, String transportInfo, Double receivedTemperature,
+                   String storageCondition, String requestedParameters, LocalDate expectedDate, String specialRequest,
+                   AcceptanceDecision decision, String acceptanceReason) {
         this.receiptCode = receiptCode; this.customer = customer; this.receivedBy = receivedBy;
         this.deliveredBy = deliveredBy; this.receivedAt = receivedAt; this.sampleName = sampleName;
+        this.sampledBy = sampledBy; this.sampledAt = sampledAt; this.growingArea = growingArea;
+        this.packingFacility = packingFacility; this.vehicleNumber = vehicleNumber;
+        this.trailerNumber = trailerNumber; this.containerNumber = containerNumber;
         this.quantity = quantity; this.packaging = packaging; this.sealNumber = sealNumber; this.sealIntact = sealIntact;
         this.sampleCondition = sampleCondition; this.conditionDetail = conditionDetail; this.transportInfo = transportInfo;
         this.receivedTemperature = receivedTemperature; this.storageCondition = storageCondition;
@@ -84,6 +107,13 @@ public class Receipt {
     public User getReceivedBy() { return receivedBy; }
     public String getDeliveredBy() { return deliveredBy; }
     public Instant getReceivedAt() { return receivedAt; }
+    public String getSampledBy() { return sampledBy; }
+    public Instant getSampledAt() { return sampledAt; }
+    public String getGrowingArea() { return growingArea; }
+    public String getPackingFacility() { return packingFacility; }
+    public String getVehicleNumber() { return vehicleNumber; }
+    public String getTrailerNumber() { return trailerNumber; }
+    public String getContainerNumber() { return containerNumber; }
     public String getSampleName() { return sampleName; }
     public String getQuantity() { return quantity; }
     public String getPackaging() { return packaging; }

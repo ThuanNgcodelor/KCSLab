@@ -1,10 +1,19 @@
 # Mô hình dữ liệu
 
-**Phiên bản:** 0.5 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có schema; coding hardening đang thiết kế
+**Phiên bản:** 0.6 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có schema; coding hardening đang thiết kế
 
 ## Lựa chọn cơ sở dữ liệu
 
 MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc định. Schema hiện tạo bằng `db/schema.sql`, backend dùng Hibernate `validate`. Cần chọn Flyway/Liquibase trước production.
+
+## Quy ước kiểu chuỗi MySQL
+
+- Dùng `VARCHAR(n)` cho chuỗi có giới hạn và `TEXT` cho nội dung dài; không dùng `NVARCHAR` hoặc `NCHAR`.
+- Unicode, bao gồm tiếng Việt, được bảo đảm bằng charset `utf8mb4`, không phải bằng tiền tố kiểu `N` như SQL Server.
+- Table nghiệp vụ mặc định khai báo `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`; không phụ thuộc vào default charset/collation của database hoặc máy cài đặt.
+- Entity JPA tiếp tục dùng Java `String` và `@Column(length = ...)`; không ép `columnDefinition = "NVARCHAR(...)"`.
+- Token, hash, checksum, opaque ID hoặc mã cần phân biệt hoa-thường có thể khai báo `CHAR`/`VARCHAR` với binary collation phù hợp. Ngoại lệ này không thay đổi quy tắc cấm `NVARCHAR`/`NCHAR`.
+- Mọi schema/migration mới phải giữ quy tắc trên và được kiểm tra bằng `Hibernate validate` cùng MySQL thật.
 
 ## Bảng đã triển khai
 
@@ -76,6 +85,7 @@ erDiagram
 - Hồ sơ nguồn cần trường có cấu trúc cho người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal để snapshot sang Phiếu kết quả.
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
 - SQL runtime đã có cho 12 bảng nêu trên; chưa có migration versioned.
+- Schema runtime hiện dùng `VARCHAR`/`TEXT`; các table đã triển khai đều khai báo `utf8mb4_unicode_ci`, không có cột `NVARCHAR`.
 
 ## Câu hỏi dữ liệu mở
 

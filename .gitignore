@@ -3,3 +3,4 @@ source/fe/dist/
 source/be/target/
 .env
 *.log
+*.m2-local

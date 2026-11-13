@@ -6,5 +6,6 @@
 - Feature có thể chứa controller, service, repository, entity, dto, mapper và exception khi thực sự cần.
 - Controller không chứa business logic và không trả trực tiếp JPA entity.
 - Dùng constructor injection, validation tại API boundary và transaction ở service khi phù hợp.
+- Với MySQL, trường chuỗi dùng `VARCHAR`/`TEXT` trên charset `utf8mb4`; không dùng `NVARCHAR`/`NCHAR`. Table nghiệp vụ mặc định dùng `utf8mb4_unicode_ci`; token, hash, checksum hoặc mã cần phân biệt hoa-thường phải khai báo binary collation phù hợp nhưng vẫn giữ kiểu `VARCHAR`/`CHAR`.
 - Giữ tương thích với Spring Boot/Java hiện có; không thêm Spring Modulith hoặc dependency khác nếu chưa có lý do và xác minh.
 - Không bịa package, database schema, token storage hoặc API contract khi chưa kiểm tra code thực tế.

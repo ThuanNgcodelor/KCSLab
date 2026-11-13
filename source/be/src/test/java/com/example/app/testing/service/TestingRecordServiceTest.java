@@ -76,9 +76,10 @@ class TestingRecordServiceTest {
         sample = receipt.getSamples().getFirst();
 
         TransferResponse transfer = transferService.create(new CreateTransferRequest(
-                receipt.getId(), LocalDate.now(), LocalDate.now().plusDays(5), false, null, null,
+                receipt.getId(), "Phòng KCS", LocalDate.now(), LocalDate.now().plusDays(5), false, null, null,
                 List.of(new CreateTransferItemRequest(sample.getId(), "500 g", "1 mẫu",
                         "Nguyên vẹn", "Cadimi", "CFC-TN-Cd"))), receptionist);
+        transfer = transferService.submit(transfer.id());
         transfer = transferService.decide(transfer.id(), new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, "Đã nhận đủ", "Tiến hành phân tích", false, null), technician);
         transferItemId = transfer.items().getFirst().id();

@@ -1,3 +1,7 @@
+-- MySQL string policy: use VARCHAR/TEXT with utf8mb4; never use NVARCHAR/NCHAR.
+-- Tables default to utf8mb4_unicode_ci. Technical case-sensitive values may
+-- override to a binary collation while remaining VARCHAR/CHAR.
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT NOT NULL AUTO_INCREMENT,
     email VARCHAR(160) NOT NULL,
@@ -43,6 +47,13 @@ CREATE TABLE IF NOT EXISTS receipts (
     received_by_user_id BIGINT NOT NULL,
     delivered_by VARCHAR(160) NOT NULL,
     received_at TIMESTAMP(6) NOT NULL,
+    sampled_by VARCHAR(160) NULL,
+    sampled_at TIMESTAMP(6) NULL,
+    growing_area VARCHAR(255) NULL,
+    packing_facility VARCHAR(255) NULL,
+    vehicle_number VARCHAR(80) NULL,
+    trailer_number VARCHAR(80) NULL,
+    container_number VARCHAR(80) NULL,
     sample_name VARCHAR(160) NOT NULL,
     quantity VARCHAR(80) NULL,
     packaging VARCHAR(80) NULL,
@@ -93,15 +104,21 @@ CREATE TABLE IF NOT EXISTS samples (
 CREATE TABLE IF NOT EXISTS receipt_attachments (
     id BIGINT NOT NULL AUTO_INCREMENT,
     receipt_id BIGINT NOT NULL,
+    category VARCHAR(30) NOT NULL,
+    description VARCHAR(255) NULL,
     original_name VARCHAR(255) NOT NULL,
     content_type VARCHAR(120) NOT NULL,
     storage_name VARCHAR(255) NOT NULL,
     size BIGINT NOT NULL,
     checksum VARCHAR(64) NOT NULL,
+    captured_at TIMESTAMP(6) NULL,
     uploaded_at TIMESTAMP(6) NOT NULL,
+    uploaded_by_user_id BIGINT NULL,
     PRIMARY KEY (id),
     KEY idx_receipt_attachments_receipt (receipt_id),
-    CONSTRAINT fk_receipt_attachments_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id)
+    KEY idx_receipt_attachments_category (receipt_id, category),
+    CONSTRAINT fk_receipt_attachments_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id),
+    CONSTRAINT fk_receipt_attachments_uploaded_by FOREIGN KEY (uploaded_by_user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS sample_transfers (
@@ -110,6 +127,7 @@ CREATE TABLE IF NOT EXISTS sample_transfers (
     receipt_id BIGINT NOT NULL,
     delivered_by_user_id BIGINT NOT NULL,
     received_by_user_id BIGINT NULL,
+    receiving_department VARCHAR(120) NOT NULL,
     transfer_date DATE NOT NULL,
     results_due_date DATE NOT NULL,
     return_to_customer BOOLEAN NOT NULL DEFAULT FALSE,
@@ -120,6 +138,7 @@ CREATE TABLE IF NOT EXISTS sample_transfers (
     lab_opinion TEXT NULL,
     lab_retain BOOLEAN NOT NULL DEFAULT FALSE,
     lab_retention_until DATE NULL,
+    submitted_at TIMESTAMP(6) NULL,
     received_at TIMESTAMP(6) NULL,
     created_at TIMESTAMP(6) NOT NULL,
     updated_at TIMESTAMP(6) NOT NULL,
