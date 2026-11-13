@@ -103,3 +103,49 @@ CREATE TABLE IF NOT EXISTS receipt_attachments (
     KEY idx_receipt_attachments_receipt (receipt_id),
     CONSTRAINT fk_receipt_attachments_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sample_transfers (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    transfer_code VARCHAR(40) NOT NULL,
+    receipt_id BIGINT NOT NULL,
+    delivered_by_user_id BIGINT NOT NULL,
+    received_by_user_id BIGINT NULL,
+    transfer_date DATE NOT NULL,
+    results_due_date DATE NOT NULL,
+    return_to_customer BOOLEAN NOT NULL DEFAULT FALSE,
+    customer_return_date DATE NULL,
+    changes_note TEXT NULL,
+    status VARCHAR(30) NOT NULL,
+    receiving_note TEXT NULL,
+    lab_opinion TEXT NULL,
+    lab_retain BOOLEAN NOT NULL DEFAULT FALSE,
+    lab_retention_until DATE NULL,
+    received_at TIMESTAMP(6) NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    updated_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_sample_transfers_code (transfer_code),
+    KEY idx_sample_transfers_receipt (receipt_id),
+    KEY idx_sample_transfers_status (status),
+    CONSTRAINT fk_sample_transfers_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id),
+    CONSTRAINT fk_sample_transfers_delivered_by FOREIGN KEY (delivered_by_user_id) REFERENCES users(id),
+    CONSTRAINT fk_sample_transfers_received_by FOREIGN KEY (received_by_user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sample_transfer_items (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    transfer_id BIGINT NOT NULL,
+    sample_id BIGINT NOT NULL,
+    sample_name VARCHAR(160) NOT NULL,
+    sample_code VARCHAR(80) NOT NULL,
+    weight VARCHAR(80) NULL,
+    quantity VARCHAR(80) NULL,
+    sample_condition VARCHAR(120) NULL,
+    requested_parameters TEXT NULL,
+    test_method VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    KEY idx_sample_transfer_items_transfer (transfer_id),
+    KEY idx_sample_transfer_items_sample (sample_id),
+    CONSTRAINT fk_sample_transfer_items_transfer FOREIGN KEY (transfer_id) REFERENCES sample_transfers(id),
+    CONSTRAINT fk_sample_transfer_items_sample FOREIGN KEY (sample_id) REFERENCES samples(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

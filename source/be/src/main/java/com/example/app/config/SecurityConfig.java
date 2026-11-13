@@ -96,6 +96,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/transfers/**").hasAnyRole("ADMIN", "RECEPTIONIST", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/transfers/*/decision").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/transfers").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/v1/transfers/**").denyAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(bearerTokenResolver)

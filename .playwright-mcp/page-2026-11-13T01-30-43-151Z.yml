@@ -1,0 +1,92 @@
+- main [ref=f6e21]:
+  - generic [ref=f6e22]:
+    - button "CFC CFC Lab" [ref=f6e23] [cursor=pointer]:
+      - generic [ref=f6e24]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f6e171] [cursor=pointer]: ☰
+  - generic [ref=f6e208]:
+    - generic [ref=f6e210]:
+      - button "← Quay lại danh sách" [ref=f6e211] [cursor=pointer]
+      - paragraph [ref=f6e212]: Phiếu số 4
+      - heading "Lập phiếu chuyển mẫu" [level=1] [ref=f6e213]
+      - paragraph [ref=f6e214]: Bàn giao mẫu và yêu cầu thử nghiệm cho KCS/phòng phân tích.
+    - generic [ref=f6e215]:
+      - generic [ref=f6e216]:
+        - generic [ref=f6e217]:
+          - generic [ref=f6e218]:
+            - generic [ref=f6e219]: "01"
+            - generic [ref=f6e220]:
+              - heading "Phiếu yêu cầu" [level=2] [ref=f6e221]
+              - paragraph [ref=f6e222]: Chọn hồ sơ tiếp nhận cần bàn giao.
+          - generic [ref=f6e223]:
+            - text: Phiếu tiếp nhận
+            - combobox "Phiếu tiếp nhận" [ref=f6e224]:
+              - option "TN-20261112-F901E9 — Hợp tác xã Playwright" [selected]
+          - generic [ref=f6e225]:
+            - generic [ref=f6e226]:
+              - generic [ref=f6e227]: Người giao mẫu
+              - strong [ref=f6e228]: Nguyễn Văn Test
+            - generic [ref=f6e229]:
+              - generic [ref=f6e230]: Ngày nhận
+              - strong [ref=f6e231]: 12/11/2026
+            - generic [ref=f6e232]:
+              - generic [ref=f6e233]: Chỉ tiêu
+              - strong [ref=f6e234]: Auramine O, Cadimi (Cd)
+        - generic [ref=f6e235]:
+          - generic [ref=f6e236]:
+            - generic [ref=f6e237]: "02"
+            - generic [ref=f6e238]:
+              - heading "Danh sách mẫu" [level=2] [ref=f6e239]
+              - paragraph [ref=f6e240]: Thông tin được chụp lại tại thời điểm lập phiếu.
+          - article [ref=f6e242]:
+            - generic [ref=f6e243] [cursor=pointer]:
+              - checkbox "CT001-SR-12112026-001 Sầu riêng kiểm thử Playwright" [checked] [ref=f6e244]
+              - generic [ref=f6e245]:
+                - strong [ref=f6e246]: CT001-SR-12112026-001
+                - generic [ref=f6e247]: Sầu riêng kiểm thử Playwright
+            - generic [ref=f6e248]:
+              - generic [ref=f6e249]:
+                - text: Khối lượng
+                - textbox "Khối lượng" [ref=f6e250]:
+                  - /placeholder: 10 kg
+                  - text: 10 kg
+              - generic [ref=f6e251]:
+                - text: Số lượng
+                - textbox "Số lượng" [ref=f6e252]:
+                  - /placeholder: 02 mẫu
+                  - text: 10 kg
+              - generic [ref=f6e253]:
+                - text: Tình trạng
+                - textbox "Tình trạng" [ref=f6e254]: Nguyên vẹn
+              - generic [ref=f6e255]:
+                - text: Phương pháp thử
+                - textbox "Phương pháp thử" [ref=f6e256]:
+                  - /placeholder: CFC-TN-...
+              - generic [ref=f6e257]:
+                - text: Chỉ tiêu yêu cầu
+                - textbox "Chỉ tiêu yêu cầu" [ref=f6e258]: Auramine O, Cadimi (Cd)
+      - complementary [ref=f6e259]:
+        - generic [ref=f6e260]:
+          - generic [ref=f6e261]:
+            - generic [ref=f6e262]: "03"
+            - generic [ref=f6e263]:
+              - heading "Thời hạn và lưu mẫu" [level=2] [ref=f6e264]
+              - paragraph [ref=f6e265]: Theo mục III của phiếu chuyển mẫu.
+          - generic [ref=f6e266]:
+            - text: Ngày chuyển mẫu
+            - textbox "Ngày chuyển mẫu" [ref=f6e267]: 2026-11-13
+          - generic [ref=f6e268]:
+            - text: Hạn trả kết quả
+            - textbox "Hạn trả kết quả" [ref=f6e269]: 2026-11-20
+          - generic [ref=f6e270]:
+            - checkbox "Lưu và trả mẫu cho khách" [ref=f6e271]
+            - text: Lưu và trả mẫu cho khách
+          - generic [ref=f6e273]:
+            - text: Thay đổi / ghi chú
+            - textbox "Thay đổi / ghi chú" [ref=f6e274]:
+              - /placeholder: Ghi các thay đổi so với phiếu yêu cầu
+        - generic [ref=f6e275]:
+          - paragraph [ref=f6e276]:
+            - strong [ref=f6e277]: Chuẩn bị bàn giao
+            - generic [ref=f6e278]: Phiếu sẽ ở trạng thái chờ phòng phân tích xác nhận.
+          - button "Lập phiếu chuyển mẫu" [ref=f6e279] [cursor=pointer]

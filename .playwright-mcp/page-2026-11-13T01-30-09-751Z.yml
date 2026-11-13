@@ -1,0 +1,111 @@
+- main [ref=f6e21]:
+  - generic [ref=f6e22]:
+    - button "CFC CFC Lab" [ref=f6e23] [cursor=pointer]:
+      - generic [ref=f6e24]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f6e25] [cursor=pointer]: ☰
+  - generic [ref=f6e26]:
+    - generic [ref=f6e27]:
+      - generic [ref=f6e28]:
+        - paragraph [ref=f6e29]: Thứ Tư, 12 tháng 11, 2026
+        - heading "Chào buổi sáng, viên." [level=1] [ref=f6e30]
+        - paragraph [ref=f6e31]: Đây là những gì đang diễn ra trong CFC Lab hôm nay.
+      - button "Quản lý nhân viên ↗" [ref=f6e32] [cursor=pointer]
+    - region "Tổng quan hệ thống" [ref=f6e33]:
+      - article [ref=f6e34]:
+        - generic [ref=f6e35]: Nhân viên đang hoạt động
+        - strong [ref=f6e37]: "03"
+        - text: +1 trong tháng này
+      - article [ref=f6e38]:
+        - generic [ref=f6e39]: Mẫu đang xử lý
+        - strong [ref=f6e41]: "128"
+        - text: Cập nhật 5 phút trước
+      - article [ref=f6e42]:
+        - generic [ref=f6e43]: Kết quả chờ duyệt
+        - strong [ref=f6e45]: "12"
+        - text: Cần được xử lý hôm nay
+      - article [ref=f6e46]:
+        - generic [ref=f6e47]: Thiết bị đang sử dụng
+        - strong [ref=f6e49]: "08"
+        - text: Trên tổng số 14 thiết bị
+    - generic [ref=f6e50]:
+      - article [ref=f6e51]:
+        - generic [ref=f6e52]:
+          - generic [ref=f6e53]:
+            - paragraph [ref=f6e54]: Theo dõi hoạt động
+            - heading "Hoạt động gần đây" [level=2] [ref=f6e55]
+          - button "Xem tất cả →" [ref=f6e56] [cursor=pointer]
+        - generic [ref=f6e57]:
+          - generic [ref=f6e58]:
+            - time [ref=f6e59]: 08:42
+            - generic [ref=f6e60]: MA
+            - generic [ref=f6e61]:
+              - paragraph [ref=f6e62]:
+                - strong [ref=f6e63]: Nguyễn Minh Anh
+                - text: đã tiếp nhận mẫu mới
+              - text: Mẫu CFC-26018
+          - generic [ref=f6e64]:
+            - time [ref=f6e65]: 08:17
+            - generic [ref=f6e66]: QB
+            - generic [ref=f6e67]:
+              - paragraph [ref=f6e68]:
+                - strong [ref=f6e69]: Trần Quốc Bảo
+                - text: đã hoàn thành phân tích
+              - text: Mẫu CFC-26011
+          - generic [ref=f6e70]:
+            - time [ref=f6e71]: 07:55
+            - generic [ref=f6e72]: ✦
+            - generic [ref=f6e73]:
+              - paragraph [ref=f6e74]:
+                - strong [ref=f6e75]: Hệ thống
+                - text: đã ghi nhận phiên đăng nhập
+              - text: Quản trị viên
+          - generic [ref=f6e76]:
+            - time [ref=f6e77]: Hôm qua
+            - generic [ref=f6e78]: TH
+            - generic [ref=f6e79]:
+              - paragraph [ref=f6e80]:
+                - strong [ref=f6e81]: Lê Thu Hà
+                - text: đã cập nhật trạng thái thiết bị
+              - text: Máy ly tâm C-04
+      - article [ref=f6e82]:
+        - generic [ref=f6e83]:
+          - generic [ref=f6e84]:
+            - paragraph [ref=f6e85]: Tình trạng phòng lab
+            - heading "Mức sẵn sàng" [level=2] [ref=f6e86]
+          - generic [ref=f6e87]: Tốt
+        - generic [ref=f6e90]:
+          - strong [ref=f6e91]: "86"
+          - text: "%"
+          - generic [ref=f6e92]: Sẵn sàng
+        - generic [ref=f6e93]:
+          - generic [ref=f6e94]:
+            - text: Đang hoạt động
+            - strong [ref=f6e96]: "8"
+          - generic [ref=f6e97]:
+            - text: Bảo trì
+            - strong [ref=f6e99]: "2"
+          - generic [ref=f6e100]:
+            - text: Chưa sử dụng
+            - strong [ref=f6e102]: "4"
+    - generic [ref=f6e103]:
+      - paragraph [ref=f6e104]: Thao tác nhanh
+      - generic [ref=f6e105]:
+        - button "＋ Thêm nhân viên Tạo tài khoản truy cập mới →" [ref=f6e106] [cursor=pointer]:
+          - generic [ref=f6e107]: ＋
+          - generic [ref=f6e108]:
+            - strong [ref=f6e109]: Thêm nhân viên
+            - generic [ref=f6e110]: Tạo tài khoản truy cập mới
+          - generic [ref=f6e111]: →
+        - button "⌁ Kiểm tra thiết bị Xem toàn bộ thiết bị trong lab →" [ref=f6e112] [cursor=pointer]:
+          - generic [ref=f6e113]: ⌁
+          - generic [ref=f6e114]:
+            - strong [ref=f6e115]: Kiểm tra thiết bị
+            - generic [ref=f6e116]: Xem toàn bộ thiết bị trong lab
+          - generic [ref=f6e117]: →
+        - button "▣ Xem báo cáo Tổng hợp hoạt động tháng này →" [ref=f6e118] [cursor=pointer]:
+          - generic [ref=f6e119]: ▣
+          - generic [ref=f6e120]:
+            - strong [ref=f6e121]: Xem báo cáo
+            - generic [ref=f6e122]: Tổng hợp hoạt động tháng này
+          - generic [ref=f6e123]: →

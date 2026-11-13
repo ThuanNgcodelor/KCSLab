@@ -1,0 +1,68 @@
+- main [ref=e4]:
+  - generic [ref=e5]:
+    - button "CFC CFC Lab" [ref=e6] [cursor=pointer]:
+      - generic [ref=e7]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=e8] [cursor=pointer]: ☰
+  - generic [ref=e9]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - button "← Danh sách phiếu chuyển" [ref=e13] [cursor=pointer]
+        - paragraph [ref=e14]: Phiếu chuyển mẫu / CM-20261113-B0854D
+        - heading "Đã nhận mẫu" [level=1] [ref=e15]
+        - paragraph [ref=e16]: Liên kết phiếu tiếp nhận TN-20261112-F901E9 · Hợp tác xã Playwright
+      - generic [ref=e17]: Đã nhận mẫu
+    - generic [ref=e19]:
+      - main [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]:
+              - paragraph [ref=e24]: Sample transfer form
+              - heading "Phiếu chuyển mẫu" [level=2] [ref=e25]
+            - strong [ref=e26]: CM-20261113-B0854D
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: Phiếu yêu cầu
+              - strong [ref=e30]: TN-20261112-F901E9
+            - generic [ref=e31]:
+              - generic [ref=e32]: Ngày chuyển
+              - strong [ref=e33]: 13/11/2026
+            - generic [ref=e34]:
+              - generic [ref=e35]: Hạn trả kết quả
+              - strong [ref=e36]: 20/11/2026
+            - generic [ref=e37]:
+              - generic [ref=e38]: Người giao
+              - strong [ref=e39]: Quản trị viên
+          - table [ref=e41]:
+            - rowgroup [ref=e42]:
+              - row [ref=e43]:
+                - cell "Mẫu CT001-SR-12112026-001 Sầu riêng kiểm thử Playwright" [ref=e44]:
+                  - text: Mẫu
+                  - strong [ref=e45]: CT001-SR-12112026-001
+                  - generic [ref=e46]: Sầu riêng kiểm thử Playwright
+                - cell "Khối lượng / SL 10 kg 10 kg" [ref=e47]:
+                  - text: Khối lượng / SL 10 kg
+                  - generic [ref=e48]: 10 kg
+                - cell "Tình trạng Nguyên vẹn" [ref=e49]
+                - cell "Chỉ tiêu Auramine O, Cadimi (Cd)" [ref=e50]
+                - cell "Phương pháp CFC-TN-01 / TCVN" [ref=e51]
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Thay đổi / ghi chú
+            - paragraph [ref=e55]: Kiểm thử E2E quy trình bàn giao mẫu
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Ý kiến phòng phân tích
+            - paragraph [ref=e58]: Đủ điều kiện đưa vào thử nghiệm
+      - complementary [ref=e59]:
+        - generic [ref=e60]:
+          - paragraph [ref=e61]: Chuỗi bàn giao
+          - generic [ref=e64]:
+            - strong [ref=e65]: Đã lập phiếu
+            - generic [ref=e66]: Quản trị viên · 08:30:58 13/11/2026
+          - generic [ref=e69]:
+            - strong [ref=e70]: Phòng PT tiếp nhận
+            - generic [ref=e71]: Quản trị viên · 08:32:20 13/11/2026
+        - generic [ref=e72]:
+          - strong [ref=e73]: Đã nhận mẫu
+          - generic [ref=e74]: Đã kiểm đếm, bao bì nguyên vẹn
+          - generic [ref=e75]: Lưu mẫu đến 27/11/2026

@@ -77,6 +77,7 @@ public class Receipt {
 
     public void addSample(Sample sample) { samples.add(sample); sample.attachTo(this); }
     public void addAttachment(ReceiptAttachment attachment) { attachments.add(attachment); attachment.attachTo(this); }
+    public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; this.updatedAt = Instant.now(); }
     public Long getId() { return id; }
     public String getReceiptCode() { return receiptCode; }
     public Customer getCustomer() { return customer; }

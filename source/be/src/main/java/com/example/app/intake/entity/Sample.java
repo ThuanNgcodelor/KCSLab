@@ -40,6 +40,9 @@ public class Sample {
         this.status = ReceiptStatus.RECEIVED;
     }
     void attachTo(Receipt receipt) { this.receipt = receipt; }
+    public void markTransferPending() { this.status = ReceiptStatus.TRANSFER_PENDING; }
+    public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; }
+    public void markTransferRejected() { this.status = ReceiptStatus.RECEIVED; }
     public Long getId() { return id; }
     public String getSampleCode() { return sampleCode; }
     public String getSourceCode() { return sourceCode; }
@@ -52,4 +55,5 @@ public class Sample {
     public String getCondition() { return sampleCondition; }
     public String getRequestedParameters() { return requestedParameters; }
     public ReceiptStatus getStatus() { return status; }
+    public Receipt getReceipt() { return receipt; }
 }

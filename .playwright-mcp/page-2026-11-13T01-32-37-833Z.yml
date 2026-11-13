@@ -1,0 +1,7 @@
+- main [ref=e4]:
+  - generic [ref=e5]:
+    - button "CFC CFC Lab" [ref=e6] [cursor=pointer]:
+      - generic [ref=e7]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=e8] [cursor=pointer]: ☰
+  - paragraph [ref=e10]: Đang tải phiếu chuyển…

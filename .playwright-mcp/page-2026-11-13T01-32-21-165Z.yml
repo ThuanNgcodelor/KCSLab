@@ -1,0 +1,69 @@
+- main [ref=f6e21]:
+  - generic [ref=f6e22]:
+    - button "CFC CFC Lab" [ref=f6e23] [cursor=pointer]:
+      - generic [ref=f6e24]: CFC
+      - text: CFC Lab
+    - button "Mở menu" [ref=f6e171] [cursor=pointer]: ☰
+  - generic [ref=f6e280]:
+    - generic [ref=f6e281]:
+      - generic [ref=f6e282]:
+        - button "← Danh sách phiếu chuyển" [ref=f6e283] [cursor=pointer]
+        - paragraph [ref=f6e284]: Phiếu chuyển mẫu / CM-20261113-B0854D
+        - heading "Đã nhận mẫu" [level=1] [ref=f6e371]
+        - paragraph [ref=f6e286]: Liên kết phiếu tiếp nhận TN-20261112-F901E9 · Hợp tác xã Playwright
+      - generic [ref=f6e287]: Đã nhận mẫu
+    - paragraph [ref=f6e289]: ✓ Đã lập phiếu CM-20261113-B0854D
+    - generic [ref=f6e290]:
+      - main [ref=f6e291]:
+        - generic [ref=f6e292]:
+          - generic [ref=f6e293]:
+            - generic [ref=f6e294]:
+              - paragraph [ref=f6e295]: Sample transfer form
+              - heading "Phiếu chuyển mẫu" [level=2] [ref=f6e296]
+            - strong [ref=f6e297]: CM-20261113-B0854D
+          - generic [ref=f6e298]:
+            - generic [ref=f6e299]:
+              - generic [ref=f6e300]: Phiếu yêu cầu
+              - strong [ref=f6e301]: TN-20261112-F901E9
+            - generic [ref=f6e302]:
+              - generic [ref=f6e303]: Ngày chuyển
+              - strong [ref=f6e304]: 13/11/2026
+            - generic [ref=f6e305]:
+              - generic [ref=f6e306]: Hạn trả kết quả
+              - strong [ref=f6e307]: 20/11/2026
+            - generic [ref=f6e308]:
+              - generic [ref=f6e309]: Người giao
+              - strong [ref=f6e310]: Quản trị viên
+          - table [ref=f6e312]:
+            - rowgroup [ref=f6e319]:
+              - row [ref=f6e364]:
+                - cell "Mẫu CT001-SR-12112026-001 Sầu riêng kiểm thử Playwright" [ref=f6e365]:
+                  - text: Mẫu
+                  - strong [ref=f6e322]: CT001-SR-12112026-001
+                  - generic [ref=f6e323]: Sầu riêng kiểm thử Playwright
+                - cell "Khối lượng / SL 10 kg 10 kg" [ref=f6e366]:
+                  - text: Khối lượng / SL 10 kg
+                  - generic [ref=f6e325]: 10 kg
+                - cell "Tình trạng Nguyên vẹn" [ref=f6e367]
+                - text: Chỉ tiêu
+                - cell "Phương pháp CFC-TN-01 / TCVN" [ref=f6e368]
+        - generic [ref=f6e328]:
+          - generic [ref=f6e329]:
+            - paragraph [ref=f6e330]: Thay đổi / ghi chú
+            - paragraph [ref=f6e331]: Kiểm thử E2E quy trình bàn giao mẫu
+          - generic [ref=f6e332]:
+            - paragraph [ref=f6e333]: Ý kiến phòng phân tích
+            - paragraph [ref=f6e334]: Đủ điều kiện đưa vào thử nghiệm
+      - complementary [ref=f6e335]:
+        - generic [ref=f6e336]:
+          - paragraph [ref=f6e337]: Chuỗi bàn giao
+          - generic [ref=f6e340]:
+            - strong [ref=f6e341]: Đã lập phiếu
+            - generic [ref=f6e342]: Quản trị viên · 08:30:58 13/11/2026
+          - generic [ref=f6e345]:
+            - strong [ref=f6e346]: Phòng PT tiếp nhận
+            - generic [ref=f6e347]: Quản trị viên · 08:32:20 13/11/2026
+        - generic [ref=f6e372]:
+          - strong [ref=f6e373]: Đã nhận mẫu
+          - generic [ref=f6e374]: Đã kiểm đếm, bao bì nguyên vẹn
+          - generic [ref=f6e375]: Lưu mẫu đến 27/11/2026
