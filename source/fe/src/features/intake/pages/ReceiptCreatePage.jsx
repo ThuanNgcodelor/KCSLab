@@ -117,10 +117,9 @@ export function ReceiptCreatePage() {
     <header className="admin-heading staff-heading"><div>
       <button className="back-link" onClick={() => navigate('/admin/intake')}>← Quay lại danh sách</button>
       <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo phiếu tiếp nhận</h1>
-      <p className="heading-copy">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh theo Phiếu số 3.</p>
     </div></header>
     {error && <p className="form-error form-page-error" role="alert">{error}</p>}
-    {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ví dụ nhập nhanh: Số điện thoại <strong>090 123 4567</strong> · Phiếu yêu cầu <strong>YC-2026-0001</strong> · Mã nguồn <strong>CT001</strong></p>}
+    {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
       <div className="receipt-form-main">
         <section className="panel-card intake-form-card"><FormHeading number="01" title="Người giao và người lấy mẫu" copy="Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận." />
@@ -205,7 +204,7 @@ function validateForm(form, samples) {
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
   if (samples.some((sample) => !sample.name.trim() || !sample.productType.trim()
-      || !sample.sourceCode.trim() || !sample.requestedParameters.trim())) {
+    || !sample.sourceCode.trim() || !sample.requestedParameters.trim())) {
     return 'Mỗi mẫu cần có tên, loại sản phẩm, mã nguồn và chỉ tiêu yêu cầu.';
   }
   if (form.acceptanceDecision !== 'ACCEPTED' && !form.acceptanceReason.trim()) {
