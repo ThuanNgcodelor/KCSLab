@@ -151,6 +151,18 @@ try {
   const intakeDesktop = await pageMetrics();
   const intakeDesktopShot = await screenshot('01-intake-list-desktop.png');
 
+  await send('Emulation.setDeviceMetricsOverride', { width: 1024, height: 768, deviceScaleFactor: 1, mobile: false });
+  await delay(300);
+  const intakeTablet = await pageMetrics();
+  const intakeTabletShot = await screenshot('01b-intake-list-tablet.png');
+
+  await send('Emulation.setDeviceMetricsOverride', { width: 2560, height: 952, deviceScaleFactor: 1, mobile: false });
+  await delay(300);
+  const intakeWide = await pageMetrics();
+  const intakeWideShot = await screenshot('01c-intake-list-wide.png');
+
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+
   await navigate(`/admin/intake/${receiptId}`);
   await waitFor("document.body.textContent.includes('Nguồn và chuỗi tiếp nhận') && document.body.textContent.includes('Ảnh và hồ sơ')", 'receipt detail');
   const receiptDetail = await pageMetrics();
@@ -188,7 +200,7 @@ try {
   const transferDetail = await pageMetrics();
   const transferDetailShot = await screenshot('05-transfer-accepted-desktop.png');
 
-  const pages = { intakeDesktop, receiptDetail, intakeFormDesktop, intakeFormMobile, intakeListMobile, transferCreate, transferDetail };
+  const pages = { intakeDesktop, intakeTablet, intakeWide, receiptDetail, intakeFormDesktop, intakeFormMobile, intakeListMobile, transferCreate, transferDetail };
   for (const [name, metrics] of Object.entries(pages)) {
     if (metrics.alerts.length) throw new Error(`${name} has visible errors: ${metrics.alerts.join('; ')}`);
     if (metrics.scrollWidth > metrics.width + 1) throw new Error(`${name} has horizontal overflow: ${metrics.scrollWidth} > ${metrics.width}`);
@@ -198,9 +210,9 @@ try {
   process.stdout.write(`${JSON.stringify({
     browser: 'Google Chrome headless (DevTools Protocol)',
     routes: Object.fromEntries(Object.entries(pages).map(([name, metrics]) => [name, metrics.path])),
-    responsive: { desktop: `${intakeDesktop.width}px`, mobile: `${intakeFormMobile.width}px`, horizontalOverflow: false },
+    responsive: { desktop: `${intakeDesktop.width}px`, tablet: `${intakeTablet.width}px`, wide: `${intakeWide.width}px`, mobile: `${intakeFormMobile.width}px`, horizontalOverflow: false },
     pagination: intakePagination,
-    screenshots: [intakeDesktopShot, receiptDetailShot, intakeFormDesktopShot, intakeFormMobileShot, intakeListMobileShot, transferCreateShot, transferDetailShot],
+    screenshots: [intakeDesktopShot, intakeTabletShot, intakeWideShot, receiptDetailShot, intakeFormDesktopShot, intakeFormMobileShot, intakeListMobileShot, transferCreateShot, transferDetailShot],
     consoleErrors: browserErrors.length,
   }, null, 2)}\n`);
 } finally {

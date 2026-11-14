@@ -1,5 +1,13 @@
 # Project State
 
+## Cập nhật mới nhất — bộ chọn Phiếu 4 và responsive
+
+- Màn lập Phiếu chuyển mẫu tìm phiếu tiếp nhận phía server theo mã phiếu, mã mẫu, khách hàng hoặc số điện thoại; debounce 300 ms, 20 kết quả/trang và có điều hướng trang.
+- API `GET /api/v1/receipts` hỗ trợ `transferable=true`, chỉ trả phiếu không bị từ chối và còn ít nhất một mẫu `RECEIVED`; không còn tải 100 phiếu rồi lọc ở trình duyệt.
+- MySQL có composite index `idx_samples_status_receipt(status, receipt_id)` phục vụ truy vấn ứng viên chuyển mẫu; migration idempotent đã được áp dụng trên CSDL local.
+- Navbar của `RECEPTIONIST` không còn mục Tổng quan. Trang `/admin/transfers` chuyển bảng thành card có nhãn ở màn hình nhỏ và không tràn ngang.
+- Đã xác minh bằng test `ReceiptServiceTest`, frontend production build và Google Chrome CDP ở breakpoint mobile; API MySQL trả đúng 3/3 ứng viên hiện có, tối đa 20/trang.
+
 **Cập nhật:** 14/11/2026
 
 ## Đã hoàn thành

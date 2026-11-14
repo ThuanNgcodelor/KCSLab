@@ -1,6 +1,13 @@
 # Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
-**Cập nhật:** 14/11/2026 · **Ưu tiên hiện tại:** Intake I1 — Dashboard/API search-filter thật; tiếp theo notification nội bộ/WebSocket và form Phiếu 3
+## Hoàn thành bổ sung ngày 14/11/2026
+
+- [x] Thay dropdown Phiếu 4 tải 100 hồ sơ bằng tìm kiếm server-side có debounce và phân trang 20 phiếu/trang.
+- [x] Chỉ hiển thị phiếu còn mẫu `RECEIVED` qua bộ lọc backend `transferable=true`; có test loại phiếu đã chuyển khỏi kết quả.
+- [x] Thêm index MySQL `samples(status, receipt_id)` cho truy vấn ứng viên khi dữ liệu tăng lớn.
+- [x] Ẩn Tổng quan đối với role Tiếp nhận và sửa responsive `/admin/transfers` thành card mobile không tràn ngang.
+
+**Cập nhật:** 14/11/2026 · **Ưu tiên hiện tại:** Hoàn tất Intake I4–I5; I1–I3 đã có runtime và đã smoke test trên MySQL/Chrome
 
 ## Báo cáo sơ bộ hiện hành
 
@@ -13,7 +20,7 @@
 | Phiếu 5 — Thử nghiệm | Hoàn thành đến kiểm tra nội bộ | Thiết bị, hóa chất, QC/raw data, submit, kiểm tra/trả lại; mẫu đến `TEST_REVIEWED` |
 | Duyệt/phát hành kết quả | Đang lập kế hoạch, chưa có runtime | Chưa có `result_releases`, PDF versioned, checksum phát hành, thu hồi/đính chính |
 | Tra cứu khách hàng | Chưa triển khai | Chưa có mã + đuôi điện thoại, trạng thái công khai hoặc tải PDF |
-| Dashboard quản trị | Giao diện mẫu | Các số liệu/hoạt động/mức sẵn sàng hiện là dữ liệu hard-code, chưa phải báo cáo thật |
+| Dashboard quản trị | Đã nối dữ liệu tiếp nhận thật | Aggregate theo ngày/người nhận từ backend; đã bỏ constants mẫu của dashboard |
 | Responsive Admin UI | Hoàn thành nền giao diện | Shell fluid tối đa 1680px; drawer từ 1080px; đã kiểm tra 390/1024/1440/2560px |
 
 **Ranh giới sản phẩm hiện tại:** hệ thống vận hành nội bộ được từ đăng nhập đến biên bản đã kiểm tra; chưa gửi Zalo/SMS cho khách và chưa có kết quả pháp lý/khách hàng được phát hành. Hoàn thành các giai đoạn 0–4 không đồng nghĩa sẵn sàng production.
@@ -35,9 +42,9 @@ Kết luận đã chốt:
 - [x] WebSocket là realtime transport, REST/database là nguồn sự thật; notification nội bộ tách khỏi ZBS/SMS gửi khách.
 - [x] KCS là đích cố định, không tạo UI chọn nhiều phòng.
 - [x] Phiếu 3 không có danh sách đóng loại sản phẩm; đổi sang combobox có search + nhập mới, còn product code do catalog/Admin quản lý.
-- [ ] I1: criteria/specification + aggregate API + index/test, sau đó nối dashboard/list và bỏ dữ liệu hard-code.
-- [ ] I2–I3: notification persistence/API, header + trang notification, rồi WebSocket user destination có auth/reconnect.
-- [ ] I4–I5: route/dashboard/list mới và refactor form theo sáu phần Phiếu 3 + draft/completion/catalog.
+- [x] I1: criteria/specification + aggregate API + index/test; dashboard/list dùng dữ liệu thật và query ở backend.
+- [x] I2–I3: notification persistence/API, header ba tin + trang riêng 20/trang và WebSocket cookie-auth có reconnect.
+- [ ] I4–I5: form Phiếu 3 đã hỗ trợ nhập tự do loại sản phẩm, nhiều mẫu và ảnh mobile; còn draft/completion, catalog duyệt và unsaved warning.
 - [ ] I6: MySQL load test hợp lý và E2E ba role trên desktop/mobile.
 
 ## Ưu tiên mới — Phase 1B thông báo sau tiếp nhận

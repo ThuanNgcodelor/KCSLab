@@ -12,9 +12,10 @@ public record ReceiptSearchCriteria(
         ReceiptStatus status,
         AcceptanceDecision decision,
         String productType,
-        Long receivedBy
+        Long receivedBy,
+        Boolean transferable
 ) {
     public static ReceiptSearchCriteria empty() {
-        return new ReceiptSearchCriteria(null, null, null, null, null, null, null);
+        return new ReceiptSearchCriteria(null, null, null, null, null, null, null, null);
     }
 }

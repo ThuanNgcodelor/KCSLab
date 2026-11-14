@@ -3,9 +3,11 @@ package com.example.app.intake.service;
 import com.example.app.intake.dto.CreateReceiptRequest;
 import com.example.app.intake.dto.ReceiptAttachmentResponse;
 import com.example.app.intake.dto.ReceiptResponse;
+import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.dto.SampleRequest;
 import com.example.app.intake.entity.AcceptanceDecision;
 import com.example.app.intake.entity.ReceiptAttachmentCategory;
+import com.example.app.intake.repository.SampleRepository;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import com.example.app.user.repository.UserRepository;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ReceiptServiceTest {
     @Autowired private ReceiptService receiptService;
     @Autowired private UserRepository userRepository;
+    @Autowired private SampleRepository sampleRepository;
 
     @Test
     void createsMultiSampleSourceRecordAndReturnsPersistedAttachmentMetadata() {
@@ -94,6 +97,27 @@ class ReceiptServiceTest {
         assertThatThrownBy(() -> receiptService.findAll(0, 101, "receivedAt,desc"))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Kích thước trang");
+    }
+
+    @Test
+    void searchesOnlyReceiptsThatStillHaveTransferableSamples() {
+        User receptionist = userRepository.save(new User(
+                "transfer-search@test.local", "Nhan vien chuyen mau", "unused", Role.RECEPTIONIST));
+        Instant now = Instant.now();
+        ReceiptResponse unavailable = receiptService.create(
+                receiptRequest("Alpha Unavailable", "0900000201", now.minusSeconds(60)), receptionist);
+        receiptService.create(receiptRequest("Beta Available", "0900000202", now), receptionist);
+
+        var sample = sampleRepository.findById(unavailable.samples().getFirst().id()).orElseThrow();
+        sample.markTransferPending();
+        sampleRepository.saveAndFlush(sample);
+
+        var result = receiptService.findAll(new ReceiptSearchCriteria(
+                null, null, null, null, null, null, null, true),
+                0, 20, "receivedAt,desc");
+
+        assertThat(result.content()).extracting(ReceiptResponse::customerName)
+                .containsExactly("Beta Available");
     }
 
     private CreateReceiptRequest receiptRequest(String customerName, String phone, Instant receivedAt) {

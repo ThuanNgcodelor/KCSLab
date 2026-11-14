@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS samples (
     UNIQUE KEY uk_samples_code (sample_code),
     KEY idx_samples_receipt (receipt_id),
     KEY idx_samples_date (received_date),
+    KEY idx_samples_status_receipt (status, receipt_id),
     CONSTRAINT fk_samples_receipt FOREIGN KEY (receipt_id) REFERENCES receipts(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

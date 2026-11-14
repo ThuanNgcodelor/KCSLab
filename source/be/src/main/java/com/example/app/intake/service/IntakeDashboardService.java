@@ -48,7 +48,7 @@ public class IntakeDashboardService {
         }
 
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria(
-                null, from, to, null, null, null, receivedBy);
+                null, from, to, null, null, null, receivedBy, false);
         Specification<Receipt> base = ReceiptSpecifications.byCriteria(criteria);
         long totalReceipts = receiptRepository.count(base);
         long totalSamples = sampleRepository.count(sampleRange(from, to, receivedBy));

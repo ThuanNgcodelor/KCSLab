@@ -2,6 +2,8 @@ package com.example.app.intake.repository;
 
 import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.entity.Receipt;
+import com.example.app.intake.entity.ReceiptStatus;
+import com.example.app.intake.entity.Sample;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -61,6 +63,20 @@ public final class ReceiptSpecifications {
                         builder.like(builder.lower(customer.get("phone")), pattern, '\\'),
                         builder.like(builder.lower(samples.get("sampleCode")), pattern, '\\'),
                         builder.like(builder.lower(samples.get("name")), pattern, '\\')
+                );
+            });
+        }
+        if (Boolean.TRUE.equals(criteria.transferable())) {
+            specification = specification.and((root, query, builder) -> {
+                var availableSample = query.subquery(Long.class);
+                var sample = availableSample.from(Sample.class);
+                availableSample.select(sample.get("id")).where(
+                        builder.equal(sample.get("receipt").get("id"), root.get("id")),
+                        builder.equal(sample.get("status"), ReceiptStatus.RECEIVED)
+                );
+                return builder.and(
+                        builder.notEqual(root.get("status"), ReceiptStatus.REJECTED),
+                        builder.exists(availableSample)
                 );
             });
         }

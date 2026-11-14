@@ -50,5 +50,6 @@ DELIMITER ;
 CALL cfc_add_index_if_missing('receipts', 'idx_receipts_received_at', '`received_at`');
 CALL cfc_add_index_if_missing('receipts', 'idx_receipts_status_received', '`status`, `received_at`');
 CALL cfc_add_index_if_missing('receipts', 'idx_receipts_received_by_received', '`received_by_user_id`, `received_at`');
+CALL cfc_add_index_if_missing('samples', 'idx_samples_status_receipt', '`status`, `receipt_id`');
 
 DROP PROCEDURE cfc_add_index_if_missing;

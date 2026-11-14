@@ -53,9 +53,10 @@ public class ReceiptController {
             @RequestParam(required = false) ReceiptStatus status,
             @RequestParam(required = false) AcceptanceDecision decision,
             @RequestParam(required = false) String productType,
-            @RequestParam(required = false) Long receivedBy) {
+            @RequestParam(required = false) Long receivedBy,
+            @RequestParam(defaultValue = "false") boolean transferable) {
         return receiptService.findAll(new ReceiptSearchCriteria(
-                query, from, to, status, decision, productType, receivedBy), page, size, sort);
+                query, from, to, status, decision, productType, receivedBy, transferable), page, size, sort);
     }
     @GetMapping("/{id}") public ReceiptResponse get(@PathVariable Long id) { return receiptService.findById(id); }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) public ReceiptResponse create(@Valid @RequestBody CreateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) { return receiptService.create(request, userService.getByEmail(jwt.getSubject())); }

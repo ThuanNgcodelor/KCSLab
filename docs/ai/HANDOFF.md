@@ -1,9 +1,16 @@
 # CFC Lab Management — Bàn giao để tiếp tục ở máy khác
 
+## Cập nhật bộ chọn chuyển mẫu
+
+- `/admin/transfers/new` dùng tìm kiếm backend theo mã phiếu/mã mẫu/khách hàng/số điện thoại, debounce 300 ms và 20 kết quả/trang.
+- `GET /api/v1/receipts?...&transferable=true` chỉ trả phiếu còn mẫu `RECEIVED`; không còn tải 100 bản ghi để frontend tự lọc.
+- Role `RECEPTIONIST` không còn mục Tổng quan trong navbar. `/admin/transfers` đã có card mobile có nhãn, không tràn ngang.
+- Kiểm tra gần nhất: Maven toàn bộ 9/9 pass trước test mới; `ReceiptServiceTest` 3/3 pass sau test mới; Vite build 67 modules; Chrome CDP kiểm tra danh sách và bộ chọn mobile không có alert/overflow.
+
 **Cập nhật:** 14/11/2026
 **Nhánh:** `main`  
 **Mốc Git tiếp nhận/pagination:** `ca3b44a`
-**Ưu tiên hiện tại:** Intake I1 — Dashboard/API query thật; tiếp theo notification nội bộ/WebSocket và form Phiếu 3
+**Ưu tiên hiện tại:** Hoàn tất Intake I4–I5; I1–I3 đã có runtime, migration MySQL và Chrome smoke
 
 > Đây là file cần đọc đầu tiên khi tiếp tục dự án ở máy khác. Không ghi mật khẩu, JWT secret hoặc thông tin đăng nhập vào file này; lấy chúng từ `.env` cục bộ.
 
@@ -15,7 +22,7 @@ Hệ thống hiện đã chạy được luồng nội bộ:
 
 Phase 1 và Phase 3 vừa được hardening: Phiếu 3 lưu hồ sơ nguồn/nhiều mẫu/ảnh bằng chứng; Phiếu 4 có bản nháp sửa được, chỉ khóa mẫu khi gửi và không lộ bản nháp cho KCS/PTN.
 
-Theo ưu tiên mới, module Tiếp nhận được tách thành plan page chung và ba role tại `plans/intake/`. Làm API dashboard/search/filter thật trước, rồi notification nội bộ lưu bền + header ba tin + page riêng + WebSocket; sau đó refactor form Phiếu 3. ZBS/SMS gửi khách vẫn là plan riêng tại `docs/INTAKE_NOTIFICATIONS.md`.
+Module Tiếp nhận hiện đã có API dashboard/search/filter thật, notification nội bộ lưu bền, header ba tin, trang riêng và WebSocket. Form Phiếu 3 đã cho nhập tự do loại sản phẩm và giữ capture ảnh mobile. ZBS/SMS gửi khách vẫn là plan riêng tại `docs/INTAKE_NOTIFICATIONS.md` và chưa được tích hợp.
 
 Ranh giới runtime hiện tại dừng ở trạng thái `TEST_REVIEWED`. Chưa có phát hành Phiếu kết quả/PDF, thu hồi hoặc đính chính kết quả, và chưa có trang khách hàng tra cứu bằng mã + đuôi số điện thoại.
 
@@ -82,7 +89,7 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 | Thông báo Zalo/SMS | Đã chốt plan, chưa triển khai | ZBS ưu tiên, SMS dự phòng; chưa có consent/outbox/provider/webhook |
 | Phiếu 4 — Chuyển mẫu | Phase 3 hoàn thành | Có nháp/sửa/gửi/nhận; vẫn cần chặn chuyển nếu mã chưa được người thứ hai xác minh |
 | Phiếu 5 — Thử nghiệm | Chạy tới `TEST_REVIEWED` | Cần chặn analyst tự review hồ sơ của mình |
-| Dashboard | Chỉ là giao diện mẫu | Số liệu và hoạt động đang hard-code |
+| Dashboard | Đã dùng dữ liệu thật | Aggregate theo khoảng ngày và theo người nhận tại backend |
 | Phiếu kết quả/PDF | Chưa triển khai | Chưa có `result_releases`, version/checksum hoặc file bất biến |
 | Tra cứu khách hàng | Chưa triển khai | Chưa có mã + đuôi điện thoại, rate limit hoặc public projection |
 
@@ -90,9 +97,9 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 
 - `ReceiptService.create` đang sinh sequence bằng `countByReceivedDate + 1`: có race condition khi hai hồ sơ được tạo đồng thời; timezone nghiệp vụ đã dùng `Asia/Ho_Chi_Minh`.
 - Model chưa có sample part `-V/-R`, QC, mã mù, người xác minh và lịch sử hiệu chỉnh mã.
-- Chưa có WebSocket thông báo chuyển mẫu; QR chưa được sinh vì điểm sinh phải nằm sau gate xác minh mã hoặc tại phát hành kết quả.
+- WebSocket nội bộ đã có cho tiếp nhận/chuyển mẫu; QR chưa được sinh vì điểm sinh phải nằm sau gate xác minh mã hoặc tại phát hành kết quả.
 - Chưa có notification runtime: form consent/kênh, template đã duyệt, outbox/delivery, worker, ZBS/SMS adapter và callback đều chưa được triển khai.
-- Receipt list chưa có search/filter phía server; dashboard đang hard-code; chưa có app header, notification persistence/page hoặc WebSocket dependency.
+- Receipt list đã search/filter/sort/page tại server; dashboard thật và notification/WebSocket đã có. Còn cần load test lớn và test realtime đa phiên chuyên biệt.
 - `TestingRecordService.review` chưa kiểm tra người review phải khác analyst.
 - Dashboard không được dùng làm báo cáo thật vì đang hard-code.
 - File đang lưu local; chưa có object storage, retention và backup production.
@@ -100,14 +107,12 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 
 ## 6. Việc tiếp theo — làm theo thứ tự
 
-### Slice kế tiếp: workspace Tiếp nhận I1–I3
+### Workspace Tiếp nhận I1–I3 — đã hoàn tất runtime
 
-1. Đọc `plans/intake/OVERVIEW.md` và role plan liên quan.
-2. Mở rộng receipt query bằng criteria/specification hoặc custom query; hỗ trợ search, khoảng ngày, trạng thái, kết luận, loại mẫu, người nhận, page/size/sort tại database.
-3. Tạo aggregate endpoint riêng cho dashboard Receptionist/Admin và activity API; thêm index/test MySQL.
-4. Nối dashboard/list với API thật rồi xóa constants `stats/activity`; frontend không tự filter/sort/paginate.
-5. Tạo notification nội bộ lưu bền, API latest 3/page 20, app header và notification page.
-6. Sau đó thêm Spring WebSocket/STOMP, JWT-cookie handshake, user destination, reconnect/dedupe và REST reconcile.
+1. Receipt criteria hỗ trợ search, ngày, trạng thái, kết luận, loại mẫu, người nhận, page/size/sort tại database.
+2. Dashboard Receptionist/Admin dùng aggregate endpoint riêng và index MySQL.
+3. Notification lưu bền, latest 3/page 20, header/trang riêng và raw WebSocket cookie-auth có reconnect/dedupe/REST reconcile.
+4. KCS là đích cố định; submit/accept/reject Phiếu 4 phát notification nội bộ tương ứng.
 
 ### Slice sau đó: form Phiếu 3 I4–I5
 
@@ -223,7 +228,10 @@ Sau khi sửa một luồng nghiệp vụ, chạy Playwright trên cả desktop 
 ## 9. Kết quả kiểm tra gần nhất
 
 - Backend `mvn test`: 9/9 pass trên Java 21.
-- Frontend `npm run build`: pass, 63 modules.
+- Frontend `npm run build`: pass, 67 modules.
+- MySQL migration intake workspace: `samples.product_type` là `VARCHAR(80)`, bảng `staff_notifications` và index receipt đã áp dụng không xóa dữ liệu.
+- Chrome UI đã tạo phiếu demo `TN-20261114-9B03B9`, mẫu `CT001-SR-14112026-001` bằng tài khoản Receptionist; notification `INTAKE_RECORDED` của Admin đã được lưu.
+- Chrome responsive audit: 390/1024/1424/2560px, không horizontal overflow và không console error.
 - MySQL smoke Phase 1/3: tạo Phiếu 3 hai mẫu, upload Form 3, tạo/sửa/gửi Phiếu 4, nhận mẫu và đồng bộ `TRANSFERRED`: pass.
 - Google Chrome CDP: 7 route intake/transfer tại desktop 1424px và mobile 390px, pagination/sort hiển thị đúng, không horizontal overflow, console không có lỗi.
 - Backend và frontend đã được xác nhận chạy lần cuối tại `127.0.0.1:8080` và `localhost:5173`; vẫn nên kiểm tra lại process khi mở phiên mới.
