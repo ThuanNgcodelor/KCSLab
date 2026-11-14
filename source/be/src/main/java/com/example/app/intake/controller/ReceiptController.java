@@ -5,7 +5,10 @@ import com.example.app.intake.dto.CreateReceiptRequest;
 import com.example.app.intake.dto.ReceiptAttachmentContent;
 import com.example.app.intake.dto.ReceiptAttachmentResponse;
 import com.example.app.intake.dto.ReceiptResponse;
+import com.example.app.intake.dto.ReceiptSearchCriteria;
+import com.example.app.intake.entity.AcceptanceDecision;
 import com.example.app.intake.entity.ReceiptAttachmentCategory;
+import com.example.app.intake.entity.ReceiptStatus;
 import com.example.app.intake.service.ReceiptService;
 import com.example.app.user.service.UserService;
 import jakarta.validation.Valid;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -42,8 +46,16 @@ public class ReceiptController {
     public PagedResponse<ReceiptResponse> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "receivedAt,desc") String sort) {
-        return receiptService.findAll(page, size, sort);
+            @RequestParam(defaultValue = "receivedAt,desc") String sort,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) ReceiptStatus status,
+            @RequestParam(required = false) AcceptanceDecision decision,
+            @RequestParam(required = false) String productType,
+            @RequestParam(required = false) Long receivedBy) {
+        return receiptService.findAll(new ReceiptSearchCriteria(
+                query, from, to, status, decision, productType, receivedBy), page, size, sort);
     }
     @GetMapping("/{id}") public ReceiptResponse get(@PathVariable Long id) { return receiptService.findById(id); }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) public ReceiptResponse create(@Valid @RequestBody CreateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) { return receiptService.create(request, userService.getByEmail(jwt.getSubject())); }

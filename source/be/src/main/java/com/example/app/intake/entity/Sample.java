@@ -20,7 +20,7 @@ public class Sample {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     @Column(nullable = false, unique = true, length = 80) private String sampleCode;
     @Column(nullable = false, length = 20) private String sourceCode;
-    @Column(nullable = false, length = 10) private String productType;
+    @Column(nullable = false, length = 80) private String productType;
     @Column(nullable = false) private LocalDate receivedDate;
     @Column(nullable = false) private Integer dailySequence;
     @Column(nullable = false, length = 160) private String name;

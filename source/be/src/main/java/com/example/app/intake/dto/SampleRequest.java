@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record SampleRequest(
         @NotBlank @Size(max = 20) String sourceCode,
-        @NotBlank @Size(max = 10) String productType,
+        @NotBlank @Size(max = 80) String productType,
         @NotBlank @Size(max = 160) String name,
         @Size(max = 80) String quantity,
         @Size(max = 80) String packaging,

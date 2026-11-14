@@ -5,6 +5,7 @@ import com.example.app.intake.dto.CreateReceiptRequest;
 import com.example.app.intake.dto.ReceiptAttachmentContent;
 import com.example.app.intake.dto.ReceiptAttachmentResponse;
 import com.example.app.intake.dto.ReceiptResponse;
+import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.dto.SampleRequest;
 import com.example.app.intake.dto.SampleResponse;
 import com.example.app.intake.entity.AcceptanceDecision;
@@ -16,6 +17,7 @@ import com.example.app.intake.entity.Sample;
 import com.example.app.intake.repository.CustomerRepository;
 import com.example.app.intake.repository.ReceiptAttachmentRepository;
 import com.example.app.intake.repository.ReceiptRepository;
+import com.example.app.intake.repository.ReceiptSpecifications;
 import com.example.app.intake.repository.SampleRepository;
 import com.example.app.user.entity.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -64,6 +67,12 @@ public class ReceiptService {
             "status", "status",
             "expectedDate", "expectedDate"
     );
+    private static final Map<String, String> COMMON_PRODUCT_CODES = Map.of(
+            "sr", "SR",
+            "sau rieng", "SR",
+            "mit", "MIT",
+            "thanh long", "THANHLONG"
+    );
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "application/pdf",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -90,12 +99,23 @@ public class ReceiptService {
 
     @Transactional(readOnly = true)
     public PagedResponse<ReceiptResponse> findAll(int page, int size, String sort) {
+        return findAll(ReceiptSearchCriteria.empty(), page, size, sort);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<ReceiptResponse> findAll(ReceiptSearchCriteria criteria,
+                                                   int page, int size, String sort) {
         if (page < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số trang phải từ 0 trở lên");
         }
         if (size < 1 || size > MAX_PAGE_SIZE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Kích thước trang phải từ 1 đến " + MAX_PAGE_SIZE);
+        }
+        if (criteria != null && criteria.from() != null && criteria.to() != null
+                && criteria.from().isAfter(criteria.to())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ngày bắt đầu không được sau ngày kết thúc");
         }
 
         ReceiptSort receiptSort = parseSort(sort);
@@ -104,7 +124,7 @@ public class ReceiptService {
             ordering = ordering.and(Sort.by(Sort.Direction.DESC, "id"));
         }
         Page<ReceiptResponse> result = receiptRepository
-                .findAll(PageRequest.of(page, size, ordering))
+                .findAll(ReceiptSpecifications.byCriteria(criteria), PageRequest.of(page, size, ordering))
                 .map(this::toResponse);
         return PagedResponse.from(result, receiptSort.canonical());
     }
@@ -139,9 +159,10 @@ public class ReceiptService {
         for (SampleRequest sampleRequest : request.samples()) {
             sequence++;
             String source = sampleRequest.sourceCode().trim().toUpperCase(Locale.ROOT);
-            String product = sampleRequest.productType().trim().toUpperCase(Locale.ROOT);
-            String code = "%s-%s-%s-%03d".formatted(source, product, SAMPLE_DATE.format(date), sequence);
-            receipt.addSample(new Sample(code, source, product, date, sequence, sampleRequest.name().trim(),
+            String productType = sampleRequest.productType().trim();
+            String productCode = productCode(productType);
+            String code = "%s-%s-%s-%03d".formatted(source, productCode, SAMPLE_DATE.format(date), sequence);
+            receipt.addSample(new Sample(code, source, productType, date, sequence, sampleRequest.name().trim(),
                     sampleRequest.quantity(), sampleRequest.packaging(), sampleRequest.condition(),
                     sampleRequest.requestedParameters()));
         }
@@ -223,6 +244,34 @@ public class ReceiptService {
 
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private String productCode(String productType) {
+        String normalized = Normalizer.normalize(productType, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", " ")
+                .trim();
+        String knownCode = COMMON_PRODUCT_CODES.get(normalized);
+        if (knownCode != null) return knownCode;
+
+        String compact = normalized.replace(" ", "").toUpperCase(Locale.ROOT);
+        if (compact.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Loại sản phẩm phải có ít nhất một chữ hoặc số");
+        }
+        if (compact.length() <= 10) return compact;
+
+        String[] words = normalized.split(" +");
+        if (words.length > 1) {
+            String initials = java.util.Arrays.stream(words)
+                    .filter(word -> !word.isBlank())
+                    .map(word -> word.substring(0, 1))
+                    .reduce("", String::concat)
+                    .toUpperCase(Locale.ROOT);
+            if (initials.length() >= 2) return initials.substring(0, Math.min(10, initials.length()));
+        }
+        return compact.substring(0, 10);
     }
 
     private ReceiptSort parseSort(String rawSort) {
