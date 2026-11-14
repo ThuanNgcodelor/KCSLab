@@ -77,6 +77,16 @@
 | F3-034 | Điện thoại 390px | Không tràn ngang, input/file picker dùng được |
 | F3-035 | Upload ảnh lớn | Frontend thu nhỏ, backend từ chối file quá giới hạn, không lưu ảnh gốc |
 
+## H. UX nhập liệu và lỗi trình duyệt
+
+| ID | Thao tác | Kết quả mong đợi |
+|---|---|---|
+| F3-036 | Mở form khi chưa nhập số điện thoại | Hiện ví dụ `090 123 4567`, `YC-2026-0001`, `CT001`; không có thông báo tiếng Anh của Chrome |
+| F3-037 | Nhập chữ hoặc ký tự đặc biệt vào ô điện thoại | Ký tự không phải số bị loại bỏ; ô chỉ giữ tối đa 11 chữ số |
+| F3-038 | Nhập `0901234567` | Ví dụ/placeholder biến mất; giá trị hợp lệ |
+| F3-039 | Nhập `12345` rồi bấm lưu | Hiện lỗi tiếng Việt, không gọi API và không tạo bản ghi |
+| F3-040 | Bỏ trống trường bắt buộc rồi bấm lưu | Hiện lỗi tiếng Việt trong form, không hiện `Please fill out this field.` |
+
 ## Tiêu chí pass
 
 Tất cả F3-001 đến F3-035 đạt; không có HTTP 500, không tạo bản ghi một phần khi validation thất bại, notification không trùng và mọi truy vấn danh sách vẫn phân trang server-side.

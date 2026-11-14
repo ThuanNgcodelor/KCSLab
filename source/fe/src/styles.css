@@ -43,6 +43,8 @@ input::placeholder { color: #749b83; }
 .primary-button { min-height: 50px; border: 0; border-radius: 12px; color: #062215; background: var(--mint); font-weight: 700; transition: transform .18s ease, background .18s ease; }
 .primary-button:hover { background: #c1ffd2; transform: translateY(-1px); }
 .form-error { margin: 0; color: var(--danger); font-size: 13px; line-height: 1.45; }
+.form-example-guide { margin: -14px 0 18px; padding: 10px 13px; border: 1px solid #d9e8dc; border-radius: 10px; color: #668373; background: #f7fbf7; font-size: 11px; line-height: 1.5; }
+.form-example-guide strong { color: #2c7547; font-weight: 700; }
 .security-note { margin: 24px 0 0; color: #88ae97; font-size: 12px; line-height: 1.5; }
 .remember-login { grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 11px; cursor: pointer; }
 .remember-login input { width: 18px; min-height: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--mint); }

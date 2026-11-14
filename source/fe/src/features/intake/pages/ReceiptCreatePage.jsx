@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createReceipt, uploadReceiptFile } from '../api/intakeApi';
 
@@ -25,9 +25,21 @@ export function ReceiptCreatePage() {
   const [uploadWarning, setUploadWarning] = useState('');
   const [created, setCreated] = useState(null);
 
+  useEffect(() => {
+    const phoneInput = document.querySelector('.receipt-form-page input[type="tel"]');
+    if (!phoneInput) return;
+    phoneInput.placeholder = '090 123 4567';
+    phoneInput.inputMode = 'numeric';
+    phoneInput.maxLength = 11;
+    phoneInput.pattern = '0[0-9]{9,10}';
+    phoneInput.setAttribute('aria-describedby', 'customer-phone-help');
+  });
+
   const update = (field) => (event) => setForm((current) => ({
     ...current,
-    [field]: event.target.type === 'checkbox' ? event.target.checked : event.target.value,
+    [field]: event.target.type === 'checkbox'
+      ? event.target.checked
+      : field === 'customerPhone' ? event.target.value.replace(/\D/g, '').slice(0, 11) : event.target.value,
   }));
   const updateSample = (index, field) => (event) => setSamples((current) => current.map((sample, itemIndex) => (
     itemIndex === index ? { ...sample, [field]: event.target.value } : sample
@@ -39,6 +51,11 @@ export function ReceiptCreatePage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const validationMessage = validateForm(form, samples);
+    if (validationMessage) {
+      setError(validationMessage);
+      return;
+    }
     setSaving(true); setError(''); setUploadWarning('');
     try {
       const primary = samples[0];
@@ -103,7 +120,8 @@ export function ReceiptCreatePage() {
       <p className="heading-copy">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh theo Phiếu số 3.</p>
     </div></header>
     {error && <p className="form-error form-page-error" role="alert">{error}</p>}
-    <form className="receipt-form-layout" onSubmit={handleSubmit}>
+    {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ví dụ nhập nhanh: Số điện thoại <strong>090 123 4567</strong> · Phiếu yêu cầu <strong>YC-2026-0001</strong> · Mã nguồn <strong>CT001</strong></p>}
+    <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
       <div className="receipt-form-main">
         <section className="panel-card intake-form-card"><FormHeading number="01" title="Người giao và người lấy mẫu" copy="Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận." />
           <div className="form-two-columns">
@@ -176,6 +194,24 @@ export function ReceiptCreatePage() {
       </aside>
     </form>
   </section>;
+}
+
+function validateForm(form, samples) {
+  if (!form.deliveredBy.trim()) return 'Vui lòng nhập họ tên người giao mẫu.';
+  if (!/^0\d{9,10}$/.test(form.customerPhone)) return 'Số điện thoại phải có 10 hoặc 11 chữ số và bắt đầu bằng số 0.';
+  if (!form.requestNumber.trim()) return 'Vui lòng nhập số Phiếu yêu cầu.';
+  if (!form.customerName.trim()) return 'Vui lòng nhập tên khách hàng hoặc đơn vị.';
+  if (form.customerEmail.trim() && !/^\S+@\S+\.\S+$/.test(form.customerEmail.trim())) return 'Email khách hàng không đúng định dạng.';
+  if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
+  if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
+  if (samples.some((sample) => !sample.name.trim() || !sample.productType.trim()
+      || !sample.sourceCode.trim() || !sample.requestedParameters.trim())) {
+    return 'Mỗi mẫu cần có tên, loại sản phẩm, mã nguồn và chỉ tiêu yêu cầu.';
+  }
+  if (form.acceptanceDecision !== 'ACCEPTED' && !form.acceptanceReason.trim()) {
+    return 'Vui lòng nhập lý do hoặc điều kiện tiếp nhận.';
+  }
+  return '';
 }
 
 function FormHeading({ number, title, copy }) {
