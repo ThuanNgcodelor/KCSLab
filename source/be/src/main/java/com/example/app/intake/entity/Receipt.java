@@ -32,6 +32,7 @@ public class Receipt {
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "received_by_user_id")
     private User receivedBy;
     @Column(nullable = false, length = 160) private String deliveredBy;
+    @Column(length = 80) private String requestNumber;
     @Column(nullable = false) private Instant receivedAt;
     @Column(length = 160) private String sampledBy;
     private Instant sampledAt;
@@ -45,6 +46,7 @@ public class Receipt {
     @Column(length = 80) private String packaging;
     @Column(length = 80) private String sealNumber;
     @Column(nullable = false) private boolean sealIntact;
+    @Enumerated(EnumType.STRING) @Column(length = 20) private SealStatus sealStatus;
     @Column(nullable = false, length = 80) private String sampleCondition;
     @Column(columnDefinition = "TEXT") private String conditionDetail;
     @Column(columnDefinition = "TEXT") private String transportInfo;
@@ -106,6 +108,8 @@ public class Receipt {
     public Customer getCustomer() { return customer; }
     public User getReceivedBy() { return receivedBy; }
     public String getDeliveredBy() { return deliveredBy; }
+    public String getRequestNumber() { return requestNumber; }
+    public void setRequestNumber(String requestNumber) { this.requestNumber = requestNumber; }
     public Instant getReceivedAt() { return receivedAt; }
     public String getSampledBy() { return sampledBy; }
     public Instant getSampledAt() { return sampledAt; }
@@ -119,6 +123,8 @@ public class Receipt {
     public String getPackaging() { return packaging; }
     public String getSealNumber() { return sealNumber; }
     public boolean isSealIntact() { return sealIntact; }
+    public SealStatus getSealStatus() { return sealStatus == null ? (sealIntact ? SealStatus.INTACT : SealStatus.OPENED) : sealStatus; }
+    public void setSealStatus(SealStatus sealStatus) { this.sealStatus = sealStatus; this.sealIntact = sealStatus == SealStatus.INTACT; }
     public String getSampleCondition() { return sampleCondition; }
     public String getConditionDetail() { return conditionDetail; }
     public String getTransportInfo() { return transportInfo; }

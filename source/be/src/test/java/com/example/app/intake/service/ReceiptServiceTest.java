@@ -7,6 +7,7 @@ import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.dto.SampleRequest;
 import com.example.app.intake.entity.AcceptanceDecision;
 import com.example.app.intake.entity.ReceiptAttachmentCategory;
+import com.example.app.intake.entity.SealStatus;
 import com.example.app.intake.repository.SampleRepository;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
@@ -39,11 +40,11 @@ class ReceiptServiceTest {
         User receptionist = userRepository.save(new User(
                 "intake@test.local", "Nhan vien tiep nhan", "unused", Role.RECEPTIONIST));
         CreateReceiptRequest request = new CreateReceiptRequest(
-                "Khach hang test", "0900000099", null, "Can Tho",
+                "Khach hang test", "0900000099", "REQ-TEST-001", null, "Can Tho",
                 "Nguoi lay mau", Instant.now().minusSeconds(3600), "Vung trong CT-TEST",
                 "Co so dong goi test", "65C-TEST", "MOOC-TEST", "CONT-TEST",
                 "Nguoi giao", Instant.now(), "Sau rieng test", "2 kg", "Tui PE",
-                "SEAL-TEST", true, "Nguyen ven", null, "Xe lanh", 18.5,
+                "SEAL-TEST", SealStatus.INTACT, "Nguyen ven", null, "Xe lanh", 18.5,
                 "Lanh", "Cadimi", LocalDate.now().plusDays(5), null,
                 AcceptanceDecision.ACCEPTED, null,
                 List.of(
@@ -122,11 +123,11 @@ class ReceiptServiceTest {
 
     private CreateReceiptRequest receiptRequest(String customerName, String phone, Instant receivedAt) {
         return new CreateReceiptRequest(
-                customerName, phone, null, "Can Tho",
+                customerName, phone, "REQ-" + customerName, null, "Can Tho",
                 "Nguoi lay mau", receivedAt.minusSeconds(3600), "Vung trong test",
                 "Co so dong goi test", "65C-TEST", null, null,
                 "Nguoi giao", receivedAt, "Sau rieng test", "1 kg", "Tui PE",
-                null, true, "Nguyen ven", null, null, null,
+                null, SealStatus.INTACT, "Nguyen ven", null, null, null,
                 "Nhiet do phong", "Cadimi", LocalDate.now().plusDays(5), null,
                 AcceptanceDecision.ACCEPTED, null,
                 List.of(new SampleRequest(

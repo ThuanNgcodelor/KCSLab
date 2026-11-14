@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { createReceipt, uploadReceiptFile } from '../api/intakeApi';
 
 const initialForm = {
-  customerName: '', customerPhone: '', customerEmail: '', customerAddress: '', deliveredBy: '',
+  customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
   sampledBy: '', sampledAt: '', growingArea: '', packingFacility: '', vehicleNumber: '',
-  trailerNumber: '', containerNumber: '', sealNumber: '', sealIntact: true, conditionDetail: '',
+  trailerNumber: '', containerNumber: '', sealNumber: '', sealStatus: 'INTACT', conditionDetail: '',
   transportInfo: '', receivedTemperature: '', storageCondition: 'Thường', expectedDate: '',
   specialRequest: '', acceptanceDecision: 'ACCEPTED', acceptanceReason: '',
 };
@@ -109,6 +109,7 @@ export function ReceiptCreatePage() {
           <div className="form-two-columns">
             <label>Họ tên người giao<input value={form.deliveredBy} onChange={update('deliveredBy')} required /></label>
             <label>Số điện thoại<input type="tel" value={form.customerPhone} onChange={update('customerPhone')} required /></label>
+            <label>Số phiếu yêu cầu<input value={form.requestNumber} onChange={update('requestNumber')} required /></label>
             <label>Tên khách hàng / đơn vị<input value={form.customerName} onChange={update('customerName')} required /></label>
             <label>Email<input type="email" value={form.customerEmail} onChange={update('customerEmail')} /></label>
             <label className="full-span">Địa chỉ<input value={form.customerAddress} onChange={update('customerAddress')} /></label>
@@ -125,7 +126,7 @@ export function ReceiptCreatePage() {
             <label>Số moóc<input value={form.trailerNumber} onChange={update('trailerNumber')} /></label>
             <label>Số container<input value={form.containerNumber} onChange={update('containerNumber')} /></label>
             <label>Số niêm phong<input value={form.sealNumber} onChange={update('sealNumber')} /></label>
-            <label className="check-field"><input type="checkbox" checked={form.sealIntact} onChange={update('sealIntact')} /> Niêm phong còn nguyên</label>
+            <label>Trạng thái niêm phong<select value={form.sealStatus} onChange={update('sealStatus')} required><option value="INTACT">Còn nguyên</option><option value="NOT_PRESENT">Không có</option><option value="OPENED">Đã mở</option></select></label>
             <label className="full-span">Phương tiện / điều kiện vận chuyển<input value={form.transportInfo} onChange={update('transportInfo')} /></label>
           </div>
         </section>

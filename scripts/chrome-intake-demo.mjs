@@ -101,6 +101,18 @@ try {
 
   await navigate('/admin/intake/new');
   await waitFor("Boolean(document.querySelector('.receipt-form-layout'))", 'intake form');
+  const pcFormCapture = await send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  const pcFormPath = join(artifactsDir, 'receipt-form-pc.png');
+  writeFileSync(pcFormPath, Buffer.from(pcFormCapture.data, 'base64'));
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 390, height: 844, screenWidth: 390, screenHeight: 844, deviceScaleFactor: 1, mobile: true,
+  });
+  await delay(300);
+  const phoneFormCapture = await send('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  const phoneFormPath = join(artifactsDir, 'receipt-form-phone.png');
+  writeFileSync(phoneFormPath, Buffer.from(phoneFormCapture.data, 'base64'));
+  await send('Emulation.clearDeviceMetricsOverride');
+  await delay(300);
   const demoPhone = `09${String(Date.now()).slice(-8)}`;
   await evaluate(`(() => {
     const setValue = (labelText, value) => {
@@ -144,7 +156,7 @@ try {
   const screenshot = await send('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const screenshotPath = join(artifactsDir, 'receipt-created.png');
   writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
-  process.stdout.write(`${JSON.stringify({ ...result, demoPhone, screenshotPath, chromePid: chrome.pid }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ ...result, demoPhone, screenshotPath, pcFormPath, phoneFormPath, chromePid: chrome.pid }, null, 2)}\n`);
 } finally {
   socket.close();
 }

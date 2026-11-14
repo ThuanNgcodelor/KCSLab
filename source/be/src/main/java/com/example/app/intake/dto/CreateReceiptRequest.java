@@ -1,6 +1,7 @@
 package com.example.app.intake.dto;
 
 import com.example.app.intake.entity.AcceptanceDecision;
+import com.example.app.intake.entity.SealStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import java.util.List;
 public record CreateReceiptRequest(
         @NotBlank String customerName,
         @NotBlank String customerPhone,
+        @NotBlank @Size(max = 80) String requestNumber,
         @Email String customerEmail,
         String customerAddress,
         @Size(max = 160) String sampledBy,
@@ -29,7 +31,7 @@ public record CreateReceiptRequest(
         String quantity,
         String packaging,
         String sealNumber,
-        boolean sealIntact,
+        SealStatus sealStatus,
         @NotBlank String sampleCondition,
         String conditionDetail,
         String transportInfo,
@@ -41,4 +43,8 @@ public record CreateReceiptRequest(
         AcceptanceDecision acceptanceDecision,
         String acceptanceReason,
         @NotEmpty List<@Valid SampleRequest> samples
-) {}
+) {
+    public boolean sealIntact() {
+        return sealStatus == SealStatus.INTACT;
+    }
+}

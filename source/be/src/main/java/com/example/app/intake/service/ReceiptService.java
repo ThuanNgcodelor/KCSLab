@@ -142,6 +142,7 @@ public class ReceiptService {
 
     @Transactional
     public ReceiptResponse create(CreateReceiptRequest request, User receivedBy) {
+        validateBusinessRules(request);
         String phone = request.customerPhone().trim();
         Customer customer = customerRepository.findByPhone(phone).orElseGet(() -> customerRepository.save(
                 new Customer(request.customerName().trim(), phone, blankToNull(request.customerEmail()),
@@ -159,6 +160,8 @@ public class ReceiptService {
                 request.conditionDetail(), request.transportInfo(), request.receivedTemperature(),
                 request.storageCondition(), request.requestedParameters(), request.expectedDate(),
                 request.specialRequest(), decision, request.acceptanceReason());
+        receipt.setRequestNumber(request.requestNumber().trim());
+        receipt.setSealStatus(request.sealStatus());
 
         LocalDate date = receivedAt.atZone(BUSINESS_ZONE).toLocalDate();
         int sequence = (int) sampleRepository.countByReceivedDate(date);
@@ -173,7 +176,7 @@ public class ReceiptService {
                     sampleRequest.requestedParameters()));
         }
         Receipt saved = receiptRepository.save(receipt);
-        notificationService.notifyRoles(Set.of(Role.ADMIN), receivedBy,
+        notificationService.notifyRoles(Set.of(Role.ADMIN, Role.TECHNICIAN), receivedBy,
                 StaffNotificationType.INTAKE_RECORDED,
                 "Phiếu tiếp nhận mới",
                 "%s đã ghi nhận %d mẫu từ %s".formatted(
@@ -329,11 +332,11 @@ public class ReceiptService {
     private ReceiptResponse toResponse(Receipt receipt) {
         return new ReceiptResponse(receipt.getId(), receipt.getReceiptCode(), receipt.getCustomer().getName(),
                 receipt.getCustomer().getPhone(), receipt.getReceivedBy().getId(),
-                receipt.getReceivedBy().getDisplayName(), receipt.getDeliveredBy(), receipt.getSampledBy(),
+                receipt.getReceivedBy().getDisplayName(), receipt.getDeliveredBy(), receipt.getRequestNumber(), receipt.getSampledBy(),
                 receipt.getSampledAt(), receipt.getGrowingArea(), receipt.getPackingFacility(),
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getReceivedAt(), receipt.getSampleName(), receipt.getQuantity(), receipt.getPackaging(),
-                receipt.getSealNumber(), receipt.isSealIntact(), receipt.getSampleCondition(),
+                receipt.getSealNumber(), receipt.isSealIntact(), receipt.getSealStatus(), receipt.getSampleCondition(),
                 receipt.getConditionDetail(), receipt.getTransportInfo(), receipt.getReceivedTemperature(),
                 receipt.getStorageCondition(), receipt.getRequestedParameters(), receipt.getExpectedDate(),
                 receipt.getSpecialRequest(), receipt.getAcceptanceDecision(), receipt.getAcceptanceReason(),
@@ -342,6 +345,21 @@ public class ReceiptService {
                         sample.getName(), sample.getQuantity(), sample.getPackaging(), sample.getCondition(),
                         sample.getRequestedParameters(), sample.getStatus())).toList(),
                 receipt.getAttachments().stream().map(this::toAttachmentResponse).toList());
+    }
+
+    private void validateBusinessRules(CreateReceiptRequest request) {
+        if (request.sealStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phải chọn trạng thái niêm phong");
+        }
+        if (request.acceptanceDecision() != AcceptanceDecision.ACCEPTED
+                && (request.acceptanceReason() == null || request.acceptanceReason().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Phải ghi lý do hoặc điều kiện khi không chấp nhận hoàn toàn");
+        }
+        if (request.samples().stream().anyMatch(sample -> sample.requestedParameters() == null
+                || sample.requestedParameters().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mỗi mẫu phải có chỉ tiêu yêu cầu");
+        }
     }
 
     private ReceiptAttachmentResponse toAttachmentResponse(ReceiptAttachment attachment) {

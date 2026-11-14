@@ -2,6 +2,14 @@
 
 ## Cập nhật mới nhất — duy trì đăng nhập bằng Redis
 
+## Cập nhật mới nhất — hardening Phiếu 3
+
+- Phiếu tiếp nhận đã bổ sung `requestNumber` và `sealStatus` với ba giá trị `INTACT`, `NOT_PRESENT`, `OPENED`; dữ liệu legacy vẫn đọc được qua `sealIntact`.
+- Backend bắt buộc lý do khi `ACCEPTED_WITH_CONDITION`/`REJECTED`, bắt buộc chỉ tiêu cho từng mẫu và từ chối trạng thái niêm phong thiếu.
+- Sự kiện `INTAKE_RECORDED` gửi cho Admin và Technician/KCS, dùng chung notification center + WebSocket toàn hệ thống.
+- Migration thật đã áp dụng trên MySQL local: thêm `receipts.request_number`, `receipts.seal_status`, backfill phiếu cũ; không dùng NVARCHAR.
+- Bộ nghiệm thu chi tiết nằm tại `plans/intake/TEST_CASES_FORM3.md`.
+
 - Trang đăng nhập có tùy chọn **Ghi nhớ đăng nhập**; hệ thống không lưu mật khẩu. Chọn ghi nhớ tạo cookie HttpOnly tối đa 30 ngày, không chọn dùng cookie phiên trình duyệt.
 - Access token mặc định 15 phút. Frontend tự gọi `/api/v1/auth/refresh` khi API trả 401, gom các request đồng thời vào một lần refresh rồi thử lại request ban đầu.
 - Refresh token ngẫu nhiên 48 byte, Redis chỉ lưu SHA-256 hash với TTL; token được xoay sau mỗi lần refresh và token cũ không thể dùng lại. Đổi mật khẩu thu hồi mọi phiên của người dùng.

@@ -102,6 +102,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp n
 
 - [x] Auth/session/CSRF, quản lý nhân viên và RBAC cơ bản; không có đăng ký công khai.
 - [x] Duy trì đăng nhập bằng Redis: cookie HttpOnly, remember-me 30 ngày hoặc browser-session, refresh rotation một lần, tự refresh/retry 401 ở frontend và thu hồi toàn bộ khi đổi mật khẩu.
+- [x] Hardening Phiếu 3: bắt buộc số Phiếu yêu cầu, trạng thái niêm phong 3 mức, validation backend cho chỉ tiêu/lý do kết luận, notification `INTAKE_RECORDED` gửi Admin và KCS; migration giữ VARCHAR/utf8mb4 tại `migration-receipt-form3-hardening.sql`.
 - [x] Phiếu tiếp nhận số 3, customer, sample, attachment và mã CFC-TN-14.
 - [x] Phase 1: hồ sơ nguồn có cấu trúc, nhiều mẫu, actor tiếp nhận và bằng chứng ảnh/file từ điện thoại.
 - [x] Danh sách tiếp nhận phân trang server-side 20 phiếu/trang và sort theo whitelist.
