@@ -87,6 +87,7 @@ public class ReceiptService {
     private final CustomerRepository customerRepository;
     private final SampleRepository sampleRepository;
     private final StaffNotificationService notificationService;
+    private final ReceiptForm3Exporter form3Exporter;
     private final Path storageRoot;
 
     public ReceiptService(ReceiptRepository receiptRepository,
@@ -94,12 +95,14 @@ public class ReceiptService {
                           CustomerRepository customerRepository,
                           SampleRepository sampleRepository,
                           StaffNotificationService notificationService,
+                          ReceiptForm3Exporter form3Exporter,
                           @Value("${app.storage.root:storage/receipts}") String storageRoot) {
         this.receiptRepository = receiptRepository;
         this.attachmentRepository = attachmentRepository;
         this.customerRepository = customerRepository;
         this.sampleRepository = sampleRepository;
         this.notificationService = notificationService;
+        this.form3Exporter = form3Exporter;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
     }
 
@@ -138,6 +141,11 @@ public class ReceiptService {
     @Transactional(readOnly = true)
     public ReceiptResponse findById(Long id) {
         return toResponse(getReceipt(id));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportForm3(Long id) {
+        return form3Exporter.export(getReceipt(id));
     }
 
     @Transactional

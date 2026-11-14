@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ByteArrayResource;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -62,13 +63,13 @@ public class ReceiptController {
     @GetMapping("/{id}") public ReceiptResponse get(@PathVariable Long id) { return receiptService.findById(id); }
     @GetMapping("/{id}/form-3")
     public ResponseEntity<Resource> form3(@PathVariable Long id) {
-        receiptService.findById(id);
-        Resource template = new ClassPathResource("templates/phieu-tiep-nhan-ban-giao-mau.docx");
+        byte[] document = receiptService.exportForm3(id);
+        Resource resource = new ByteArrayResource(document);
         ContentDisposition disposition = ContentDisposition.attachment()
                 .filename("phieu-tiep-nhan-" + id + ".docx", StandardCharsets.UTF_8).build();
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString()).body(template);
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString()).body(resource);
     }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) public ReceiptResponse create(@Valid @RequestBody CreateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) { return receiptService.create(request, userService.getByEmail(jwt.getSubject())); }
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
