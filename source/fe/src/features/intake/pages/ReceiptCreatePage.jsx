@@ -11,7 +11,7 @@ const initialForm = {
 };
 
 const newSample = () => ({
-  sourceCode: 'CT001', productType: 'SR', name: '', quantity: '', packaging: 'Túi PE',
+  sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
   condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
@@ -138,7 +138,7 @@ export function ReceiptCreatePage() {
               </div>
               <div className="form-two-columns">
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
-                <label>Loại sản phẩm<select value={sample.productType} onChange={updateSample(index, 'productType')}><option value="SR">SR — Sầu riêng</option><option value="MIT">MIT — Mít</option><option value="OTHER">Khác</option></select></label>
+                <label>Loại sản phẩm<input list="product-type-suggestions" maxLength="80" value={sample.productType} onChange={updateSample(index, 'productType')} placeholder="Nhập loại sản phẩm" required /></label>
                 <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
                 <label>Số lượng / khối lượng<input value={sample.quantity} onChange={updateSample(index, 'quantity')} /></label>
                 <label>Bao bì<input value={sample.packaging} onChange={updateSample(index, 'packaging')} /></label>
@@ -148,6 +148,7 @@ export function ReceiptCreatePage() {
             </article>)}
           </div>
           <button type="button" className="outline-button add-sample-button" onClick={() => setSamples((current) => [...current, newSample()])}>＋ Thêm mẫu vào phiếu</button>
+          <datalist id="product-type-suggestions"><option value="Sầu riêng" /><option value="Mít" /><option value="Thanh long" /><option value="Xoài" /><option value="Nông sản khác" /></datalist>
         </section>
 
         <section className="panel-card intake-form-card"><FormHeading number="04" title="Điều kiện và kết luận tiếp nhận" copy="Ghi nhận tình trạng chung của lô tại thời điểm nhận." />

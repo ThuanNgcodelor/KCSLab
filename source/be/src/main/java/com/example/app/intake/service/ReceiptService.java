@@ -19,6 +19,9 @@ import com.example.app.intake.repository.ReceiptAttachmentRepository;
 import com.example.app.intake.repository.ReceiptRepository;
 import com.example.app.intake.repository.ReceiptSpecifications;
 import com.example.app.intake.repository.SampleRepository;
+import com.example.app.notification.entity.StaffNotificationType;
+import com.example.app.notification.service.StaffNotificationService;
+import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -83,17 +86,20 @@ public class ReceiptService {
     private final ReceiptAttachmentRepository attachmentRepository;
     private final CustomerRepository customerRepository;
     private final SampleRepository sampleRepository;
+    private final StaffNotificationService notificationService;
     private final Path storageRoot;
 
     public ReceiptService(ReceiptRepository receiptRepository,
                           ReceiptAttachmentRepository attachmentRepository,
                           CustomerRepository customerRepository,
                           SampleRepository sampleRepository,
+                          StaffNotificationService notificationService,
                           @Value("${app.storage.root:storage/receipts}") String storageRoot) {
         this.receiptRepository = receiptRepository;
         this.attachmentRepository = attachmentRepository;
         this.customerRepository = customerRepository;
         this.sampleRepository = sampleRepository;
+        this.notificationService = notificationService;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
     }
 
@@ -166,7 +172,14 @@ public class ReceiptService {
                     sampleRequest.quantity(), sampleRequest.packaging(), sampleRequest.condition(),
                     sampleRequest.requestedParameters()));
         }
-        return toResponse(receiptRepository.save(receipt));
+        Receipt saved = receiptRepository.save(receipt);
+        notificationService.notifyRoles(Set.of(Role.ADMIN), receivedBy,
+                StaffNotificationType.INTAKE_RECORDED,
+                "Phiếu tiếp nhận mới",
+                "%s đã ghi nhận %d mẫu từ %s".formatted(
+                        receivedBy.getDisplayName(), saved.getSamples().size(), saved.getCustomer().getName()),
+                "/admin/intake/" + saved.getId(), "RECEIPT", saved.getId());
+        return toResponse(saved);
     }
 
     @Transactional

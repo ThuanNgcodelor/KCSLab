@@ -76,6 +76,9 @@ CREATE TABLE IF NOT EXISTS receipts (
     UNIQUE KEY uk_receipts_code (receipt_code),
     KEY idx_receipts_customer (customer_id),
     KEY idx_receipts_created (created_at),
+    KEY idx_receipts_received_at (received_at),
+    KEY idx_receipts_status_received (status, received_at),
+    KEY idx_receipts_received_by_received (received_by_user_id, received_at),
     CONSTRAINT fk_receipts_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_receipts_user FOREIGN KEY (received_by_user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -84,7 +87,7 @@ CREATE TABLE IF NOT EXISTS samples (
     id BIGINT NOT NULL AUTO_INCREMENT,
     sample_code VARCHAR(80) NOT NULL,
     source_code VARCHAR(20) NOT NULL,
-    product_type VARCHAR(10) NOT NULL,
+    product_type VARCHAR(80) NOT NULL,
     received_date DATE NOT NULL,
     daily_sequence INT NOT NULL,
     name VARCHAR(160) NOT NULL,
@@ -224,6 +227,26 @@ CREATE TABLE IF NOT EXISTS testing_reagents (
     PRIMARY KEY (id),
     KEY idx_testing_reagents_record (testing_record_id),
     CONSTRAINT fk_testing_reagents_record FOREIGN KEY (testing_record_id) REFERENCES testing_records(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS staff_notifications (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    recipient_user_id BIGINT NOT NULL,
+    type VARCHAR(40) NOT NULL,
+    title VARCHAR(180) NOT NULL,
+    message VARCHAR(500) NOT NULL,
+    target_url VARCHAR(255) NULL,
+    entity_type VARCHAR(60) NULL,
+    entity_id BIGINT NULL,
+    dedupe_key VARCHAR(180) NOT NULL,
+    read_at TIMESTAMP(6) NULL,
+    created_at TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_staff_notifications_dedupe (dedupe_key),
+    KEY idx_staff_notifications_recipient_created (recipient_user_id, created_at),
+    KEY idx_staff_notifications_recipient_read (recipient_user_id, read_at),
+    CONSTRAINT fk_staff_notifications_recipient
+        FOREIGN KEY (recipient_user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS testing_measurements (

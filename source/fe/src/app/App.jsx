@@ -14,6 +14,7 @@ import { TransferDetailPage } from '../features/transfer/pages/TransferDetailPag
 import { TestingRecordsPage } from '../features/testing/pages/TestingRecordsPage';
 import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFormPage';
 import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
+import { NotificationsPage } from '../features/notifications/pages/NotificationsPage';
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -33,6 +34,7 @@ export function App() {
     <Route element={<ProtectedRoute />}>
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<DashboardPage />} />
+        <Route path="/admin/notifications" element={<NotificationsPage />} />
         <Route element={<RoleRoute roles={['ADMIN']} />}>
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/new" element={<UserFormPage />} />

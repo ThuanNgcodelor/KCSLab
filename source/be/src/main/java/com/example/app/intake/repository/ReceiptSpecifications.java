@@ -45,7 +45,7 @@ public final class ReceiptSpecifications {
             specification = specification.and((root, query, builder) -> {
                 query.distinct(true);
                 var samples = root.join("samples", JoinType.INNER);
-                return builder.like(builder.lower(samples.get("productType")), pattern);
+                return builder.like(builder.lower(samples.get("productType")), pattern, '\\');
             });
         }
         if (hasText(criteria.query())) {
@@ -55,12 +55,12 @@ public final class ReceiptSpecifications {
                 var customer = root.join("customer", JoinType.INNER);
                 var samples = root.join("samples", JoinType.LEFT);
                 return builder.or(
-                        builder.like(builder.lower(root.get("receiptCode")), pattern),
-                        builder.like(builder.lower(root.get("sampleName")), pattern),
-                        builder.like(builder.lower(customer.get("name")), pattern),
-                        builder.like(builder.lower(customer.get("phone")), pattern),
-                        builder.like(builder.lower(samples.get("sampleCode")), pattern),
-                        builder.like(builder.lower(samples.get("name")), pattern)
+                        builder.like(builder.lower(root.get("receiptCode")), pattern, '\\'),
+                        builder.like(builder.lower(root.get("sampleName")), pattern, '\\'),
+                        builder.like(builder.lower(customer.get("name")), pattern, '\\'),
+                        builder.like(builder.lower(customer.get("phone")), pattern, '\\'),
+                        builder.like(builder.lower(samples.get("sampleCode")), pattern, '\\'),
+                        builder.like(builder.lower(samples.get("name")), pattern, '\\')
                 );
             });
         }

@@ -149,7 +149,7 @@ class TransferServiceTest {
         TransferResponse updated = transferService.update(created.id(), updatedRequest);
 
         assertThat(updated.status()).isEqualTo(TransferStatus.DRAFT);
-        assertThat(updated.receivingDepartment()).isEqualTo("Phòng KCS cập nhật");
+        assertThat(updated.receivingDepartment()).isEqualTo("KCS");
         assertThat(updated.items()).singleElement().satisfies(item -> {
             assertThat(item.weight()).isEqualTo("600 g");
             assertThat(item.testMethod()).isEqualTo("CFC-TN cập nhật");

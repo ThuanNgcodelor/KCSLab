@@ -5,6 +5,8 @@ import com.example.app.intake.entity.ReceiptStatus;
 import com.example.app.intake.entity.Sample;
 import com.example.app.intake.repository.ReceiptRepository;
 import com.example.app.intake.repository.SampleRepository;
+import com.example.app.notification.entity.StaffNotificationType;
+import com.example.app.notification.service.StaffNotificationService;
 import com.example.app.transfer.dto.CreateTransferItemRequest;
 import com.example.app.transfer.dto.CreateTransferRequest;
 import com.example.app.transfer.dto.TransferDecisionRequest;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class TransferService {
+    private static final String RECEIVING_DEPARTMENT = "KCS";
     private static final List<TransferStatus> ACTIVE_TRANSFER_STATUSES =
             List.of(TransferStatus.PENDING, TransferStatus.ACCEPTED);
 
@@ -43,15 +46,18 @@ public class TransferService {
     private final SampleTransferItemRepository itemRepository;
     private final ReceiptRepository receiptRepository;
     private final SampleRepository sampleRepository;
+    private final StaffNotificationService notificationService;
 
     public TransferService(SampleTransferRepository transferRepository,
                            SampleTransferItemRepository itemRepository,
                            ReceiptRepository receiptRepository,
-                           SampleRepository sampleRepository) {
+                           SampleRepository sampleRepository,
+                           StaffNotificationService notificationService) {
         this.transferRepository = transferRepository;
         this.itemRepository = itemRepository;
         this.receiptRepository = receiptRepository;
         this.sampleRepository = sampleRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +94,7 @@ public class TransferService {
         Map<Long, Sample> samples = loadSamples(request, receipt);
 
         SampleTransfer transfer = new SampleTransfer(nextCode(request.transferDate()), receipt, deliveredBy,
-                request.receivingDepartment().trim(), request.transferDate(), request.resultsDueDate(),
+                RECEIVING_DEPARTMENT, request.transferDate(), request.resultsDueDate(),
                 request.returnToCustomer(), request.customerReturnDate(), blankToNull(request.changesNote()));
         buildItems(request, samples).forEach(transfer::addItem);
         return toResponse(transferRepository.save(transfer));
@@ -104,7 +110,7 @@ public class TransferService {
         }
         validateRequest(request, transfer.getReceipt());
         Map<Long, Sample> samples = loadSamples(request, transfer.getReceipt());
-        transfer.updateDraft(request.receivingDepartment().trim(), request.transferDate(),
+        transfer.updateDraft(RECEIVING_DEPARTMENT, request.transferDate(),
                 request.resultsDueDate(), request.returnToCustomer(), request.customerReturnDate(),
                 blankToNull(request.changesNote()));
         transfer.replaceItems(buildItems(request, samples));
@@ -134,7 +140,14 @@ public class TransferService {
 
         transfer.getItems().forEach(item -> item.getSample().markTransferPending());
         transfer.submit();
-        return toResponse(transferRepository.save(transfer));
+        SampleTransfer saved = transferRepository.save(transfer);
+        notificationService.notifyRoles(Set.of(Role.TECHNICIAN), transfer.getDeliveredBy(),
+                StaffNotificationType.TRANSFER_SUBMITTED,
+                "Phiếu chuyển mẫu mới",
+                "%s đã chuyển %d mẫu đến phòng KCS".formatted(
+                        transfer.getDeliveredBy().getDisplayName(), transfer.getItems().size()),
+                "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());
+        return toResponse(saved);
     }
 
     @Transactional
@@ -166,7 +179,21 @@ public class TransferService {
         } else {
             transfer.getItems().forEach(item -> item.getSample().markTransferRejected());
         }
-        return toResponse(transferRepository.save(transfer));
+        SampleTransfer saved = transferRepository.save(transfer);
+        StaffNotificationType notificationType = request.decision() == TransferStatus.ACCEPTED
+                ? StaffNotificationType.TRANSFER_ACCEPTED
+                : StaffNotificationType.TRANSFER_REJECTED;
+        String title = request.decision() == TransferStatus.ACCEPTED
+                ? "KCS đã nhận mẫu"
+                : "KCS từ chối nhận mẫu";
+        String message = request.decision() == TransferStatus.ACCEPTED
+                ? "%s đã xác nhận nhận phiếu %s".formatted(receiver.getDisplayName(), saved.getTransferCode())
+                : "%s đã từ chối phiếu %s: %s".formatted(
+                        receiver.getDisplayName(), saved.getTransferCode(), request.receivingNote().trim());
+        notificationService.notifyUsers(List.of(saved.getDeliveredBy()), receiver,
+                notificationType, title, message,
+                "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());
+        return toResponse(saved);
     }
 
     private Receipt getReceipt(Long id) {
