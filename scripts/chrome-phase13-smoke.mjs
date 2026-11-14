@@ -139,7 +139,15 @@ try {
   browserErrors.length = 0;
 
   await navigate('/admin/intake');
-  await waitFor("document.body.textContent.includes('Tiếp nhận mẫu') && Boolean(document.querySelector('table'))", 'intake list');
+  await waitFor("document.body.textContent.includes('Tiếp nhận mẫu') && Boolean(document.querySelector('table')) && Boolean(document.querySelector('.intake-list-tools select'))", 'paginated intake list');
+  const intakePagination = await evaluate(`(() => ({
+    sortOptions: document.querySelectorAll('.intake-list-tools select option').length,
+    pageButtons: document.querySelectorAll('.list-pagination .pagination-button').length,
+    summary: document.querySelector('.list-pagination p')?.textContent?.trim() ?? ''
+  }))()`);
+  if (intakePagination.sortOptions < 9) throw new Error(`Expected at least 9 receipt sort options, got ${intakePagination.sortOptions}`);
+  if (intakePagination.pageButtons < 3) throw new Error('Receipt pagination controls are missing');
+  if (!intakePagination.summary.includes('20 phiếu/trang')) throw new Error('Receipt page-size summary is missing');
   const intakeDesktop = await pageMetrics();
   const intakeDesktopShot = await screenshot('01-intake-list-desktop.png');
 
@@ -164,13 +172,23 @@ try {
   const intakeFormMobile = await pageMetrics();
   const intakeFormMobileShot = await screenshot('04-intake-form-mobile.png');
 
+  await navigate('/admin/intake');
+  await waitFor("Boolean(document.querySelector('.intake-list-tools select')) && Boolean(document.querySelector('.list-pagination'))", 'mobile intake pagination');
+  const intakeListMobile = await pageMetrics();
+  const intakeListMobileShot = await screenshot('06-intake-list-mobile.png');
+
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  await navigate('/admin/transfers/new');
+  await waitFor("document.body.textContent.includes('Lập phiếu chuyển mẫu') && (Boolean(document.querySelector('.transfer-form-layout')) || Boolean(document.querySelector('.empty-intake')))", 'transfer create after receipt pagination contract');
+  const transferCreate = await pageMetrics();
+  const transferCreateShot = await screenshot('07-transfer-create-pagination-contract.png');
+
   await navigate(`/admin/transfers/${transferId}`);
   await waitFor("document.body.textContent.includes('Phiếu chuyển mẫu') && document.body.textContent.includes('Đã nhận mẫu')", 'accepted transfer detail');
   const transferDetail = await pageMetrics();
   const transferDetailShot = await screenshot('05-transfer-accepted-desktop.png');
 
-  const pages = { intakeDesktop, receiptDetail, intakeFormDesktop, intakeFormMobile, transferDetail };
+  const pages = { intakeDesktop, receiptDetail, intakeFormDesktop, intakeFormMobile, intakeListMobile, transferCreate, transferDetail };
   for (const [name, metrics] of Object.entries(pages)) {
     if (metrics.alerts.length) throw new Error(`${name} has visible errors: ${metrics.alerts.join('; ')}`);
     if (metrics.scrollWidth > metrics.width + 1) throw new Error(`${name} has horizontal overflow: ${metrics.scrollWidth} > ${metrics.width}`);
@@ -181,7 +199,8 @@ try {
     browser: 'Google Chrome headless (DevTools Protocol)',
     routes: Object.fromEntries(Object.entries(pages).map(([name, metrics]) => [name, metrics.path])),
     responsive: { desktop: `${intakeDesktop.width}px`, mobile: `${intakeFormMobile.width}px`, horizontalOverflow: false },
-    screenshots: [intakeDesktopShot, receiptDetailShot, intakeFormDesktopShot, intakeFormMobileShot, transferDetailShot],
+    pagination: intakePagination,
+    screenshots: [intakeDesktopShot, receiptDetailShot, intakeFormDesktopShot, intakeFormMobileShot, intakeListMobileShot, transferCreateShot, transferDetailShot],
     consoleErrors: browserErrors.length,
   }, null, 2)}\n`);
 } finally {

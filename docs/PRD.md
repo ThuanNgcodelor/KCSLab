@@ -1,18 +1,19 @@
 # CFC Lab Management — PRD sơ bộ
 
-**Phiên bản:** 0.2 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Đang triển khai theo vertical slice
+**Phiên bản:** 0.3 · **Cập nhật:** 14/11/2026 · **Trạng thái:** Đang triển khai theo vertical slice
 
 ## 1. Mục tiêu và phạm vi
 
 CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu, theo dõi tiến độ thử nghiệm và công bố kết quả đã được phép phát hành. Runtime hiện đã đi hết vertical slice từ phiếu tiếp nhận số 3 qua phiếu chuyển mẫu số 4 đến biên bản thử nghiệm số 5 và bước kiểm tra nội bộ; phát hành PDF và tra cứu khách là phần tiếp theo.
 
-**Cập nhật nghiệp vụ 12/11/2026:** Quy trình thực tế được đối chiếu với phiếu tiếp nhận/bàn giao mẫu số 3, phiếu chuyển mẫu số 4, biên bản thử nghiệm số 5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại 00:29. Phạm vi ưu tiên được sắp lại thành: tiếp nhận phiếu giấy và số hóa hồ sơ → mã hóa mẫu → chuyển KCS/PTN → lập biên bản thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu bằng mã và phần đuôi điện thoại.
+**Cập nhật nghiệp vụ 14/11/2026:** Quy trình thực tế được đối chiếu với phiếu tiếp nhận/bàn giao mẫu số 3, phiếu chuyển mẫu số 4, biên bản thử nghiệm số 5, quy trình mã hóa CFC-TN-14 và video `ư.mp4` tại 00:29. Phạm vi ưu tiên hiện là: tiếp nhận và số hóa hồ sơ → gửi xác nhận cho khách qua ZBS/SMS → mã hóa mẫu → chuyển KCS/PTN → lập biên bản thử nghiệm → kiểm tra/duyệt → phát hành PDF → khách tra cứu bằng mã và phần đuôi điện thoại.
 
 ### MVP đề xuất (P0)
 
 - Tài khoản nhân viên và RBAC.
 - Số hóa phiếu tiếp nhận/bàn giao mẫu giấy và quản lý file hồ sơ gốc.
 - Quản lý khách hàng, phiếu tiếp nhận, mẫu, chỉ tiêu và lịch sử bàn giao.
+- Gửi xác nhận đã ghi nhận Phiếu 3 theo consent qua ZBS Template Message hoặc SMS Brandname, có outbox, idempotency, delivery audit và fallback chống gửi kép.
 - Sinh mã mẫu theo CFC-TN-14, gồm nguồn/mã khách hàng, loại sản phẩm, ngày nhận, số thứ tự và hậu tố nền V/R.
 - Quản lý phiếu chuyển mẫu, biên bản thử nghiệm, thiết bị, hóa chất, QC, raw data và kết quả từng chỉ tiêu.
 - Quan hệ một khách hàng — nhiều phiếu; một phiếu — nhiều mẫu.
@@ -24,7 +25,7 @@ CFC Lab Management là hệ thống web giúp LAB quản lý tiếp nhận mẫu
 
 ### Mở rộng (P1/P2)
 
-Import Excel, vùng trồng và lịch sử nhiều kỳ, dashboard nâng cao, thông báo, PDF nâng cao, tích hợp thiết bị/phần mềm LAB, QR nâng cao.
+Import Excel, vùng trồng và lịch sử nhiều kỳ, dashboard nâng cao, notification đa sự kiện/chiến dịch, PDF nâng cao, tích hợp thiết bị/phần mềm LAB, QR nâng cao.
 
 ## 2. Người dùng
 
@@ -41,6 +42,7 @@ Import Excel, vùng trồng và lịch sử nhiều kỳ, dashboard nâng cao, t
 flowchart LR
     A[Nhập thông tin tiếp nhận] --> B[Phiếu nháp]
     B --> C[Đã xác nhận nhận mẫu]
+    C --> N[Gửi xác nhận ZBS/SMS theo consent]
     C --> D[Đang thử nghiệm]
     D --> E[Chờ kiểm tra/duyệt nội bộ]
     E --> F[Đã phát hành kết quả]
@@ -48,6 +50,8 @@ flowchart LR
 ```
 
 “Nhập liệu” là thao tác tạo/cập nhật dữ liệu và chưa đồng nghĩa LAB đã xác nhận mẫu thực tế. `Đã nhận mẫu` chỉ bắt đầu khi nhân viên có thẩm quyền xác nhận việc tiếp nhận hợp lệ, kèm thời điểm và người thực hiện.
+
+Trong runtime hiện tại chưa có bước xác nhận riêng, MVP tạm phát `INTAKE_RECORDED` sau khi Phiếu 3 commit và chỉ dùng nội dung “đã ghi nhận”. Khi Phase 2 tách trạng thái chấp nhận mẫu, hệ thống bổ sung `INTAKE_ACCEPTED`/`INTAKE_REJECTED`; chi tiết tại `docs/INTAKE_NOTIFICATIONS.md`.
 
 ## 4. Trạng thái và ngoại lệ
 

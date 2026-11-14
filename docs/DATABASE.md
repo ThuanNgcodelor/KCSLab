@@ -1,6 +1,6 @@
 # Mô hình dữ liệu
 
-**Phiên bản:** 0.7 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Phase 1/3 đã nâng schema; coding hardening đang thiết kế
+**Phiên bản:** 0.8 · **Cập nhật:** 14/11/2026 · **Trạng thái:** Phase 1/3 đã nâng schema; notification và coding hardening đang thiết kế
 
 ## Lựa chọn cơ sở dữ liệu
 
@@ -21,6 +21,8 @@ MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc 
 
 Các bảng status history/custody tổng quát/result release/audit trong ERD mục tiêu dưới đây chưa được triển khai. Custody tối thiểu hiện nằm trực tiếp trên `sample_transfers`.
 
+Các bảng `customer_notification_preferences`, `receipt_notification_consents`, `notification_templates`, `notification_outbox` và `notification_deliveries` mới là thiết kế Phase 1B, chưa có trong schema runtime. `notifications` (tin nội bộ theo user), `product_types` và `test_parameters` là thiết kế workspace Tiếp nhận I2/I5, cũng chưa có runtime.
+
 Phase 1 bổ sung hồ sơ nguồn trên `receipts` (`sampled_by/at`, vùng trồng, cơ sở đóng gói, xe/moóc/container), metadata phân loại/actor/thời điểm chụp trên `receipt_attachments` và hỗ trợ nhiều dòng `samples`. Phase 3 bổ sung `receiving_department`, `submitted_at` và trạng thái `DRAFT` trên `sample_transfers`.
 
 ## Thực thể và quan hệ
@@ -39,6 +41,13 @@ erDiagram
     USERS ||--o{ AUDIT_LOGS : performs
     RECEIPTS ||--o{ CUSTOMER_CONFIRMATIONS : receives
     RECEIPTS ||--o{ RECEIPT_ATTACHMENTS : stores
+    CUSTOMERS ||--o| CUSTOMER_NOTIFICATION_PREFERENCES : chooses
+    RECEIPTS ||--o{ RECEIPT_NOTIFICATION_CONSENTS : snapshots
+    RECEIPTS ||--o{ NOTIFICATION_OUTBOX : emits
+    NOTIFICATION_OUTBOX ||--o{ NOTIFICATION_DELIVERIES : attempts
+    NOTIFICATION_TEMPLATES ||--o{ NOTIFICATION_DELIVERIES : renders
+    USERS ||--o{ NOTIFICATIONS : receives
+    PRODUCT_TYPES ||--o{ SAMPLES : classifies
     SAMPLES ||--o{ SAMPLE_CUSTODY_EVENTS : transfers
     SAMPLES ||--o{ SAMPLE_PARTS : splits
     SAMPLE_TESTS ||--o{ TEST_RECORDS : documents
@@ -60,6 +69,13 @@ erDiagram
 | Auth Sessions | Refresh/session hash, user, expiry, revokedAt, device metadata tối thiểu |
 | Customer Confirmations | Phiên bản nội dung, người xác nhận, thời điểm và bằng chứng |
 | Receipt Attachments | Form 3, ảnh lô/mẫu/bao bì/seal/hư hỏng/nhãn; category, actor upload, thời điểm chụp, metadata và checksum |
+| Customer Notification Preferences | Số nhận chuẩn hóa, kênh ưu tiên, consent/opt-out dài hạn, nguồn và thời điểm cập nhật |
+| Receipt Notification Consents | Snapshot số nhận, kênh được phép, phiên bản nội dung đồng ý, actor và thời điểm theo từng Phiếu 3 |
+| Notification Templates | Mã nghiệp vụ/kênh, provider template ID, version, schema tham số và trạng thái active |
+| Notification Outbox | Event giao dịch, aggregate, payload tối thiểu, idempotency key, attempt và lịch retry; ghi cùng transaction Phiếu 3 |
+| Notification Deliveries | Kênh/provider, recipient đã mask/hash, provider message ID, trạng thái chuẩn hóa, lỗi và các mốc gửi/giao |
+| Notifications | Tin nội bộ theo recipient user; type, message, target, entity, dedupe key, created/read timestamp |
+| Product Types | Danh mục tên/code/alias, trạng thái chờ duyệt/active/inactive; Receptionist đề xuất, Admin chuẩn hóa |
 | Sample Custody Events | Người giao/nhận, thời điểm, nơi chuyển, tình trạng, lý do và chữ ký/bằng chứng |
 | Sample Parts | Các phần vỏ/ruột hoặc nền tách từ mã gốc; hậu tố `-V`, `-R` và liên kết mẫu cha |
 | Sample Coding Events | Gán mã, xác minh độc lập, hiệu chỉnh/void; actor, thời điểm, lý do và mã cũ/mới |
@@ -88,6 +104,10 @@ erDiagram
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
 - SQL runtime đã có cho 12 bảng nêu trên; `db/migration-phase1-phase3.sql` là script nâng cấp MySQL idempotent tạm thời, chưa thay thế migration tool/version history.
 - Schema runtime hiện dùng `VARCHAR`/`TEXT`; các table đã triển khai đều khai báo `utf8mb4_unicode_ci`, không có cột `NVARCHAR`.
+- Notification dùng unique `idempotency_key`; webhook/callback được xử lý idempotent và không cho sự kiện đến trễ làm lùi trạng thái `DELIVERED`.
+- Outbox payload không chứa ảnh/file Phiếu 3, mapping mã mù hoặc kết quả thử nghiệm; secret provider không lưu trong bảng nghiệp vụ. Số điện thoại đầy đủ chỉ tồn tại ở cột cần gửi và phải được mã hóa/giới hạn quyền theo thiết kế production, còn log/UI dùng dạng mask.
+- `notifications` không dùng chung với customer delivery: notification nội bộ có `recipient_user_id` và read state, còn ZBS/SMS có consent/provider delivery state. WebSocket chỉ phát sau khi notification nội bộ đã được lưu.
+- Loại sản phẩm nhập tay tạo `product_types` ở trạng thái chờ duyệt; product code chính thức do Admin/backend quản lý. Mã mẫu không dùng một mã `OTHER` chung cho mọi sản phẩm mới.
 
 ## Câu hỏi dữ liệu mở
 

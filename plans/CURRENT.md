@@ -1,6 +1,6 @@
-# Current Plan — Hoàn thiện mã hóa và phát hành kết quả
+# Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
-**Cập nhật:** 13/11/2026 · **Giai đoạn hiện tại:** 5A — Hoàn thiện hồ sơ nguồn và mã hóa
+**Cập nhật:** 14/11/2026 · **Ưu tiên hiện tại:** Intake I1 — Dashboard/API search-filter thật; tiếp theo notification nội bộ/WebSocket và form Phiếu 3
 
 ## Báo cáo sơ bộ hiện hành
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | Nền tảng, auth, user/RBAC | Hoàn thành vertical slice | Login email, JWT cookie/refresh/CSRF, Admin tạo/sửa/khóa tài khoản; không có đăng ký công khai |
 | Phiếu 3 — Tiếp nhận | Phase 1 hoàn thành, cần Phase 2 mã hóa | Đã có hồ sơ nguồn, actor, nhiều mẫu, ảnh/file phân loại; thiếu xác minh hai người, `-V/-R`, QC và mã mù |
+| Thông báo khách hàng | Đã chốt plan, chưa có runtime | Ưu tiên ZBS Template Message; SMS Brandname/MultiSMS dự phòng; chưa có consent, outbox, provider adapter hoặc webhook |
 | Phiếu 4 — Chuyển mẫu | Phase 3 hoàn thành | Nháp/sửa/gửi, KCS nhận hoặc từ chối, ẩn nháp khỏi KCS, lưu/hoàn mẫu và đồng bộ trạng thái |
 | Phiếu 5 — Thử nghiệm | Hoàn thành đến kiểm tra nội bộ | Thiết bị, hóa chất, QC/raw data, submit, kiểm tra/trả lại; mẫu đến `TEST_REVIEWED` |
 | Duyệt/phát hành kết quả | Đang lập kế hoạch, chưa có runtime | Chưa có `result_releases`, PDF versioned, checksum phát hành, thu hồi/đính chính |
@@ -15,7 +16,52 @@
 | Dashboard quản trị | Giao diện mẫu | Các số liệu/hoạt động/mức sẵn sàng hiện là dữ liệu hard-code, chưa phải báo cáo thật |
 | Responsive Admin UI | Hoàn thành nền giao diện | Shell fluid tối đa 1680px; drawer từ 1080px; đã kiểm tra 390/1024/1440/2560px |
 
-**Ranh giới sản phẩm hiện tại:** hệ thống vận hành nội bộ được từ đăng nhập đến biên bản đã kiểm tra; chưa có kết quả pháp lý/khách hàng được phát hành. Hoàn thành các giai đoạn 0–4 không đồng nghĩa sẵn sàng production.
+**Ranh giới sản phẩm hiện tại:** hệ thống vận hành nội bộ được từ đăng nhập đến biên bản đã kiểm tra; chưa gửi Zalo/SMS cho khách và chưa có kết quả pháp lý/khách hàng được phát hành. Hoàn thành các giai đoạn 0–4 không đồng nghĩa sẵn sàng production.
+
+## Plan riêng cho module Tiếp nhận
+
+Nguồn thực thi mới:
+
+- `plans/intake/OVERVIEW.md`: page/route, header, dashboard, API, WebSocket, form Phiếu 3 và thứ tự I1–I6.
+- `plans/intake/RECEPTIONIST.md`: dashboard cá nhân và quy trình của người nhận mẫu.
+- `plans/intake/ADMIN.md`: dashboard tổng hợp, ngoại lệ, catalog và notification operation.
+- `plans/intake/TECHNICIAN_KCS.md`: KCS một phòng, nhận Phiếu 4 và notification realtime.
+
+Kết luận đã chốt:
+
+- [x] Không dùng dashboard hard-code; chỉ xóa constants mẫu khi API thật đã được nối để không tạo màn hình hỏng.
+- [x] Search/filter/sort/pagination chạy ở backend/database; frontend chỉ giữ query state và render response.
+- [x] Header hiển thị ba notification mới nhất; trang notification riêng dùng pagination 20/trang.
+- [x] WebSocket là realtime transport, REST/database là nguồn sự thật; notification nội bộ tách khỏi ZBS/SMS gửi khách.
+- [x] KCS là đích cố định, không tạo UI chọn nhiều phòng.
+- [x] Phiếu 3 không có danh sách đóng loại sản phẩm; đổi sang combobox có search + nhập mới, còn product code do catalog/Admin quản lý.
+- [ ] I1: criteria/specification + aggregate API + index/test, sau đó nối dashboard/list và bỏ dữ liệu hard-code.
+- [ ] I2–I3: notification persistence/API, header + trang notification, rồi WebSocket user destination có auth/reconnect.
+- [ ] I4–I5: route/dashboard/list mới và refactor form theo sáu phần Phiếu 3 + draft/completion/catalog.
+- [ ] I6: MySQL load test hợp lý và E2E ba role trên desktop/mobile.
+
+## Ưu tiên mới — Phase 1B thông báo sau tiếp nhận
+
+Chi tiết contract, schema, retry, bảo mật và acceptance criteria nằm tại `docs/INTAKE_NOTIFICATIONS.md`.
+
+- [x] Chốt điểm kích hoạt MVP: `INTAKE_RECORDED` chỉ phát sau khi Phiếu 3 và mẫu được commit thành công; nội dung chỉ xác nhận “đã ghi nhận”, không khẳng định mẫu đạt hoặc đã mã hóa.
+- [x] Chốt chiến lược kênh: ZBS Template Message là kênh ưu tiên; SMS Brandname/MultiSMS là adapter dự phòng; WebSocket chỉ dành cho nhân viên nội bộ.
+- [x] Chốt kiến trúc database outbox + worker nền + provider adapter + webhook/callback; không gọi provider trong transaction tiếp nhận.
+- [ ] Chốt nội dung consent, template, sender/brandname, ngân sách và nhà cung cấp SMS thực tế.
+- [ ] Tạo OA/ZBS Account/AppID, liên kết quyền, gửi duyệt template và chuẩn bị sandbox/provider credentials ngoài source code.
+- [ ] Triển khai preferences/consent/template/outbox/delivery bằng migration versioned; mọi chuỗi dùng `VARCHAR/TEXT` + `utf8mb4`.
+- [ ] Triển khai worker, idempotency, retry/backoff, fake provider và test rollback/concurrency/duplicate.
+- [ ] Bổ sung form chọn kênh/consent, timeline delivery, hàng đợi lỗi phân trang 20/trang và quyền resend cho Admin.
+- [ ] Tích hợp ZBS API + delivery webhook; sau đó tích hợp đúng SMS provider và fallback chống gửi kép.
+- [ ] Thêm WebSocket nội bộ sau khi event notification ổn định; REST/database vẫn là nguồn sự thật.
+
+### Thứ tự ưu tiên tích hợp với plan cũ
+
+1. Làm N0–N2 của notification bằng fake provider, không chờ tài khoản Zalo/SMS.
+2. Tích hợp ZBS/SMS khi LAB có tài khoản, template đã duyệt và sandbox.
+3. Tiếp tục Phase 2/5A: sequence nguyên tử, chấp nhận mẫu, `-V/-R`, xác minh hai người, QC/mã mù và gate trước Phiếu 4.
+4. Hardening Phase 3 bằng WebSocket nội bộ cho sự kiện gửi/nhận/từ chối Phiếu 4.
+5. Sau đó mới phát hành PDF, public lookup và QR kết quả.
 
 ## Kết luận từ biểu mẫu mới
 
@@ -29,13 +75,15 @@
 
 ## Mục tiêu
 
-Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác minh → biên bản đã kiểm tra → kết quả có phiên bản/PDF bất biến, rồi mới chuẩn bị dữ liệu an toàn cho tra cứu khách hàng.
+Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp nhận cho khách → mã mẫu đã xác minh → biên bản đã kiểm tra → kết quả có phiên bản/PDF bất biến, rồi mới chuẩn bị dữ liệu an toàn cho tra cứu khách hàng.
 
 ## Đã hoàn thành làm nền
 
 - [x] Auth/session/CSRF, quản lý nhân viên và RBAC cơ bản; không có đăng ký công khai.
 - [x] Phiếu tiếp nhận số 3, customer, sample, attachment và mã CFC-TN-14.
 - [x] Phase 1: hồ sơ nguồn có cấu trúc, nhiều mẫu, actor tiếp nhận và bằng chứng ảnh/file từ điện thoại.
+- [x] Danh sách tiếp nhận phân trang server-side 20 phiếu/trang và sort theo whitelist.
+- [x] Thiết kế Phase 1B notification với ZBS/SMS, outbox, idempotency, delivery audit và fallback; chưa có code runtime.
 - [x] Phase 3/Phiếu chuyển mẫu số 4: tạo/sửa nháp, gửi bàn giao, giao/nhận hoặc từ chối, thông tin lưu/hoàn mẫu.
 - [x] Biên bản thử nghiệm số 5: thiết bị, hóa chất, đường chuẩn, công thức, QC, raw data, submit và kiểm tra/trả lại.
 - [x] Giao diện desktop/mobile, navbar cố định theo viewport, footer CFC và bộ nhận diện sáng.
@@ -71,19 +119,19 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác 
 
 ## Thứ tự triển khai đề xuất
 
-1. Khóa contract mã mẫu theo CFC-TN-14, chốt riêng quy tắc số Phiếu kết quả và hoàn thiện schema hồ sơ nguồn.
-2. Làm bộ cấp số nguyên tử + timezone Việt Nam + test concurrency.
-3. Làm `-V/-R`, xác minh hai người, lịch sử hiệu chỉnh và chặn chuyển mẫu chưa xác minh.
-4. Thiết kế QC/mã mù và data projection cho kỹ thuật viên.
-5. Sửa quy tắc tách người phân tích–người kiểm tra và khóa contract quyền bằng unit test.
-6. Bổ sung `result_releases`, snapshot, version/checksum và PDF bất biến.
-7. Thêm thu hồi/đính chính cùng lịch sử trên Admin UI; chạy E2E toàn luồng.
+1. Intake I1: API dashboard/search/filter/sort/pagination thật và bỏ dashboard hard-code sau khi frontend nối API.
+2. Intake I2–I3: notification nội bộ lưu bền, header ba tin, page riêng và WebSocket user destination.
+3. Intake I4–I5: dashboard/list theo role và form Phiếu 3 bám sáu mục, catalog loại sản phẩm nhập tay có kiểm soát.
+4. Customer notification N0–N2 bằng outbox/fake provider; tích hợp ZBS/SMS khi có tài khoản/template/sandbox.
+5. Khóa Phase 2/5A: sequence nguyên tử, `-V/-R`, xác minh hai người, QC/mã mù và gate Phiếu 4.
+6. Sửa separation of duties cho thử nghiệm, rồi làm `result_releases`, PDF/QR và public lookup.
 
 ## Chưa làm trong giai đoạn này
 
 - Public lookup bằng mã + đuôi số điện thoại.
 - QR/OTP, rate limit chống dò mã và lịch sử vùng trồng.
-- Audit log tổng quát, object storage/backup và migration versioned.
+- Gửi nội dung quảng cáo/broadcast hoặc kết quả thử nghiệm qua Zalo/SMS.
+- Audit log tổng quát, object storage/backup và migration versioned ngoài các migration bắt buộc của notification.
 
 ## Điều kiện hoàn thành
 
@@ -100,6 +148,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác 
 - `ReceiptService.create` vẫn dùng `countByReceivedDate + 1`; timezone nghiệp vụ đã chuyển sang `Asia/Ho_Chi_Minh` nhưng cấp số vẫn có race condition.
 - Model hiện chưa có `-V/-R`, QC, mã mù, người xác minh và lịch sử hiệu chỉnh mã.
 - WebSocket thông báo chuyển mẫu và QR chưa triển khai; phải chốt event/điểm sinh QR sau gate xác minh mã.
+- ZBS/SMS chưa có code, consent, template đã duyệt, credential, outbox, callback hoặc delivery audit; plan nằm tại `docs/INTAKE_NOTIFICATIONS.md`.
 - Dashboard đang hiển thị dữ liệu mẫu nên không dùng làm số liệu vận hành.
 - Schema vẫn quản lý bằng SQL thủ công + Hibernate `validate`; chưa có Flyway/Liquibase.
 - File phiếu đang lưu local; chưa có object storage, retention và backup production.

@@ -1,5 +1,19 @@
 # Project Changelog
 
+## 2026-11-14
+
+- Tách kế hoạch module Tiếp nhận tại `plans/intake/OVERVIEW.md` cùng ba role `RECEPTIONIST`, `ADMIN`, `TECHNICIAN_KCS`; chốt KCS là một phòng cố định.
+- Chốt dashboard/list chỉ dùng API thật và query database; frontend không tự search/sort/paginate, dashboard hard-code sẽ bị xóa sau khi nối aggregate API.
+- Thiết kế app header, popover ba notification mới nhất, trang notification phân trang và WebSocket user destination có REST reconcile.
+- Đối chiếu Phiếu 3: thay select `SR/MIT/OTHER` bằng combobox catalog có search + nhập mới; product code vẫn do backend/Admin quản lý.
+- Viết lại roadmap tích hợp khâu tiếp nhận với thông báo khách hàng; thêm `docs/INTAKE_NOTIFICATIONS.md` làm contract cho consent, template, outbox, delivery, retry, webhook và rollout.
+- Chốt `INTAKE_RECORDED` chỉ phát sau commit Phiếu 3; ZBS Template Message là kênh ưu tiên, SMS Brandname/MultiSMS là dự phòng qua provider adapter và WebSocket chỉ dành cho nội bộ.
+- Cập nhật API/database/RBAC/architecture decisions và Project Memory; notification hiện mới ở mức thiết kế, chưa có runtime hoặc credential/template nhà cung cấp.
+- Chuyển `GET /api/v1/receipts` từ danh sách cố định 50 sang envelope phân trang ổn định; mặc định 20/trang, tối đa 100.
+- Whitelist sort receipt theo ngày nhận/tạo, mã phiếu, khách hàng, tên mẫu, trạng thái và hạn trả; input sort ngoài danh sách trả HTTP 400.
+- Bổ sung UI chọn 9 kiểu sắp xếp, tổng số phiếu, số trang, nút trước/sau và tối đa 5 nút trang; tối ưu card mobile có nhãn dữ liệu.
+- Backend test 9/9, frontend build và Chrome desktop/mobile pass; phân trang API nhiều trang đã kiểm tra trực tiếp với MySQL.
+
 ## 2026-11-13
 
 - Hoàn thành Phase 1/Phiếu 3: hồ sơ nguồn có cấu trúc, nhiều mẫu, actor tiếp nhận, ảnh/file phân loại từ điện thoại, checksum và endpoint xem/tải bằng chứng.

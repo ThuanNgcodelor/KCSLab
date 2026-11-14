@@ -1,5 +1,25 @@
 # Architecture Decisions
 
+## 14/11/2026 — Workspace Tiếp nhận, query và notification nội bộ
+
+- Tách module Tiếp nhận thành dashboard, danh sách, tạo phiếu và notification center; có plan riêng cho `ADMIN`, `RECEPTIONIST`, `TECHNICIAN` tại `plans/intake/`.
+- Search/filter/sort/pagination receipt chạy trong SQL qua specification/custom query; frontend chỉ quản lý query state và render envelope. Dashboard dùng aggregate API riêng, không đếm từ page và không dùng dữ liệu hard-code.
+- App header chỉ hiển thị ba notification mới nhất; trang notification dùng pagination 20/trang. Notification nội bộ được lưu theo recipient trước khi WebSocket phát; REST/database là nguồn sự thật.
+- WebSocket dùng authenticated user destination, không cho client subscribe role topic rộng. Customer ZBS/SMS là context riêng, không dùng chung bảng/read state với notification nội bộ.
+- KCS hiện là một phòng duy nhất; không tạo UI chọn phòng. Backend dùng giá trị canonical/config `KCS`.
+- Phiếu 3 không định nghĩa danh sách đóng loại sản phẩm. UI dùng combobox search + nhập mới; Receptionist đề xuất tên, Admin/backend quản lý product code để bảo vệ quy tắc mã mẫu.
+
+## 14/11/2026 — Thông báo khách hàng sau tiếp nhận
+
+- Sự kiện MVP là `INTAKE_RECORDED`, chỉ được phát sau khi Phiếu 3 và các mẫu commit thành công. Nội dung xác nhận đã ghi nhận, không khẳng định mẫu đã đạt, đã mã hóa hoặc có kết quả.
+- Kênh Zalo dùng **ZBS Template Message** theo số điện thoại và template đã duyệt; không dùng chat OA thông thường làm contract cho thông báo giao dịch.
+- Hệ thống không khóa cứng một hãng SMS. ZBS, SMS Brandname/MultiSMS và fake provider cùng implement provider interface; adapter SMS thật chỉ được chốt khi LAB chọn nhà cung cấp và cung cấp contract/sandbox hiện hành.
+- Ghi `notification_outbox` cùng transaction tiếp nhận, gửi bất đồng bộ bằng worker sau commit. Provider lỗi không rollback Phiếu 3.
+- Delivery dùng idempotency/tracking ID và state machine chuẩn hóa; fallback ZBS → SMS chỉ áp dụng cho lỗi vĩnh viễn đã xác định, không fallback khi kết quả kênh đầu còn không rõ để tránh gửi kép.
+- Lưu consent theo từng phiếu, template version, actor, provider message ID và trạng thái giao; secret chỉ nằm trong cấu hình deployment, số điện thoại phải mask trong log/UI theo quyền.
+- WebSocket chỉ là kênh realtime nội bộ cho nhân viên; database/REST là nguồn sự thật và ZBS/SMS là kênh gửi ra khách hàng.
+- Thiết kế và thứ tự triển khai đầy đủ nằm tại `docs/INTAKE_NOTIFICATIONS.md`.
+
 ## 13/11/2026 — Kiểu chuỗi và Unicode trên MySQL
 
 - Schema MySQL dùng `VARCHAR`/`TEXT`; không dùng `NVARCHAR`/`NCHAR`.

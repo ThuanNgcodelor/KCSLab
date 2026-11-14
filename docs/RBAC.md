@@ -1,6 +1,6 @@
 # RBAC
 
-**Phiên bản:** 0.4 · **Cập nhật:** 13/11/2026
+**Phiên bản:** 0.5 · **Cập nhật:** 14/11/2026
 
 ## Enforcement hiện tại
 
@@ -10,6 +10,7 @@
 - Backend testing đọc/lập/cập nhật/submit: `ADMIN` hoặc `TECHNICIAN`; review: `ADMIN`.
 - Frontend route intake mở cho `ADMIN|RECEPTIONIST`, testing cho `ADMIN|TECHNICIAN`, user management chỉ `ADMIN`.
 - Quyền phát hành kết quả vẫn chưa triển khai và cần LAB xác nhận.
+- Notification chưa có runtime: đề xuất Receptionist nhập/xác nhận consent và xem delivery của phiếu trong phạm vi; chỉ Admin cấu hình provider/template hoặc resend lỗi cuối cùng.
 
 Ký hiệu: `✓` được đề xuất, `—` không được phép mặc định, `?` cần xác nhận theo phạm vi/ủy quyền.
 
@@ -19,6 +20,15 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Tạo khách hàng/phiếu/mẫu | ✓ | ✓ | — |
 | Sửa dữ liệu tiếp nhận trước khóa | ✓ | ✓ | — |
 | Lưu file phiếu 3 và hồ sơ tiếp nhận | ✓ | ✓ | — |
+| Xác nhận số nhận tin/kênh/consent trước hoàn tất Phiếu 3 | ✓ | ✓ | — |
+| Xem trạng thái ZBS/SMS của Phiếu 3 trong phạm vi | ✓ | ✓ | — |
+| Gửi lại notification đã lỗi cuối cùng, có lý do | ✓ | — | — |
+| Quản lý provider/template/credential notification | ✓ cấu hình; secret không hiển thị | — | — |
+| Dashboard tiếp nhận cá nhân | ✓ | ✓ | — |
+| Dashboard tiếp nhận tổng hợp/workload | ✓ | — | — |
+| Xem/đánh dấu notification nội bộ của chính mình | ✓ | ✓ | ✓ |
+| Đề xuất loại sản phẩm mới | ✓ | ✓ | — |
+| Duyệt/chuẩn hóa loại sản phẩm | ✓ | — | — |
 | Sinh/gán mã mẫu CFC-TN-14 | ✓ | ✓ | — |
 | Xác minh mã mẫu của người khác | ✓ | ✓ theo phân công | — |
 | Xem mapping mã mẫu–khách hàng | ✓ | ✓ | — mặc định |
@@ -45,6 +55,8 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 Nguyên tắc: người nhập không mặc định được duyệt kết quả của chính mình; quyền chuyên môn của Admin không tự động được giả định; không xóa vật lý dữ liệu đã tạo lịch sử, ưu tiên vô hiệu hóa/đính chính có audit.
 
 Người gán mã không được tự xác minh mã của chính mình. Mẫu chưa xác minh không được chuyển phòng thử nghiệm. Kỹ thuật viên chỉ dùng mã mẫu trên hồ sơ trung gian và dữ liệu thiết bị; thông tin khách/mapping mã gốc chỉ mở khi có quyền nghiệp vụ. Trưởng/Phó phòng QLCLSP kiểm soát, phê duyệt thay đổi và lưu hồ sơ mã hóa theo CFC-TN-14.
+
+Notification nội bộ thuộc về từng recipient; API list/read không cho Admin tùy ý đánh dấu tin của user khác. KCS hiện là một phòng duy nhất, không có quyền chọn hoặc đổi `receivingDepartment`; KCS chỉ nhận event Phiếu 4 đã submit và payload không chứa phone/email/địa chỉ khách.
 
 ## Quyền tra cứu khách hàng
 
