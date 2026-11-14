@@ -1,8 +1,7 @@
 package com.example.app.user.service;
 
-import com.example.app.auth.entity.RefreshSession;
-import com.example.app.auth.repository.RefreshSessionRepository;
 import com.example.app.auth.service.AccountSecurityService;
+import com.example.app.auth.service.RefreshSessionStore;
 import com.example.app.user.dto.ChangeOwnPasswordRequest;
 import com.example.app.user.dto.UpdateOwnProfileRequest;
 import com.example.app.user.entity.Role;
@@ -22,8 +21,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,7 +33,7 @@ class UserProfileServiceTest {
     @Autowired private UserService userService;
     @Autowired private UserRepository userRepository;
     @Autowired private AccountSecurityService accountSecurityService;
-    @Autowired private RefreshSessionRepository refreshSessionRepository;
+    @Autowired private RefreshSessionStore refreshSessionStore;
     @Autowired private PasswordEncoder passwordEncoder;
 
     @Test
@@ -67,8 +65,7 @@ class UserProfileServiceTest {
     void changesPasswordAndRevokesRefreshSessions() {
         User user = userRepository.save(new User(
                 "password@test.local", "Nhan vien", passwordEncoder.encode("CurrentPass123"), Role.TECHNICIAN));
-        refreshSessionRepository.save(new RefreshSession(
-                "test-token-hash", user, Instant.now().plus(1, ChronoUnit.DAYS)));
+        refreshSessionStore.save("test-token-hash", user.getId(), user.getEmail(), true, Duration.ofDays(1));
 
         assertThatThrownBy(() -> accountSecurityService.changePassword(user.getEmail(),
                 new ChangeOwnPasswordRequest("wrong-password", "NewSecurePass456")))
@@ -80,7 +77,7 @@ class UserProfileServiceTest {
 
         assertThat(passwordEncoder.matches("NewSecurePass456",
                 userRepository.findById(user.getId()).orElseThrow().getPasswordHash())).isTrue();
-        assertThat(refreshSessionRepository.findByTokenHash("test-token-hash")).isEmpty();
+        assertThat(refreshSessionStore.consume("test-token-hash")).isEmpty();
     }
 
     private byte[] png(int width, int height) throws Exception {

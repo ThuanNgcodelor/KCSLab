@@ -182,6 +182,14 @@ Các tài liệu nghiệp vụ gốc ở root, không tự ý xóa hoặc sửa:
 
 ## 8. Cách chạy lại ở máy nhà
 
+### Phiên đăng nhập Redis
+
+- MySQL profile dùng Redis tại `REDIS_HOST`/`REDIS_PORT` (mặc định `127.0.0.1:6379`); bật Redis Laragon trước backend.
+- Access token mặc định 900 giây. `rememberMe=true` giữ phiên tối đa 30 ngày; `false` chỉ giữ tới khi đóng trình duyệt (Redis giữ tối đa 1 ngày nếu trình duyệt chưa đóng).
+- Redis chỉ lưu hash refresh token dưới namespace `cfc:auth:*`; refresh token được xoay một lần. Redis 5.x của Laragon dùng Lua atomic consume, không phụ thuộc `GETDEL`.
+- Smoke test runtime an toàn: chạy backend thử với `ACCESS_TOKEN_SECONDS=3`, sau đó `node scripts/auth-refresh-smoke.mjs`. Script không in mật khẩu/token.
+- Chrome responsive trang hồ sơ: `node scripts/chrome-profile-smoke.mjs`; kiểm tra 1424/1024/390 px và ảnh tại `artifacts/profile/`.
+
 ### Chuẩn bị
 
 - Cài Java 21, Maven, Node.js/npm và MySQL nếu muốn dùng profile MySQL.

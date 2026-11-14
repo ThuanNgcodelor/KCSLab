@@ -6,7 +6,7 @@ export function LoginPage() {
   const { user, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '', rememberMe: false });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,6 +55,17 @@ export function LoginPage() {
               onChange={(event) => setForm({ ...form, password: event.target.value })}
               required
             />
+          </label>
+          <label className="remember-login">
+            <input
+              type="checkbox"
+              checked={form.rememberMe}
+              onChange={(event) => setForm({ ...form, rememberMe: event.target.checked })}
+            />
+            <span>
+              <strong>Ghi nhớ đăng nhập</strong>
+              <small>Duy trì phiên trên thiết bị này trong 30 ngày.</small>
+            </span>
           </label>
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button" type="submit" disabled={submitting}>

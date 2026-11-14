@@ -11,7 +11,7 @@ const env = Object.fromEntries(readFileSync(join(root, '.env'), 'utf8')
     const separator = line.indexOf('=');
     return [line.slice(0, separator), line.slice(separator + 1)];
   }));
-const email = 'nguyentrungthuan4177@gmail.com';
+const email = env.ADMIN_EMAIL;
 const port = 9900 + Math.floor(Math.random() * 80);
 const profileDir = mkdtempSync(join(tmpdir(), 'cfc-profile-smoke-'));
 const artifacts = join(root, 'artifacts', 'profile');
@@ -154,6 +154,17 @@ try {
   }
 
   await send('Emulation.setDeviceMetricsOverride', {
+    width: 1024, height: 768, screenWidth: 1024, screenHeight: 768, deviceScaleFactor: 1, mobile: false,
+  });
+  await delay(300);
+  const tablet = await metrics();
+  const tabletShot = await screenshot('profile-tablet.png');
+  await evaluate("document.querySelector('.profile-forms form:last-child')?.scrollIntoView({ block: 'start' })");
+  await delay(250);
+  const tabletPasswordShot = await screenshot('profile-tablet-password.png');
+  await evaluate('window.scrollTo(0, 0)');
+
+  await send('Emulation.setDeviceMetricsOverride', {
     width: 390, height: 844, screenWidth: 390, screenHeight: 844, deviceScaleFactor: 1, mobile: true,
   });
   await delay(300);
@@ -166,12 +177,12 @@ try {
   })()`);
   await waitFor("document.querySelector('[role=status]')?.textContent.includes('Đã xóa avatar')", 'avatar cleanup');
 
-  for (const page of [desktop, mobile]) {
+  for (const page of [desktop, tablet, mobile]) {
     if (page.scrollWidth > page.width + 1) throw new Error(`Horizontal overflow: ${page.scrollWidth} > ${page.width}`);
     if (page.alerts.length) throw new Error(page.alerts.join('; '));
   }
   if (browserErrors.length) throw new Error(browserErrors.join(' | '));
-  process.stdout.write(JSON.stringify({ desktop, mobile, avatarDimensions, screenshots: [desktopShot, mobileShot] }, null, 2));
+  process.stdout.write(JSON.stringify({ desktop, tablet, mobile, avatarDimensions, screenshots: [desktopShot, tabletShot, tabletPasswordShot, mobileShot] }, null, 2));
 } finally {
   socket.close();
   chrome.kill();

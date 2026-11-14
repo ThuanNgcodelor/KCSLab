@@ -49,7 +49,7 @@ public class AuthController {
     public ResponseEntity<AuthUserResponse> login(@Valid @RequestBody LoginRequest request,
                                                    HttpServletResponse response) {
         AuthService.LoginResult result = authService.login(request.email(), request.password(), request.rememberMe());
-        setCookie(response, "access_token", result.accessToken(), accessTokenSeconds, true);
+        setAccessCookie(response, result);
         setRefreshCookie(response, result);
         return ResponseEntity.ok(toResponse(result.user()));
     }
@@ -59,7 +59,7 @@ public class AuthController {
                                                      HttpServletResponse response) {
         String token = cookie(request, "refresh_token");
         AuthService.LoginResult result = authService.refresh(token);
-        setCookie(response, "access_token", result.accessToken(), accessTokenSeconds, true);
+        setAccessCookie(response, result);
         setRefreshCookie(response, result);
         return ResponseEntity.ok(toResponse(result.user()));
     }
@@ -93,6 +93,11 @@ public class AuthController {
     private void setRefreshCookie(HttpServletResponse response, AuthService.LoginResult result) {
         Long maxAge = result.rememberMe() ? 30L * 24 * 60 * 60 : null;
         setCookie(response, "refresh_token", result.refreshToken(), maxAge, true);
+    }
+
+    private void setAccessCookie(HttpServletResponse response, AuthService.LoginResult result) {
+        Long maxAge = result.rememberMe() ? accessTokenSeconds : null;
+        setCookie(response, "access_token", result.accessToken(), maxAge, true);
     }
 
     private void setCookie(HttpServletResponse response, String name, String value, Long maxAge, boolean httpOnly) {

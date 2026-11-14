@@ -14,6 +14,17 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const handleRefreshed = (event) => setUser(event.detail);
+    const handleExpired = () => setUser(null);
+    window.addEventListener('auth:refreshed', handleRefreshed);
+    window.addEventListener('auth:expired', handleExpired);
+    return () => {
+      window.removeEventListener('auth:refreshed', handleRefreshed);
+      window.removeEventListener('auth:expired', handleExpired);
+    };
+  }, []);
+
   const value = useMemo(() => ({
     user,
     loading,

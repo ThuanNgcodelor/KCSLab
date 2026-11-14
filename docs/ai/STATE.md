@@ -1,5 +1,15 @@
 # Project State
 
+## Cập nhật mới nhất — duy trì đăng nhập bằng Redis
+
+- Trang đăng nhập có tùy chọn **Ghi nhớ đăng nhập**; hệ thống không lưu mật khẩu. Chọn ghi nhớ tạo cookie HttpOnly tối đa 30 ngày, không chọn dùng cookie phiên trình duyệt.
+- Access token mặc định 15 phút. Frontend tự gọi `/api/v1/auth/refresh` khi API trả 401, gom các request đồng thời vào một lần refresh rồi thử lại request ban đầu.
+- Refresh token ngẫu nhiên 48 byte, Redis chỉ lưu SHA-256 hash với TTL; token được xoay sau mỗi lần refresh và token cũ không thể dùng lại. Đổi mật khẩu thu hồi mọi phiên của người dùng.
+- Redis Laragon 5.x được hỗ trợ bằng Lua `GET + DEL` nguyên tử thay cho lệnh `GETDEL` chỉ có từ Redis 6.2.
+- Cookie resolver bỏ qua access token cũ tại `csrf/login/refresh`, nên access token hết hạn không chặn chính endpoint làm mới phiên.
+- Trang thông tin cá nhân đã khóa overflow theo content area; dưới 1280 px chuyển layout hồ sơ thành một cột và các ô mật khẩu giữ cùng chiều cao.
+- Xác minh: backend 16/16 test pass; frontend production build 71 modules; Redis runtime smoke đạt remembered/session cookie, 401 → refresh → 200 và chống tái sử dụng token; Chrome 1424/1024/390 px không tràn ngang.
+
 ## Cập nhật mới nhất — bộ chọn Phiếu 4 và responsive
 
 - Màn lập Phiếu chuyển mẫu tìm phiếu tiếp nhận phía server theo mã phiếu, mã mẫu, khách hàng hoặc số điện thoại; debounce 300 ms, 20 kết quả/trang và có điều hướng trang.
