@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createReceipt, uploadReceiptFile } from '../api/intakeApi';
+import { createReceipt, downloadReceiptForm3, uploadReceiptFile } from '../api/intakeApi';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -100,13 +100,14 @@ export function ReceiptCreatePage() {
       <span className="success-check">✓</span><p className="section-kicker">Đã lưu hồ sơ tiếp nhận</p>
       <h1>Phiếu đã được tạo</h1>
       <p>Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.</p>
-      {uploadWarning && <p className="form-error" role="alert">{uploadWarning}</p>}
+      {uploadWarning && <div className="toast toast-warning" role="alert">{uploadWarning}</div>}
       <div className="code-display"><small>MÃ PHIẾU</small><strong>{created.receiptCode}</strong>
         <small>MÃ MẪU HIỆN TẠI</small>
         {created.samples?.map((sample) => <strong key={sample.id}>{sample.sampleCode}</strong>)}
       </div>
       <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mã mẫu hiện tại chưa mang ý nghĩa “đã xác minh hai người”; Phase 2 sẽ bổ sung cổng xác minh này.</p>
       <div className="receipt-success-actions">
+        <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất Phiếu 3</button>
         <button className="outline-button" onClick={() => navigate('/admin/intake')}>Về danh sách</button>
         <button className="primary-button" onClick={() => { setForm(initialForm); setSamples([newSample()]); setFiles({ form3: [], samples: [], lot: [] }); setCreated(null); }}>Tạo phiếu khác</button>
       </div>
@@ -118,7 +119,7 @@ export function ReceiptCreatePage() {
       <button className="back-link" onClick={() => navigate('/admin/intake')}>← Quay lại danh sách</button>
       <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo phiếu tiếp nhận</h1>
     </div></header>
-    {error && <p className="form-error form-page-error" role="alert">{error}</p>}
+    {error && <div className="toast toast-error" role="alert">{error}</div>}
     {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
       <div className="receipt-form-main">

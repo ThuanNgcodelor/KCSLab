@@ -14,6 +14,17 @@ export function getAdminDashboard(filters = {}) {
   return request(`/intake/dashboard/admin?${dashboardSearch(filters)}`);
 }
 export function getReceipt(id) { return request(`/receipts/${id}`); }
+export async function downloadReceiptForm3(id) {
+  const response = await fetch(`/api/v1/receipts/${id}/form-3`, { credentials: 'include' });
+  if (!response.ok) throw new Error('Không thể tải Phiếu tiếp nhận và bàn giao mẫu.');
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `phieu-tiep-nhan-${id}.docx`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 export function createReceipt(data) { return request('/receipts', { method: 'POST', body: JSON.stringify(data) }); }
 export function uploadReceiptFile(id, file, metadata = {}) {
   const formData = new FormData(); formData.append('file', file);

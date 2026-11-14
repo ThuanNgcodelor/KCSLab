@@ -781,3 +781,8 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
   .notification-preview strong, .notification-page-copy strong { font-size: 14px; }
   .notification-preview small, .notification-page-copy small, .notification-tabs button { font-size: 12px; }
 }
+/* Top-level validation feedback stays visible without shifting the form. */
+.toast { position: fixed; z-index: 1000; top: 22px; left: 50%; width: min(560px, calc(100vw - 32px)); transform: translateX(-50%); padding: 14px 18px 14px 44px; border: 1px solid; border-radius: 12px; box-shadow: 0 16px 40px rgba(30, 70, 44, .18); font-size: 12px; line-height: 1.45; background: #fff; }
+.toast::before { position: absolute; left: 17px; top: 13px; content: '!'; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 800; background: currentColor; }
+.toast-error { color: #b64545; border-color: #f0bcbc; background: #fff8f8; }
+.toast-warning { color: #9a691c; border-color: #efd49b; background: #fffaf0; }
