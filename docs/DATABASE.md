@@ -1,6 +1,6 @@
 # Mô hình dữ liệu
 
-**Phiên bản:** 0.6 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có schema; coding hardening đang thiết kế
+**Phiên bản:** 0.7 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Phase 1/3 đã nâng schema; coding hardening đang thiết kế
 
 ## Lựa chọn cơ sở dữ liệu
 
@@ -20,6 +20,8 @@ MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc 
 `users`, `auth_sessions`, `customers`, `receipts`, `samples`, `receipt_attachments`, `sample_transfers`, `sample_transfer_items`, `testing_records`, `testing_equipment`, `testing_reagents`, `testing_measurements`.
 
 Các bảng status history/custody tổng quát/result release/audit trong ERD mục tiêu dưới đây chưa được triển khai. Custody tối thiểu hiện nằm trực tiếp trên `sample_transfers`.
+
+Phase 1 bổ sung hồ sơ nguồn trên `receipts` (`sampled_by/at`, vùng trồng, cơ sở đóng gói, xe/moóc/container), metadata phân loại/actor/thời điểm chụp trên `receipt_attachments` và hỗ trợ nhiều dòng `samples`. Phase 3 bổ sung `receiving_department`, `submitted_at` và trạng thái `DRAFT` trên `sample_transfers`.
 
 ## Thực thể và quan hệ
 
@@ -57,7 +59,7 @@ erDiagram
 | Test Results | Giá trị, đơn vị, LOD/ghi chú, người nhập, phiên bản và trạng thái duyệt |
 | Auth Sessions | Refresh/session hash, user, expiry, revokedAt, device metadata tối thiểu |
 | Customer Confirmations | Phiên bản nội dung, người xác nhận, thời điểm và bằng chứng |
-| Receipt Attachments | Bản scan/chụp phiếu 3, phiếu 4, file giấy gốc và checksum/version |
+| Receipt Attachments | Form 3, ảnh lô/mẫu/bao bì/seal/hư hỏng/nhãn; category, actor upload, thời điểm chụp, metadata và checksum |
 | Sample Custody Events | Người giao/nhận, thời điểm, nơi chuyển, tình trạng, lý do và chữ ký/bằng chứng |
 | Sample Parts | Các phần vỏ/ruột hoặc nền tách từ mã gốc; hậu tố `-V`, `-R` và liên kết mẫu cha |
 | Sample Coding Events | Gán mã, xác minh độc lập, hiệu chỉnh/void; actor, thời điểm, lý do và mã cũ/mới |
@@ -84,7 +86,7 @@ erDiagram
 - Cấp sequence phải dùng row lock/counter nguyên tử; unique theo mã hoàn chỉnh và ngày + sequence. Ngày trong mã dùng `Asia/Ho_Chi_Minh`, timestamp audit lưu UTC.
 - Hồ sơ nguồn cần trường có cấu trúc cho người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal để snapshot sang Phiếu kết quả.
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
-- SQL runtime đã có cho 12 bảng nêu trên; chưa có migration versioned.
+- SQL runtime đã có cho 12 bảng nêu trên; `db/migration-phase1-phase3.sql` là script nâng cấp MySQL idempotent tạm thời, chưa thay thế migration tool/version history.
 - Schema runtime hiện dùng `VARCHAR`/`TEXT`; các table đã triển khai đều khai báo `utf8mb4_unicode_ci`, không có cột `NVARCHAR`.
 
 ## Câu hỏi dữ liệu mở

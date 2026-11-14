@@ -2,7 +2,7 @@
 
 **Cập nhật:** 13/11/2026  
 **Nhánh:** `main`  
-**Mốc Git trước khi tạo file bàn giao:** `e7affc3`  
+**Mốc Git Phase 1/3:** `1e078d0`
 **Giai đoạn hiện tại:** 5A — Hoàn thiện hồ sơ nguồn và mã hóa mẫu
 
 > Đây là file cần đọc đầu tiên khi tiếp tục dự án ở máy khác. Không ghi mật khẩu, JWT secret hoặc thông tin đăng nhập vào file này; lấy chúng từ `.env` cục bộ.
@@ -12,6 +12,8 @@
 Hệ thống hiện đã chạy được luồng nội bộ:
 
 `Đăng nhập → quản lý nhân viên → tiếp nhận mẫu (Phiếu 3) → chuyển mẫu (Phiếu 4) → thử nghiệm và kiểm tra nội bộ (Phiếu 5)`
+
+Phase 1 và Phase 3 vừa được hardening: Phiếu 3 lưu hồ sơ nguồn/nhiều mẫu/ảnh bằng chứng; Phiếu 4 có bản nháp sửa được, chỉ khóa mẫu khi gửi và không lộ bản nháp cho KCS/PTN.
 
 Ranh giới runtime hiện tại dừng ở trạng thái `TEST_REVIEWED`. Chưa có phát hành Phiếu kết quả/PDF, thu hồi hoặc đính chính kết quả, và chưa có trang khách hàng tra cứu bằng mã + đuôi số điện thoại.
 
@@ -25,8 +27,8 @@ Việc phải làm tiếp trước tiên không phải là PDF. Cần hoàn thi�
 - Đăng nhập bằng email; JWT access token trong cookie, refresh session và CSRF.
 - Không có đăng ký công khai. Admin khởi tạo từ biến môi trường.
 - Quản lý nhân viên: tạo, sửa quyền và khóa tài khoản.
-- Tiếp nhận mẫu/Phiếu 3: customer, receipt, sample, attachment, checksum SHA-256 và mã mẫu gốc.
-- Chuyển mẫu/Phiếu 4: tạo phiếu, giao/nhận hoặc từ chối, lưu/hoàn mẫu, cập nhật trạng thái.
+- Tiếp nhận mẫu/Phiếu 3: customer, receipt, nhiều sample, hồ sơ nguồn, actor, attachment phân loại, ảnh chụp mobile, checksum SHA-256 và mã mẫu gốc.
+- Chuyển mẫu/Phiếu 4: tạo/sửa nháp, gửi bàn giao, giao/nhận hoặc từ chối, lưu/hoàn mẫu, cập nhật trạng thái; KCS/PTN không thấy bản nháp.
 - Thử nghiệm/Phiếu 5: thiết bị, hóa chất, đường chuẩn, công thức, QC, raw data, submit, trả lại hoặc kiểm tra.
 - MySQL dùng schema SQL thủ công và Hibernate `validate`; profile mặc định dùng H2.
 
@@ -37,8 +39,8 @@ Việc phải làm tiếp trước tiên không phải là PDF. Cần hoàn thi�
   - `/login`
   - `/admin`
   - `/admin/users`, `/admin/users/new`, `/admin/users/:id/edit`
-  - `/admin/intake`, `/admin/intake/new`
-  - `/admin/transfers`
+  - `/admin/intake`, `/admin/intake/new`, `/admin/intake/:id`
+  - `/admin/transfers`, `/admin/transfers/new`, `/admin/transfers/:id`, `/admin/transfers/:id/edit`
   - `/admin/testing`
 - Đã bỏ phần “topup”; form thêm nhân viên dùng trang riêng.
 - Giao diện dùng nền sáng/trắng, xanh CFC làm điểm nhấn để giữ độ tương phản.
@@ -73,8 +75,8 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 |---|---|---|
 | Auth/session | Đã có vertical slice | Login email, refresh, logout, `/me`, CSRF; không đăng ký |
 | User/RBAC | Đã có vertical slice | Admin tạo/sửa/khóa; quyền cơ bản theo role |
-| Phiếu 3 — Tiếp nhận | Chạy được, cần hardening | Thiếu một số dữ liệu hồ sơ nguồn và gate xác minh mã |
-| Phiếu 4 — Chuyển mẫu | Chạy được | Cần chặn chuyển nếu mã chưa được người thứ hai xác minh |
+| Phiếu 3 — Tiếp nhận | Phase 1 hoàn thành | Có hồ sơ nguồn/nhiều mẫu/bằng chứng; còn thiếu gate xác minh mã của Phase 2 |
+| Phiếu 4 — Chuyển mẫu | Phase 3 hoàn thành | Có nháp/sửa/gửi/nhận; vẫn cần chặn chuyển nếu mã chưa được người thứ hai xác minh |
 | Phiếu 5 — Thử nghiệm | Chạy tới `TEST_REVIEWED` | Cần chặn analyst tự review hồ sơ của mình |
 | Dashboard | Chỉ là giao diện mẫu | Số liệu và hoạt động đang hard-code |
 | Phiếu kết quả/PDF | Chưa triển khai | Chưa có `result_releases`, version/checksum hoặc file bất biến |
@@ -82,10 +84,9 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 
 ## 5. Các lỗi thiết kế/rủi ro đã biết
 
-- `ReceiptService.create` đang sinh sequence bằng `countByReceivedDate + 1`: có race condition khi hai hồ sơ được tạo đồng thời.
-- Ngày dùng để tạo mã hiện lấy theo UTC, có thể lệch ngày nghiệp vụ tại Việt Nam.
+- `ReceiptService.create` đang sinh sequence bằng `countByReceivedDate + 1`: có race condition khi hai hồ sơ được tạo đồng thời; timezone nghiệp vụ đã dùng `Asia/Ho_Chi_Minh`.
 - Model chưa có sample part `-V/-R`, QC, mã mù, người xác minh và lịch sử hiệu chỉnh mã.
-- Hồ sơ tiếp nhận chưa cấu trúc đủ người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal.
+- Chưa có WebSocket thông báo chuyển mẫu; QR chưa được sinh vì điểm sinh phải nằm sau gate xác minh mã hoặc tại phát hành kết quả.
 - `TestingRecordService.review` chưa kiểm tra người review phải khác analyst.
 - Dashboard không được dùng làm báo cáo thật vì đang hard-code.
 - File đang lưu local; chưa có object storage, retention và backup production.
@@ -96,12 +97,12 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 ### Slice kế tiếp: hoàn thiện nền mã hóa
 
 1. Đọc `docs/SAMPLE_CODING.md` và phần 5A trong `plans/CURRENT.md`.
-2. Bổ sung schema/entity/DTO cho hồ sơ nguồn còn thiếu.
-3. Tạo bộ cấp sequence nguyên tử theo ngày `Asia/Ho_Chi_Minh`; không dùng phép đếm số bản ghi.
-4. Viết test cho tạo mã đồng thời và ranh giới nửa đêm Việt Nam.
-5. Tách các bước: tạo hồ sơ → chấp nhận mẫu → gán mã → người thứ hai xác minh.
-6. Tạo sample part `-V/-R`; chặn Phiếu 4 nếu mã chưa được xác minh.
-7. Sau đó mới làm QC/mã mù và projection dữ liệu giới hạn cho kỹ thuật viên.
+2. Tạo bộ cấp sequence nguyên tử theo ngày `Asia/Ho_Chi_Minh`; không dùng phép đếm số bản ghi.
+3. Viết test cho tạo mã đồng thời và ranh giới nửa đêm Việt Nam.
+4. Tách các bước: tạo hồ sơ → chấp nhận mẫu → gán mã → người thứ hai xác minh.
+5. Tạo sample part `-V/-R`; chặn Phiếu 4 nếu mã chưa được xác minh.
+6. Sau đó mới làm QC/mã mù và projection dữ liệu giới hạn cho kỹ thuật viên.
+7. Sau khi event nghiệp vụ ổn định mới thêm WebSocket; QR mẫu chỉ sinh sau xác minh mã.
 
 ### Slice sau đó
 
@@ -142,6 +143,7 @@ Các tài liệu nghiệp vụ gốc ở root, không tự ý xóa hoặc sửa:
 - Cài Java 21, Maven, Node.js/npm và MySQL nếu muốn dùng profile MySQL.
 - Sao chép `.env.example` thành `.env` và điền secret cục bộ. Không commit `.env`.
 - Nếu dùng MySQL mới, tạo database và chạy `source/be/src/main/resources/db/schema.sql` trước; Hibernate đang ở chế độ `validate`.
+- Nếu database đã có schema cũ, chạy `source/be/src/main/resources/db/migration-phase1-phase3.sql` một lần trước khi khởi động backend.
 
 ### Backend với MySQL
 
@@ -189,20 +191,20 @@ Sau khi sửa một luồng nghiệp vụ, chạy Playwright trên cả desktop 
 
 ## 9. Kết quả kiểm tra gần nhất
 
-- Backend `mvn test`: pass.
-- Frontend `npm run build`: pass.
-- Playwright với MySQL: login, intake, transfer, tạo/submit/review Phiếu 5 và đồng bộ trạng thái mẫu: pass.
-- Responsive tại 390, 1024, 1440 và 2560 px: pass, không có horizontal overflow; console không có lỗi.
-- Các kết quả trên là lần kiểm tra gần nhất trước khi chỉ cập nhật tài liệu mã hóa. Tại thời điểm bàn giao, chưa xác nhận backend/frontend đang chạy; hãy khởi động lại theo mục 8.
+- Backend `mvn test`: 8/8 pass trên Java 21.
+- Frontend `npm run build`: pass, 63 modules.
+- MySQL smoke Phase 1/3: tạo Phiếu 3 hai mẫu, upload Form 3, tạo/sửa/gửi Phiếu 4, nhận mẫu và đồng bộ `TRANSFERRED`: pass.
+- Google Chrome CDP: 5 route intake/transfer tại desktop 1424px và mobile 390px, không horizontal overflow, console không có lỗi.
+- Backend và frontend đã được xác nhận chạy lần cuối tại `127.0.0.1:8080` và `localhost:5173`; vẫn nên kiểm tra lại process khi mở phiên mới.
 
 ## 10. Trạng thái Git và cách mang về nhà
 
-Trước khi tạo file này, worktree sạch và `main` đang ở commit `e7affc3`, đồng bộ với `origin/main`. File `docs/ai/HANDOFF.md` mới tạo sẽ chưa có ở máy nhà cho tới khi được commit/push hoặc sao chép thủ công.
+Phase 1/3 nền đã ở commit `1e078d0` trên `main`/`origin/main`. Worktree hiện có phần hardening quyền KCS, giao diện sửa nháp, test và Project Memory chưa commit; luôn xem `git status` và diff trước khi commit/push.
 
 Không dùng `git reset --hard` hoặc xóa tài liệu nghiệp vụ/asset để “làm sạch”. Luôn xem `git status` trước khi sửa vì thay đổi chưa commit có thể thuộc về người dùng.
 
 ## 11. Prompt dùng để tiếp tục với AI ở máy nhà
 
 ```text
-Đọc AGENTS.md, docs/ai/HANDOFF.md, plans/CURRENT.md và docs/SAMPLE_CODING.md. Dùng CodeGraph trước khi đọc nhiều source. Tiếp tục đúng gate 5A: trước hết triển khai bộ cấp sequence nguyên tử theo ngày Asia/Ho_Chi_Minh và các test concurrency/ranh giới nửa đêm, sau đó bổ sung gate gán/xác minh mã. Không triển khai PDF hoặc public lookup trước, không thay đổi secret, và cập nhật Project Memory sau khi test pass.
+Đọc AGENTS.md, docs/ai/HANDOFF.md, plans/CURRENT.md và docs/SAMPLE_CODING.md. Dùng CodeGraph trước khi đọc nhiều source. Phase 1 và Phase 3 đã hoàn thành; tiếp tục Phase 2/gate 5A bằng bộ cấp sequence nguyên tử theo ngày Asia/Ho_Chi_Minh và test concurrency/ranh giới nửa đêm, sau đó bổ sung gate gán/xác minh mã và `-V/-R`. Chưa làm PDF/public lookup/WebSocket trước khi gate mã ổn định, không thay đổi secret, và cập nhật Project Memory sau khi test pass.
 ```

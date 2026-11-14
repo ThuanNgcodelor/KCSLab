@@ -1,5 +1,6 @@
 package com.example.app.intake.controller;
 
+import com.example.app.common.dto.PagedResponse;
 import com.example.app.intake.dto.CreateReceiptRequest;
 import com.example.app.intake.dto.ReceiptAttachmentContent;
 import com.example.app.intake.dto.ReceiptAttachmentResponse;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.time.Instant;
 import java.nio.charset.StandardCharsets;
 
@@ -38,7 +38,13 @@ public class ReceiptController {
     private final ReceiptService receiptService;
     private final UserService userService;
     public ReceiptController(ReceiptService receiptService, UserService userService) { this.receiptService = receiptService; this.userService = userService; }
-    @GetMapping public List<ReceiptResponse> list() { return receiptService.findAll(); }
+    @GetMapping
+    public PagedResponse<ReceiptResponse> list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "receivedAt,desc") String sort) {
+        return receiptService.findAll(page, size, sort);
+    }
     @GetMapping("/{id}") public ReceiptResponse get(@PathVariable Long id) { return receiptService.findById(id); }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) public ReceiptResponse create(@Valid @RequestBody CreateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) { return receiptService.create(request, userService.getByEmail(jwt.getSubject())); }
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

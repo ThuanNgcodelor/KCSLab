@@ -1,5 +1,6 @@
 package com.example.app.intake.service;
 
+import com.example.app.common.dto.PagedResponse;
 import com.example.app.intake.dto.CreateReceiptRequest;
 import com.example.app.intake.dto.ReceiptAttachmentContent;
 import com.example.app.intake.dto.ReceiptAttachmentResponse;
@@ -18,6 +19,9 @@ import com.example.app.intake.repository.ReceiptRepository;
 import com.example.app.intake.repository.SampleRepository;
 import com.example.app.user.entity.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,6 +54,16 @@ public class ReceiptService {
     private static final DateTimeFormatter SAMPLE_DATE = DateTimeFormatter.ofPattern("ddMMyyyy");
     private static final DateTimeFormatter RECEIPT_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final long MAX_ATTACHMENT_SIZE = 10L * 1024 * 1024;
+    private static final int MAX_PAGE_SIZE = 100;
+    private static final Map<String, String> RECEIPT_SORT_FIELDS = Map.of(
+            "receivedAt", "receivedAt",
+            "createdAt", "createdAt",
+            "receiptCode", "receiptCode",
+            "customerName", "customer.name",
+            "sampleName", "sampleName",
+            "status", "status",
+            "expectedDate", "expectedDate"
+    );
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "application/pdf",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -74,8 +89,24 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReceiptResponse> findAll() {
-        return receiptRepository.findTop50ByOrderByCreatedAtDesc().stream().map(this::toResponse).toList();
+    public PagedResponse<ReceiptResponse> findAll(int page, int size, String sort) {
+        if (page < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số trang phải từ 0 trở lên");
+        }
+        if (size < 1 || size > MAX_PAGE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Kích thước trang phải từ 1 đến " + MAX_PAGE_SIZE);
+        }
+
+        ReceiptSort receiptSort = parseSort(sort);
+        Sort ordering = Sort.by(receiptSort.direction(), receiptSort.property());
+        if (!"id".equals(receiptSort.property())) {
+            ordering = ordering.and(Sort.by(Sort.Direction.DESC, "id"));
+        }
+        Page<ReceiptResponse> result = receiptRepository
+                .findAll(PageRequest.of(page, size, ordering))
+                .map(this::toResponse);
+        return PagedResponse.from(result, receiptSort.canonical());
     }
 
     @Transactional(readOnly = true)
@@ -193,6 +224,33 @@ public class ReceiptService {
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
+
+    private ReceiptSort parseSort(String rawSort) {
+        String value = rawSort == null || rawSort.isBlank() ? "receivedAt,desc" : rawSort.trim();
+        String[] parts = value.split(",", -1);
+        if (parts.length != 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Sort phải có dạng field,direction");
+        }
+
+        String field = parts[0].trim();
+        String property = RECEIPT_SORT_FIELDS.get(field);
+        if (property == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Trường sort không hợp lệ: " + field);
+        }
+
+        Sort.Direction direction;
+        try {
+            direction = Sort.Direction.fromString(parts[1].trim());
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Chiều sort chỉ nhận asc hoặc desc");
+        }
+        return new ReceiptSort(property, direction, field + "," + direction.name().toLowerCase(Locale.ROOT));
+    }
+
+    private record ReceiptSort(String property, Sort.Direction direction, String canonical) {}
 
     private String sha256(Path file) throws IOException {
         try {

@@ -4,3 +4,5 @@ source/be/target/
 .env
 *.log
 *.m2-local
+/artifacts/
+/source/be/storage/

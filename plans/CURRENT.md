@@ -7,8 +7,8 @@
 | Hạng mục | Trạng thái | Ranh giới hiện tại |
 |---|---|---|
 | Nền tảng, auth, user/RBAC | Hoàn thành vertical slice | Login email, JWT cookie/refresh/CSRF, Admin tạo/sửa/khóa tài khoản; không có đăng ký công khai |
-| Phiếu 3 — Tiếp nhận | Có vertical slice, cần hardening mã hóa | Đã có customer/receipt/sample/mã gốc/attachment; thiếu xác minh hai người, `-V/-R`, QC, mã mù và một số trường hồ sơ nguồn |
-| Phiếu 4 — Chuyển mẫu | Hoàn thành vertical slice | Tạo phiếu, giao/nhận hoặc từ chối, lưu/hoàn mẫu và đồng bộ trạng thái |
+| Phiếu 3 — Tiếp nhận | Phase 1 hoàn thành, cần Phase 2 mã hóa | Đã có hồ sơ nguồn, actor, nhiều mẫu, ảnh/file phân loại; thiếu xác minh hai người, `-V/-R`, QC và mã mù |
+| Phiếu 4 — Chuyển mẫu | Phase 3 hoàn thành | Nháp/sửa/gửi, KCS nhận hoặc từ chối, ẩn nháp khỏi KCS, lưu/hoàn mẫu và đồng bộ trạng thái |
 | Phiếu 5 — Thử nghiệm | Hoàn thành đến kiểm tra nội bộ | Thiết bị, hóa chất, QC/raw data, submit, kiểm tra/trả lại; mẫu đến `TEST_REVIEWED` |
 | Duyệt/phát hành kết quả | Đang lập kế hoạch, chưa có runtime | Chưa có `result_releases`, PDF versioned, checksum phát hành, thu hồi/đính chính |
 | Tra cứu khách hàng | Chưa triển khai | Chưa có mã + đuôi điện thoại, trạng thái công khai hoặc tải PDF |
@@ -35,7 +35,8 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác 
 
 - [x] Auth/session/CSRF, quản lý nhân viên và RBAC cơ bản; không có đăng ký công khai.
 - [x] Phiếu tiếp nhận số 3, customer, sample, attachment và mã CFC-TN-14.
-- [x] Phiếu chuyển mẫu số 4: tạo phiếu, giao/nhận hoặc từ chối, thông tin lưu/hoàn mẫu.
+- [x] Phase 1: hồ sơ nguồn có cấu trúc, nhiều mẫu, actor tiếp nhận và bằng chứng ảnh/file từ điện thoại.
+- [x] Phase 3/Phiếu chuyển mẫu số 4: tạo/sửa nháp, gửi bàn giao, giao/nhận hoặc từ chối, thông tin lưu/hoàn mẫu.
 - [x] Biên bản thử nghiệm số 5: thiết bị, hóa chất, đường chuẩn, công thức, QC, raw data, submit và kiểm tra/trả lại.
 - [x] Giao diện desktop/mobile, navbar cố định theo viewport, footer CFC và bộ nhận diện sáng.
 - [x] Maven test, frontend build và Playwright E2E với MySQL.
@@ -44,7 +45,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác 
 
 - [x] Chốt thứ tự mã mẫu theo CFC-TN-14: `CT001-SR-DDMMYYYY-SEQ`; không áp dụng thứ tự `SR-CT001-...` từ phiếu ví dụ.
 - [ ] Chốt quy tắc số Phiếu kết quả; chưa mặc định generator `SRMMYYYY-SEQ` chỉ từ một ví dụ.
-- [ ] Bổ sung trường người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal.
+- [x] Bổ sung trường người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal.
 - [ ] Tách bước tạo hồ sơ, chấp nhận mẫu, gán mã và xác minh mã; không sinh mã khi hồ sơ chưa đạt.
 - [ ] Thay cấp số bằng counter/locking nguyên tử theo ngày `Asia/Ho_Chi_Minh`; thêm test đồng thời và ranh giới nửa đêm.
 - [ ] Triển khai sample part `-V/-R`, nhãn mẫu và chặn chuyển mẫu trước khi mã được người thứ hai xác minh.
@@ -96,9 +97,9 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → mã mẫu đã xác 
 ## Rủi ro/việc kỹ thuật chưa đóng
 
 - `TestingRecordService.review` hiện chưa kiểm tra `checker != analyst`.
-- `ReceiptService.create` đang dùng `countByReceivedDate + 1` và ngày UTC để sinh mã; có rủi ro race condition và sai ngày nghiệp vụ Việt Nam.
+- `ReceiptService.create` vẫn dùng `countByReceivedDate + 1`; timezone nghiệp vụ đã chuyển sang `Asia/Ho_Chi_Minh` nhưng cấp số vẫn có race condition.
 - Model hiện chưa có `-V/-R`, QC, mã mù, người xác minh và lịch sử hiệu chỉnh mã.
-- Phiếu kết quả cần các trường hồ sơ nguồn hiện chưa được cấu trúc đầy đủ.
+- WebSocket thông báo chuyển mẫu và QR chưa triển khai; phải chốt event/điểm sinh QR sau gate xác minh mã.
 - Dashboard đang hiển thị dữ liệu mẫu nên không dùng làm số liệu vận hành.
 - Schema vẫn quản lý bằng SQL thủ công + Hibernate `validate`; chưa có Flyway/Liquibase.
 - File phiếu đang lưu local; chưa có object storage, retention và backup production.

@@ -1,6 +1,6 @@
 # REST API conventions
 
-**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có runtime API
+**Phiên bản:** 0.4 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có runtime API
 
 ## Quy ước chung
 
@@ -25,13 +25,16 @@
 | GET/POST | `/api/v1/customers` | Tìm/tạo khách hàng | Đề xuất |
 | GET/POST | `/api/v1/receipts` | Tối đa 50 phiếu mới nhất/tạo phiếu theo biểu mẫu 3 | Đã triển khai |
 | GET | `/api/v1/receipts/{id}` | Xem phiếu theo ID | Đã triển khai |
-| POST | `/api/v1/receipts/{id}/attachments` | Lưu file và metadata/checksum phiếu giấy | Đã triển khai |
+| POST | `/api/v1/receipts/{id}/attachments` | Lưu file/ảnh tối đa 10 MB cùng `category`, mô tả, thời điểm chụp, actor và checksum | Đã triển khai |
+| GET | `/api/v1/receipts/{id}/attachments/{attachmentId}/content` | Xem/tải bằng chứng thuộc đúng phiếu tiếp nhận | Đã triển khai |
 | POST | `/api/v1/receipts/{id}/coding` | Cấp mã mẫu nguyên tử sau khi hồ sơ/mẫu được chấp nhận | Đề xuất theo CFC-TN-14 |
 | POST | `/api/v1/samples/{id}/coding-verification` | Người thứ hai xác minh nhãn, phiếu nguồn và bản ghi | Đề xuất theo CFC-TN-14 |
 | POST | `/api/v1/samples/{id}/parts` | Sinh phần nền `-V/-R` từ mã gốc | Đề xuất theo CFC-TN-14 |
 | GET | `/api/v1/samples/{id}/label` | Tạo/in nhãn mẫu; ghi nhận actor in nhãn | Đề xuất |
 | GET/POST | `/api/v1/transfers` | Danh sách/lập phiếu chuyển mẫu theo biểu mẫu 4 | Đã triển khai |
 | GET | `/api/v1/transfers/{id}` | Chi tiết phiếu chuyển mẫu | Đã triển khai |
+| PUT | `/api/v1/transfers/{id}` | Sửa Phiếu 4 khi còn `DRAFT`; không được đổi phiếu tiếp nhận | Đã triển khai |
+| POST | `/api/v1/transfers/{id}/submit` | Gửi bàn giao, khóa mẫu và chuyển `DRAFT → PENDING` | Đã triển khai |
 | POST | `/api/v1/transfers/{id}/decision` | KCS/PTN chấp nhận hoặc từ chối bàn giao | Đã triển khai |
 | GET/POST | `/api/v1/samples` | Tìm/tạo mẫu | Đề xuất |
 | GET | `/api/v1/samples/{id}` | Chi tiết mẫu | Đề xuất |
@@ -43,6 +46,8 @@
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
 
 Không có `POST /api/v1/auth/register`. Tài khoản chỉ được Admin tạo qua endpoint quản trị `/api/v1/users` sau khi đăng nhập.
+
+Phiếu chuyển mẫu còn `DRAFT` chỉ hiển thị cho `ADMIN|RECEPTIONIST`; `TECHNICIAN` chỉ nhận danh sách/chi tiết sau khi phiếu đã gửi. Quyết định nhận/từ chối chỉ áp dụng cho `PENDING`.
 
 API coding phải tách DTO nội bộ: Receptionist/Admin được xem mapping hồ sơ nguồn; Technician mặc định chỉ nhận mã mẫu, phần nền, chỉ tiêu và dữ liệu kỹ thuật cần thiết. Không trả bảng đối chiếu mã mù trong API thử nghiệm thông thường.
 

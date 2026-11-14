@@ -159,6 +159,19 @@ $transfer = Send-Json $receptionSession POST 'transfers' @{
 }
 Assert-Phase ($transfer.status -eq 'DRAFT') 'New transfer must be DRAFT'
 
+$transfer = Send-Json $receptionSession PUT "transfers/$($transfer.id)" @{
+    receiptId = $receipt.id
+    receivingDepartment = 'KCS E2E room updated'
+    transferDate = $receivedDate
+    resultsDueDate = (Get-Date).AddDays(5).ToString('yyyy-MM-dd')
+    returnToCustomer = $false
+    customerReturnDate = $null
+    changesNote = 'Smoke test Phase 3 - updated draft'
+    items = $transferItems
+}
+Assert-Phase ($transfer.status -eq 'DRAFT') 'Updated transfer must remain DRAFT'
+Assert-Phase ($transfer.receivingDepartment -eq 'KCS E2E room updated') 'Draft update must persist receiving department'
+
 $draftReceipt = Send-Json $receptionSession GET "receipts/$($receipt.id)"
 Assert-Phase (($draftReceipt.samples | Where-Object status -ne 'RECEIVED').Count -eq 0) 'Draft must not lock samples'
 

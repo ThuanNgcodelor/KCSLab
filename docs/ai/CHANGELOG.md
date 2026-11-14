@@ -2,6 +2,10 @@
 
 ## 2026-11-13
 
+- Hoàn thành Phase 1/Phiếu 3: hồ sơ nguồn có cấu trúc, nhiều mẫu, actor tiếp nhận, ảnh/file phân loại từ điện thoại, checksum và endpoint xem/tải bằng chứng.
+- Hoàn thành Phase 3/Phiếu 4: `DRAFT → PENDING → ACCEPTED|REJECTED`, sửa nháp, chỉ khóa mẫu khi gửi và ẩn nháp khỏi KCS/PTN.
+- Thêm migration MySQL idempotent Phase 1/3; xác minh schema thực không có `NVARCHAR`/`NCHAR`.
+- Kiểm thử Java 21 đạt 8/8, frontend build pass, MySQL smoke toàn luồng pass và Google Chrome desktop/mobile không có overflow hay console error.
 - Khóa quy ước MySQL: chuỗi dùng `VARCHAR`/`TEXT` với `utf8mb4`, không dùng `NVARCHAR`/`NCHAR`; table nghiệp vụ mặc định `utf8mb4_unicode_ci`, giá trị kỹ thuật cần phân biệt hoa-thường dùng binary collation phù hợp.
 - Xác nhận `CFC14Quy trình mã hóa mẫu trái cây.doc` là quy trình chuẩn: khóa cấu trúc `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`, coi thứ tự ngược trên phiếu ví dụ là sai lệch cần rà soát.
 - Bổ sung trách nhiệm tiếp nhận/đối chiếu/kiểm nghiệm/QLCLSP, nhãn không phai, Sổ theo dõi, lưu riêng mã mù và hiệu chỉnh append-only vào coding plan.

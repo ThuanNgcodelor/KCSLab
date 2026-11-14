@@ -136,6 +136,27 @@ class TransferServiceTest {
                 .contains(created.id());
     }
 
+    @Test
+    void updatesDraftBeforeSubmission() {
+        TransferResponse created = transferService.create(createRequest(), receptionist);
+        CreateTransferRequest updatedRequest = new CreateTransferRequest(
+                receipt.getId(), "Phòng KCS cập nhật", LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(5), false, null, "Đã đối chiếu lại",
+                List.of(new CreateTransferItemRequest(
+                        sample.getId(), "600 g", "1 túi", "Nguyên vẹn",
+                        "Cadimi", "CFC-TN cập nhật")));
+
+        TransferResponse updated = transferService.update(created.id(), updatedRequest);
+
+        assertThat(updated.status()).isEqualTo(TransferStatus.DRAFT);
+        assertThat(updated.receivingDepartment()).isEqualTo("Phòng KCS cập nhật");
+        assertThat(updated.items()).singleElement().satisfies(item -> {
+            assertThat(item.weight()).isEqualTo("600 g");
+            assertThat(item.testMethod()).isEqualTo("CFC-TN cập nhật");
+        });
+        assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.RECEIVED);
+    }
+
     private CreateTransferRequest createRequest() {
         return new CreateTransferRequest(
                 receipt.getId(), "Phòng KCS", LocalDate.now(), LocalDate.now().plusDays(4),

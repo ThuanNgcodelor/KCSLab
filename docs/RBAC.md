@@ -1,12 +1,12 @@
 # RBAC
 
-**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026
+**Phiên bản:** 0.4 · **Cập nhật:** 13/11/2026
 
 ## Enforcement hiện tại
 
 - Backend `/api/v1/users/**`: `ADMIN`.
 - Backend `/api/v1/receipts/**`: `ADMIN` hoặc `RECEPTIONIST`.
-- Backend transfer đọc/tạo/quyết định: `ADMIN`, `RECEPTIONIST` hoặc `TECHNICIAN` theo method security hiện tại.
+- Backend transfer: `ADMIN|RECEPTIONIST` tạo/sửa/gửi; `ADMIN|TECHNICIAN` quyết định; cả ba role được đọc nhưng service ẩn `DRAFT` khỏi `TECHNICIAN`.
 - Backend testing đọc/lập/cập nhật/submit: `ADMIN` hoặc `TECHNICIAN`; review: `ADMIN`.
 - Frontend route intake mở cho `ADMIN|RECEPTIONIST`, testing cho `ADMIN|TECHNICIAN`, user management chỉ `ADMIN`.
 - Quyền phát hành kết quả vẫn chưa triển khai và cần LAB xác nhận.
@@ -23,8 +23,10 @@ Ký hiệu: `✓` được đề xuất, `—` không được phép mặc đị
 | Xác minh mã mẫu của người khác | ✓ | ✓ theo phân công | — |
 | Xem mapping mã mẫu–khách hàng | ✓ | ✓ | — mặc định |
 | Xem bảng đối chiếu mã mù | ? | ? theo ủy quyền | — trước mở mù |
-| Lập phiếu chuyển mẫu 4 | ✓ | ✓ | ? |
-| Xác nhận bàn giao mẫu | ✓ | ✓ | ✓ theo phân công |
+| Lập/sửa/gửi phiếu chuyển mẫu 4 | ✓ | ✓ | — |
+| Xem phiếu chuyển đã gửi | ✓ | ✓ | ✓ |
+| Xem phiếu chuyển còn nháp | ✓ | ✓ | — |
+| Xác nhận nhận/từ chối bàn giao | ✓ | — | ✓ theo phân công |
 | Lập biên bản thử nghiệm 5 | ✓ | — | ✓ |
 | Quản lý thiết bị/hóa chất/raw data thử nghiệm | ✓ | — | ✓ |
 | Xóa dữ liệu nghiệp vụ | ? | — | — |

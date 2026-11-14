@@ -43,6 +43,7 @@ export function App() {
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />
           <Route path="/admin/intake/:id" element={<ReceiptDetailPage />} />
           <Route path="/admin/transfers/new" element={<TransferCreatePage />} />
+          <Route path="/admin/transfers/:id/edit" element={<TransferCreatePage />} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST', 'TECHNICIAN']} />}>
           <Route path="/admin/transfers" element={<TransfersPage />} />

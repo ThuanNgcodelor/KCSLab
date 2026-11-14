@@ -1,6 +1,9 @@
 import { request } from '../../../shared/api/httpClient';
 
-export function listReceipts() { return request('/receipts'); }
+export function listReceipts({ page = 0, size = 20, sort = 'receivedAt,desc' } = {}) {
+  const search = new URLSearchParams({ page: String(page), size: String(size), sort });
+  return request(`/receipts?${search}`);
+}
 export function getReceipt(id) { return request(`/receipts/${id}`); }
 export function createReceipt(data) { return request('/receipts', { method: 'POST', body: JSON.stringify(data) }); }
 export function uploadReceiptFile(id, file, metadata = {}) {
