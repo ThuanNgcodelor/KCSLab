@@ -7,6 +7,14 @@
 - Role `RECEPTIONIST` không còn mục Tổng quan trong navbar. `/admin/transfers` đã có card mobile có nhãn, không tràn ngang.
 - Kiểm tra gần nhất: Maven toàn bộ 9/9 pass trước test mới; `ReceiptServiceTest` 3/3 pass sau test mới; Vite build 67 modules; Chrome CDP kiểm tra danh sách và bộ chọn mobile không có alert/overflow.
 
+## Cập nhật thông tin cá nhân
+
+- Route `/admin/profile` dùng cho cả ba role; sidebar/profile menu hiển thị avatar thật hoặc ký tự fallback.
+- API self-service nằm dưới `/api/v1/users/me`: PATCH thông tin, PUT/DELETE avatar, PUT mật khẩu. GET avatar theo `/api/v1/users/{id}/avatar` yêu cầu đăng nhập.
+- Frontend giảm ảnh về 640×640 trước upload; backend chỉ nhận JPG/PNG tối đa 5 MB/40 MP và lưu JPEG 320×320 chất lượng 82%, ghi đè theo user, không giữ ảnh gốc. Cache URL có version 30 ngày.
+- Migration `migration-intake-workspace.sql` thêm idempotent `users.avatar_updated_at`; đã áp dụng trên MySQL local.
+- Test gần nhất: backend 12/12, frontend 71 modules; Chrome Receptionist desktop/mobile pass, ảnh trả đúng 320×320, không overflow/console error. File avatar smoke đã được xóa sau test.
+
 **Cập nhật:** 14/11/2026
 **Nhánh:** `main`  
 **Mốc Git tiếp nhận/pagination:** `ca3b44a`

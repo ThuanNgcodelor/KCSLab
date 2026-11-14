@@ -6,6 +6,20 @@
 - [x] Chỉ hiển thị phiếu còn mẫu `RECEIVED` qua bộ lọc backend `transferable=true`; có test loại phiếu đã chuyển khỏi kết quả.
 - [x] Thêm index MySQL `samples(status, receipt_id)` cho truy vấn ứng viên khi dữ liệu tăng lớn.
 - [x] Ẩn Tổng quan đối với role Tiếp nhận và sửa responsive `/admin/transfers` thành card mobile không tràn ngang.
+- [x] Tạo trang `/admin/profile` cho mọi role: xem email/role/trạng thái, tự đổi tên hiển thị, avatar và mật khẩu.
+- [x] Avatar được nén hai lớp: frontend cắt vuông 640×640 trước khi gửi; backend xác thực JPG/PNG, giới hạn request 5 MB/40 MP rồi chỉ lưu JPEG 320×320 chất lượng 82%. Không giữ ảnh gốc, mỗi user chỉ có một file hiện hành.
+- [x] Avatar có URL theo phiên bản và cache private 30 ngày; xuất hiện ở sidebar và danh sách nhân viên. Đổi mật khẩu thu hồi toàn bộ refresh session.
+
+## Profile P1 — Thông tin cá nhân
+
+| Hạng mục | Trạng thái | Ghi chú |
+|---|---|---|
+| Trang hồ sơ dùng chung ba role | Hoàn thành | Route `/admin/profile`, có loading/error/success và responsive |
+| Tên hiển thị | Hoàn thành | Người dùng tự sửa; email/role/trạng thái là chỉ đọc |
+| Avatar | Hoàn thành | Upload, thay, xóa; JPG/PNG; client pre-compress + server normalize 320×320 |
+| Kiểm soát dung lượng | Hoàn thành MVP | Không lưu ảnh gốc, ghi đè file theo user, cache URL có version |
+| Đổi mật khẩu | Hoàn thành | Kiểm tra mật khẩu hiện tại, tối thiểu 10 ký tự, thu hồi refresh session và đăng nhập lại |
+| Lưu trữ production | Chưa làm | Hiện lưu local; cần object storage/backup khi triển khai nhiều máy chủ |
 
 **Cập nhật:** 14/11/2026 · **Ưu tiên hiện tại:** Hoàn tất Intake I4–I5; I1–I3 đã có runtime và đã smoke test trên MySQL/Chrome
 
@@ -13,7 +27,7 @@
 
 | Hạng mục | Trạng thái | Ranh giới hiện tại |
 |---|---|---|
-| Nền tảng, auth, user/RBAC | Hoàn thành vertical slice | Login email, JWT cookie/refresh/CSRF, Admin tạo/sửa/khóa tài khoản; không có đăng ký công khai |
+| Nền tảng, auth, user/RBAC | Hoàn thành vertical slice | Login email, JWT cookie/refresh/CSRF, Admin tạo/sửa/khóa; từng user có profile/avatar/đổi mật khẩu; không có đăng ký công khai |
 | Phiếu 3 — Tiếp nhận | Phase 1 hoàn thành, cần Phase 2 mã hóa | Đã có hồ sơ nguồn, actor, nhiều mẫu, ảnh/file phân loại; thiếu xác minh hai người, `-V/-R`, QC và mã mù |
 | Thông báo khách hàng | Đã chốt plan, chưa có runtime | Ưu tiên ZBS Template Message; SMS Brandname/MultiSMS dự phòng; chưa có consent, outbox, provider adapter hoặc webhook |
 | Phiếu 4 — Chuyển mẫu | Phase 3 hoàn thành | Nháp/sửa/gửi, KCS nhận hoặc từ chối, ẩn nháp khỏi KCS, lưu/hoàn mẫu và đồng bộ trạng thái |

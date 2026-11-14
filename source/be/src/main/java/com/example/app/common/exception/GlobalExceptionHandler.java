@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +37,11 @@ public class GlobalExceptionHandler {
                         (first, second) -> first));
         detail.setProperty("fieldErrors", errors);
         return detail;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    ProblemDetail uploadTooLarge() {
+        return problem(HttpStatus.PAYLOAD_TOO_LARGE, "Tệp tải lên vượt quá giới hạn 5 MB");
     }
 
     private ProblemDetail problem(HttpStatus status, String message) {

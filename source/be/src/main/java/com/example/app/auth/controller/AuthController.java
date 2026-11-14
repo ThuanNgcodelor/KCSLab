@@ -27,14 +27,17 @@ public class AuthController {
     private final UserService userService;
     private final String cookiePath;
     private final boolean secureCookie;
+    private final long accessTokenSeconds;
 
     public AuthController(AuthService authService, UserService userService,
                           @Value("${app.security.cookie-path:/}") String cookiePath,
-                          @Value("${app.security.secure-cookie:false}") boolean secureCookie) {
+                          @Value("${app.security.secure-cookie:false}") boolean secureCookie,
+                          @Value("${app.security.access-token-seconds:900}") long accessTokenSeconds) {
         this.authService = authService;
         this.userService = userService;
         this.cookiePath = cookiePath;
         this.secureCookie = secureCookie;
+        this.accessTokenSeconds = accessTokenSeconds;
     }
 
     @GetMapping("/csrf")
@@ -45,9 +48,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthUserResponse> login(@Valid @RequestBody LoginRequest request,
                                                    HttpServletResponse response) {
-        AuthService.LoginResult result = authService.login(request.email(), request.password());
-        setCookie(response, "access_token", result.accessToken(), 900, true);
-        setCookie(response, "refresh_token", result.refreshToken(), 30 * 24 * 60 * 60, true);
+        AuthService.LoginResult result = authService.login(request.email(), request.password(), request.rememberMe());
+        setCookie(response, "access_token", result.accessToken(), accessTokenSeconds, true);
+        setRefreshCookie(response, result);
         return ResponseEntity.ok(toResponse(result.user()));
     }
 
@@ -56,8 +59,8 @@ public class AuthController {
                                                      HttpServletResponse response) {
         String token = cookie(request, "refresh_token");
         AuthService.LoginResult result = authService.refresh(token);
-        setCookie(response, "access_token", result.accessToken(), 900, true);
-        setCookie(response, "refresh_token", result.refreshToken(), 30 * 24 * 60 * 60, true);
+        setCookie(response, "access_token", result.accessToken(), accessTokenSeconds, true);
+        setRefreshCookie(response, result);
         return ResponseEntity.ok(toResponse(result.user()));
     }
 
@@ -87,18 +90,22 @@ public class AuthController {
         return null;
     }
 
-    private void setCookie(HttpServletResponse response, String name, String value, int maxAge, boolean httpOnly) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
+    private void setRefreshCookie(HttpServletResponse response, AuthService.LoginResult result) {
+        Long maxAge = result.rememberMe() ? 30L * 24 * 60 * 60 : null;
+        setCookie(response, "refresh_token", result.refreshToken(), maxAge, true);
+    }
+
+    private void setCookie(HttpServletResponse response, String name, String value, Long maxAge, boolean httpOnly) {
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
                 .httpOnly(httpOnly)
                 .secure(secureCookie)
                 .sameSite("Lax")
-                .path(cookiePath)
-                .maxAge(maxAge)
-                .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+                .path(cookiePath);
+        if (maxAge != null) builder.maxAge(maxAge);
+        response.addHeader("Set-Cookie", builder.build().toString());
     }
 
     private void clearCookie(HttpServletResponse response, String name) {
-        setCookie(response, name, "", 0, true);
+        setCookie(response, name, "", 0L, true);
     }
 }

@@ -1,6 +1,5 @@
 package com.example.app.auth.service;
 
-import com.example.app.auth.repository.RefreshSessionRepository;
 import com.example.app.user.dto.ChangeOwnPasswordRequest;
 import com.example.app.user.entity.User;
 import com.example.app.user.repository.UserRepository;
@@ -13,14 +12,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class AccountSecurityService {
     private final UserRepository userRepository;
-    private final RefreshSessionRepository refreshSessionRepository;
+    private final RefreshSessionStore refreshSessionStore;
     private final PasswordEncoder passwordEncoder;
 
     public AccountSecurityService(UserRepository userRepository,
-                                  RefreshSessionRepository refreshSessionRepository,
+                                  RefreshSessionStore refreshSessionStore,
                                   PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.refreshSessionRepository = refreshSessionRepository;
+        this.refreshSessionStore = refreshSessionStore;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,6 +35,6 @@ public class AccountSecurityService {
         }
         user.changePassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
-        refreshSessionRepository.deleteAllByUser_Id(user.getId());
+        refreshSessionStore.deleteAllForUser(user.getId());
     }
 }
