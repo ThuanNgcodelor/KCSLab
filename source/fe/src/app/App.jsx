@@ -15,6 +15,7 @@ import { TestingRecordsPage } from '../features/testing/pages/TestingRecordsPage
 import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFormPage';
 import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
 import { NotificationsPage } from '../features/notifications/pages/NotificationsPage';
+import { ProfilePage } from '../features/profile/pages/ProfilePage';
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -35,6 +36,7 @@ export function App() {
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<DashboardPage />} />
         <Route path="/admin/notifications" element={<NotificationsPage />} />
+        <Route path="/admin/profile" element={<ProfilePage />} />
         <Route element={<RoleRoute roles={['ADMIN']} />}>
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/new" element={<UserFormPage />} />

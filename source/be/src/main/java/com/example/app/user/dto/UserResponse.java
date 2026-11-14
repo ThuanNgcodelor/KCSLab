@@ -10,6 +10,7 @@ public record UserResponse(
         String displayName,
         Role role,
         boolean enabled,
+        String avatarUrl,
         Instant createdAt,
         Instant updatedAt
 ) {

@@ -33,6 +33,7 @@ export function LoginPage() {
         <p className="eyebrow">LAB MANAGEMENT</p>
         <h1 id="login-title">Chào mừng trở lại</h1>
         <p className="muted">Đăng nhập để làm việc trong hệ thống nội bộ.</p>
+        {location.state?.message && <p className="success-note" role="status">✓ {location.state.message}</p>}
         <form onSubmit={handleSubmit} className="login-form">
           <label>
             Email công việc

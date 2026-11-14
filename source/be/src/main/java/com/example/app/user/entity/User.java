@@ -45,6 +45,8 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    private Instant avatarUpdatedAt;
+
     protected User() {
     }
 
@@ -66,6 +68,7 @@ public class User implements UserDetails {
     public boolean isEnabled() { return enabled; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public Instant getAvatarUpdatedAt() { return avatarUpdatedAt; }
 
     public void updateProfile(String displayName, Role role, Boolean enabled) {
         this.displayName = displayName;
@@ -76,6 +79,16 @@ public class User implements UserDetails {
 
     public void changePassword(String passwordHash) {
         this.passwordHash = passwordHash;
+        this.updatedAt = Instant.now();
+    }
+
+    public void markAvatarUpdated() {
+        this.avatarUpdatedAt = Instant.now();
+        this.updatedAt = this.avatarUpdatedAt;
+    }
+
+    public void clearAvatar() {
+        this.avatarUpdatedAt = null;
         this.updatedAt = Instant.now();
     }
 

@@ -77,7 +77,8 @@ public class AuthController {
     }
 
     private AuthUserResponse toResponse(User user) {
-        return new AuthUserResponse(user.getId(), user.getEmail(), user.getDisplayName(), user.getRole());
+        return new AuthUserResponse(user.getId(), user.getEmail(), user.getDisplayName(), user.getRole(),
+                userService.avatarUrl(user));
     }
 
     private String cookie(jakarta.servlet.http.HttpServletRequest request, String name) {

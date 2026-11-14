@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
   const value = useMemo(() => ({
     user,
     loading,
+    updateCurrentUser: setUser,
     signIn: async (credentials) => {
       const nextUser = await login(credentials);
       setUser(nextUser);

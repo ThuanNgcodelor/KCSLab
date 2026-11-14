@@ -95,6 +95,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                         .requestMatchers("/ws/notifications", "/api/v1/notifications/**").authenticated()
+                        .requestMatchers("/api/v1/users/me", "/api/v1/users/me/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*/avatar").authenticated()
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/receptionist").hasAnyRole("ADMIN", "RECEPTIONIST")

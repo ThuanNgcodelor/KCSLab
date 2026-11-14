@@ -13,6 +13,10 @@ spring:
   h2:
     console:
       enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 
 app:
   frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
@@ -25,6 +29,8 @@ app:
   seed-admin:
     email: ${ADMIN_EMAIL:admin@example.com}
     password: ${ADMIN_PASSWORD:}
+  storage:
+    avatar-root: ${AVATAR_STORAGE_ROOT:storage/avatars}
 
 server:
   port: ${PORT:8080}

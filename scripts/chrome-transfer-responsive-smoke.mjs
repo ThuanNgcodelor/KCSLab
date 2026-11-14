@@ -11,6 +11,9 @@ const env = Object.fromEntries(readFileSync(join(root, '.env'), 'utf8')
     const separator = line.indexOf('=');
     return [line.slice(0, separator), line.slice(separator + 1)];
   }));
+const testEmail = process.argv.includes('--reception')
+  ? 'nguyentrungthuan4177@gmail.com'
+  : env.ADMIN_EMAIL;
 const port = 9700 + Math.floor(Math.random() * 200);
 const profile = mkdtempSync(join(tmpdir(), 'cfc-transfer-responsive-'));
 const artifacts = join(root, 'artifacts', 'transfer-responsive');
@@ -91,7 +94,7 @@ try {
   await evaluate(`(() => {
     const [email, password] = document.querySelectorAll('input');
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
-    setter.call(email, ${JSON.stringify(env.ADMIN_EMAIL)});
+    setter.call(email, ${JSON.stringify(testEmail)});
     email.dispatchEvent(new Event('input', { bubbles: true }));
     setter.call(password, ${JSON.stringify(env.ADMIN_PASSWORD)});
     password.dispatchEvent(new Event('input', { bubbles: true }));
@@ -106,6 +109,7 @@ try {
     scrollWidth: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),
     cardRows: document.querySelectorAll('.transfer-table tbody tr').length,
     firstLabels: Array.from(document.querySelectorAll('.transfer-table tbody tr:first-child td')).map((cell) => getComputedStyle(cell, '::before').content),
+    hasDashboardNavigation: Array.from(document.querySelectorAll('.admin-nav a')).some((link) => link.textContent.includes('Tổng quan')),
     alerts: Array.from(document.querySelectorAll('[role="alert"]')).map((node) => node.textContent.trim())
   }))()`);
   const listScreenshot = await screenshot('transfer-list-mobile.png');
@@ -128,6 +132,9 @@ try {
   }
   if (listMetrics.cardRows && listMetrics.firstLabels.some((label) => label === 'none' || label === '""')) {
     throw new Error('Mobile transfer cards are missing field labels');
+  }
+  if (process.argv.includes('--reception') && listMetrics.hasDashboardNavigation) {
+    throw new Error('Receptionist still sees dashboard navigation');
   }
   if (pickerMetrics.resultCount > 20) throw new Error('Receipt picker loaded more than 20 results');
   if (browserErrors.length) throw new Error(browserErrors.join(' | '));

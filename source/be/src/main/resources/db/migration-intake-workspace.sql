@@ -3,6 +3,23 @@
 
 ALTER TABLE samples MODIFY COLUMN product_type VARCHAR(80) NOT NULL;
 
+DROP PROCEDURE IF EXISTS cfc_add_column_if_missing;
+DELIMITER $$
+CREATE PROCEDURE cfc_add_column_if_missing()
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = 'users'
+          AND column_name = 'avatar_updated_at'
+    ) THEN
+        ALTER TABLE users ADD COLUMN avatar_updated_at TIMESTAMP(6) NULL AFTER updated_at;
+    END IF;
+END$$
+DELIMITER ;
+CALL cfc_add_column_if_missing();
+DROP PROCEDURE cfc_add_column_if_missing;
+
 CREATE TABLE IF NOT EXISTS staff_notifications (
     id BIGINT NOT NULL AUTO_INCREMENT,
     recipient_user_id BIGINT NOT NULL,
