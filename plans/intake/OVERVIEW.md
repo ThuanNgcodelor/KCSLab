@@ -1,6 +1,16 @@
 # Plan riêng — Module Tiếp nhận mẫu
 
-**Cập nhật:** 14/11/2026 · **Trạng thái:** Đã khảo sát source/Phiếu 3, chưa triển khai runtime mới
+**Cập nhật:** 15/11/2026 · **Trạng thái:** I1–I3 đã có runtime; I4–I6 còn lại
+
+> Các dòng “chưa có” trong phần khảo sát bên dưới là baseline lịch sử. Khi đối chiếu trạng thái hiện tại, ưu tiên `docs/ai/START_HERE.md`, `docs/ai/STATE.md` và `plans/CURRENT.md`.
+
+## Trạng thái triển khai hiện tại
+
+- I1: đã có API dashboard/query, search/filter/sort/pagination server-side và index/test.
+- I2–I3: đã có notification persistence/API, header ba tin, trang riêng và WebSocket nội bộ.
+- I4–I5: form nhập nhiều mẫu, loại sản phẩm nhập tự do, upload ảnh mobile đã có; còn draft/completion, catalog duyệt và unsaved warning.
+- I6: còn MySQL load test hợp lý và E2E đầy đủ ba role.
+- Gửi khách Zalo/SMS không thuộc runtime notification nội bộ; theo dõi riêng ở `docs/INTAKE_NOTIFICATIONS.md`.
 
 ## 1. Kết luận hiện trạng
 

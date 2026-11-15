@@ -1,5 +1,43 @@
 # CFC Lab Management — Bàn giao để tiếp tục ở máy khác
 
+## Bản cập nhật 15/11/2026 — đọc phần này trước
+
+File điều hướng đầy đủ: `docs/ai/START_HERE.md`.
+
+### Đã triển khai và đã có runtime
+
+- Auth email/JWT cookie/CSRF, Redis refresh session, remember-me, tự refresh access token.
+- Role `ADMIN`, `RECEPTIONIST`, `TECHNICIAN`; Admin quản lý user; cả ba role có profile/avatar/password.
+- Phiếu 3 có customer, hồ sơ nguồn, nhiều sample, actor nhận mẫu, niêm phong, tình trạng, chỉ tiêu, ảnh/file và checksum.
+- Danh sách Phiếu 3 server-side 20/trang, search/filter/sort whitelist, dữ liệu thật từ backend.
+- Phiếu 4 có draft → pending → accepted/rejected, KCS một phòng cố định, ẩn draft khỏi KCS.
+- Phiếu 5 có thiết bị/hóa chất/QC/raw data, submit, return và review nội bộ.
+- Notification nội bộ lưu database, header hiển thị tin mới, trang riêng và WebSocket. Đây chưa phải Zalo OA/SMS.
+- `.env` đã thêm `SPRING_PROFILES_ACTIVE=mysql`; MySQL `cfc_lab` là nơi lưu dữ liệu khi chạy đúng profile.
+
+### Các phần chưa được đánh dấu hoàn tất
+
+- Export Phiếu 3: đã có template placeholder, exporter và API `GET /api/v1/receipts/{id}/form-3`, nhưng Microsoft Word vừa báo lỗi mở file. Phải sửa ZIP/XML và test mở Word thật trước khi nghiệm thu.
+- CFC-TN-14: chưa có sequence nguyên tử, xác minh hai người, `-V/-R`, QC/mã mù, correction history và gate chặn chuyển mẫu.
+- Chưa có `result_releases`, PDF phát hành, QR, public lookup hoặc SEO runtime.
+- Chưa có provider runtime ZBS/SMS, outbox worker, webhook delivery.
+- Avatar/file còn lưu local, chưa có object storage/backup production.
+
+### Người tiếp nhận và KCS nhìn thấy gì
+
+- `receivedBy` là nhân viên đăng nhập tạo Phiếu 3; `deliveredBy` là người giao mẫu được nhập trong form.
+- Admin/Receptionist xem đầy đủ người tiếp nhận.
+- Technician/KCS không được gọi API receipt đầy đủ; notification `INTAKE_RECORDED` có thể hiển thị tên người ghi nhận để giữ traceability.
+- KCS không được thấy dữ liệu khách hàng dư thừa. Public lookup tương lai không trả người tiếp nhận.
+
+### SEO/public lookup đã chốt hướng
+
+- Chỉ route `/tracuu` được index.
+- `/tracuu/ket-qua`, API public lookup và PDF kết quả dùng `noindex`, `no-store`, rate limit; chỉ trả kết quả `RELEASED`.
+- `/admin`, `/login`, `/api/v1`, WebSocket không public và không nằm trong sitemap.
+- Cloudflare Tunnel chỉ route hostname tra cứu riêng; không expose Admin/backend nội bộ.
+- Chi tiết: `docs/PUBLIC_LOOKUP_SEO.md`.
+
 ## Cập nhật bộ chọn chuyển mẫu
 
 - `/admin/transfers/new` dùng tìm kiếm backend theo mã phiếu/mã mẫu/khách hàng/số điện thoại, debounce 300 ms và 20 kết quả/trang.
@@ -18,7 +56,7 @@
 **Cập nhật:** 14/11/2026
 **Nhánh:** `main`  
 **Mốc Git tiếp nhận/pagination:** `ca3b44a`
-**Ưu tiên hiện tại:** Hoàn tất Intake I4–I5; I1–I3 đã có runtime, migration MySQL và Chrome smoke
+**Ưu tiên hiện tại:** Sửa/nghiệm thu export DOCX, sau đó hoàn thiện coding gate 5A; I1–I3 đã có runtime, migration MySQL và Chrome smoke
 
 > Đây là file cần đọc đầu tiên khi tiếp tục dự án ở máy khác. Không ghi mật khẩu, JWT secret hoặc thông tin đăng nhập vào file này; lấy chúng từ `.env` cục bộ.
 

@@ -1,5 +1,24 @@
 # Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
+## Cập nhật điều phối — 15/11/2026
+
+File đọc đầu tiên ở máy công ty: `docs/ai/START_HERE.md`.
+
+Trạng thái cần nhớ:
+
+- Runtime nội bộ đã có auth/Redis, user/RBAC, Phiếu 3, Phiếu 4, Phiếu 5, pagination/sort/filter, notification/WebSocket và profile/avatar.
+- MySQL profile đã được bật trong `.env`; chạy backend với `SPRING_PROFILES_ACTIVE=mysql`.
+- Export Phiếu 3 đang ở trạng thái **đang sửa/nghiệm thu**, vì file DOCX vừa không mở được trong Microsoft Word. Không coi endpoint/template hiện tại là done cho đến khi mở Word thật và kiểm tra dữ liệu.
+- Mã hóa mới có mã gốc; chưa có gate CFC-TN-14 đầy đủ.
+- SEO/public lookup/Cloudflare Tunnel mới là plan tại `docs/PUBLIC_LOOKUP_SEO.md`, chưa public bất kỳ route nào.
+
+Thứ tự làm tiếp:
+
+1. Fix và test export DOCX.
+2. Hoàn thiện coding gate 5A.
+3. Hoàn thiện notification ZBS/SMS khi có provider.
+4. Tạo result release/PDF/QR rồi mới làm public lookup và SEO.
+
 ## Hoàn thành bổ sung ngày 14/11/2026
 
 - [x] Thay dropdown Phiếu 4 tải 100 hồ sơ bằng tìm kiếm server-side có debounce và phân trang 20 phiếu/trang.

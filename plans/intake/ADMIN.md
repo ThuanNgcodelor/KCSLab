@@ -1,5 +1,7 @@
 # Role plan — Admin đối với khâu tiếp nhận
 
+**Trạng thái 15/11/2026:** User/RBAC, dashboard dữ liệu thật, notification và profile đã có; catalog, approval/coding gate, resend ZBS/SMS và result release còn plan.
+
 **Role:** `ADMIN` · **Landing:** `/admin`
 
 ## Mục tiêu công việc

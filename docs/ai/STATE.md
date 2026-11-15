@@ -1,5 +1,13 @@
 # Project State
 
+## Cập nhật phiên làm việc mới — 15/11/2026
+
+- Bộ hướng dẫn đọc nhanh đã được gom tại `docs/ai/START_HERE.md`.
+- `.env` đã có `SPRING_PROFILES_ACTIVE=mysql`; khi chạy đúng profile, backend dùng MySQL `cfc_lab` với Hibernate `validate`, không dùng H2 `create-drop`.
+- Đã có thiết kế export Phiếu 3 bằng template placeholder và endpoint `/api/v1/receipts/{id}/form-3`. Tuy nhiên file DOCX export/template vừa bị Microsoft Word báo lỗi mở; chưa đánh dấu nghiệm thu. Cần kiểm tra lại ZIP/XML và mở bằng Word thật.
+- Quyền hiển thị `receivedBy`: Admin/Receptionist xem đầy đủ; Technician/KCS không có receipt API đầy đủ nhưng notification nội bộ có thể hiển thị tên người ghi nhận. Public lookup tương lai không được trả trường này.
+- Kiến trúc SEO/public lookup được ghi tại `docs/PUBLIC_LOOKUP_SEO.md`; hiện chưa có runtime public route, result release, PDF, QR hoặc Cloudflare Tunnel.
+
 ## Cập nhật mới nhất — duy trì đăng nhập bằng Redis
 
 ## Cập nhật mới nhất — hardening Phiếu 3
@@ -34,7 +42,7 @@
 - MySQL đã có cột nullable `users.avatar_updated_at` bằng migration idempotent; file hiện lưu local tại `storage/avatars`.
 - Xác minh: backend 12/12 test pass, frontend build 71 modules, Chrome profile desktop 1424 px/mobile 390 px không overflow; ảnh smoke thực tế trả đúng 320×320 rồi được xóa.
 
-**Cập nhật:** 14/11/2026
+**Cập nhật:** 15/11/2026
 
 ## Đã hoàn thành
 
@@ -63,7 +71,7 @@
 - Chưa có phát hành/version PDF, public lookup và audit log tổng quát.
 - Chưa có migration tool, object storage/backup và bộ integration test nghiệp vụ.
 - Chưa có role reviewer chuyên biệt; bước review biên bản hiện do `ADMIN` thực hiện.
-- Chưa có gate mã hóa độc lập (counter nguyên tử, `-V/-R`, người thứ hai xác minh), QR và WebSocket thông báo.
+- Chưa có gate mã hóa độc lập (counter nguyên tử, `-V/-R`, người thứ hai xác minh), QR và correction history. WebSocket notification nội bộ đã có; WebSocket không dùng cho Zalo/SMS.
 - Chưa có consent/template được duyệt, outbox/delivery, worker, provider adapter hoặc callback ZBS/SMS; chi tiết tại `docs/INTAKE_NOTIFICATIONS.md`.
 - Avatar hiện lưu filesystem local; chưa có object storage/CDN, backup và xử lý nhiều instance production.
 

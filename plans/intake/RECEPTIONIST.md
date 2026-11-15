@@ -1,5 +1,7 @@
 # Role plan — Nhân viên tiếp nhận mẫu
 
+**Trạng thái 15/11/2026:** Route/list/form/upload cơ bản đã chạy; draft/completion, coding verification và customer notification chưa hoàn tất.
+
 **Role:** `RECEPTIONIST` · **Landing:** `/admin/intake`
 
 ## Mục tiêu công việc

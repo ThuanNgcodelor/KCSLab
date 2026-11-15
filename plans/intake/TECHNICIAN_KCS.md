@@ -1,5 +1,7 @@
 # Role plan — Kỹ thuật viên/phòng KCS
 
+**Trạng thái 15/11/2026:** KCS nhận Phiếu 4 và notification nội bộ đã có; Technician không có quyền xem đầy đủ Phiếu 3. Projection dữ liệu KCS tối thiểu và coding verification vẫn cần hoàn thiện.
+
 **Role:** `TECHNICIAN` · **Đích nhận mẫu duy nhất:** `KCS`
 
 ## Mục tiêu công việc

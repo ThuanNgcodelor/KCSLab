@@ -1,5 +1,12 @@
 # RBAC
 
+## Ghi chú hiển thị người tiếp nhận — 15/11/2026
+
+- `receivedBy` là nhân viên đăng nhập tạo Phiếu 3, khác với `deliveredBy` là người giao mẫu được nhập trong phiếu.
+- `ADMIN` và `RECEPTIONIST` được xem đầy đủ Phiếu 3 và người tiếp nhận.
+- `TECHNICIAN/KCS` không được gọi API `/api/v1/receipts/**` theo security hiện tại. Notification `INTAKE_RECORDED` có thể hiển thị tên người ghi nhận để giữ chuỗi trách nhiệm; đây là projection tối thiểu, không phải quyền xem toàn bộ hồ sơ.
+- Trang tra cứu public tương lai không được trả `receivedBy`, `deliveredBy`, email, phone đầy đủ hoặc mapping thông tin nội bộ.
+
 **Phiên bản:** 0.5 · **Cập nhật:** 14/11/2026
 
 ## Enforcement hiện tại

@@ -1,6 +1,13 @@
 # Quy trình tiếp nhận hồ sơ và mã hóa mẫu
 
-**Phiên bản:** 0.2 · **Cập nhật:** 13/11/2026 · **Trạng thái:** CFC-TN-14 đã được xác nhận là quy trình chuẩn; runtime chưa triển khai đầy đủ
+**Phiên bản:** 0.3 · **Cập nhật:** 15/11/2026 · **Trạng thái:** CFC-TN-14 là nguồn chuẩn; runtime mới có mã gốc, gate mã hóa đầy đủ chưa triển khai
+
+## Trạng thái runtime hiện tại
+
+- Phiếu 3 đã lưu `sourceCode`, `productType`, ngày nhận và sinh mã gốc dạng `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`.
+- Ví dụ `CT001` trong form là mã nguồn mẫu do người nhập cung cấp; nó chưa phải danh mục nguồn được Admin duyệt.
+- Runtime hiện chưa đáp ứng đầy đủ CFC-TN-14: sequence vẫn cần counter/locking nguyên tử; chưa có trạng thái `PENDING_CODING/PENDING_VERIFICATION/VERIFIED`, người xác minh thứ hai, `-V/-R`, QC/mã mù hoặc correction history.
+- Không được chặn hoặc tuyên bố “đã xác minh mã” chỉ dựa trên mã gốc hiện tại.
 
 ## Nguồn đã đối chiếu
 
