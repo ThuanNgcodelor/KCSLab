@@ -1,0 +1,125 @@
+- main [ref=e25]:
+  - generic [ref=e26]:
+    - button "CFC Lab" [ref=e27] [cursor=pointer]
+    - button "Mở menu" [ref=e28] [cursor=pointer]: ☰
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]: Không gian làm việc
+      - strong [ref=e32]: Tổng quan
+    - button "Thông báo, 0 chưa đọc" [ref=e34] [cursor=pointer]
+  - generic [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - paragraph [ref=e41]: Thứ Hai, 16 tháng 11, 2026
+        - heading "Chào viên." [level=1] [ref=e42]
+        - paragraph [ref=e43]: Số liệu vận hành được lấy trực tiếp từ hồ sơ tiếp nhận, không dùng dữ liệu minh họa.
+      - button "＋ Tạo phiếu tiếp nhận" [ref=e44] [cursor=pointer]
+    - region "Tổng quan tiếp nhận" [ref=e45]:
+      - article [ref=e46]:
+        - generic [ref=e47]: Phiếu tiếp nhận
+        - strong [ref=e49]: "3"
+        - text: Trong khoảng 7 ngày
+      - article [ref=e50]:
+        - generic [ref=e51]: Tổng số mẫu
+        - strong [ref=e53]: "3"
+        - text: Gắn với các phiếu tiếp nhận
+      - article [ref=e54]:
+        - generic [ref=e55]: Chờ lập phiếu chuyển
+        - strong [ref=e57]: "2"
+        - text: Cần bàn giao sang KCS
+      - article [ref=e58]:
+        - generic [ref=e59]: Từ chối tiếp nhận
+        - strong [ref=e61]: "0"
+        - text: Có lưu lý do trên hồ sơ
+    - generic [ref=e62]:
+      - article [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Dòng công việc
+            - heading "Tiếp nhận gần đây" [level=2] [ref=e67]
+          - button "Xem danh sách →" [ref=e68] [cursor=pointer]
+        - generic [ref=e69]:
+          - button "16-11 1 TN-20261116-C9CC5A · Khách hàng kiểm thử MCP Mẫu kiểm thử Chrome · Nguyễn Trung Thuận" [ref=e70] [cursor=pointer]:
+            - time [ref=e71]: 16-11
+            - generic [ref=e72]: "1"
+            - generic [ref=e73]:
+              - paragraph [ref=e74]:
+                - strong [ref=e75]: TN-20261116-C9CC5A
+                - text: · Khách hàng kiểm thử MCP
+              - generic [ref=e76]: Mẫu kiểm thử Chrome · Nguyễn Trung Thuận
+          - button "16-11 1 TN-20261116-BAEFE4 · Khách hàng kiểm thử MCP Mẫu kiểm thử MCP · Quản trị viên" [ref=e77] [cursor=pointer]:
+            - time [ref=e78]: 16-11
+            - generic [ref=e79]: "1"
+            - generic [ref=e80]:
+              - paragraph [ref=e81]:
+                - strong [ref=e82]: TN-20261116-BAEFE4
+                - text: · Khách hàng kiểm thử MCP
+              - generic [ref=e83]: Mẫu kiểm thử MCP · Quản trị viên
+          - button "12-11 1 TN-20261112-F901E9 · Hợp tác xã Playwright Sầu riêng kiểm thử Playwright · Quản trị viên" [ref=e84] [cursor=pointer]:
+            - time [ref=e85]: 12-11
+            - generic [ref=e86]: "1"
+            - generic [ref=e87]:
+              - paragraph [ref=e88]:
+                - strong [ref=e89]: TN-20261112-F901E9
+                - text: · Hợp tác xã Playwright
+              - generic [ref=e90]: Sầu riêng kiểm thử Playwright · Quản trị viên
+      - article [ref=e91]:
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - paragraph [ref=e94]: Kết luận tiếp nhận
+            - heading "Chất lượng đầu vào" [level=2] [ref=e95]
+          - generic [ref=e96]: Dữ liệu thật
+        - generic [ref=e98]:
+          - strong [ref=e99]: "3"
+          - generic [ref=e100]: phiếu chấp nhận
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - text: Chấp nhận
+            - strong [ref=e104]: "3"
+          - generic [ref=e105]:
+            - text: Có điều kiện
+            - strong [ref=e107]: "0"
+          - generic [ref=e108]:
+            - text: Từ chối
+            - strong [ref=e110]: "0"
+  - generic [ref=e111]:
+    - generic [ref=e112]:
+      - generic [ref=e113]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e122] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e123]:
+            - strong [ref=e124]: CFC CÒ BAY
+            - generic [ref=e125]: Agriculture & Technology
+        - paragraph [ref=e126]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e127] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e128]: ↗
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e131]
+          - generic [ref=e132]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e133]:
+            - link "1900 5307" [ref=e134] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e135] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e136]:
+          - heading "Về CFC" [level=2] [ref=e137]
+          - link "Giới thiệu" [ref=e138] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e139] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e140] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e141]:
+          - heading "Hỗ trợ" [level=2] [ref=e142]
+          - link "Tìm kiếm" [ref=e143] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e144] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e145] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e146]:
+      - generic [ref=e147]: © 2026 CFC Cò Bay
+      - generic [ref=e148]: CFC Lab Management — hệ thống nội bộ

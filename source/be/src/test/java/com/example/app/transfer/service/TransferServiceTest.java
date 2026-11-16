@@ -157,6 +157,42 @@ class TransferServiceTest {
     }
 
     @Test
+    void receivingDashboardAndPaginationIncludeMoreThanOnePage() {
+        for (int i = 0; i < 21; i++) {
+            Sample item = new Sample("SM-PAGE-" + i, "VT-01", "Sầu riêng", LocalDate.now(), i + 10,
+                    "Mẫu " + i, "1", "Túi", "Tốt", "Cd");
+            receipt.addSample(item);
+            entityManager.persist(item);
+            entityManager.flush();
+            var request = new CreateTransferRequest(receipt.getId(), "KCS", LocalDate.now(),
+                    LocalDate.now().plusDays(4), false, null, null,
+                    List.of(new CreateTransferItemRequest(item.getId(), "500 g", "1 túi", "Tốt", "Cd", "TCVN")));
+            transferService.submit(transferService.create(request, receptionist).id());
+        }
+        entityManager.flush();
+        LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
+        var first = receivingService.list(technician, 0, 20, TransferStatus.PENDING, null, today, today, "submittedAt,asc");
+        var second = receivingService.list(technician, 1, 20, TransferStatus.PENDING, null, today, today, "submittedAt,asc");
+        assertThat(first.content()).hasSize(20);
+        assertThat(second.content()).hasSize(1);
+        assertThat(first.content()).extracting(item -> item.id()).doesNotContain(second.content().getFirst().id());
+        assertThat(receivingService.dashboard(technician, today, today).submittedTransfers()).isEqualTo(21);
+        assertThat(receivingService.dashboard(technician, today, today).submittedSamples()).isEqualTo(21);
+    }
+
+    @Test
+    void receivingDashboardUsesVietnamMidnightForDecisions() {
+        var created = transferService.create(createRequest(), receptionist);
+        transferService.submit(created.id());
+        transferService.decide(created.id(), new TransferDecisionRequest(TransferStatus.ACCEPTED, "Đủ mẫu", null, false, null), technician);
+        var transfer = transferRepository.findById(created.id()).orElseThrow();
+        ReflectionTestUtils.setField(transfer, "receivedAt", Instant.parse("2026-11-15T17:00:00Z"));
+        entityManager.flush();
+        assertThat(receivingService.dashboard(technician, LocalDate.of(2026, 11, 15), LocalDate.of(2026, 11, 15)).acceptedTransfers()).isZero();
+        assertThat(receivingService.dashboard(technician, LocalDate.of(2026, 11, 16), LocalDate.of(2026, 11, 16)).acceptedTransfers()).isEqualTo(1);
+    }
+
+    @Test
     void allowsCreatingANewTransferAfterRejection() {
         TransferResponse first = transferService.create(createRequest(), receptionist);
         transferService.submit(first.id());

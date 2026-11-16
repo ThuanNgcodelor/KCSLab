@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { NotificationCenter } from '../../notifications/components/NotificationCenter';
 import { NotificationProvider } from '../../notifications/hooks/useNotifications';
+import { NotificationToasts } from '../../notifications/components/NotificationToasts';
 import cfcLogo from '../../../../../../guideline-assets/cfc-008.png';
 import { UserAvatar } from '../../profile/components/UserAvatar';
 
@@ -31,7 +32,7 @@ export function AdminLayout() {
   const pageTitle = getPageTitle(location.pathname);
 
   return (
-    <NotificationProvider><div className="admin-shell">
+    <NotificationProvider><NotificationToasts /><div className="admin-shell">
       <aside className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-brand"><img className="sidebar-logo" src={cfcLogo} alt="" width="38" height="38" /><div><strong>CFC Lab</strong><small>Management system</small></div></div>
         <div className="sidebar-section-label">Không gian quản trị</div>

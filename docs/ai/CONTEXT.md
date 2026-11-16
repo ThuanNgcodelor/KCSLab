@@ -66,3 +66,9 @@
 - Chỉ đọc `plans/CURRENT.md` khi lập kế hoạch; đọc `plans/intake/OVERVIEW.md` và role plan tương ứng khi làm workspace tiếp nhận/WebSocket nội bộ; đọc `docs/INTAKE_NOTIFICATIONS.md` khi làm Zalo/SMS; `docs/API_CONVENTIONS.md` khi đổi API; `docs/DATABASE.md` khi đổi schema; `docs/RBAC.md` khi đổi quyền.
 - Chỉ mở skill phù hợp tác vụ. Không tải toàn bộ references của skill hoặc toàn bộ `docs/`.
 - `docs/ai/CHANGELOG.md` là lịch sử, không phải file cần đọc đầu phiên.
+
+## Bổ sung KCS 16/11/2026
+
+- Chi tiết receiving hiển thị riêng số lượng/khối lượng và thông tin bàn giao có sẵn; reload sau 409 thất bại không còn báo tải thành công. Dashboard hiển thị thời gian chờ, không đặt SLA.
+- Thêm test HTTP/MySQL chặn truy cập attachment khác receipt, KPI/phân trang 21 phiếu và ranh giới receivedAt. Bộ test Java 21 chạy trên MySQL/Redis tạm: 32 test, 0 failures/errors/skipped; frontend build pass.
+- Chưa nghiệm thu Chrome E2E bản cuối, notification sau commit/rollback và đầy đủ sort/ranh giới thời gian. Thiếu ảnh vẫn là giả định MVP; chính sách tên khách trong notification cần LAB xác nhận.

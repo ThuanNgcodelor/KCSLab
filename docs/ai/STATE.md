@@ -124,3 +124,31 @@
 ## Nguồn đọc mặc định
 
 Đọc `docs/ai/CONTEXT.md` để lấy context ngắn; dùng file này khi cần snapshot trạng thái chi tiết hơn.
+
+## Kiểm tra KCS bổ sung — 16/11/2026
+
+- Java 21 + MySQL 8.4 + Redis tạm: `Tests run: 32, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS`; frontend `npm run build`: `✓ built in 944ms`.
+- Có test MockMvc + MySQL cho content cùng receipt và chặn attachment của receipt khác; có test 21 phiếu, phân trang và receivedAt nửa đêm Việt Nam. Concurrency test được bật trên DB tạm.
+- Chưa kiểm tra Chrome E2E bản cuối cho ba role/4 breakpoint, file thật/keyboard/401/403/409; chưa có test WebSocket sau commit và rollback. Không coi K1+K2 hoàn thành.
+- Migration V5 chỉ được áp dụng lên DB tạm trống trong kiểm thử; chưa xác nhận trên DB làm việc. Thiếu ảnh vẫn cảnh báo/cho nhận; chính sách tên khách trong notification chờ LAB xác nhận.
+
+## Giao diện KCS — 16/11/2026
+
+- Điều chỉnh dashboard, danh sách và chi tiết receiving: sửa hàng chờ bị bó hẹp, tăng độ tương phản, làm rõ thông tin và trình bày mẫu dạng thẻ trên điện thoại.
+- `npm run build` pass; Playwright với API và role TECHNICIAN giả lập kiểm tra ba màn hình ở 390×844, 1024×768, 1440×900, 2560×952: không thấy tràn ngang toàn trang. Đã xem ảnh dashboard desktop và chi tiết mobile.
+- Chưa phải E2E với đăng nhập, dữ liệu, file và WebSocket thật; cần nghiệm thu lại các luồng này trên hệ thống chạy thật.
+
+## Hộp thoại xác nhận CFC — 16/11/2026
+
+- Tạo `shared/components/ConfirmDialog.jsx` để tái sử dụng; xác nhận nhận/từ chối KCS không còn dùng `window.confirm`. Có Escape, focus nút hủy và màu riêng cho thao tác từ chối.
+- Frontend build pass; Playwright dùng API giả lập đã kiểm tra hủy/Escape không gửi quyết định, xác nhận gửi đúng loại quyết định và hiển thị tại bốn breakpoint chuẩn. Chưa kiểm thử nhận/từ chối trên dữ liệu thật.
+
+## Đồng bộ dashboard KCS — 16/11/2026
+
+- Dashboard nhận mẫu dùng cùng cách chào, lọc kỳ, làm mới và thẻ chỉ số có mô tả như dashboard Tiếp nhận; giữ nguyên KPI và hàng đợi từ API receiving.
+- `npm run build` pass; Playwright với API giả lập đã kiểm tra 390×844, 1024×768, 1440×900, 2560×952 không tràn ngang toàn trang, thao tác tuần/tùy chọn/làm mới. Chưa nghiệm thu dữ liệu thật sau thay đổi này.
+
+## Toast và đồng bộ thông báo — 16/11/2026
+
+- Có toast CFC khi nhận event WebSocket mới, đóng/xem chi tiết, tự đóng sau 8 giây; socket kết nối lại sẽ tải REST, chống event trùng gần đây. Quyền người nhận không đổi, không có âm thanh.
+- Frontend build pass; Playwright giả lập WebSocket/REST kiểm tra toast, lặp, đóng, tự đóng, điều hướng, reconnect và bốn breakpoint. Chưa test hai phiên WebSocket thật hoặc lỗi đánh dấu đã đọc; plan tại `plans/NOTIFICATION_REALTIME.md`.

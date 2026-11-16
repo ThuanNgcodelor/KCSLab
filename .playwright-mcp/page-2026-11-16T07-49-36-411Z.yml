@@ -1,0 +1,112 @@
+- main [ref=e25]:
+  - generic [ref=e26]:
+    - button "CFC Lab" [ref=e27] [cursor=pointer]
+    - button "Mở menu" [ref=e28] [cursor=pointer]: ☰
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]: Không gian làm việc
+      - strong [ref=e32]: Tổng quan nhận mẫu
+    - button "Thông báo, 0 chưa đọc" [ref=e34] [cursor=pointer]
+  - generic [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - heading "Tổng quan nhận mẫu" [level=1] [ref=e41]
+        - paragraph [ref=e42]: Phiếu chuyển đến KCS và tình trạng bàn giao.
+      - button "Xem danh sách nhận mẫu" [ref=e43] [cursor=pointer]
+    - region "Khoảng thời gian" [ref=e44]:
+      - button "Hôm nay" [pressed] [ref=e45] [cursor=pointer]
+      - button "Tuần này" [ref=e46] [cursor=pointer]
+      - button "Tháng này" [ref=e47] [cursor=pointer]
+      - button "Tùy chọn" [ref=e48] [cursor=pointer]
+    - region "Thống kê nhận mẫu" [ref=e49]:
+      - article [ref=e50]:
+        - generic [ref=e51]: Phiếu chuyển lên
+        - strong [ref=e52]: "1"
+      - article [ref=e53]:
+        - generic [ref=e54]: Số mẫu chuyển lên
+        - strong [ref=e55]: "1"
+      - article [ref=e56]:
+        - generic [ref=e57]: Đang chờ nhận
+        - strong [ref=e58]: "1"
+      - article [ref=e59]:
+        - generic [ref=e60]: Đã nhận trong kỳ
+        - strong [ref=e61]: "0"
+      - article [ref=e62]:
+        - generic [ref=e63]: Từ chối trong kỳ
+        - strong [ref=e64]: "0"
+      - article [ref=e65]:
+        - generic [ref=e66]: Thời gian xử lý TB
+        - strong [ref=e67]: —
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - heading "Chờ nhận lâu nhất" [level=2] [ref=e72]
+            - paragraph [ref=e73]: Các phiếu đang chờ đối chiếu, ưu tiên phiếu đến trước.
+          - generic [ref=e74]: 1 đang chờ
+        - button "CM-20261116-F20ED7 1 mẫu · Gửi lúc 11:03:31 16/11/2026 Đã chờ 225 phút" [ref=e75] [cursor=pointer]:
+          - generic [aria-hidden] [ref=e76]: ↗
+          - generic [ref=e77]:
+            - strong [ref=e78]: CM-20261116-F20ED7
+            - generic [ref=e79]: 1 mẫu · Gửi lúc 11:03:31 16/11/2026
+          - generic [ref=e80]: Đã chờ 225 phút
+          - generic [aria-hidden] [ref=e81]: ›
+      - generic [ref=e82]:
+        - heading "Nhịp nhận mẫu theo ngày" [level=2] [ref=e83]
+        - table [ref=e85]:
+          - rowgroup [ref=e86]:
+            - row [ref=e87]:
+              - columnheader "Ngày" [ref=e88]
+              - columnheader "Chuyển lên" [ref=e89]
+              - columnheader "Đã nhận" [ref=e90]
+              - columnheader "Từ chối" [ref=e91]
+          - rowgroup [ref=e92]:
+            - row [ref=e93]:
+              - cell "2026-11-16" [ref=e94]
+              - cell "1" [ref=e95]
+              - cell "0" [ref=e96]
+              - cell "0" [ref=e97]
+    - generic [ref=e98]:
+      - heading "Quyết định gần đây" [level=2] [ref=e99]
+      - paragraph [ref=e100]: Chưa có quyết định gần đây.
+  - generic [ref=e101]:
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e112] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e113]:
+            - strong [ref=e114]: CFC CÒ BAY
+            - generic [ref=e115]: Agriculture & Technology
+        - paragraph [ref=e116]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e117] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e118]: ↗
+      - generic [ref=e119]:
+        - generic [ref=e120]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e121]
+          - generic [ref=e122]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e123]:
+            - link "1900 5307" [ref=e124] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e125] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e126]:
+          - heading "Về CFC" [level=2] [ref=e127]
+          - link "Giới thiệu" [ref=e128] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e129] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e130] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e131]:
+          - heading "Hỗ trợ" [level=2] [ref=e132]
+          - link "Tìm kiếm" [ref=e133] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e134] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e135] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e136]:
+      - generic [ref=e137]: © 2026 CFC Cò Bay
+      - generic [ref=e138]: CFC Lab Management — hệ thống nội bộ
