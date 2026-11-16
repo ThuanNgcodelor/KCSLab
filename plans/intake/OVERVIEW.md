@@ -12,16 +12,16 @@
 - I6: còn MySQL load test hợp lý và E2E đầy đủ ba role.
 - Gửi khách Zalo/SMS không thuộc runtime notification nội bộ; theo dõi riêng ở `docs/INTAKE_NOTIFICATIONS.md`.
 - `RECEPTIONIST`: tạo Phiếu 3 và sinh mã hiện tại đã pass Chrome smoke bằng tài khoản role thật; `/admin/intake` vẫn gộp KPI + danh sách, navbar chưa có dashboard riêng.
-- Người nhận mẫu KCS: nhận/từ chối Phiếu 4 đã có vertical slice nhưng chưa có dashboard ngày/tuần/tháng, chưa xem được ảnh theo projection an toàn và role `TECHNICIAN` đang bị gộp với chức năng thử nghiệm.
+- Người nhận mẫu KCS: nhận/từ chối Phiếu 4 đã có vertical slice nhưng chưa có dashboard ngày/tuần/tháng, chưa xem được ảnh theo projection transfer. Người dùng xác nhận `TECHNICIAN` được vừa nhận mẫu vừa lập Phiếu 5 cùng Admin.
 - Plan chi tiết mới nằm tại `plans/intake/RECEPTIONIST.md` và `plans/intake/TECHNICIAN_KCS.md`.
 
 ## Ưu tiên triển khai workspace theo role
 
-1. Khóa quyết định người nhận mẫu là role riêng hay tái dùng `TECHNICIAN`.
-2. Làm backend projection/dashboard/list/evidence cho người nhận mẫu, không mở receipt API đầy đủ và không trả PII khách hàng.
-3. Làm navbar + dashboard + hàng đợi + gallery ảnh cho workspace nhận mẫu.
-4. Tách dashboard Receptionist khỏi danh sách Phiếu 3 và thêm mục Tổng quan vào navbar.
-5. Chạy E2E chuỗi Phiếu 3 có ảnh → Phiếu 4 → KCS xem ảnh/nhận hoặc từ chối → notification ngược về Receptionist.
+1. Giữ `TECHNICIAN` cho nhận mẫu và thử nghiệm; xây dựng contract API và file.
+2. Làm projection/dashboard/list/evidence cho KCS, cho xem file gốc theo hồ sơ được chuyển giao.
+3. Làm navbar + dashboard + hàng đợi + gallery ảnh cho KCS; hỗ trợ nhiều file Phiếu 5 cho KCS và Admin.
+4. Tách dashboard Receptionist khỏi danh sách Phiếu 3; mở rộng dashboard Admin bao quát toàn bộ.
+5. Chạy E2E chuỗi Phiếu 3 có ảnh → Phiếu 4 → KCS nhận → Phiếu 5 có file → notification.
 
 ## 1. Kết luận hiện trạng
 

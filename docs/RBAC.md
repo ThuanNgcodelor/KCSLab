@@ -1,12 +1,11 @@
 # RBAC
 
-## Quyết định đang chờ — role Người nhận mẫu KCS — 16/11/2026
+## Quyết định role Người nhận mẫu KCS — 16/11/2026
 
-- Yêu cầu sản phẩm mới: người nhận mẫu chỉ thấy dashboard nhận mẫu, Phiếu 4 đã gửi, bằng chứng ảnh/file, thông báo và hồ sơ cá nhân.
-- Source hiện dùng `TECHNICIAN` cho cả quyết định nhận/từ chối Phiếu 4 và lập/cập nhật Phiếu 5. Đây là hai trách nhiệm đang bị gộp.
-- Khuyến nghị tạo role `SAMPLE_RECEIVER` riêng và giữ `TECHNICIAN` cho người phân tích. Nếu cùng một nhân sự làm hai việc, cần chốt role gộp tạm thời hoặc mở rộng user sang nhiều role.
-- Cho đến khi người dùng xác nhận, enforcement runtime bên dưới không thay đổi. Plan chi tiết: `plans/intake/TECHNICIAN_KCS.md`.
-- Dù chọn phương án nào, người nhận mẫu xem ảnh qua projection của transfer, không được mở toàn bộ `/api/v1/receipts/**`; response không trả phone/email/address/customer name.
+- Người dùng xác nhận giữ `TECHNICIAN` cho cả nhận/từ chối Phiếu 4 và lập Phiếu 5; `ADMIN` cũng được lập Phiếu 5. Cả hai cần upload nhiều file PDF và tài liệu khác vào Phiếu 5; đây là yêu cầu chưa triển khai.
+- `RECEPTIONIST`, `TECHNICIAN` và `ADMIN` có dashboard riêng theo phạm vi công việc; Admin bao quát toàn hệ thống.
+- Người nhận mẫu được xem đầy đủ file gốc của hồ sơ được chuyển giao thông qua quyền theo transfer; file gốc có thể chứa thông tin khách hàng. API projection vẫn hạn chế trả riêng các trường liên hệ khi không cần thiết và không mở toàn bộ `/api/v1/receipts/**`.
+- Quy tắc thiếu ảnh tạm đề xuất cảnh báo, chưa có quy định bắt buộc từ LAB; chưa áp đặt SLA. Plan chi tiết: `plans/intake/TECHNICIAN_KCS.md`.
 
 ## Ghi chú hiển thị người tiếp nhận — 15/11/2026
 

@@ -13,7 +13,7 @@
 - Dashboard Admin và aggregate API Tiếp nhận đã dùng dữ liệu thật; notification center lưu bền, header ba tin, trang riêng và WebSocket nội bộ. `RECEPTIONIST` chưa có dashboard/navbar Tổng quan riêng vì `/admin/intake` đang gộp KPI với danh sách. Người nhận mẫu KCS chưa có dashboard ngày/tuần/tháng hoặc projection xem ảnh.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
 - Frontend mở từng route theo role: `ADMIN` quản lý user/review; `ADMIN|RECEPTIONIST` tiếp nhận và lập/sửa/gửi Phiếu 4; `ADMIN|TECHNICIAN` thử nghiệm và quyết định nhận mẫu. KCS/PTN không nhìn thấy Phiếu 4 còn `DRAFT`; Technician không có quyền gọi đầy đủ API Phiếu 3, nhưng notification có thể chứa tên người ghi nhận.
-- Yêu cầu mới muốn người nhận mẫu chỉ thấy workspace nhận mẫu. Source hiện gộp việc này với thử nghiệm trong `TECHNICIAN`; khuyến nghị tách `SAMPLE_RECEIVER`, chờ xác nhận trước khi đổi code/RBAC.
+- Người dùng xác nhận `TECHNICIAN` vừa nhận mẫu vừa lập Phiếu 5 cùng `ADMIN`; không tạo role mới. Cần dashboard riêng cho từng role, Admin xem tổng hợp toàn hệ thống, và bổ sung upload nhiều file vào Phiếu 5.
 - UI dùng tone sáng CFC, logo từ `guideline-assets/cfc-008.png`; admin shell fluid tối đa 1680px, sidebar cố định ở desktop và chuyển drawer từ 1080px trở xuống, typography tăng trên màn 2K; footer liên kết website CFC.
 
 ## Luồng đã chạy
@@ -47,8 +47,8 @@
 
 ## Việc tiếp theo
 
-1. Khóa role Người nhận mẫu, quy tắc ảnh bắt buộc và SLA; triển khai dashboard/list/evidence theo `plans/intake/TECHNICIAN_KCS.md`.
-2. Tách dashboard cá nhân `RECEPTIONIST` khỏi danh sách Phiếu 3.
+1. Triển khai dashboard/list/evidence cho `TECHNICIAN` và upload nhiều file Phiếu 5 cho `TECHNICIAN`/`ADMIN` theo `plans/intake/TECHNICIAN_KCS.md`.
+2. Tách dashboard cá nhân `RECEPTIONIST` khỏi danh sách Phiếu 3 và mở rộng dashboard `ADMIN` tổng hợp toàn hệ thống.
 3. Sửa và nghiệm thu export DOCX Phiếu 3 bằng Word thật.
 4. Hoàn tất I4–I6 và Phase 2/5A: draft/completion, catalog, sequence nguyên tử, xác minh độc lập, `-V/-R`, QC/mã mù.
 5. Làm ZBS/SMS, `result_releases`, PDF/QR và public lookup theo các plan chuyên biệt.

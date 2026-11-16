@@ -4,6 +4,15 @@
 
 **Role:** `ADMIN` · **Landing:** `/admin`
 
+## Yêu cầu dashboard tổng thể — 16/11/2026
+
+- Dashboard Admin bao quát toàn bộ chuỗi: tiếp nhận Phiếu 3, chuyển/nhận Phiếu 4 và thử nghiệm Phiếu 5, có bộ lọc ngày/tuần/tháng và khoảng tùy chọn theo giờ Việt Nam.
+- Tách số phiếu và số mẫu; hiển thị hàng đợi chờ chuyển, chờ KCS nhận, đã nhận/từ chối và tiến độ thử nghiệm theo trạng thái đã có trong hệ thống.
+- Điều hướng từ số liệu tới danh sách được lọc tương ứng; có loading, lỗi và trạng thái rỗng. Tổng hợp tại backend, không đếm từ một trang dữ liệu.
+- Phần kết quả phát hành, gửi khách, danh mục duyệt hoặc SLA chỉ hiển thị khi có dữ liệu và quy tắc tương ứng; không giả lập là đã triển khai.
+- Admin và Technician được lập Phiếu 5; plan bổ sung upload nhiều file tại `plans/intake/TECHNICIAN_KCS.md`.
+- Hiện dashboard Admin chủ yếu tổng hợp tiếp nhận, chưa phản ánh toàn chuỗi như yêu cầu mới.
+
 ## Mục tiêu công việc
 
 Giám sát năng lực tiếp nhận, xử lý ngoại lệ, chuẩn hóa danh mục và kiểm soát notification mà không thay nhân viên nhập liệu thường ngày.

@@ -6,7 +6,9 @@
 - Phạm vi xác nhận không bao gồm draft/completion, gate mã hóa hai người, gửi khách ZBS/SMS hoặc export Word nghiệm thu cuối.
 - Receptionist chưa có dashboard riêng: `/admin/intake` đang gộp dải aggregate với danh sách và navbar đã ẩn mục Tổng quan.
 - Người nhận mẫu KCS hiện dùng runtime role `TECHNICIAN`, xem/nhận/từ chối Phiếu 4 nhưng chưa có dashboard ngày/tuần/tháng và chưa có quyền xem ảnh theo projection transfer.
-- `TECHNICIAN` hiện còn thấy/thao tác module thử nghiệm; yêu cầu mới muốn người nhận mẫu chỉ thấy nhận mẫu. Khuyến nghị tách `SAMPLE_RECEIVER`, chờ người dùng khóa quyết định trước khi code.
+- Người dùng xác nhận `TECHNICIAN` vừa nhận mẫu vừa lập Phiếu 5 cùng `ADMIN`; giữ ba role hiện tại. Cần thêm upload nhiều file PDF/tài liệu vào Phiếu 5; chưa thấy runtime attachment riêng cho Phiếu 5.
+- Ba dashboard cần riêng biệt: Receptionist theo tiếp nhận, Technician theo nhận mẫu/thử nghiệm, Admin tổng hợp toàn hệ thống. Chưa đặt SLA; thiếu ảnh tạm đề xuất cảnh báo.
+- KCS được xem toàn bộ file gốc của hồ sơ được chuyển giao; file gốc có thể chứa thông tin khách hàng, dù API projection hạn chế các trường liên hệ riêng.
 - `GET /api/v1/transfers` hiện lấy top 50, chưa phân trang/filter DB; `TransferResponse` còn trả `customerName`; quyết định đồng thời chưa có row/optimistic lock.
 - Plan chi tiết được cập nhật tại `plans/intake/RECEPTIONIST.md`, `plans/intake/TECHNICIAN_KCS.md` và `plans/intake/OVERVIEW.md`.
 

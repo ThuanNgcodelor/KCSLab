@@ -4,8 +4,8 @@
 
 - Người dùng đã nghiệm thu vertical slice `RECEPTIONIST`: đăng nhập bằng tài khoản role thật và tạo Phiếu 3 thành công trên Chrome hiển thị. Không suy rộng trạng thái này sang draft/completion, coding verification, ZBS/SMS hoặc export Word.
 - Receptionist vẫn thiếu dashboard riêng: `/admin/intake` đang gộp KPI với danh sách, navbar không có Tổng quan.
-- Yêu cầu kế tiếp là workspace Người nhận mẫu KCS: navbar tối giản, dashboard Hôm nay/Tuần/Tháng, hàng đợi Phiếu 4, xem ảnh/file để đối chiếu, nhận/từ chối và không lộ PII khách hàng.
-- Runtime hiện gộp nhận mẫu và thử nghiệm trong `TECHNICIAN`. Khuyến nghị role mới `SAMPLE_RECEIVER`; chờ chốt ba câu hỏi tại cuối `plans/intake/TECHNICIAN_KCS.md` trước khi sửa enum/migration/RBAC.
+- Workspace KCS cần dashboard Hôm nay/Tuần/Tháng, hàng đợi Phiếu 4 và xem toàn bộ ảnh/file gốc được chuyển giao; nội dung file có thể chứa thông tin khách hàng.
+- Người dùng xác nhận giữ `TECHNICIAN` cho cả nhận mẫu và lập Phiếu 5; Admin cũng được lập Phiếu 5. Bổ sung upload nhiều file PDF/tài liệu cho Phiếu 5 và dashboard Admin bao quát toàn bộ. Trước mắt đề xuất cảnh báo thiếu ảnh, chưa đặt SLA.
 - Plan đã cập nhật tại `plans/intake/OVERVIEW.md`, `plans/intake/RECEPTIONIST.md`, `plans/intake/TECHNICIAN_KCS.md`, `plans/CURRENT.md` và `docs/RBAC.md`.
 
 ## Bản cập nhật 15/11/2026 — đọc phần này trước

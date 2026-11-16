@@ -4,17 +4,18 @@
 
 - Người dùng đã nghiệm thu luồng role `RECEPTIONIST`: đăng nhập → tạo Phiếu 3 → sinh mã phiếu/mã mẫu trên Chrome hiển thị. Chỉ đánh dấu ổn cho vertical slice này; draft/completion, coding verification và customer notification vẫn chưa hoàn tất.
 - `RECEPTIONIST` chưa có dashboard riêng: `/admin/intake` hiện gộp dải KPI và danh sách, navbar không có mục Tổng quan. Plan tách dashboard/list đã cập nhật tại `plans/intake/RECEPTIONIST.md`.
-- Role Người nhận mẫu KCS cần dashboard Hôm nay/Tuần/Tháng, hàng đợi Phiếu 4, xem toàn bộ ảnh/file cần đối chiếu, nhận/từ chối và không thấy PII khách hàng.
-- Source hiện gộp nhận mẫu và thử nghiệm vào `TECHNICIAN`. Khuyến nghị tách `SAMPLE_RECEIVER`; cần người dùng xác nhận trước khi sửa enum, migration và RBAC.
+- Người dùng xác nhận `TECHNICIAN` vừa nhận mẫu vừa được lập Phiếu 5 cùng `ADMIN`; giữ ba role hiện có. Cần dashboard riêng cho `RECEPTIONIST`, `TECHNICIAN` và dashboard tổng hợp toàn hệ thống cho `ADMIN`.
+- Người nhận mẫu cần dashboard ngày/tuần/tháng, hàng đợi Phiếu 4, xem đầy đủ file/ảnh gốc của hồ sơ chuyển giao, nhận/từ chối; Phiếu 5 cần hỗ trợ nhiều file PDF và tài liệu phù hợp.
+- File gốc có thể chứa thông tin khách hàng, dù projection API không chủ động trả thông tin liên hệ dưới dạng trường riêng.
 - Kế hoạch backend/API, navbar/route, dashboard, gallery, concurrency và E2E nằm tại `plans/intake/TECHNICIAN_KCS.md`.
 
 Thứ tự gần nhất:
 
-1. Khóa ba quyết định K0: role riêng hay gộp, ảnh bắt buộc hay cảnh báo, SLA chờ nhận.
-2. Triển khai projection/dashboard/list/evidence an toàn cho người nhận mẫu.
-3. Triển khai navbar + dashboard + hàng đợi + gallery ảnh KCS.
-4. Tách dashboard Receptionist khỏi danh sách Phiếu 3.
-5. E2E chuỗi Receptionist gửi Phiếu 4 có ảnh → KCS xem/nhận hoặc từ chối → notification ngược về Receptionist.
+1. Giữ `TECHNICIAN` nhận mẫu và lập Phiếu 5; xây dựng contract cho projection, file và ba dashboard.
+2. Triển khai dashboard/list/evidence cho KCS và upload nhiều file Phiếu 5 cho KCS/Admin.
+3. Tách dashboard Receptionist khỏi danh sách; mở rộng dashboard Admin bao quát toàn bộ.
+4. E2E chuỗi Receptionist gửi Phiếu 4 có ảnh → KCS xem/nhận hoặc từ chối → lập Phiếu 5 đính kèm → notification.
+5. Trước mắt cảnh báo nếu thiếu ảnh, chưa đặt SLA; đây là giả định MVP, không phải quy định LAB đã xác nhận.
 
 ## Cập nhật điều phối — 15/11/2026
 
