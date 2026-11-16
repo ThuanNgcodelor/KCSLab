@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { decideTransfer, getTransfer, submitTransfer } from '../api/transferApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const statusLabels = {
   DRAFT: 'Bản nháp', PENDING: 'Chờ KCS/PTN nhận', ACCEPTED: 'Đã nhận mẫu', REJECTED: 'Từ chối nhận',
@@ -42,7 +43,7 @@ export function TransferDetailPage() {
     finally { setSaving(false); }
   }
 
-  if (!transfer) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <p className="muted">Đang tải phiếu chuyển…</p>}</section>;
+  if (!transfer) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <PageLoader label="Đang tải phiếu chuyển…" rows={4} />}</section>;
 
   return <section className="staff-page transfer-detail-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/transfers')}>← Danh sách phiếu chuyển</button><p className="section-kicker">Phiếu chuyển mẫu / {transfer.transferCode}</p><h1>{statusLabels[transfer.status]}</h1><p className="heading-copy">{transfer.receivingDepartment} · Liên kết {transfer.receiptCode}</p></div><span className={`transfer-status large ${transfer.status.toLowerCase()}`}><i />{statusLabels[transfer.status]}</span></header>

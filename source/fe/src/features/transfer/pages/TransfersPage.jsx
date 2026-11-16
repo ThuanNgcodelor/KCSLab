@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { listTransfers } from '../api/transferApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const statusLabels = { DRAFT: 'Bản nháp', PENDING: 'Chờ KCS/PTN nhận', ACCEPTED: 'Đã nhận mẫu', REJECTED: 'Từ chối nhận' };
 
@@ -30,7 +31,7 @@ export function TransfersPage() {
     <div className="intake-guide"><div className="guide-step done"><span>✓</span><div><strong>Tiếp nhận</strong><small>Phiếu số 3</small></div></div><div className="guide-line done" /><div className="guide-step current"><span>02</span><div><strong>Chuyển mẫu</strong><small>Phiếu số 4</small></div></div><div className="guide-line" /><div className="guide-step"><span>03</span><div><strong>Thử nghiệm</strong><small>Biên bản số 5</small></div></div></div>
     <section className="panel-card intake-list-card">
       <div className="panel-heading"><div><p className="section-kicker">Chuỗi bàn giao</p><h2>Phiếu chuyển mẫu</h2></div><button className="outline-button small-button" onClick={loadTransfers}>↻ Làm mới</button></div>
-      {loading ? <p className="muted">Đang tải phiếu chuyển…</p> : transfers.length === 0 ? <div className="empty-intake"><span>⇄</span><h3>Chưa có phiếu chuyển mẫu</h3><p>Lập Phiếu số 4 từ hồ sơ tiếp nhận để bàn giao mẫu.</p>{canCreate && <button className="outline-button" onClick={() => navigate('/admin/transfers/new')}>Lập phiếu đầu tiên</button>}</div> : <div className="table-wrap"><table className="staff-table transfer-table"><thead><tr><th>Mã phiếu</th><th>Phiếu tiếp nhận</th><th>Nơi nhận</th><th>Mẫu</th><th>Hạn trả</th><th>Trạng thái</th><th /></tr></thead><tbody>{transfers.map((transfer) => <tr key={transfer.id}>
+      {loading ? <PageLoader label="Đang tải phiếu chuyển…" rows={3} /> : transfers.length === 0 ? <div className="empty-intake"><span>⇄</span><h3>Chưa có phiếu chuyển mẫu</h3><p>Lập Phiếu số 4 từ hồ sơ tiếp nhận để bàn giao mẫu.</p>{canCreate && <button className="outline-button" onClick={() => navigate('/admin/transfers/new')}>Lập phiếu đầu tiên</button>}</div> : <div className="table-wrap"><table className="staff-table transfer-table"><thead><tr><th>Mã phiếu</th><th>Phiếu tiếp nhận</th><th>Nơi nhận</th><th>Mẫu</th><th>Hạn trả</th><th>Trạng thái</th><th /></tr></thead><tbody>{transfers.map((transfer) => <tr key={transfer.id}>
         <td data-label="Mã phiếu"><span className="transfer-cell-copy"><strong className="receipt-code">{transfer.transferCode}</strong><small>{transfer.customerName}</small></span></td>
         <td data-label="Tiếp nhận"><span className="transfer-cell-copy"><strong>{transfer.receiptCode}</strong><small>{transfer.deliveredBy}</small></span></td>
         <td data-label="Nơi nhận">{transfer.receivingDepartment}</td>

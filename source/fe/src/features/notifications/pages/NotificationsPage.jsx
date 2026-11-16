@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from '../api/notificationApi';
 import { formatTime, typeIcon } from '../components/NotificationCenter';
 import { useNotifications } from '../hooks/useNotifications';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const emptyPage = { content: [], page: 0, totalElements: 0, totalPages: 0, first: true, last: true };
 
@@ -44,7 +45,7 @@ export function NotificationsPage() {
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
     <section className="panel-card notification-page-card">
-      {loading ? <p className="muted">Đang tải thông báo…</p> : notificationPage.content.length === 0
+      {loading ? <PageLoader label="Đang tải thông báo…" rows={3} /> : notificationPage.content.length === 0
         ? <div className="notification-page-empty"><span>✓</span><h2>{unread ? 'Không còn thông báo chưa đọc' : 'Chưa có thông báo'}</h2><p>Các hoạt động tiếp nhận và bàn giao sẽ xuất hiện tại đây.</p></div>
         : <div className="notification-page-list">{notificationPage.content.map((notification) => <button className={`notification-page-row ${notification.readAt ? '' : 'unread'}`} type="button" key={notification.id} onClick={() => openNotification(notification)}>
           <span className="notification-type-icon">{typeIcon(notification.type)}</span>

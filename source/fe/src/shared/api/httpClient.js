@@ -1,3 +1,5 @@
+import { trackRequest } from '../loading/loadingStore';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 let refreshPromise = null;
 
@@ -58,6 +60,13 @@ async function refreshAccessToken() {
 }
 
 export async function request(path, options = {}) {
+  const done = options.silent ? () => {} : trackRequest();
+  try { return await send(path, options); } finally { done(); }
+}
+
+async function send(path, options) {
+  const { silent, ...fetchOptions } = options; // eslint-disable-line no-unused-vars
+  options = fetchOptions;
   let response = await fetch(`${API_BASE_URL}${path}`, requestOptions(options));
   const canRefresh = response.status === 401 && !['/auth/login', '/auth/refresh'].includes(path);
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { getAdminDashboard } from '../../intake/api/intakeApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -37,7 +38,7 @@ export function DashboardPage() {
     <section className="stats-grid" aria-label="Tổng quan tiếp nhận">{stats.map((stat) => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{loading ? '…' : stat.value}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>
     <section className="dashboard-grid intake-dashboard-grid">
       <article className="panel-card activity-panel"><div className="panel-heading"><div><p className="section-kicker">Dòng công việc</p><h2>Tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Xem danh sách <span>→</span></button></div>
-        {loading ? <p className="muted">Đang tải dữ liệu…</p> : dashboard?.recentReceipts?.length
+        {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : dashboard?.recentReceipts?.length
           ? <div className="activity-list">{dashboard.recentReceipts.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · {receipt.receivedByName}</small></div></button>)}</div>
           : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu tiếp nhận</h3><p>Tạo hồ sơ đầu tiên để bắt đầu theo dõi.</p></div>}
       </article>

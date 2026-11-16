@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { getTestingRecord, reviewTestingRecord, submitTestingRecord } from '../api/testingApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const statusLabels = { DRAFT: 'Bản nháp', SUBMITTED: 'Chờ kiểm tra', REVIEWED: 'Đã kiểm tra', RETURNED: 'Cần bổ sung' };
 
@@ -36,7 +37,7 @@ export function TestingRecordDetailPage() {
     finally { setSaving(false); }
   }
 
-  if (!record) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <p className="muted">Đang tải biên bản…</p>}</section>;
+  if (!record) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <PageLoader label="Đang tải biên bản…" rows={4} />}</section>;
   const editable = ['DRAFT', 'RETURNED'].includes(record.status) && (user?.role === 'ADMIN' || user?.id === record.analystId);
   const qcRows = record.measurements.filter((row) => row.type === 'QC');
   const rawRows = record.measurements.filter((row) => row.type === 'RAW');

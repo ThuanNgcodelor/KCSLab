@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, uploadReceiptFile } from '../api/intakeApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const categoryLabels = {
   FORM_3: 'Phiếu tiếp nhận số 3', LOT_PHOTO: 'Ảnh lô hàng', SAMPLE_PHOTO: 'Ảnh mẫu',
@@ -36,12 +37,12 @@ export function ReceiptDetailPage() {
     finally { setSaving(false); }
   }
 
-  if (!receipt) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <p className="muted">Đang tải hồ sơ tiếp nhận…</p>}</section>;
+  if (!receipt) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <PageLoader label="Đang tải hồ sơ tiếp nhận…" rows={4} />}</section>;
   const photoCategory = category !== 'FORM_3' && category !== 'OTHER';
 
   return <section className="staff-page receipt-detail-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Phiếu số 3 / {receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div></header>
-    {error && <p className="form-error intake-toast" role="alert" role="alert">{error}</p>}
+    {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <div className="receipt-detail-grid">
       <main className="receipt-form-main">
         <section className="panel-card intake-form-card"><DetailHeading title="Nguồn và chuỗi tiếp nhận" />

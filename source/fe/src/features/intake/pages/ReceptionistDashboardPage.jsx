@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { getReceptionistDashboard } from '../api/intakeApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const TIME_ZONE = 'Asia/Ho_Chi_Minh';
 const statusLabels = {
@@ -70,7 +71,7 @@ export function ReceptionistDashboardPage() {
     <section className="dashboard-grid intake-dashboard-grid">
       <article className="panel-card activity-panel">
         <div className="panel-heading"><div><p className="section-kicker">Hoạt động của bạn</p><h2>Phiếu tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách phiếu <span>→</span></button></div>
-        {loading ? <p className="muted">Đang tải dữ liệu…</p> : recent.length
+        {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : recent.length
           ? <div className="activity-list">{recent.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · {statusLabels[receipt.status] ?? receipt.status}{receipt.expectedDate ? ` · Hạn ${formatShortDate(receipt.expectedDate)}` : ''}</small></div></button>)}</div>
           : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu trong khoảng này</h3><p>Tạo phiếu tiếp nhận mới hoặc chọn khoảng thời gian khác.</p></div>}
       </article>

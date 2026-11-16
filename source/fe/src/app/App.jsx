@@ -16,6 +16,7 @@ import { TestingRecordsPage } from '../features/testing/pages/TestingRecordsPage
 import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFormPage';
 import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
 import { NotificationsPage } from '../features/notifications/pages/NotificationsPage';
+import { SplashScreen } from '../shared/components/Loading';
 import { ProfilePage } from '../features/profile/pages/ProfilePage';
 import { ReceivingDashboardPage } from '../features/receiving/pages/ReceivingDashboardPage';
 import { ReceivingListPage } from '../features/receiving/pages/ReceivingListPage';
@@ -24,7 +25,7 @@ import { ReceivingDetailPage } from '../features/receiving/pages/ReceivingDetail
 function ProtectedRoute() {
   const { user, loading } = useAuth();
   const location = useLocation();
-  if (loading) return <div className="page-loading">Đang khởi tạo phiên…</div>;
+  if (loading) return <SplashScreen />;
   return user ? <Outlet /> : <Navigate to="/login" replace state={{ from: location.pathname }} />;
 }
 

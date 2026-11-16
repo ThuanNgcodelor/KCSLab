@@ -17,7 +17,7 @@ export function NotificationProvider({ children }) {
   const refresh = useCallback(async () => {
     const sequence = ++requestSequence.current;
     const revision = eventRevision.current;
-    const page = await listNotifications({ size: 3 });
+    const page = await listNotifications({ size: 3, silent: true });
     if (sequence === requestSequence.current && revision === eventRevision.current) {
       page.content.forEach((item) => seenIds.current.add(item.id));
       setNotifications(page.content);

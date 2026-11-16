@@ -4,6 +4,7 @@ import { presetRange } from '../../intake/pages/ReceptionistDashboardPage';
 import { getReceivingDashboard } from '../api/receivingApi';
 import { useNotifications } from '../../notifications/hooks/useNotifications';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { PageLoader } from '../../../shared/components/Loading';
 
 export function ReceivingDashboardPage() {
   const [preset, setPreset] = useState('today');
@@ -42,7 +43,7 @@ export function ReceivingDashboardPage() {
       <button type="button" className="outline-button small-button" onClick={() => setRefreshKey(key => key + 1)}>↻ Làm mới</button>
     </section>
     {error && <p className="form-error" role="alert">{error}</p>}
-    {loading && <p role="status">Đang tải số liệu…</p>}
+    {loading && <PageLoader label="Đang tải số liệu…" compact />}
     {!loading && !error && !data && <p>Chọn khoảng ngày để xem số liệu.</p>}
     {data && <>
       <section className="stats-grid" aria-label="Thống kê nhận mẫu">{stats.map(stat => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{stat.value}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>

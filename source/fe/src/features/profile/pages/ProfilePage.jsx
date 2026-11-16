@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { changePassword, deleteAvatar, getProfile, updateProfile, uploadAvatar } from '../api/profileApi';
 import { UserAvatar } from '../components/UserAvatar';
 import { formatBytes, prepareAvatar } from '../utils/prepareAvatar';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const roleLabels = { ADMIN: 'Quản trị viên', RECEPTIONIST: 'Nhân viên tiếp nhận', TECHNICIAN: 'Kỹ thuật viên KCS' };
 
@@ -90,7 +91,7 @@ export function ProfilePage() {
     finally { setPasswordSaving(false); }
   }
 
-  if (loading) return <section className="admin-page"><p className="muted">Đang tải thông tin cá nhân…</p></section>;
+  if (loading) return <section className="admin-page"><PageLoader label="Đang tải thông tin cá nhân…" /></section>;
 
   return <section className="admin-page profile-page">
     <header className="admin-heading"><div><p className="section-kicker">Tài khoản cá nhân</p><h1>Thông tin của tôi</h1><p className="heading-copy">Quản lý nhận diện nhân sự và bảo mật đăng nhập của chính bạn.</p></div></header>

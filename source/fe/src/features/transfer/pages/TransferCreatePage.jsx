@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, listReceipts } from '../../intake/api/intakeApi';
 import { createTransfer, getTransfer, updateTransfer } from '../api/transferApi';
+import { PageLoader } from '../../../shared/components/Loading';
 
 const today = businessDate();
 const dueDefault = businessDate(7);
@@ -113,7 +114,7 @@ export function TransferCreatePage() {
     finally { setSaving(false); }
   }
 
-  if (loading) return <section className="staff-page"><p className="muted">Đang tải hồ sơ tiếp nhận…</p></section>;
+  if (loading) return <section className="staff-page"><PageLoader label="Đang tải hồ sơ tiếp nhận…" /></section>;
 
   return <section className="staff-page transfer-form-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(editing ? `/admin/transfers/${id}` : '/admin/transfers')}>← {editing ? 'Quay lại phiếu chuyển' : 'Quay lại danh sách'}</button><p className="section-kicker">Phiếu số 4</p><h1>{editing ? 'Sửa bản nháp chuyển mẫu' : 'Lập phiếu chuyển mẫu'}</h1><p className="heading-copy">Chuẩn bị hồ sơ bàn giao mẫu cho KCS/phòng phân tích; bản nháp chưa khóa mẫu.</p></div></header>
