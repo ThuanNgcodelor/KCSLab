@@ -108,7 +108,7 @@ export function ReceiptCreatePage() {
       <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mã mẫu hiện tại chưa mang ý nghĩa “đã xác minh hai người”; Phase 2 sẽ bổ sung cổng xác minh này.</p>
       <div className="receipt-success-actions">
         <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất Phiếu 3</button>
-        <button className="outline-button" onClick={() => navigate('/admin/intake')}>Về danh sách</button>
+        <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Về danh sách</button>
         <button className="primary-button" onClick={() => { setForm(initialForm); setSamples([newSample()]); setFiles({ form3: [], samples: [], lot: [] }); setCreated(null); }}>Tạo phiếu khác</button>
       </div>
     </div>
@@ -116,7 +116,7 @@ export function ReceiptCreatePage() {
 
   return <section className="staff-page receipt-form-page">
     <header className="admin-heading staff-heading"><div>
-      <button className="back-link" onClick={() => navigate('/admin/intake')}>← Quay lại danh sách</button>
+      <button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Quay lại danh sách</button>
       <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo phiếu tiếp nhận</h1>
     </div></header>
     {error && <div className="toast toast-error" role="alert">{error}</div>}

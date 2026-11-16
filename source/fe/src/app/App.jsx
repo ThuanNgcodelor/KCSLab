@@ -3,6 +3,7 @@ import { LoginPage } from '../features/auth/pages/LoginPage';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { UsersPage } from '../features/users/pages/UsersPage';
 import { UserFormPage } from '../features/users/pages/UserFormPage';
+import { ReceptionistDashboardPage } from '../features/intake/pages/ReceptionistDashboardPage';
 import { IntakePage } from '../features/intake/pages/IntakePage';
 import { ReceiptCreatePage } from '../features/intake/pages/ReceiptCreatePage';
 import { ReceiptDetailPage } from '../features/intake/pages/ReceiptDetailPage';
@@ -29,6 +30,11 @@ function RoleRoute({ roles }) {
   return roles.includes(user?.role) ? <Outlet /> : <Navigate to="/admin" replace />;
 }
 
+function IntakeHome() {
+  const { user } = useAuth();
+  return user?.role === 'RECEPTIONIST' ? <ReceptionistDashboardPage /> : <Navigate to="/admin/intake/receipts" replace />;
+}
+
 export function App() {
   return <Routes>
     <Route path="/login" element={<LoginPage />} />
@@ -43,7 +49,8 @@ export function App() {
           <Route path="/admin/users/:id/edit" element={<UserFormPage />} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST']} />}>
-          <Route path="/admin/intake" element={<IntakePage />} />
+          <Route path="/admin/intake" element={<IntakeHome />} />
+          <Route path="/admin/intake/receipts" element={<IntakePage />} />
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />
           <Route path="/admin/intake/:id" element={<ReceiptDetailPage />} />
           <Route path="/admin/transfers/new" element={<TransferCreatePage />} />

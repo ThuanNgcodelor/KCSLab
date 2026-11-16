@@ -38,7 +38,8 @@ export function AdminLayout() {
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
           {isAdmin && <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {isAdmin && <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
-          {canReceive && <NavLink to="/admin/intake" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}
+          {user?.role === 'RECEPTIONIST' && <NavLink to="/admin/intake" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
+          {canReceive && <NavLink to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}
           <NavLink to="/admin/transfers" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>Chuyển mẫu</span></NavLink>
           {canTest && <NavLink to="/admin/testing" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Thử nghiệm</span></NavLink>}
           <NavLink to="/admin/notifications" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="bell" /><span>Thông báo</span></NavLink>
@@ -59,6 +60,7 @@ function getPageTitle(pathname) {
   if (pathname.includes('/profile')) return 'Thông tin cá nhân';
   if (pathname.includes('/notifications')) return 'Thông báo';
   if (pathname.includes('/intake/new')) return 'Tạo phiếu tiếp nhận';
+  if (pathname.replace(/\/$/, '') === '/admin/intake') return 'Tổng quan';
   if (pathname.includes('/intake')) return 'Tiếp nhận mẫu';
   if (pathname.includes('/transfers')) return 'Chuyển mẫu';
   if (pathname.includes('/testing')) return 'Thử nghiệm';
