@@ -1,0 +1,65 @@
+- main [ref=f1e26]:
+  - generic [ref=f1e27]:
+    - button "CFC Lab" [ref=f1e28] [cursor=pointer]
+    - button "Mở menu" [ref=f1e29] [cursor=pointer]: ☰
+  - generic [ref=f1e30]:
+    - generic [ref=f1e31]:
+      - generic [ref=f1e32]: Không gian làm việc
+      - strong [ref=f1e33]: Tạo phiếu tiếp nhận
+    - button "Thông báo, 0 chưa đọc" [ref=f1e35] [cursor=pointer]
+  - generic [ref=f1e277]:
+    - generic [ref=f1e278]: ✓
+    - paragraph [ref=f1e279]: Đã lưu hồ sơ tiếp nhận
+    - heading "Phiếu đã được tạo" [level=1] [ref=f1e280]
+    - paragraph [ref=f1e281]: Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.
+    - generic [ref=f1e282]:
+      - generic [ref=f1e283]: MÃ PHIẾU
+      - strong [ref=f1e284]: TN-20261116-BAEFE4
+      - generic [ref=f1e285]: MÃ MẪU HIỆN TẠI
+      - strong [ref=f1e286]: CT001-SR-16112026-001
+    - paragraph [ref=f1e287]: Đã lưu 0 file/ảnh. Mã mẫu hiện tại chưa mang ý nghĩa “đã xác minh hai người”; Phase 2 sẽ bổ sung cổng xác minh này.
+    - generic [ref=f1e288]:
+      - button "Xuất Phiếu 3" [ref=f1e289] [cursor=pointer]
+      - button "Về danh sách" [ref=f1e290] [cursor=pointer]
+      - button "Tạo phiếu khác" [ref=f1e291] [cursor=pointer]
+  - generic [ref=f1e98]:
+    - generic [ref=f1e99]:
+      - generic [ref=f1e100]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=f1e109] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=f1e110]:
+            - strong [ref=f1e111]: CFC CÒ BAY
+            - generic [ref=f1e112]: Agriculture & Technology
+        - paragraph [ref=f1e113]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=f1e114] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=f1e115]: ↗
+      - generic [ref=f1e116]:
+        - generic [ref=f1e117]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=f1e118]
+          - generic [ref=f1e119]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=f1e120]:
+            - link "1900 5307" [ref=f1e121] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=f1e122] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=f1e123]:
+          - heading "Về CFC" [level=2] [ref=f1e124]
+          - link "Giới thiệu" [ref=f1e125] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=f1e126] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=f1e127] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=f1e128]:
+          - heading "Hỗ trợ" [level=2] [ref=f1e129]
+          - link "Tìm kiếm" [ref=f1e130] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=f1e131] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=f1e132] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=f1e133]:
+      - generic [ref=f1e134]: © 2026 CFC Cò Bay
+      - generic [ref=f1e135]: CFC Lab Management — hệ thống nội bộ

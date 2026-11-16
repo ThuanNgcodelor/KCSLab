@@ -1,6 +1,8 @@
 # Role plan — Nhân viên tiếp nhận mẫu
 
-**Trạng thái 15/11/2026:** Route/list/form/upload cơ bản đã chạy; draft/completion, coding verification và customer notification chưa hoàn tất.
+**Cập nhật:** 16/11/2026
+
+**Trạng thái:** Luồng đăng nhập bằng tài khoản `RECEPTIONIST` → tạo Phiếu 3 → sinh mã phiếu/mã mẫu đã được người dùng nghiệm thu trên Chrome hiển thị. Phạm vi “ổn” là luồng tạo phiếu hiện tại; draft/completion, coding verification, customer notification và dashboard riêng chưa hoàn tất.
 
 **Role:** `RECEPTIONIST` · **Landing:** `/admin/intake`
 
@@ -9,6 +11,27 @@
 Giúp nhân viên hoàn tất một Phiếu 3 nhanh, đủ bằng chứng và biết ngay hồ sơ nào cần xử lý tiếp mà không phải đi qua dashboard quản trị.
 
 ## Dashboard cá nhân
+
+### Khoảng trống hiện tại
+
+- `/admin/intake` hiện gộp dải KPI, bộ lọc và danh sách Phiếu 3 trong cùng một trang; đây chưa phải dashboard cá nhân độc lập.
+- Navbar `RECEPTIONIST` đang không có mục `Tổng quan`; landing đi thẳng vào danh sách tiếp nhận.
+- API `/api/v1/intake/dashboard/receptionist` đã có aggregate 7 ngày theo user đăng nhập, có thể tái sử dụng làm nền nhưng chưa có hàng đợi hành động.
+
+### Route/navbar cần triển khai
+
+```text
+Không gian tiếp nhận
+├── Tổng quan                 /admin/intake
+├── Tiếp nhận mẫu             /admin/intake/receipts
+├── Chuyển mẫu                /admin/transfers
+├── Thông báo                 /admin/notifications
+└── Thông tin cá nhân         /admin/profile
+```
+
+- `/admin/intake` trở thành dashboard cá nhân.
+- Danh sách hiện tại chuyển sang `/admin/intake/receipts`; giữ redirect tương thích cho link chi tiết cũ.
+- Action chính trên dashboard là `Tạo phiếu tiếp nhận`; action phụ là `Mở danh sách phiếu` và `Lập Phiếu 4`.
 
 - Bộ lọc mặc định `Hôm nay`; cho chọn khoảng ngày.
 - KPI từ API: đã ghi nhận, chờ hoàn tất, có điều kiện, bị từ chối, chờ lập/gửi Phiếu 4.
@@ -48,6 +71,8 @@ Không tạo notification “bạn vừa tạo phiếu” cho chính thao tác �
 ## Acceptance criteria
 
 - Từ dashboard mở form mới trong một thao tác.
+- Navbar có Tổng quan riêng; dashboard và danh sách không còn là cùng một màn hình.
+- Preset Hôm nay/Tuần/Tháng và khoảng tùy chọn tính theo `Asia/Ho_Chi_Minh`.
 - Filter/search không xử lý mảng receipt ở frontend.
 - Form mobile chụp ảnh trực tiếp, không tràn ngang và giữ draft khi mạng gián đoạn ngắn.
 - Nhân viên biết rõ file nào upload lỗi và retry riêng, không phải tạo lại phiếu.

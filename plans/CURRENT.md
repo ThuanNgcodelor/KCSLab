@@ -1,5 +1,21 @@
 # Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
+## Ưu tiên mới — Dashboard theo role và workspace Người nhận mẫu — 16/11/2026
+
+- Người dùng đã nghiệm thu luồng role `RECEPTIONIST`: đăng nhập → tạo Phiếu 3 → sinh mã phiếu/mã mẫu trên Chrome hiển thị. Chỉ đánh dấu ổn cho vertical slice này; draft/completion, coding verification và customer notification vẫn chưa hoàn tất.
+- `RECEPTIONIST` chưa có dashboard riêng: `/admin/intake` hiện gộp dải KPI và danh sách, navbar không có mục Tổng quan. Plan tách dashboard/list đã cập nhật tại `plans/intake/RECEPTIONIST.md`.
+- Role Người nhận mẫu KCS cần dashboard Hôm nay/Tuần/Tháng, hàng đợi Phiếu 4, xem toàn bộ ảnh/file cần đối chiếu, nhận/từ chối và không thấy PII khách hàng.
+- Source hiện gộp nhận mẫu và thử nghiệm vào `TECHNICIAN`. Khuyến nghị tách `SAMPLE_RECEIVER`; cần người dùng xác nhận trước khi sửa enum, migration và RBAC.
+- Kế hoạch backend/API, navbar/route, dashboard, gallery, concurrency và E2E nằm tại `plans/intake/TECHNICIAN_KCS.md`.
+
+Thứ tự gần nhất:
+
+1. Khóa ba quyết định K0: role riêng hay gộp, ảnh bắt buộc hay cảnh báo, SLA chờ nhận.
+2. Triển khai projection/dashboard/list/evidence an toàn cho người nhận mẫu.
+3. Triển khai navbar + dashboard + hàng đợi + gallery ảnh KCS.
+4. Tách dashboard Receptionist khỏi danh sách Phiếu 3.
+5. E2E chuỗi Receptionist gửi Phiếu 4 có ảnh → KCS xem/nhận hoặc từ chối → notification ngược về Receptionist.
+
 ## Cập nhật điều phối — 15/11/2026
 
 File đọc đầu tiên ở máy công ty: `docs/ai/START_HERE.md`.

@@ -1,12 +1,22 @@
 # Project State
 
+## Xác nhận ROLE Tiếp nhận và plan ROLE Người nhận mẫu — 16/11/2026
+
+- Người dùng xác nhận vertical slice `RECEPTIONIST` hiện tại đã ổn: tài khoản role thật đăng nhập và tạo thành công Phiếu 3 trên Chrome hiển thị; backend sinh mã phiếu và mã mẫu.
+- Phạm vi xác nhận không bao gồm draft/completion, gate mã hóa hai người, gửi khách ZBS/SMS hoặc export Word nghiệm thu cuối.
+- Receptionist chưa có dashboard riêng: `/admin/intake` đang gộp dải aggregate với danh sách và navbar đã ẩn mục Tổng quan.
+- Người nhận mẫu KCS hiện dùng runtime role `TECHNICIAN`, xem/nhận/từ chối Phiếu 4 nhưng chưa có dashboard ngày/tuần/tháng và chưa có quyền xem ảnh theo projection transfer.
+- `TECHNICIAN` hiện còn thấy/thao tác module thử nghiệm; yêu cầu mới muốn người nhận mẫu chỉ thấy nhận mẫu. Khuyến nghị tách `SAMPLE_RECEIVER`, chờ người dùng khóa quyết định trước khi code.
+- `GET /api/v1/transfers` hiện lấy top 50, chưa phân trang/filter DB; `TransferResponse` còn trả `customerName`; quyết định đồng thời chưa có row/optimistic lock.
+- Plan chi tiết được cập nhật tại `plans/intake/RECEPTIONIST.md`, `plans/intake/TECHNICIAN_KCS.md` và `plans/intake/OVERVIEW.md`.
+
 ## Cập nhật cấu hình migration MySQL — 16/11/2026
 
-- Đã thêm Flyway Core và module MySQL vào backend.
+- Đã thêm Spring Boot Flyway starter và module MySQL vào backend để Flyway tự chạy khi startup.
 - `source/be/src/main/resources/db/migration/V1__baseline_schema.sql` là bản baseline sao từ schema hiện tại.
-- Database `cfc_lab` đã có dữ liệu sẽ được Flyway baseline tự động ở version `1`; database rỗng sẽ chạy V1 khi backend khởi động.
+- Database `cfc_lab` đã có dữ liệu sẽ được Flyway baseline tự động ở version `1`, sau đó chạy `V2`–`V4` để bù các thay đổi Phase 1/3, intake workspace và hardening Phiếu 3; database rỗng sẽ chạy toàn bộ V1–V4.
 - Hibernate đã chuyển sang `ddl-auto=validate`; rename cột, backfill, index, foreign key và stored procedure phải thêm thành migration SQL có version.
-- Các lần thay đổi schema sau này chỉ cần thêm `V2__...sql`, `V3__...sql` rồi bấm Run lại. Flyway lưu lịch sử tại `flyway_schema_history`.
+- Các lần thay đổi schema sau này chỉ cần thêm migration tăng dần từ `V5__...sql` rồi bấm Run lại. Flyway lưu lịch sử tại `flyway_schema_history`.
 
 ## Cấu hình local/test MySQL — 16/11/2026
 

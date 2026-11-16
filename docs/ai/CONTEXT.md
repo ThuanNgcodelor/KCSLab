@@ -1,6 +1,6 @@
 # CFC Lab — AI Context
 
-**Cập nhật:** 15/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
+**Cập nhật:** 16/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
 
 > Nếu chỉ có ít thời gian, đọc `docs/ai/START_HERE.md` trước. File này là context kỹ thuật ngắn; `plans/CURRENT.md` là kế hoạch tổng thể.
 
@@ -10,9 +10,10 @@
 - Đã hoàn thành vertical slice: auth email/session/CSRF, user, Phase 1/Phiếu 3 có hồ sơ nguồn + nhiều mẫu + bằng chứng ảnh/file, Phase 3/Phiếu 4 có nháp/gửi/nhận và biên bản 5 đến kiểm tra/trả lại. CFC-TN-14 đã được xác nhận là quy trình chuẩn; runtime hiện mới có mã gốc, chưa đủ `-V/-R`, QC/mã mù và xác minh độc lập.
 - Ranh giới runtime hiện tại là `TEST_REVIEWED`; chưa có `result_releases`, PDF phát hành, thu hồi/đính chính hoặc tra cứu khách. Export Phiếu 3 đã có endpoint/template/placeholder nhưng chưa được đánh dấu hoàn tất vì file DOCX cần test mở Word thật sau lỗi mở file gần nhất.
 - Chưa có gửi tin khách hàng. Phase 1B đã chốt plan dùng ZBS Template Message ưu tiên, SMS Brandname/MultiSMS dự phòng qua database outbox; WebSocket được tách riêng cho nhân viên nội bộ.
-- Dashboard Admin và workspace Tiếp nhận đã có API/query dữ liệu thật, notification center lưu bền, header ba tin, trang riêng và WebSocket nội bộ. Vẫn còn các hạng mục I4–I6 như draft/completion, catalog duyệt, load test và E2E ba role.
+- Dashboard Admin và aggregate API Tiếp nhận đã dùng dữ liệu thật; notification center lưu bền, header ba tin, trang riêng và WebSocket nội bộ. `RECEPTIONIST` chưa có dashboard/navbar Tổng quan riêng vì `/admin/intake` đang gộp KPI với danh sách. Người nhận mẫu KCS chưa có dashboard ngày/tuần/tháng hoặc projection xem ảnh.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
 - Frontend mở từng route theo role: `ADMIN` quản lý user/review; `ADMIN|RECEPTIONIST` tiếp nhận và lập/sửa/gửi Phiếu 4; `ADMIN|TECHNICIAN` thử nghiệm và quyết định nhận mẫu. KCS/PTN không nhìn thấy Phiếu 4 còn `DRAFT`; Technician không có quyền gọi đầy đủ API Phiếu 3, nhưng notification có thể chứa tên người ghi nhận.
+- Yêu cầu mới muốn người nhận mẫu chỉ thấy workspace nhận mẫu. Source hiện gộp việc này với thử nghiệm trong `TECHNICIAN`; khuyến nghị tách `SAMPLE_RECEIVER`, chờ xác nhận trước khi đổi code/RBAC.
 - UI dùng tone sáng CFC, logo từ `guideline-assets/cfc-008.png`; admin shell fluid tối đa 1680px, sidebar cố định ở desktop và chuyển drawer từ 1080px trở xuống, typography tăng trên màn 2K; footer liên kết website CFC.
 
 ## Luồng đã chạy
@@ -46,11 +47,11 @@
 
 ## Việc tiếp theo
 
-1. Sửa và nghiệm thu export DOCX Phiếu 3 bằng Word thật.
-2. Hoàn tất I4–I6: draft/completion, catalog duyệt, MySQL load test và E2E ba role.
-3. Làm Phase 2/5A trong `docs/SAMPLE_CODING.md`: sequence nguyên tử, xác minh độc lập, `-V/-R`, QC/mã mù.
-4. Làm N0–N5 trong `docs/INTAKE_NOTIFICATIONS.md` khi có tài khoản/template ZBS/SMS thật.
-5. Làm `result_releases`, PDF/QR và public lookup/SEO theo `docs/PUBLIC_LOOKUP_SEO.md`.
+1. Khóa role Người nhận mẫu, quy tắc ảnh bắt buộc và SLA; triển khai dashboard/list/evidence theo `plans/intake/TECHNICIAN_KCS.md`.
+2. Tách dashboard cá nhân `RECEPTIONIST` khỏi danh sách Phiếu 3.
+3. Sửa và nghiệm thu export DOCX Phiếu 3 bằng Word thật.
+4. Hoàn tất I4–I6 và Phase 2/5A: draft/completion, catalog, sequence nguyên tử, xác minh độc lập, `-V/-R`, QC/mã mù.
+5. Làm ZBS/SMS, `result_releases`, PDF/QR và public lookup theo các plan chuyên biệt.
 
 ## Cách nạp ngữ cảnh tiết kiệm token
 

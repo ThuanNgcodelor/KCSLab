@@ -8,11 +8,11 @@ MySQL 8.4 là database mặc định cho profile `mysql`; H2 đã được loạ
 
 ## Quy trình migration
 
-- Database `cfc_lab` hiện có chưa có bảng lịch sử Flyway sẽ được baseline tự động ở version `1`; dữ liệu và bảng hiện hữu không bị xóa.
-- Database rỗng sẽ được Flyway tạo từ `V1__baseline_schema.sql` khi bấm Run.
-- Mọi thay đổi schema sau này phải thêm file tăng dần, ví dụ `db/migration/V2__rename_delivered_by.sql`, rồi chỉ cần chạy lại backend. Flyway chỉ chạy mỗi migration một lần và ghi vào `flyway_schema_history`.
+- Database `cfc_lab` hiện có chưa có bảng lịch sử Flyway sẽ được baseline tự động ở version `1`, sau đó chạy các migration tương thích `V2`–`V4`; dữ liệu và bảng hiện hữu không bị xóa.
+- Database rỗng sẽ được Flyway tạo từ `V1__baseline_schema.sql` khi bấm Run, rồi kiểm tra các migration tương thích `V2`–`V4`.
+- Mọi thay đổi schema sau này phải thêm file tăng dần từ `V5`, ví dụ `db/migration/V5__rename_delivered_by.sql`, rồi chỉ cần chạy lại backend. Flyway chỉ chạy mỗi migration một lần và ghi vào `flyway_schema_history`.
 - Rename cột, backfill dữ liệu, đổi index, foreign key hoặc stored procedure phải viết SQL tường minh trong migration; không trông chờ Hibernate tự đoán.
-- Các file `migration-*.sql` ở thư mục `db/` là script lịch sử/tham chiếu; không chạy lặp lại sau khi Flyway đã quản lý database.
+- `V2`–`V4` là bản Flyway hóa các script nâng cấp cũ để bổ sung cột/index/backfill còn thiếu trên database đã tồn tại; các file `migration-*.sql` ở thư mục `db/` chỉ giữ để tham chiếu, không chạy lặp lại.
 - Không dùng `flyway clean` trên database có dữ liệu; cấu hình hiện tại đã khóa thao tác này.
 
 ## Quy ước kiểu chuỗi MySQL

@@ -1,5 +1,13 @@
 # CFC Lab Management — Bàn giao để tiếp tục ở máy khác
 
+## Bản cập nhật 16/11/2026 — workspace theo role
+
+- Người dùng đã nghiệm thu vertical slice `RECEPTIONIST`: đăng nhập bằng tài khoản role thật và tạo Phiếu 3 thành công trên Chrome hiển thị. Không suy rộng trạng thái này sang draft/completion, coding verification, ZBS/SMS hoặc export Word.
+- Receptionist vẫn thiếu dashboard riêng: `/admin/intake` đang gộp KPI với danh sách, navbar không có Tổng quan.
+- Yêu cầu kế tiếp là workspace Người nhận mẫu KCS: navbar tối giản, dashboard Hôm nay/Tuần/Tháng, hàng đợi Phiếu 4, xem ảnh/file để đối chiếu, nhận/từ chối và không lộ PII khách hàng.
+- Runtime hiện gộp nhận mẫu và thử nghiệm trong `TECHNICIAN`. Khuyến nghị role mới `SAMPLE_RECEIVER`; chờ chốt ba câu hỏi tại cuối `plans/intake/TECHNICIAN_KCS.md` trước khi sửa enum/migration/RBAC.
+- Plan đã cập nhật tại `plans/intake/OVERVIEW.md`, `plans/intake/RECEPTIONIST.md`, `plans/intake/TECHNICIAN_KCS.md`, `plans/CURRENT.md` và `docs/RBAC.md`.
+
 ## Bản cập nhật 15/11/2026 — đọc phần này trước
 
 File điều hướng đầy đủ: `docs/ai/START_HERE.md`.
@@ -233,7 +241,7 @@ Các tài liệu nghiệp vụ gốc ở root, không tự ý xóa hoặc sửa:
 - Cài Java 21, Maven, Node.js/npm và MySQL nếu muốn dùng profile MySQL.
 - Sao chép `.env.example` thành `.env` và điền secret cục bộ. Không commit `.env`.
 - Nếu dùng MySQL mới, chỉ cần tạo database `cfc_lab`; Flyway sẽ chạy `V1__baseline_schema.sql` khi khởi động backend.
-- Nếu database đã có schema hiện tại, Flyway sẽ tự baseline ở version `1`; không chạy lặp các file `migration-*.sql` cũ.
+- Nếu database đã có schema hiện tại, Flyway sẽ tự baseline ở version `1` rồi chạy các migration tương thích V2–V4; không chạy lặp các file `migration-*.sql` cũ.
 
 ### Backend với MySQL
 
@@ -251,7 +259,7 @@ Backend mặc định dùng MySQL thật; có thể giữ `SPRING_PROFILES_ACTIV
 
 ### Thêm thay đổi schema
 
-Tạo migration mới trong `source/be/src/main/resources/db/migration/`, ví dụ `V2__rename_delivered_by.sql`, viết SQL tường minh cho rename/backfill/index rồi bấm Run backend. Không sửa hoặc đổi tên migration đã chạy; Flyway dùng `flyway_schema_history` để đảm bảo mỗi migration chỉ chạy một lần.
+Tạo migration mới trong `source/be/src/main/resources/db/migration/`, bắt đầu từ `V5__rename_delivered_by.sql`, viết SQL tường minh cho rename/backfill/index rồi bấm Run backend. Không sửa hoặc đổi tên migration đã chạy; Flyway dùng `flyway_schema_history` để đảm bảo mỗi migration chỉ chạy một lần.
 
 ### Frontend
 

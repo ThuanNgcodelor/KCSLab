@@ -1,6 +1,6 @@
 # Plan riêng — Module Tiếp nhận mẫu
 
-**Cập nhật:** 15/11/2026 · **Trạng thái:** I1–I3 đã có runtime; I4–I6 còn lại
+**Cập nhật:** 16/11/2026 · **Trạng thái:** Luồng tạo Phiếu 3 của `RECEPTIONIST` đã được người dùng nghiệm thu; dashboard riêng của Receptionist và workspace người nhận mẫu KCS là ưu tiên kế tiếp
 
 > Các dòng “chưa có” trong phần khảo sát bên dưới là baseline lịch sử. Khi đối chiếu trạng thái hiện tại, ưu tiên `docs/ai/START_HERE.md`, `docs/ai/STATE.md` và `plans/CURRENT.md`.
 
@@ -11,6 +11,17 @@
 - I4–I5: form nhập nhiều mẫu, loại sản phẩm nhập tự do, upload ảnh mobile đã có; còn draft/completion, catalog duyệt và unsaved warning.
 - I6: còn MySQL load test hợp lý và E2E đầy đủ ba role.
 - Gửi khách Zalo/SMS không thuộc runtime notification nội bộ; theo dõi riêng ở `docs/INTAKE_NOTIFICATIONS.md`.
+- `RECEPTIONIST`: tạo Phiếu 3 và sinh mã hiện tại đã pass Chrome smoke bằng tài khoản role thật; `/admin/intake` vẫn gộp KPI + danh sách, navbar chưa có dashboard riêng.
+- Người nhận mẫu KCS: nhận/từ chối Phiếu 4 đã có vertical slice nhưng chưa có dashboard ngày/tuần/tháng, chưa xem được ảnh theo projection an toàn và role `TECHNICIAN` đang bị gộp với chức năng thử nghiệm.
+- Plan chi tiết mới nằm tại `plans/intake/RECEPTIONIST.md` và `plans/intake/TECHNICIAN_KCS.md`.
+
+## Ưu tiên triển khai workspace theo role
+
+1. Khóa quyết định người nhận mẫu là role riêng hay tái dùng `TECHNICIAN`.
+2. Làm backend projection/dashboard/list/evidence cho người nhận mẫu, không mở receipt API đầy đủ và không trả PII khách hàng.
+3. Làm navbar + dashboard + hàng đợi + gallery ảnh cho workspace nhận mẫu.
+4. Tách dashboard Receptionist khỏi danh sách Phiếu 3 và thêm mục Tổng quan vào navbar.
+5. Chạy E2E chuỗi Phiếu 3 có ảnh → Phiếu 4 → KCS xem ảnh/nhận hoặc từ chối → notification ngược về Receptionist.
 
 ## 1. Kết luận hiện trạng
 

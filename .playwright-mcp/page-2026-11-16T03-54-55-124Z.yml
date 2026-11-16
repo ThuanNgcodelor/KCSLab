@@ -1,0 +1,222 @@
+- main [ref=f1e26]:
+  - generic [ref=f1e27]:
+    - button "CFC Lab" [ref=f1e28] [cursor=pointer]
+    - button "Mở menu" [ref=f1e29] [cursor=pointer]: ☰
+  - generic [ref=f1e30]:
+    - generic [ref=f1e31]:
+      - generic [ref=f1e32]: Không gian làm việc
+      - strong [ref=f1e33]: Tạo phiếu tiếp nhận
+    - button "Thông báo, 0 chưa đọc" [ref=f1e35] [cursor=pointer]
+  - generic [ref=f1e136]:
+    - generic [ref=f1e138]:
+      - button "← Quay lại danh sách" [ref=f1e139] [cursor=pointer]
+      - paragraph [ref=f1e140]: Vận hành / Tiếp nhận mẫu
+      - heading "Tạo phiếu tiếp nhận" [level=1] [ref=f1e141]
+    - note [ref=f1e142]: Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.
+    - generic [ref=f1e143]:
+      - generic [ref=f1e144]:
+        - generic [ref=f1e145]:
+          - generic [ref=f1e146]:
+            - generic [ref=f1e147]: "01"
+            - generic [ref=f1e148]:
+              - heading "Người giao và người lấy mẫu" [level=2] [ref=f1e149]
+              - paragraph [ref=f1e150]: Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận.
+          - generic [ref=f1e151]:
+            - generic [ref=f1e152]:
+              - text: Họ tên người giao
+              - textbox "Họ tên người giao" [ref=f1e153]
+            - generic [ref=f1e154]:
+              - text: Số điện thoại
+              - textbox "Số điện thoại" [ref=f1e155]:
+                - /placeholder: 090 123 4567
+            - generic [ref=f1e156]:
+              - text: Số phiếu yêu cầu
+              - textbox "Số phiếu yêu cầu" [ref=f1e157]
+            - generic [ref=f1e158]:
+              - text: Tên khách hàng / đơn vị
+              - textbox "Tên khách hàng / đơn vị" [ref=f1e159]
+            - generic [ref=f1e160]:
+              - text: Email
+              - textbox "Email" [ref=f1e161]
+            - generic [ref=f1e162]:
+              - text: Địa chỉ
+              - textbox "Địa chỉ" [ref=f1e163]
+            - generic [ref=f1e164]:
+              - text: Người lấy mẫu
+              - textbox "Người lấy mẫu" [ref=f1e165]:
+                - /placeholder: Nếu khác người giao
+            - generic [ref=f1e166]:
+              - text: Thời điểm lấy mẫu
+              - textbox "Thời điểm lấy mẫu" [ref=f1e167]
+        - generic [ref=f1e168]:
+          - generic [ref=f1e169]:
+            - generic [ref=f1e170]: "02"
+            - generic [ref=f1e171]:
+              - heading "Hồ sơ nguồn và lô hàng" [level=2] [ref=f1e172]
+              - paragraph [ref=f1e173]: Dữ liệu có cấu trúc để truy xuất và đưa vào hồ sơ kết quả sau này.
+          - generic [ref=f1e174]:
+            - generic [ref=f1e175]:
+              - text: Vùng trồng / nguồn mẫu
+              - textbox "Vùng trồng / nguồn mẫu" [ref=f1e176]
+            - generic [ref=f1e177]:
+              - text: Cơ sở đóng gói
+              - textbox "Cơ sở đóng gói" [ref=f1e178]
+            - generic [ref=f1e179]:
+              - text: Biển số xe
+              - textbox "Biển số xe" [ref=f1e180]
+            - generic [ref=f1e181]:
+              - text: Số moóc
+              - textbox "Số moóc" [ref=f1e182]
+            - generic [ref=f1e183]:
+              - text: Số container
+              - textbox "Số container" [ref=f1e184]
+            - generic [ref=f1e185]:
+              - text: Số niêm phong
+              - textbox "Số niêm phong" [ref=f1e186]
+            - generic [ref=f1e187]:
+              - text: Trạng thái niêm phong
+              - combobox "Trạng thái niêm phong" [ref=f1e188]:
+                - option "Còn nguyên" [selected]
+                - option "Không có"
+                - option "Đã mở"
+            - generic [ref=f1e189]:
+              - text: Phương tiện / điều kiện vận chuyển
+              - textbox "Phương tiện / điều kiện vận chuyển" [ref=f1e190]
+        - generic [ref=f1e191]:
+          - generic [ref=f1e192]:
+            - generic [ref=f1e193]: "03"
+            - generic [ref=f1e194]:
+              - heading "Danh sách mẫu" [level=2] [ref=f1e195]
+              - paragraph [ref=f1e196]: Một phiếu tiếp nhận có thể chứa nhiều mẫu độc lập.
+          - article [ref=f1e198]:
+            - strong [ref=f1e200]: Mẫu 01
+            - generic [ref=f1e201]:
+              - generic [ref=f1e202]:
+                - text: Tên mẫu
+                - textbox "Tên mẫu" [ref=f1e203]
+              - generic [ref=f1e204]:
+                - text: Loại sản phẩm
+                - combobox "Loại sản phẩm" [ref=f1e205]: Sầu riêng
+              - generic [ref=f1e206]:
+                - text: Mã nguồn
+                - textbox "Mã nguồn" [ref=f1e207]: CT001
+              - generic [ref=f1e208]:
+                - text: Số lượng / khối lượng
+                - textbox "Số lượng / khối lượng" [ref=f1e209]
+              - generic [ref=f1e210]:
+                - text: Bao bì
+                - textbox "Bao bì" [ref=f1e211]: Túi PE
+              - generic [ref=f1e212]:
+                - text: Tình trạng
+                - textbox "Tình trạng" [ref=f1e213]: Nguyên vẹn
+              - generic [ref=f1e214]:
+                - text: Chỉ tiêu yêu cầu
+                - textbox "Chỉ tiêu yêu cầu" [ref=f1e215]
+          - button "＋ Thêm mẫu vào phiếu" [ref=f1e216] [cursor=pointer]
+        - generic [ref=f1e217]:
+          - generic [ref=f1e218]:
+            - generic [ref=f1e219]: "04"
+            - generic [ref=f1e220]:
+              - heading "Điều kiện và kết luận tiếp nhận" [level=2] [ref=f1e221]
+              - paragraph [ref=f1e222]: Ghi nhận tình trạng chung của lô tại thời điểm nhận.
+          - generic [ref=f1e223]:
+            - generic [ref=f1e224]:
+              - text: Nhiệt độ khi nhận (°C)
+              - spinbutton "Nhiệt độ khi nhận (°C)" [ref=f1e225]
+            - generic [ref=f1e226]:
+              - text: Điều kiện bảo quản
+              - textbox "Điều kiện bảo quản" [ref=f1e227]: Thường
+            - generic [ref=f1e228]:
+              - text: Thời hạn dự kiến
+              - textbox "Thời hạn dự kiến" [ref=f1e229]
+            - generic [ref=f1e230]:
+              - text: Mô tả tình trạng
+              - textbox "Mô tả tình trạng" [ref=f1e231]
+            - generic [ref=f1e232]:
+              - text: Yêu cầu đặc biệt
+              - textbox "Yêu cầu đặc biệt" [ref=f1e233]
+          - generic [ref=f1e234]:
+            - generic [ref=f1e235]:
+              - radio "Chấp nhận Đủ điều kiện tiếp nhận" [checked] [ref=f1e236]
+              - generic [ref=f1e237]:
+                - strong [ref=f1e238]: Chấp nhận
+                - generic [ref=f1e239]: Đủ điều kiện tiếp nhận
+            - generic [ref=f1e240]:
+              - radio "Chấp nhận có điều kiện Bắt buộc ghi lý do/điều kiện" [ref=f1e241]
+              - generic [ref=f1e242]:
+                - strong [ref=f1e243]: Chấp nhận có điều kiện
+                - generic [ref=f1e244]: Bắt buộc ghi lý do/điều kiện
+            - generic [ref=f1e245]:
+              - radio "Từ chối Bắt buộc ghi lý do/điều kiện" [ref=f1e246]
+              - generic [ref=f1e247]:
+                - strong [ref=f1e248]: Từ chối
+                - generic [ref=f1e249]: Bắt buộc ghi lý do/điều kiện
+      - complementary [ref=f1e250]:
+        - generic [ref=f1e251]:
+          - generic [ref=f1e252]:
+            - generic [ref=f1e253]: "05"
+            - generic [ref=f1e254]:
+              - heading "Ảnh và hồ sơ" [level=2] [ref=f1e255]
+              - paragraph [ref=f1e256]: Ảnh được phân loại và ghi nhận người tải lên.
+          - generic [ref=f1e257] [cursor=pointer]:
+            - button "↑ Phiếu số 3 PDF, DOCX hoặc ảnh" [ref=f1e258]
+            - generic [ref=f1e259]: ↑
+            - strong [ref=f1e260]: Phiếu số 3
+            - generic [ref=f1e261]: PDF, DOCX hoặc ảnh
+          - generic [ref=f1e262] [cursor=pointer]:
+            - button "↑ Ảnh mẫu Có thể chụp trực tiếp bằng điện thoại" [ref=f1e263]
+            - generic [ref=f1e264]: ↑
+            - strong [ref=f1e265]: Ảnh mẫu
+            - generic [ref=f1e266]: Có thể chụp trực tiếp bằng điện thoại
+          - generic [ref=f1e267] [cursor=pointer]:
+            - button "↑ Ảnh lô hàng Toàn cảnh lô/xe/container khi nhận" [ref=f1e268]
+            - generic [ref=f1e269]: ↑
+            - strong [ref=f1e270]: Ảnh lô hàng
+            - generic [ref=f1e271]: Toàn cảnh lô/xe/container khi nhận
+          - text: Tối đa 10 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.
+        - generic [ref=f1e272]:
+          - paragraph [ref=f1e273]:
+            - strong [ref=f1e274]: Kiểm tra trước khi lưu
+            - generic [ref=f1e275]: Mã hiện được sinh theo CFC-TN-14; xác minh độc lập sẽ được bổ sung ở Phase 2.
+          - button "Lưu phiếu tiếp nhận" [ref=f1e276] [cursor=pointer]
+  - generic [ref=f1e98]:
+    - generic [ref=f1e99]:
+      - generic [ref=f1e100]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=f1e109] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=f1e110]:
+            - strong [ref=f1e111]: CFC CÒ BAY
+            - generic [ref=f1e112]: Agriculture & Technology
+        - paragraph [ref=f1e113]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=f1e114] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=f1e115]: ↗
+      - generic [ref=f1e116]:
+        - generic [ref=f1e117]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=f1e118]
+          - generic [ref=f1e119]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=f1e120]:
+            - link "1900 5307" [ref=f1e121] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=f1e122] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=f1e123]:
+          - heading "Về CFC" [level=2] [ref=f1e124]
+          - link "Giới thiệu" [ref=f1e125] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=f1e126] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=f1e127] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=f1e128]:
+          - heading "Hỗ trợ" [level=2] [ref=f1e129]
+          - link "Tìm kiếm" [ref=f1e130] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=f1e131] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=f1e132] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=f1e133]:
+      - generic [ref=f1e134]: © 2026 CFC Cò Bay
+      - generic [ref=f1e135]: CFC Lab Management — hệ thống nội bộ
