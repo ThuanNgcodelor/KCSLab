@@ -152,3 +152,9 @@
 
 - Có toast CFC khi nhận event WebSocket mới, đóng/xem chi tiết, tự đóng sau 8 giây; socket kết nối lại sẽ tải REST, chống event trùng gần đây. Quyền người nhận không đổi, không có âm thanh.
 - Frontend build pass; Playwright giả lập WebSocket/REST kiểm tra toast, lặp, đóng, tự đóng, điều hướng, reconnect và bốn breakpoint. Chưa test hai phiên WebSocket thật hoặc lỗi đánh dấu đã đọc; plan tại `plans/NOTIFICATION_REALTIME.md`.
+
+## Rà soát login và frontend — 16/11/2026
+
+- Login dùng logo CFC cùng sidebar, favicon được đổi sang cùng asset sau khi frontend khởi tạo; có nút hiện/ẩn mật khẩu. Giữ nguyên xác thực và `ConfirmDialog`; rà source không có `window.confirm/alert/prompt`.
+- `npm run build` pass; kiểm tra logo, toggle, lỗi đăng nhập và bốn breakpoint bằng Playwright/API giả lập. Chưa kiểm tra login thành công và favicon trên bản build thật.
+- Các hạng mục chuẩn hóa toast, xác nhận và validation toàn frontend được đưa vào `plans/NOTIFICATION_REALTIME.md`, chưa hoàn thành toàn bộ.

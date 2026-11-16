@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import cfcLogo from '../../../../../../guideline-assets/cfc-008.png';
 
 export function LoginPage() {
   const { user, signIn } = useAuth();
@@ -9,6 +10,7 @@ export function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '', rememberMe: false });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (user) return <Navigate to={location.state?.from ?? '/users'} replace />;
 
@@ -29,7 +31,7 @@ export function LoginPage() {
   return (
     <main className="login-shell">
       <section className="login-panel" aria-labelledby="login-title">
-        <div className="brand-mark" aria-hidden="true"><img src="/cfc-mark.png" alt="" /></div>
+        <div className="login-brand"><img src={cfcLogo} alt="Logo CFC Cò Bay" width="48" height="48" /><span><strong>CFC Lab</strong><small>Phòng kiểm nghiệm</small></span></div>
         <p className="eyebrow">LAB MANAGEMENT</p>
         <h1 id="login-title">Chào mừng trở lại</h1>
         <p className="muted">Đăng nhập để làm việc trong hệ thống nội bộ.</p>
@@ -46,16 +48,20 @@ export function LoginPage() {
               required
             />
           </label>
-          <label>
-            Mật khẩu
+          <div className="login-password-group"><label htmlFor="login-password">Mật khẩu</label>
+          <div className="login-password-field">
             <input
-              type="password"
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               value={form.password}
               onChange={(event) => setForm({ ...form, password: event.target.value })}
               required
             />
-          </label>
+            <button type="button" className="login-password-toggle" aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.7"/>{showPassword && <path d="M4 4 20 20"/>}</svg>
+            </button>
+          </div></div>
           <label className="remember-login">
             <input
               type="checkbox"

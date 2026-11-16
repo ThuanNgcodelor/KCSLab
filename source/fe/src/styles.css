@@ -43,6 +43,18 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .login-aside p:last-child { max-width: 360px; color: #d5f4dd; font-size: 17px; line-height: 1.6; }
 .brand-mark { width: 54px; height: 54px; display: grid; place-items: center; margin-bottom: 34px; border: 1px solid rgba(157, 255, 192, .6); border-radius: 50%; color: var(--mint); overflow: hidden; }
 .brand-mark img { width: 42px; height: 42px; object-fit: contain; filter: brightness(0) saturate(100%) invert(91%) sepia(18%) saturate(1138%) hue-rotate(78deg) brightness(105%); }
+.login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+.login-brand img { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; object-fit: contain; }
+.login-brand span { display: grid; gap: 3px; }
+.login-brand strong { color: #f2fff5; font: 600 16px 'Space Grotesk', sans-serif; }
+.login-brand small { color: #a9cbb4; font-size: 11px; }
+.login-password-group { display: grid; gap: 8px; }
+.login-password-group > label { color: #d5eadd; font-size: 12px; font-weight: 700; }
+.login-password-field { position: relative; }
+.login-password-field input { padding-right: 50px; }
+.login-password-toggle { position: absolute; top: 50%; right: 7px; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 9px; color: #b5d9bf; background: transparent; transform: translateY(-50%); cursor: pointer; }
+.login-password-toggle:hover { color: #fff; background: rgba(167, 248, 186, .1); }
+.login-password-toggle svg { width: 20px; height: 20px; }
 .eyebrow { margin: 0 0 14px; color: var(--mint); font-size: 11px; font-weight: 700; letter-spacing: .16em; }
 h1, h2, p { margin-top: 0; }
 .login-panel h1, .page-heading h1 { margin-bottom: 10px; font: 600 40px/1.05 'Space Grotesk', sans-serif; letter-spacing: -.045em; }
@@ -923,3 +935,6 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .toast::before { position: absolute; left: 17px; top: 13px; content: '!'; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 800; background: currentColor; }
 .toast-error { color: #b64545; border-color: #f0bcbc; background: #fff8f8; }
 .toast-warning { color: #9a691c; border-color: #efd49b; background: #fffaf0; }
+
+.show-password { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: inherit; cursor: pointer; }
+.show-password input { width: auto; margin: 0; }

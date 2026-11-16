@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { getTestingRecord, reviewTestingRecord, submitTestingRecord } from '../api/testingApi';
 
 const statusLabels = { DRAFT: 'Bản nháp', SUBMITTED: 'Chờ kiểm tra', REVIEWED: 'Đã kiểm tra', RETURNED: 'Cần bổ sung' };
@@ -17,6 +18,10 @@ export function TestingRecordDetailPage() {
 
   useEffect(() => { getTestingRecord(id).then(setRecord).catch((exception) => setError(exception.message)); }, [id]);
 
+  const [confirm, setConfirm] = useState(null);
+  function ask(config) { setConfirm(config); }
+  async function runConfirmed() { const action = confirm?.run; setConfirm(null); if (action && !saving) await action(); }
+
   async function submit() {
     setSaving(true); setError('');
     try { setRecord(await submitTestingRecord(id)); }
@@ -31,14 +36,14 @@ export function TestingRecordDetailPage() {
     finally { setSaving(false); }
   }
 
-  if (!record) return <section className="staff-page">{error ? <p className="form-error">{error}</p> : <p className="muted">Đang tải biên bản…</p>}</section>;
+  if (!record) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <p className="muted">Đang tải biên bản…</p>}</section>;
   const editable = ['DRAFT', 'RETURNED'].includes(record.status) && (user?.role === 'ADMIN' || user?.id === record.analystId);
   const qcRows = record.measurements.filter((row) => row.type === 'QC');
   const rawRows = record.measurements.filter((row) => row.type === 'RAW');
 
   return <section className="staff-page testing-detail-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/testing')}>← Danh sách biên bản</button><p className="section-kicker">{record.recordCode} / {record.sampleCode}</p><h1>{statusLabels[record.status]}</h1><p className="heading-copy">{record.sampleName} · {record.testMethod}</p></div><span className={`testing-status large ${record.status.toLowerCase()}`}>{statusLabels[record.status]}</span></header>
-    {location.state?.message && <p className="success-note intake-toast">✓ {location.state.message}</p>}{error && <p className="form-error intake-toast">{error}</p>}
+    {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}{error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <div className="testing-detail-grid"><main className="receipt-form-main">
       <section className="panel-card test-record-sheet"><div className="test-record-title"><div><small>TEST RECORD</small><h2>Biên bản thử nghiệm</h2></div><strong>{record.recordCode}</strong></div><div className="test-general-grid"><Data label="Phiếu yêu cầu" value={record.receiptCode} /><Data label="Mã số mẫu" value={record.sampleCode} /><Data label="Tên mẫu" value={record.sampleName} /><Data label="Số lượng" value={record.quantity} /><Data label="Ngày PTN nhận mẫu" value={formatDate(record.receivedDate)} /><Data label="Ngày yêu cầu trả KQ" value={formatDate(record.dueDate)} /><Data label="Bắt đầu thử nghiệm" value={formatDateTime(record.analysisStart)} /><Data label="Kết thúc thử nghiệm" value={formatDateTime(record.analysisEnd)} /><Data label="Người phân tích" value={record.analyst} /><Data label="Người kiểm tra" value={record.checkedBy || 'Chưa kiểm tra'} /></div></section>
       <RecordTable title="II. Thiết bị phân tích" columns={['Thiết bị', 'Mã hiệu / Serial', 'Nhà sản xuất', 'Mã nhận dạng', 'Hiệu chuẩn']} rows={record.equipment.map((item) => [item.name, item.serialNumber, item.manufacturer, item.identificationCode, formatDate(item.calibrationDate)])} empty="Không ghi nhận thiết bị." />
@@ -50,9 +55,10 @@ export function TestingRecordDetailPage() {
     </main><aside className="receipt-form-aside testing-review-aside">
       <section className="panel-card custody-card"><p className="section-kicker">Luồng kiểm tra</p><Timeline complete title="Đã lập biên bản" detail={`${record.analyst} · ${formatDateTime(record.createdAt)}`} /><Timeline complete={record.status !== 'DRAFT' && record.status !== 'RETURNED'} title="Gửi kiểm tra" detail={record.submittedAt ? formatDateTime(record.submittedAt) : 'Chưa gửi'} /><Timeline complete={record.status === 'REVIEWED'} title={record.status === 'RETURNED' ? 'Đã trả lại' : 'Kiểm tra hoàn tất'} detail={record.reviewedAt ? `${record.checkedBy} · ${formatDateTime(record.reviewedAt)}` : 'Đang chờ'} /></section>
       {record.reviewNote && <section className={`handoff-result ${record.status === 'RETURNED' ? 'rejected' : 'accepted'}`}><strong>Ý kiến kiểm tra</strong><span>{record.reviewNote}</span></section>}
-      {editable && <section className="form-submit-panel testing-action-panel"><p><strong>Biên bản đang mở</strong><span>Cập nhật số liệu nếu cần, sau đó gửi người kiểm tra.</span></p><button className="outline-button light-outline" onClick={() => navigate(`/admin/testing/${id}/edit`)}>Sửa biên bản</button><button className="primary-button" disabled={saving} onClick={submit}>{saving ? 'Đang gửi…' : 'Gửi kiểm tra'}</button></section>}
-      {record.status === 'SUBMITTED' && user?.role === 'ADMIN' && <section className="panel-card intake-form-card testing-review-panel"><div className="form-card-heading"><span className="form-number">✓</span><div><h2>Kiểm tra biên bản</h2><p>Duyệt hoặc trả lại kỹ thuật viên bổ sung.</p></div></div><label>Ý kiến kiểm tra<textarea value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} placeholder="Bắt buộc khi trả lại" /></label><div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={saving} onClick={() => review('RETURNED')}>Trả lại</button><button className="primary-button" disabled={saving} onClick={() => review('REVIEWED')}>{saving ? 'Đang lưu…' : 'Xác nhận đạt'}</button></div></section>}
+      {editable && <section className="form-submit-panel testing-action-panel"><p><strong>Biên bản đang mở</strong><span>Cập nhật số liệu nếu cần, sau đó gửi người kiểm tra.</span></p><button className="outline-button light-outline" onClick={() => navigate(`/admin/testing/${id}/edit`)}>Sửa biên bản</button><button className="primary-button" disabled={saving} onClick={() => ask({ title: 'Gửi biên bản đi kiểm tra?', description: 'Sau khi gửi, biên bản chờ người kiểm tra và không thể sửa cho đến khi được trả lại.', confirmLabel: 'Xác nhận gửi', run: submit })}>{saving ? 'Đang gửi…' : 'Gửi kiểm tra'}</button></section>}
+      {record.status === 'SUBMITTED' && user?.role === 'ADMIN' && <section className="panel-card intake-form-card testing-review-panel"><div className="form-card-heading"><span className="form-number">✓</span><div><h2>Kiểm tra biên bản</h2><p>Duyệt hoặc trả lại kỹ thuật viên bổ sung.</p></div></div><label>Ý kiến kiểm tra<textarea value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} placeholder="Bắt buộc khi trả lại" /></label><div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={saving} onClick={() => { if (!reviewNote.trim()) { setError('Vui lòng ghi ý kiến khi trả lại biên bản.'); return; } setError(''); ask({ title: 'Trả lại biên bản?', description: 'Biên bản sẽ quay về kỹ thuật viên để bổ sung theo ý kiến của bạn.', confirmLabel: 'Xác nhận trả lại', tone: 'danger', run: () => review('RETURNED') }); }}>Trả lại</button><button className="primary-button" disabled={saving} onClick={() => ask({ title: 'Xác nhận biên bản đạt?', description: 'Biên bản chuyển sang trạng thái Đã kiểm tra.', confirmLabel: 'Xác nhận đạt', run: () => review('REVIEWED') })}>{saving ? 'Đang lưu…' : 'Xác nhận đạt'}</button></div></section>}
     </aside></div>
+  {confirm && <ConfirmDialog title={confirm.title} description={confirm.description} confirmLabel={confirm.confirmLabel} tone={confirm.tone} onCancel={() => setConfirm(null)} onConfirm={runConfirmed} />}
   </section>;
 }
 

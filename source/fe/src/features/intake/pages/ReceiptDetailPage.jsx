@@ -23,6 +23,7 @@ export function ReceiptDetailPage() {
   async function handleUpload(event) {
     event.preventDefault();
     if (!file) return;
+    const form = event.currentTarget;
     setSaving(true); setError('');
     try {
       const attachment = await uploadReceiptFile(id, file, {
@@ -30,17 +31,17 @@ export function ReceiptDetailPage() {
         capturedAt: file.lastModified ? new Date(file.lastModified).toISOString() : null,
       });
       setReceipt((current) => ({ ...current, attachments: [...current.attachments, attachment] }));
-      setFile(null); setDescription(''); event.currentTarget.reset();
+      setFile(null); setDescription(''); form.reset();
     } catch (exception) { setError(exception.message); }
     finally { setSaving(false); }
   }
 
-  if (!receipt) return <section className="staff-page">{error ? <p className="form-error">{error}</p> : <p className="muted">Đang tải hồ sơ tiếp nhận…</p>}</section>;
+  if (!receipt) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <p className="muted">Đang tải hồ sơ tiếp nhận…</p>}</section>;
   const photoCategory = category !== 'FORM_3' && category !== 'OTHER';
 
   return <section className="staff-page receipt-detail-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Phiếu số 3 / {receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div></header>
-    {error && <p className="form-error intake-toast" role="alert">{error}</p>}
+    {error && <p className="form-error intake-toast" role="alert" role="alert">{error}</p>}
     <div className="receipt-detail-grid">
       <main className="receipt-form-main">
         <section className="panel-card intake-form-card"><DetailHeading title="Nguồn và chuỗi tiếp nhận" />
@@ -65,7 +66,7 @@ export function ReceiptDetailPage() {
       <aside className="receipt-form-aside"><form className="panel-card intake-form-card" onSubmit={handleUpload}><DetailHeading title="Bổ sung bằng chứng" />
         <label>Loại hồ sơ<select value={category} onChange={(event) => setCategory(event.target.value)}>{Object.entries(categoryLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
         <label>Mô tả<input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Góc chụp, tình trạng…" /></label>
-        <label className="file-drop compact-file-drop"><input type="file" accept={photoCategory ? 'image/*' : 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*'} capture={photoCategory ? 'environment' : undefined} onChange={(event) => setFile(event.target.files?.[0] ?? null)} /><span className="upload-symbol">↑</span><strong>{file?.name || (photoCategory ? 'Chụp hoặc chọn ảnh' : 'Chọn file')}</strong><small>Tối đa 10 MB</small></label>
+        <label className="file-drop compact-file-drop"><input type="file" accept={photoCategory ? 'image/*' : 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*'} capture={photoCategory ? 'environment' : undefined} onChange={(event) => setFile(event.target.files?.[0] ?? null)} /><span className="upload-symbol">↑</span><strong>{file?.name || (photoCategory ? 'Chụp hoặc chọn ảnh' : 'Chọn file')}</strong><small>Tối đa 5 MB</small></label>
         <button className="primary-button" type="submit" disabled={!file || saving}>{saving ? 'Đang tải lên…' : 'Lưu vào hồ sơ'}</button>
       </form></aside>
     </div>

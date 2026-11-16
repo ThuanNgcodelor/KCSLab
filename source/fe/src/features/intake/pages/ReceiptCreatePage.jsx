@@ -188,7 +188,7 @@ export function ReceiptCreatePage() {
           <FilePicker label="Phiếu số 3" copy="PDF, DOCX hoặc ảnh" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
           <FilePicker label="Ảnh mẫu" copy="Có thể chụp trực tiếp bằng điện thoại" accept="image/*" capture="environment" multiple files={files.samples} onChange={updateFiles('samples')} />
           <FilePicker label="Ảnh lô hàng" copy="Toàn cảnh lô/xe/container khi nhận" accept="image/*" capture="environment" multiple files={files.lot} onChange={updateFiles('lot')} />
-          <small className="field-help">Tối đa 10 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
+          <small className="field-help">Tối đa 5 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
         </section>
         <div className="form-submit-panel"><p><strong>Kiểm tra trước khi lưu</strong><span>Mã hiện được sinh theo CFC-TN-14; xác minh độc lập sẽ được bổ sung ở Phase 2.</span></p><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Đang lưu hồ sơ…' : 'Lưu phiếu tiếp nhận'}</button></div>
       </aside>
