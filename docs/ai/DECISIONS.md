@@ -80,4 +80,4 @@
 
 - Người ký/xác nhận phiếu 4 và người duyệt/phát hành kết quả.
 - Có thêm role `LAB_MANAGER`/`REVIEWER` hay không.
-- Flyway hay Liquibase; object storage và chính sách retention/backup.
+- Đã chọn Flyway cho migration schema; object storage và chính sách retention/backup vẫn cần chốt.

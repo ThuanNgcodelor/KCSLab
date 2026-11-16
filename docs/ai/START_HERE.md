@@ -65,6 +65,7 @@ Không dùng `npm run dev` nếu PowerShell đang chặn `npm.ps1`; dùng `npm.c
 ## Dữ liệu và secrets
 
 - MySQL: `cfc_lab`, cấu hình local ở `.env` và `source/be/src/main/resources/application-mysql.yml`.
+- Schema: Flyway tự chạy `source/be/src/main/resources/db/migration/` khi backend startup; database hiện có sẽ được baseline ở version `1`, database rỗng sẽ chạy `V1__baseline_schema.sql`. Hibernate chỉ `validate`.
 - File/ảnh receipt: `source/be/storage/receipts`.
 - Avatar: `source/be/storage/avatars`.
 - Refresh session: Redis, không lưu raw refresh token.

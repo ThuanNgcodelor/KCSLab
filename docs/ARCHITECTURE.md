@@ -6,7 +6,7 @@
 
 - Backend: Java 21, Spring Boot 4.1.2, Maven, Spring MVC/Security/JPA/Validation, JWT resource server.
 - Frontend: React 19, Vite 6, JavaScript/JSX, React Router 7.
-- Database: H2 `create-drop` cho profile mặc định; MySQL 8.4 + Hibernate `validate` cho profile `mysql`.
+- Database: MySQL 8.4 là profile mặc định; Flyway chạy migration có version khi startup và Hibernate dùng `validate` để kiểm tra schema.
 - Dev runtime: backend có thể chạy bằng Docker Maven/JDK vì host không bắt buộc cài Java/Maven.
 
 ## Biên module
@@ -30,5 +30,5 @@ Browser → React/Vite → /api/v1 → Spring Security → feature controller/se
 
 - Giữ package-by-feature và API contract hiện có; chỉ tạo module khi có vertical slice thực tế.
 - Dùng CodeGraph trước khi đọc nhiều source file hoặc đánh giá blast radius.
-- Schema mới phải chuyển dần sang Flyway/Liquibase trước production; không tiếp tục phụ thuộc vào SQL chạy thủ công lâu dài.
+- Schema mới phải thêm bằng migration Flyway có version trong `source/be/src/main/resources/db/migration/`; không tiếp tục phụ thuộc vào SQL chạy thủ công.
 - Không ghi secrets vào source/tài liệu; `.env` chỉ dùng local và phải nằm ngoài Git.

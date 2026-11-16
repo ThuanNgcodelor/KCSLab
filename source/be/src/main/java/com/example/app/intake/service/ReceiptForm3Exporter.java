@@ -55,24 +55,33 @@ public class ReceiptForm3Exporter {
     private byte[] fillDocument(byte[] source, Receipt receipt) throws Exception {
         Sample sample = receipt.getSamples().isEmpty() ? null : receipt.getSamples().get(0);
         String xml = new String(source, StandardCharsets.UTF_8);
-        xml = xml.replace("{{receiptCode}}", value(receipt.getReceiptCode()))
-                .replace("{{requestNumber}}", value(receipt.getRequestNumber()))
-                .replace("{{sampleCode}}", sample == null ? "" : value(sample.getSampleCode()))
-                .replace("{{receivedAt}}", DATE_TIME.format(receipt.getReceivedAt()))
-                .replace("{{deliveredBy}}", value(receipt.getDeliveredBy()))
-                .replace("{{receivedBy}}", value(receipt.getReceivedBy().getDisplayName()))
-                .replace("{{sampleName}}", sample == null ? value(receipt.getSampleName()) : value(sample.getName()))
-                .replace("{{sealNumber}}", value(receipt.getSealNumber()))
-                .replace("{{sealStatus}}", value(receipt.getSealStatus()))
-                .replace("{{conditionDetail}}", value(receipt.getConditionDetail()))
-                .replace("{{transportInfo}}", value(receipt.getTransportInfo()))
-                .replace("{{temperature}}", receipt.getReceivedTemperature() == null ? "" : receipt.getReceivedTemperature() + " °C")
-                .replace("{{storageCondition}}", value(receipt.getStorageCondition()))
-                .replace("{{requestedParameters}}", sample == null ? value(receipt.getRequestedParameters()) : value(sample.getRequestedParameters()))
-                .replace("{{specialRequest}}", value(receipt.getSpecialRequest()))
-                .replace("{{acceptanceReason}}", value(receipt.getAcceptanceReason()))
-                .replace("{{approvedBy}}", "Chưa có phê duyệt độc lập");
+        xml = xml.replace("{{receiptCode}}", xmlValue(receipt.getReceiptCode()))
+                .replace("{{requestNumber}}", xmlValue(receipt.getRequestNumber()))
+                .replace("{{sampleCode}}", sample == null ? "" : xmlValue(sample.getSampleCode()))
+                .replace("{{receivedAt}}", xmlValue(DATE_TIME.format(receipt.getReceivedAt())))
+                .replace("{{deliveredBy}}", xmlValue(receipt.getDeliveredBy()))
+                .replace("{{receivedBy}}", xmlValue(receipt.getReceivedBy().getDisplayName()))
+                .replace("{{sampleName}}", sample == null ? xmlValue(receipt.getSampleName()) : xmlValue(sample.getName()))
+                .replace("{{sealNumber}}", xmlValue(receipt.getSealNumber()))
+                .replace("{{sealStatus}}", xmlValue(receipt.getSealStatus()))
+                .replace("{{conditionDetail}}", xmlValue(receipt.getConditionDetail()))
+                .replace("{{transportInfo}}", xmlValue(receipt.getTransportInfo()))
+                .replace("{{temperature}}", xmlValue(receipt.getReceivedTemperature() == null ? "" : receipt.getReceivedTemperature() + " °C"))
+                .replace("{{storageCondition}}", xmlValue(receipt.getStorageCondition()))
+                .replace("{{requestedParameters}}", sample == null ? xmlValue(receipt.getRequestedParameters()) : xmlValue(sample.getRequestedParameters()))
+                .replace("{{specialRequest}}", xmlValue(receipt.getSpecialRequest()))
+                .replace("{{acceptanceReason}}", xmlValue(receipt.getAcceptanceReason()))
+                .replace("{{approvedBy}}", xmlValue("Chưa có phê duyệt độc lập"));
         return xml.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private String xmlValue(Object value) {
+        return value(value)
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&apos;");
     }
 
     private String value(Object value) { return value == null ? "" : value.toString(); }

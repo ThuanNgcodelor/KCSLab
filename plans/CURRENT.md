@@ -192,6 +192,6 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp n
 - WebSocket thông báo chuyển mẫu và QR chưa triển khai; phải chốt event/điểm sinh QR sau gate xác minh mã.
 - ZBS/SMS chưa có code, consent, template đã duyệt, credential, outbox, callback hoặc delivery audit; plan nằm tại `docs/INTAKE_NOTIFICATIONS.md`.
 - Dashboard đang hiển thị dữ liệu mẫu nên không dùng làm số liệu vận hành.
-- Schema vẫn quản lý bằng SQL thủ công + Hibernate `validate`; chưa có Flyway/Liquibase.
+- Schema đã chuyển sang Flyway với baseline `V1__baseline_schema.sql`; Hibernate dùng `validate`. Migration mới phải đặt trong `db/migration/`.
 - File phiếu đang lưu local; chưa có object storage, retention và backup production.
 - Chưa có audit log tổng quát, rate limiting và bộ integration/Testcontainers đầy đủ.

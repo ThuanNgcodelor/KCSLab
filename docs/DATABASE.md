@@ -4,7 +4,16 @@
 
 ## Lựa chọn cơ sở dữ liệu
 
-MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc định. Schema hiện tạo bằng `db/schema.sql`, backend dùng Hibernate `validate`. Cần chọn Flyway/Liquibase trước production.
+MySQL 8.4 là database mặc định cho profile `mysql`; H2 đã được loại khỏi runtime. Flyway chạy migration tự động khi backend khởi động, còn Hibernate dùng `validate` để chỉ kiểm tra entity khớp schema. `db/migration/V1__baseline_schema.sql` là baseline cho schema hiện tại; `db/schema.sql` được giữ làm tài liệu/schema tham chiếu.
+
+## Quy trình migration
+
+- Database `cfc_lab` hiện có chưa có bảng lịch sử Flyway sẽ được baseline tự động ở version `1`; dữ liệu và bảng hiện hữu không bị xóa.
+- Database rỗng sẽ được Flyway tạo từ `V1__baseline_schema.sql` khi bấm Run.
+- Mọi thay đổi schema sau này phải thêm file tăng dần, ví dụ `db/migration/V2__rename_delivered_by.sql`, rồi chỉ cần chạy lại backend. Flyway chỉ chạy mỗi migration một lần và ghi vào `flyway_schema_history`.
+- Rename cột, backfill dữ liệu, đổi index, foreign key hoặc stored procedure phải viết SQL tường minh trong migration; không trông chờ Hibernate tự đoán.
+- Các file `migration-*.sql` ở thư mục `db/` là script lịch sử/tham chiếu; không chạy lặp lại sau khi Flyway đã quản lý database.
+- Không dùng `flyway clean` trên database có dữ liệu; cấu hình hiện tại đã khóa thao tác này.
 
 ## Quy ước kiểu chuỗi MySQL
 
@@ -13,7 +22,7 @@ MySQL 8.4 đang được dùng cho profile `mysql`; H2 chạy ở profile mặc 
 - Table nghiệp vụ mặc định khai báo `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`; không phụ thuộc vào default charset/collation của database hoặc máy cài đặt.
 - Entity JPA tiếp tục dùng Java `String` và `@Column(length = ...)`; không ép `columnDefinition = "NVARCHAR(...)"`.
 - Token, hash, checksum, opaque ID hoặc mã cần phân biệt hoa-thường có thể khai báo `CHAR`/`VARCHAR` với binary collation phù hợp. Ngoại lệ này không thay đổi quy tắc cấm `NVARCHAR`/`NCHAR`.
-- Mọi schema/migration mới phải giữ quy tắc trên và được kiểm tra bằng `Hibernate validate` cùng MySQL thật.
+- Mọi schema/migration mới phải giữ quy tắc trên và được kiểm tra bằng MySQL thật; production phải kiểm tra bằng `Hibernate validate`.
 
 ## Bảng đã triển khai
 
@@ -102,7 +111,7 @@ erDiagram
 - Cấp sequence phải dùng row lock/counter nguyên tử; unique theo mã hoàn chỉnh và ngày + sequence. Ngày trong mã dùng `Asia/Ho_Chi_Minh`, timestamp audit lưu UTC.
 - Hồ sơ nguồn cần trường có cấu trúc cho người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal để snapshot sang Phiếu kết quả.
 - File hồ sơ và PDF phải có checksum/version; không ghi đè bản đã phát hành.
-- SQL runtime đã có cho 12 bảng nêu trên; `db/migration-phase1-phase3.sql` là script nâng cấp MySQL idempotent tạm thời, chưa thay thế migration tool/version history.
+- SQL runtime đã có cho 12 bảng nêu trên; các thay đổi mới phải đi qua thư mục `db/migration/` và lịch sử Flyway.
 - Schema runtime hiện dùng `VARCHAR`/`TEXT`; các table đã triển khai đều khai báo `utf8mb4_unicode_ci`, không có cột `NVARCHAR`.
 - Notification dùng unique `idempotency_key`; webhook/callback được xử lý idempotent và không cho sự kiện đến trễ làm lùi trạng thái `DELIVERED`.
 - Outbox payload không chứa ảnh/file Phiếu 3, mapping mã mù hoặc kết quả thử nghiệm; secret provider không lưu trong bảng nghiệp vụ. Số điện thoại đầy đủ chỉ tồn tại ở cột cần gửi và phải được mã hóa/giới hạn quyền theo thiết kế production, còn log/UI dùng dạng mask.

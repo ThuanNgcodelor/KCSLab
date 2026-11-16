@@ -1,18 +1,10 @@
 spring:
   application:
     name: cfc-lab-management-backend
-  datasource:
-    url: jdbc:h2:mem:cfc_lab;MODE=MySQL;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+  profiles:
+    default: mysql
   jpa:
-    hibernate:
-      ddl-auto: create-drop
     open-in-view: false
-  h2:
-    console:
-      enabled: true
   servlet:
     multipart:
       max-file-size: 5MB

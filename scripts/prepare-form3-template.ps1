@@ -36,7 +36,9 @@ foreach ($paragraph in $xml.SelectNodes('//w:p', $ns)) {
     if ($text.Contains($label)) {
       $run = $xml.CreateElement('w', 'r', $ns.LookupNamespace('w'))
       $textNode = $xml.CreateElement('w', 't', $ns.LookupNamespace('w'))
-      $textNode.SetAttribute('space', 'http://www.w3.org/XML/1998/namespace', 'preserve')
+      $spaceAttribute = $xml.CreateAttribute('xml', 'space', 'http://www.w3.org/XML/1998/namespace')
+      $spaceAttribute.Value = 'preserve'
+      $textNode.Attributes.Append($spaceAttribute) | Out-Null
       $textNode.InnerText = '  ' + $fields[$label]
       $run.AppendChild($textNode) | Out-Null
       $paragraph.AppendChild($run) | Out-Null

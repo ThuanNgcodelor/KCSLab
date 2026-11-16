@@ -86,7 +86,7 @@ Việc phải làm tiếp trước tiên không phải là PDF. Làm Intake I1�
 - Danh sách tiếp nhận dùng pagination phía server mặc định 20/trang, tối đa 100 và sort whitelist; frontend có 9 lựa chọn sort cùng thanh điều hướng trang.
 - Chuyển mẫu/Phiếu 4: tạo/sửa nháp, gửi bàn giao, giao/nhận hoặc từ chối, lưu/hoàn mẫu, cập nhật trạng thái; KCS/PTN không thấy bản nháp.
 - Thử nghiệm/Phiếu 5: thiết bị, hóa chất, đường chuẩn, công thức, QC, raw data, submit, trả lại hoặc kiểm tra.
-- MySQL dùng schema SQL thủ công và Hibernate `validate`; profile mặc định dùng H2.
+- MySQL là profile mặc định; Flyway tự chạy migration có version khi startup, Hibernate dùng `validate` để kiểm tra entity/schema.
 
 ### Frontend
 
@@ -149,7 +149,7 @@ Phân tích chi tiết và acceptance criteria nằm trong `docs/SAMPLE_CODING.m
 - `TestingRecordService.review` chưa kiểm tra người review phải khác analyst.
 - Dashboard không được dùng làm báo cáo thật vì đang hard-code.
 - File đang lưu local; chưa có object storage, retention và backup production.
-- Chưa có Flyway/Liquibase, audit log tổng quát, rate limit và bộ integration/Testcontainers đầy đủ.
+- Chưa có audit log tổng quát, rate limit và bộ integration/Testcontainers đầy đủ.
 
 ## 6. Việc tiếp theo — làm theo thứ tự
 
@@ -232,8 +232,8 @@ Các tài liệu nghiệp vụ gốc ở root, không tự ý xóa hoặc sửa:
 
 - Cài Java 21, Maven, Node.js/npm và MySQL nếu muốn dùng profile MySQL.
 - Sao chép `.env.example` thành `.env` và điền secret cục bộ. Không commit `.env`.
-- Nếu dùng MySQL mới, tạo database và chạy `source/be/src/main/resources/db/schema.sql` trước; Hibernate đang ở chế độ `validate`.
-- Nếu database đã có schema cũ, chạy `source/be/src/main/resources/db/migration-phase1-phase3.sql` một lần trước khi khởi động backend.
+- Nếu dùng MySQL mới, chỉ cần tạo database `cfc_lab`; Flyway sẽ chạy `V1__baseline_schema.sql` khi khởi động backend.
+- Nếu database đã có schema hiện tại, Flyway sẽ tự baseline ở version `1`; không chạy lặp các file `migration-*.sql` cũ.
 
 ### Backend với MySQL
 
@@ -247,7 +247,11 @@ cd source/be
 SPRING_PROFILES_ACTIVE=mysql mvn spring-boot:run
 ```
 
-Muốn chạy nhanh bằng H2, bỏ `SPRING_PROFILES_ACTIVE=mysql`.
+Backend mặc định dùng MySQL thật; có thể giữ `SPRING_PROFILES_ACTIVE=mysql` để ghi rõ profile khi chạy.
+
+### Thêm thay đổi schema
+
+Tạo migration mới trong `source/be/src/main/resources/db/migration/`, ví dụ `V2__rename_delivered_by.sql`, viết SQL tường minh cho rename/backfill/index rồi bấm Run backend. Không sửa hoặc đổi tên migration đã chạy; Flyway dùng `flyway_schema_history` để đảm bảo mỗi migration chỉ chạy một lần.
 
 ### Frontend
 

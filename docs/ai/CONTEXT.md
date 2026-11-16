@@ -34,7 +34,7 @@
 - Transfer: `GET|POST /api/v1/transfers`, `GET|PUT /api/v1/transfers/{id}`, `POST /submit`, `POST /decision`.
 - Testing: `GET|POST /api/v1/testing-records`, `GET|PUT /api/v1/testing-records/{id}`, `POST /submit`, `POST /review`.
 - Bảng hiện có: 6 bảng nền/intake, `sample_transfers`, `sample_transfer_items`, `testing_records`, `testing_equipment`, `testing_reagents`, `testing_measurements`.
-- Schema hiện dùng SQL thủ công + Hibernate `validate`; có script nâng cấp idempotent `db/migration-phase1-phase3.sql`, chưa có Flyway/Liquibase. Chuỗi MySQL dùng `VARCHAR/TEXT` + `utf8mb4`, không dùng `NVARCHAR`.
+- Schema hiện được quản lý bằng Flyway: baseline là `db/migration/V1__baseline_schema.sql`, migration mới chạy tự động khi backend startup. Hibernate dùng `validate`; các file `db/migration-*.sql` cũ chỉ giữ để tham chiếu. Chuỗi MySQL dùng `VARCHAR/TEXT` + `utf8mb4`, không dùng `NVARCHAR`.
 
 ## Xác minh gần nhất
 

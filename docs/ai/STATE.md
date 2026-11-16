@@ -1,9 +1,33 @@
 # Project State
 
+## Cập nhật cấu hình migration MySQL — 16/11/2026
+
+- Đã thêm Flyway Core và module MySQL vào backend.
+- `source/be/src/main/resources/db/migration/V1__baseline_schema.sql` là bản baseline sao từ schema hiện tại.
+- Database `cfc_lab` đã có dữ liệu sẽ được Flyway baseline tự động ở version `1`; database rỗng sẽ chạy V1 khi backend khởi động.
+- Hibernate đã chuyển sang `ddl-auto=validate`; rename cột, backfill, index, foreign key và stored procedure phải thêm thành migration SQL có version.
+- Các lần thay đổi schema sau này chỉ cần thêm `V2__...sql`, `V3__...sql` rồi bấm Run lại. Flyway lưu lịch sử tại `flyway_schema_history`.
+
+## Cấu hình local/test MySQL — 16/11/2026
+
+- Backend mặc định dùng profile `mysql`; H2 đã được loại khỏi dependency và cấu hình runtime.
+- `application-mysql.yml` dùng URL, username và password từ `.env`/environment variables.
+- Flyway chạy migration khi backend khởi động; Hibernate dùng `spring.jpa.hibernate.ddl-auto=validate` để kiểm tra entity/schema.
+- H2 đã được loại khỏi dependency và cấu hình runtime; kết nối dùng URL, username và password MySQL từ `.env`/environment variables.
+
+## Cập nhật phiên làm việc — sửa template export Phiếu 3 — 16/11/2026
+
+- Đã sửa `source/be/src/main/resources/templates/phieu-tiep-nhan-ban-giao-mau.docx`: thay các thuộc tính namespace XML không hợp lệ `d5p1/d8p1:space` bằng `xml:space` chuẩn.
+- Đã sửa `scripts/prepare-form3-template.ps1` để các lần tạo template sau dùng đúng namespace `xml:space`, không tái tạo lỗi Word.
+- `ReceiptForm3Exporter` đã escape giá trị động trước khi chèn vào XML, tránh dữ liệu như `&` hoặc `<` làm hỏng file DOCX.
+- Đã thêm `ReceiptForm3ExporterTest` để kiểm tra `word/document.xml` hợp lệ và dữ liệu đặc biệt được export đúng.
+- Xác minh được: ZIP DOCX hợp lệ, toàn bộ XML trong package hợp lệ với `xmllint`, không còn prefix namespace sai, `git diff --check` pass.
+- Chưa chạy được Maven/JDK hoặc mở Word thật trong môi trường hiện tại; vì vậy export Phiếu 3 vẫn chờ nghiệm thu cuối bằng Microsoft Word tại máy công ty.
+
 ## Cập nhật phiên làm việc mới — 15/11/2026
 
 - Bộ hướng dẫn đọc nhanh đã được gom tại `docs/ai/START_HERE.md`.
-- `.env` đã có `SPRING_PROFILES_ACTIVE=mysql`; khi chạy đúng profile, backend dùng MySQL `cfc_lab` với Hibernate `validate`, không dùng H2 `create-drop`.
+- `.env` đã có `SPRING_PROFILES_ACTIVE=mysql`; khi chạy đúng profile, backend dùng MySQL `cfc_lab` với Flyway migration và Hibernate `validate`, không dùng H2.
 - Đã có thiết kế export Phiếu 3 bằng template placeholder và endpoint `/api/v1/receipts/{id}/form-3`. Tuy nhiên file DOCX export/template vừa bị Microsoft Word báo lỗi mở; chưa đánh dấu nghiệm thu. Cần kiểm tra lại ZIP/XML và mở bằng Word thật.
 - Quyền hiển thị `receivedBy`: Admin/Receptionist xem đầy đủ; Technician/KCS không có receipt API đầy đủ nhưng notification nội bộ có thể hiển thị tên người ghi nhận. Public lookup tương lai không được trả trường này.
 - Kiến trúc SEO/public lookup được ghi tại `docs/PUBLIC_LOOKUP_SEO.md`; hiện chưa có runtime public route, result release, PDF, QR hoặc Cloudflare Tunnel.
@@ -69,7 +93,7 @@
 ## Khoảng trống
 
 - Chưa có phát hành/version PDF, public lookup và audit log tổng quát.
-- Chưa có migration tool, object storage/backup và bộ integration test nghiệp vụ.
+- Chưa có bộ integration test nghiệp vụ đầy đủ; migration tool Flyway đã được bật cho MySQL.
 - Chưa có role reviewer chuyên biệt; bước review biên bản hiện do `ADMIN` thực hiện.
 - Chưa có gate mã hóa độc lập (counter nguyên tử, `-V/-R`, người thứ hai xác minh), QR và correction history. WebSocket notification nội bộ đã có; WebSocket không dùng cho Zalo/SMS.
 - Chưa có consent/template được duyệt, outbox/delivery, worker, provider adapter hoặc callback ZBS/SMS; chi tiết tại `docs/INTAKE_NOTIFICATIONS.md`.
