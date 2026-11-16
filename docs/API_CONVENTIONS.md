@@ -1,5 +1,14 @@
 # REST API conventions
 
+## Workspace nhận mẫu KCS — 16/11/2026
+
+- Các endpoint dưới đây chỉ cho `ADMIN|TECHNICIAN` qua security filter và method security. Không cấp thêm quyền gọi `/api/v1/receipts/**` cho `TECHNICIAN`.
+- `GET /api/v1/receiving/dashboard?from&to`: số phiếu/mẫu gửi theo `submittedAt`, số đang chờ hiện tại, nhận/từ chối theo `receivedAt`, thời gian xử lý trung bình tính bằng giây, xu hướng từng ngày, hàng đợi và lịch sử gần đây. Mặc định bảy ngày, khoảng tối đa 366 ngày; ngày theo `Asia/Ho_Chi_Minh` và cận trên loại trừ.
+- `GET /api/v1/receiving/transfers?page&size&status&q&from&to&sort`: envelope phân trang chung; `size` 1–50, mặc định 20; filter ngày theo thời gian gửi, tìm mã Phiếu 4/Phiếu 3/mã mẫu. Sort whitelist `submittedAt`, `receivedAt`, `transferCode`, `resultsDueDate`; khi `status=PENDING` mặc định `submittedAt,asc`. Không trả `customerName` trong DTO.
+- `GET /api/v1/receiving/transfers/{id}`, `GET /api/v1/receiving/transfers/{id}/evidence` và `GET /api/v1/receiving/transfers/{id}/evidence/{attachmentId}/content`: chỉ phiếu đã gửi; kiểm tra file thuộc đúng receipt của transfer. File gốc có thể chứa thông tin khách hàng. Response file dùng `private, no-store`.
+- `POST /api/v1/receiving/transfers/{id}/decision`: dùng cùng logic quyết định với API transfer cũ, khóa hàng ở MySQL; trạng thái không còn `PENDING` trả 409. Notification lưu trong transaction, realtime gửi sau commit.
+- Kiểm thử hiện có gồm MySQL/Redis tạm, phân quyền bị chặn, test projection, kiểm tra ranh giới ngày và hai quyết định đồng thời. Chưa nghiệm thu Chrome E2E với backend thật; xem `docs/ai/STATE.md`.
+
 **Phiên bản:** 0.6 · **Cập nhật:** 14/11/2026 · **Trạng thái:** Auth/user/intake/transfer/testing đã có runtime API; notification mới ở mức đề xuất
 
 ## Quy ước chung

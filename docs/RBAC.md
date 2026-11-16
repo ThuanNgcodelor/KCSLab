@@ -1,5 +1,12 @@
 # RBAC
 
+## Workspace KCS đã triển khai, chờ nghiệm thu E2E — 16/11/2026
+
+- Backend `/api/v1/receiving/**` cho `ADMIN|TECHNICIAN`; `RECEPTIONIST` bị từ chối. `TECHNICIAN` vẫn không có quyền đọc `/api/v1/receipts/**`.
+- DTO receiving không có trường `customerName`, phone/email/address; file gốc và tên/mô tả file vẫn có thể chứa thông tin khách hàng. Nội dung file chỉ được tải sau khi xác minh attachment thuộc receipt của transfer đã gửi.
+- API `/api/v1/transfers/**` cũ được giữ để không phá luồng Admin/Receptionist; frontend điều hướng Technician sang workspace KCS. Với Technician, field `customerName` trong DTO cũ được trả `null`; Admin/Receptionist vẫn nhận giá trị hiện có. File gốc và các trường ghi chú tự do vẫn có thể chứa thông tin khách hàng.
+- Chưa nghiệm thu end-to-end trên Chrome với backend đang chạy; chưa kiểm tra tải thực tế và backup file.
+
 ## Quyết định role Người nhận mẫu KCS — 16/11/2026
 
 - Người dùng xác nhận giữ `TECHNICIAN` cho cả nhận/từ chối Phiếu 4 và lập Phiếu 5; `ADMIN` cũng được lập Phiếu 5. Cả hai cần upload nhiều file PDF và tài liệu khác vào Phiếu 5; đây là yêu cầu chưa triển khai.

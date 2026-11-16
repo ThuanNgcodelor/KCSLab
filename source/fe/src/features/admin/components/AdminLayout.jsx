@@ -27,7 +27,7 @@ export function AdminLayout() {
   const isAdmin = user?.role === 'ADMIN';
   const canReceive = isAdmin || user?.role === 'RECEPTIONIST';
   const canTest = isAdmin || user?.role === 'TECHNICIAN';
-  const roleLabel = { ADMIN: 'Quản trị viên', RECEPTIONIST: 'Nhân viên tiếp nhận', TECHNICIAN: 'Kỹ thuật viên' }[user?.role] ?? 'Nhân viên';
+  const roleLabel = { ADMIN: 'Quản trị viên', RECEPTIONIST: 'Nhân viên tiếp nhận', TECHNICIAN: 'Người nhận mẫu KCS' }[user?.role] ?? 'Nhân viên';
   const pageTitle = getPageTitle(location.pathname);
 
   return (
@@ -40,14 +40,15 @@ export function AdminLayout() {
           {isAdmin && <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
           {user?.role === 'RECEPTIONIST' && <NavLink to="/admin/intake" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {canReceive && <NavLink to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}
-          <NavLink to="/admin/transfers" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>Chuyển mẫu</span></NavLink>
+          {user?.role === 'TECHNICIAN' && <NavLink to="/admin/receiving" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
+          <NavLink to={user?.role === 'TECHNICIAN' ? '/admin/receiving/transfers' : '/admin/transfers'} onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>{user?.role === 'TECHNICIAN' ? 'Nhận mẫu' : 'Chuyển mẫu'}</span></NavLink>
           {canTest && <NavLink to="/admin/testing" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Thử nghiệm</span></NavLink>}
           <NavLink to="/admin/notifications" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="bell" /><span>Thông báo</span></NavLink>
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
         <nav className="admin-nav">
           <NavLink to="/admin/profile" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="profile" /><span>Thông tin cá nhân</span></NavLink>
-          <a className="nav-item disabled" href="#settings" onClick={(event) => event.preventDefault()}><Icon name="settings" /><span>Cài đặt chung</span></a>
+          {user?.role !== 'TECHNICIAN' && <a className="nav-item disabled" href="#settings" onClick={(event) => event.preventDefault()}><Icon name="settings" /><span>Cài đặt chung</span></a>}
         </nav>
         <div className="sidebar-bottom"><div className="sidebar-status"><span className="pulse-dot" />Hệ thống hoạt động</div><button className="sidebar-profile" onClick={() => navigate('/admin/profile')}><UserAvatar user={user} className="sidebar-user-avatar" /><span><strong>{user?.displayName ?? roleLabel}</strong><small>{roleLabel}</small></span><span className="profile-more">•••</span></button><button className="sidebar-logout" onClick={signOut}>Đăng xuất</button></div>
       </aside>
@@ -62,6 +63,8 @@ function getPageTitle(pathname) {
   if (pathname.includes('/intake/new')) return 'Tạo phiếu tiếp nhận';
   if (pathname.replace(/\/$/, '') === '/admin/intake') return 'Tổng quan';
   if (pathname.includes('/intake')) return 'Tiếp nhận mẫu';
+  if (pathname.includes('/receiving/transfers')) return 'Nhận mẫu';
+  if (pathname.includes('/receiving')) return 'Tổng quan nhận mẫu';
   if (pathname.includes('/transfers')) return 'Chuyển mẫu';
   if (pathname.includes('/testing')) return 'Thử nghiệm';
   if (pathname.includes('/users')) return 'Nhân viên';

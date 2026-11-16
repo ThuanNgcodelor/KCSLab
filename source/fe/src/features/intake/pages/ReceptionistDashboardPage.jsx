@@ -90,7 +90,7 @@ function vnToday() {
   // en-CA gives YYYY-MM-DD in the requested time zone.
   return new Date().toLocaleDateString('en-CA', { timeZone: TIME_ZONE });
 }
-function presetRange(preset) {
+export function presetRange(preset) {
   const today = vnToday();
   const [y, m, d] = today.split('-').map(Number);
   if (preset === 'month') return { from: `${today.slice(0, 8)}01`, to: today };

@@ -12,6 +12,9 @@ import com.example.app.transfer.dto.CreateTransferRequest;
 import com.example.app.transfer.dto.TransferDecisionRequest;
 import com.example.app.transfer.dto.TransferResponse;
 import com.example.app.transfer.entity.TransferStatus;
+import com.example.app.transfer.receiving.ReceivingService;
+import com.example.app.transfer.repository.SampleTransferRepository;
+import jakarta.persistence.EntityManager;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import com.example.app.user.repository.UserRepository;
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -36,6 +40,9 @@ class TransferServiceTest {
     @Autowired private UserRepository userRepository;
     @Autowired private CustomerRepository customerRepository;
     @Autowired private ReceiptRepository receiptRepository;
+    @Autowired private ReceivingService receivingService;
+    @Autowired private EntityManager entityManager;
+    @Autowired private SampleTransferRepository transferRepository;
 
     private User receptionist;
     private User technician;
@@ -101,6 +108,55 @@ class TransferServiceTest {
     }
 
     @Test
+    void rejectsASecondDecisionAfterTheTransferHasAlreadyBeenAccepted() {
+        TransferResponse created = transferService.create(createRequest(), receptionist);
+        transferService.submit(created.id());
+        TransferDecisionRequest decision = new TransferDecisionRequest(
+                TransferStatus.ACCEPTED, "Đủ mẫu", null, false, null);
+        transferService.decide(created.id(), decision, technician);
+
+        assertThatThrownBy(() -> transferService.decide(created.id(), decision, technician))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        ex -> assertThat(ex.getStatusCode().value()).isEqualTo(409));
+    }
+
+    @Test
+    void receivingDashboardAndSearchUseSubmittedTransfers() {
+        TransferResponse created = transferService.create(createRequest(), receptionist);
+        transferService.submit(created.id());
+        entityManager.flush();
+        LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
+        var dashboard = receivingService.dashboard(technician, today, today);
+        assertThat(dashboard.submittedTransfers()).isEqualTo(1);
+        assertThat(dashboard.submittedSamples()).isEqualTo(1);
+        assertThat(dashboard.pendingNow()).isEqualTo(1);
+        assertThat(dashboard.trend()).singleElement().satisfies(day -> assertThat(day.submitted()).isEqualTo(1));
+        var result = receivingService.list(technician, 0, 20, TransferStatus.PENDING,
+                sample.getSampleCode(), today, today, null);
+        assertThat(result.content()).extracting(item -> item.id()).containsExactly(created.id());
+        assertThatThrownBy(() -> receivingService.list(technician, 0, 20, null, null, null, null, "customerName,asc"))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        ex -> assertThat(ex.getStatusCode().value()).isEqualTo(400));
+    }
+
+    @Test
+    void receivingDashboardUsesVietnamMidnightBoundaries() {
+        TransferResponse created = transferService.create(createRequest(), receptionist);
+        transferService.submit(created.id());
+        var transfer = transferRepository.findById(created.id()).orElseThrow();
+        ReflectionTestUtils.setField(transfer, "submittedAt", Instant.parse("2026-11-15T17:00:00Z"));
+        entityManager.flush();
+        assertThat(receivingService.dashboard(technician, LocalDate.of(2026, 11, 16), LocalDate.of(2026, 11, 16))
+                .submittedTransfers()).isEqualTo(1);
+        assertThat(receivingService.dashboard(technician, LocalDate.of(2026, 11, 15), LocalDate.of(2026, 11, 15))
+                .submittedTransfers()).isZero();
+        var trend = receivingService.dashboard(technician, LocalDate.of(2026, 11, 15), LocalDate.of(2026, 11, 16)).trend();
+        assertThat(trend).hasSize(2);
+        assertThat(trend.get(0).submitted()).isZero();
+        assertThat(trend.get(1).submitted()).isEqualTo(1);
+    }
+
+    @Test
     void allowsCreatingANewTransferAfterRejection() {
         TransferResponse first = transferService.create(createRequest(), receptionist);
         transferService.submit(first.id());
@@ -134,6 +190,9 @@ class TransferServiceTest {
         assertThat(transferService.findAll(technician))
                 .extracting(TransferResponse::id)
                 .contains(created.id());
+        assertThat(transferService.findById(created.id(), technician).customerName()).isNull();
+        assertThat(transferService.findById(created.id(), receptionist).customerName())
+                .isEqualTo("Khách hàng kiểm thử");
     }
 
     @Test

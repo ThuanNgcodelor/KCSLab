@@ -1,5 +1,15 @@
 # Project State
 
+## Workspace nhận mẫu KCS — 16/11/2026
+
+- Đã thêm API `/api/v1/receiving/**` cho dashboard, list, chi tiết, metadata/content file và quyết định; role `ADMIN|TECHNICIAN`, không mở receipt API. DTO mới không có `customerName`; file gốc có thể chứa dữ liệu khách.
+- Dashboard lọc theo `Asia/Ho_Chi_Minh`, tối đa 366 ngày, đếm tại DB; list phân trang tối đa 50, search theo mã, sort whitelist. Khóa pessimistic tại `TransferService.decide` bảo vệ cả API cũ và mới.
+- `V5__receiving_query_indexes.sql` thêm index `(status, submitted_at)` và `(received_at)`; EXPLAIN trên database tạm quy mô nhỏ đã dùng hai index, chưa load test quy mô thực.
+- Frontend thêm dashboard/list/detail/gallery KCS và navbar theo role, giữ dashboard Receptionist và chuyển link transfer cũ của Technician theo role. Chưa chạy Chrome E2E thật với dữ liệu/ảnh và backend mới.
+- Kiểm tra: 29 test Java pass trên MySQL 8.4 + Redis tạm (bao gồm 5 test security, timezone, projection, traversal giả lập và test hai giao dịch thực); `npm run build` pass. Chrome kiểm tra bốn kích thước dashboard/list/detail bằng API mô phỏng, không tràn ngang ngoài bảng cuộn.
+- Chưa hoàn tất nghiệm thu: kiểm tra luồng thật Receptionist → Phiếu 4 → KCS xem file → nhận/từ chối và notification, file thực tế/401/403/409 trên UI; test tải, xác minh attachment chéo trên MySQL và biểu mẫu mobile. API transfer cũ giữ quyền đọc cho Technician nhưng trả `customerName=null`; Admin/Receptionist vẫn nhận giá trị cũ.
+- Dashboard nhóm dữ liệu từng ngày bằng query ở database thay vì chạy ba query cho mỗi ngày; khoảng chọn tối đa 366 ngày. Chưa load test production. Chưa chạy V5 trên database người dùng; Flyway sẽ chạy V5 khi backend khởi động với database phù hợp.
+
 ## Xác nhận ROLE Tiếp nhận và plan ROLE Người nhận mẫu — 16/11/2026
 
 - Người dùng xác nhận vertical slice `RECEPTIONIST` hiện tại đã ổn: tài khoản role thật đăng nhập và tạo thành công Phiếu 3 trên Chrome hiển thị; backend sinh mã phiếu và mã mẫu.

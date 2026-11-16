@@ -69,7 +69,7 @@ public class TransferService {
     public List<TransferResponse> findAll(User viewer) {
         return transferRepository.findTop50ByOrderByCreatedAtDesc().stream()
                 .filter(transfer -> canView(transfer, viewer))
-                .map(this::toResponse)
+                .map(transfer -> toResponse(transfer, viewer))
                 .toList();
     }
 
@@ -84,7 +84,7 @@ public class TransferService {
         if (!canView(transfer, viewer)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy phiếu chuyển mẫu");
         }
-        return toResponse(transfer);
+        return toResponse(transfer, viewer);
     }
 
     @Transactional
@@ -152,7 +152,11 @@ public class TransferService {
 
     @Transactional
     public TransferResponse decide(Long id, TransferDecisionRequest request, User receiver) {
-        SampleTransfer transfer = getTransfer(id);
+        // Both the existing transfer API and the receiving workspace must serialize
+        // decisions on the same row, including across separate application instances.
+        SampleTransfer transfer = transferRepository.findByIdForDecision(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Không tìm thấy phiếu chuyển mẫu"));
         if (transfer.getStatus() != TransferStatus.PENDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phiếu chuyển mẫu không ở trạng thái chờ nhận");
         }
@@ -193,7 +197,7 @@ public class TransferService {
         notificationService.notifyUsers(List.of(saved.getDeliveredBy()), receiver,
                 notificationType, title, message,
                 "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());
-        return toResponse(saved);
+        return toResponse(saved, receiver);
     }
 
     private Receipt getReceipt(Long id) {
@@ -295,6 +299,18 @@ public class TransferService {
                 transfer.getReceivingNote(), transfer.getLabOpinion(), transfer.isLabRetain(),
                 transfer.getLabRetentionUntil(), transfer.getSubmittedAt(), transfer.getReceivedAt(),
                 transfer.getCreatedAt(), transfer.getItems().stream().map(this::toItemResponse).toList());
+    }
+
+    private TransferResponse toResponse(SampleTransfer transfer, User viewer) {
+        TransferResponse response = toResponse(transfer);
+        if (viewer.getRole() != Role.TECHNICIAN) return response;
+        return new TransferResponse(response.id(), response.transferCode(), response.receiptId(),
+                response.receiptCode(), null, response.receivingDepartment(), response.deliveredBy(),
+                response.receivedBy(), response.transferDate(), response.resultsDueDate(),
+                response.returnToCustomer(), response.customerReturnDate(), response.changesNote(),
+                response.status(), response.receivingNote(), response.labOpinion(), response.labRetain(),
+                response.labRetentionUntil(), response.submittedAt(), response.receivedAt(),
+                response.createdAt(), response.items());
     }
 
     private TransferItemResponse toItemResponse(SampleTransferItem item) {

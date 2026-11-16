@@ -22,7 +22,7 @@ export function DashboardPage() {
   }, [user?.role]);
 
   if (user?.role === 'RECEPTIONIST') return <Navigate to="/admin/intake" replace />;
-  if (user?.role === 'TECHNICIAN') return <Navigate to="/admin/transfers" replace />;
+  if (user?.role === 'TECHNICIAN') return <Navigate to="/admin/receiving" replace />;
 
   const stats = [
     { label: 'Phiếu tiếp nhận', value: dashboard?.totalReceipts ?? '—', detail: 'Trong khoảng 7 ngày', tone: 'mint' },

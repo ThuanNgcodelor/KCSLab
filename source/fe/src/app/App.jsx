@@ -17,6 +17,9 @@ import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFo
 import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
 import { NotificationsPage } from '../features/notifications/pages/NotificationsPage';
 import { ProfilePage } from '../features/profile/pages/ProfilePage';
+import { ReceivingDashboardPage } from '../features/receiving/pages/ReceivingDashboardPage';
+import { ReceivingListPage } from '../features/receiving/pages/ReceivingListPage';
+import { ReceivingDetailPage } from '../features/receiving/pages/ReceivingDetailPage';
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -33,6 +36,14 @@ function RoleRoute({ roles }) {
 function IntakeHome() {
   const { user } = useAuth();
   return user?.role === 'RECEPTIONIST' ? <ReceptionistDashboardPage /> : <Navigate to="/admin/intake/receipts" replace />;
+}
+
+function TransferRoleRedirect({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  return user?.role === 'TECHNICIAN'
+    ? <Navigate to={location.pathname.replace('/admin/transfers', '/admin/receiving/transfers') + location.search} replace />
+    : children;
 }
 
 export function App() {
@@ -57,10 +68,13 @@ export function App() {
           <Route path="/admin/transfers/:id/edit" element={<TransferCreatePage />} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST', 'TECHNICIAN']} />}>
-          <Route path="/admin/transfers" element={<TransfersPage />} />
-          <Route path="/admin/transfers/:id" element={<TransferDetailPage />} />
+          <Route path="/admin/transfers" element={<TransferRoleRedirect><TransfersPage /></TransferRoleRedirect>} />
+          <Route path="/admin/transfers/:id" element={<TransferRoleRedirect><TransferDetailPage /></TransferRoleRedirect>} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'TECHNICIAN']} />}>
+          <Route path="/admin/receiving" element={<ReceivingDashboardPage />} />
+          <Route path="/admin/receiving/transfers" element={<ReceivingListPage />} />
+          <Route path="/admin/receiving/transfers/:id" element={<ReceivingDetailPage />} />
           <Route path="/admin/testing" element={<TestingRecordsPage />} />
           <Route path="/admin/testing/new" element={<TestingRecordFormPage />} />
           <Route path="/admin/testing/:id" element={<TestingRecordDetailPage />} />

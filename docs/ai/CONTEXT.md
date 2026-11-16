@@ -1,5 +1,12 @@
 # CFC Lab — AI Context
 
+## Cập nhật workspace KCS — 16/11/2026
+
+- Có workspace `/admin/receiving` cho Technician: dashboard, danh sách Phiếu 4, chi tiết và gallery file, quyết định nhận/từ chối. API projection riêng `/api/v1/receiving/**` dành cho Admin/Technician; receipt API không mở thêm quyền.
+- Migration `V5__receiving_query_indexes.sql` thêm hai index transfer; quyết định bàn giao dùng khóa hàng, không thêm cột version.
+- Backend 29 test pass trên MySQL/Redis Docker tạm với `KCS_ISOLATED_DB=true` (gồm test hai giao dịch và security); frontend build pass. Chrome đã kiểm tra không tràn ngang trên bốn kích thước với API mô phỏng; chưa chạy E2E thật với hai role và file upload.
+- API transfer cũ giữ contract cho Admin/Receptionist và trả `customerName=null` với Technician; receiving DTO mới không có trường này. File gốc/ghi chú vẫn có thể chứa PII. Dashboard đã nhóm xu hướng theo ngày tại database; chưa load test quy mô production.
+
 **Cập nhật:** 16/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
 
 > Nếu chỉ có ít thời gian, đọc `docs/ai/START_HERE.md` trước. File này là context kỹ thuật ngắn; `plans/CURRENT.md` là kế hoạch tổng thể.
