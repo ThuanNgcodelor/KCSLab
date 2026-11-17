@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.example.app.common.dto.PagedResponse;
+import com.example.app.transfer.entity.TransferStatus;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/transfers")
@@ -32,8 +36,16 @@ public class TransferController {
     }
 
     @GetMapping
-    public List<TransferResponse> list(@AuthenticationPrincipal Jwt jwt) {
-        return transferService.findAll(userService.getByEmail(jwt.getSubject()));
+    public PagedResponse<TransferResponse> list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) TransferStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @AuthenticationPrincipal Jwt jwt) {
+        return transferService.search(userService.getByEmail(jwt.getSubject()), query, status, from, to, page, size, sort);
     }
 
     @GetMapping("/{id}")

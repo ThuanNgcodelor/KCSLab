@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.app.common.dto.PagedResponse;
+import com.example.app.testing.entity.TestRecordStatus;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,7 +37,20 @@ public class TestingRecordController {
     }
 
     @GetMapping
-    public List<TestingRecordResponse> list() { return testingRecordService.findAll(); }
+    public PagedResponse<TestingRecordResponse> list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) TestRecordStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return testingRecordService.search(query, status, from, to, page, size, sort);
+    }
+
+    /** Accepted samples that still need a testing record. */
+    @GetMapping("/candidates")
+    public List<TestingRecordService.Candidate> candidates() { return testingRecordService.candidates(); }
 
     @GetMapping("/{id}")
     public TestingRecordResponse get(@PathVariable Long id) { return testingRecordService.findById(id); }

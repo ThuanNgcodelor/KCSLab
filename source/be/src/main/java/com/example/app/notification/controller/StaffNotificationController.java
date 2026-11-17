@@ -34,8 +34,12 @@ public class StaffNotificationController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort,
             @RequestParam(defaultValue = "false") boolean unread,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) com.example.app.notification.entity.StaffNotificationType type,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate to,
             @AuthenticationPrincipal Jwt jwt) {
-        return notificationService.findFor(currentUser(jwt), page, size, sort, unread);
+        return notificationService.findFor(currentUser(jwt), page, size, sort, unread, query, type, from, to);
     }
 
     @PatchMapping("/{id}")

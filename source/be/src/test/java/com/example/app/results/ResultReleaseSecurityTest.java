@@ -34,12 +34,15 @@ class ResultReleaseSecurityTest {
                     .andExpect(status().isForbidden());
         }
     }
-    @Test void adminCannotUploadOrSubmitAndUnknownDecisionPathIsDenied() throws Exception {
+    @Test void receptionistCannotPrepareDossiersAndUnknownDecisionPathIsDenied() throws Exception {
         for (String action : new String[]{"submit", "revisions"}) {
             mvc.perform(post("/api/v1/result-releases/1/" + action).with(csrf())
-                            .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                            .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
                     .andExpect(status().isForbidden());
         }
+        mvc.perform(put("/api/v1/result-releases/1/report").with(csrf()).contentType("application/json").content("{}")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
+                .andExpect(status().isForbidden());
         mvc.perform(post("/api/v1/result-releases/1/decision").with(csrf())
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isForbidden());
@@ -52,8 +55,8 @@ class ResultReleaseSecurityTest {
                 .andExpect(status().isForbidden());
         mvc.perform(get("/api/v1/result-releases/1")).andExpect(status().isUnauthorized());
     }
-    @Test void onlyTechnicianCanCreateDraft() throws Exception {
-        mvc.perform(post("/api/v1/result-releases").with(csrf()).with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+    @Test void receptionistCannotCreateDraft() throws Exception {
+        mvc.perform(post("/api/v1/result-releases").with(csrf()).with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
                 .andExpect(status().isForbidden());
     }
 }

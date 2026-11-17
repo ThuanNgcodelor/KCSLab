@@ -44,8 +44,19 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponse> list() {
-        return userService.findAll();
+    public com.example.app.common.dto.PagedResponse<UserResponse> list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) com.example.app.user.entity.Role role,
+            @RequestParam(required = false) Boolean enabled) {
+        return userService.search(query, role, enabled, page, size, sort);
+    }
+
+    @GetMapping("/{id:\\d+}")
+    public UserResponse get(@PathVariable Long id) {
+        return userService.findOne(id);
     }
 
     @PostMapping

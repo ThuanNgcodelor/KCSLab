@@ -4,25 +4,33 @@ import { listNotifications, markAllNotificationsRead, markNotificationRead } fro
 import { formatTime, typeIcon } from '../components/NotificationCenter';
 import { useNotifications } from '../hooks/useNotifications';
 import { PageLoader } from '../../../shared/components/Loading';
+import { ListToolbar } from '../../../shared/components/ListToolbar';
+import { useListState } from '../../../shared/hooks/useListState';
+import { Icon } from '../../../shared/components/Icon';
 
+const typeOptions = [['', 'Tất cả loại'], ['INTAKE_RECORDED', 'Tiếp nhận mới'], ['TRANSFER_SUBMITTED', 'Gửi chuyển mẫu'], ['TRANSFER_ACCEPTED', 'KCS đã nhận'], ['TRANSFER_REJECTED', 'KCS từ chối']];
+const sortOptions = [['createdAt,desc', 'Mới nhất'], ['createdAt,asc', 'Cũ nhất'], ['type,asc', 'Loại: A → Z'], ['title,asc', 'Tiêu đề: A → Z'], ['readAt,desc', 'Đã đọc gần nhất']];
+const defaults = { q: '', from: '', to: '', type: '', sort: 'createdAt,desc' };
 const emptyPage = { content: [], page: 0, totalElements: 0, totalPages: 0, first: true, last: true };
 
 export function NotificationsPage() {
   const navigate = useNavigate();
   const live = useNotifications();
   const [notificationPage, setNotificationPage] = useState(emptyPage);
-  const [page, setPage] = useState(0);
+  const [list, setList] = useListState(defaults);
+  const page = list.page;
+  const setPage = (value) => setList({ page: typeof value === 'function' ? value(page) : value });
   const [unread, setUnread] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const load = useCallback(() => {
     setLoading(true); setError('');
-    return listNotifications({ page, size: 20, unread })
+    return listNotifications({ page, size: 20, unread, q: list.q, from: list.from, to: list.to, type: list.type, sort: list.sort })
       .then(setNotificationPage)
       .catch((exception) => setError(exception.message))
       .finally(() => setLoading(false));
-  }, [page, unread]);
+  }, [page, unread, list]);
 
   useEffect(() => { load(); }, [load, live.unreadCount]);
 
@@ -43,10 +51,13 @@ export function NotificationsPage() {
       <button className={!unread ? 'active' : ''} type="button" onClick={() => { setUnread(false); setPage(0); }}>Tất cả</button>
       <button className={unread ? 'active' : ''} type="button" onClick={() => { setUnread(true); setPage(0); }}>Chưa đọc <span>{notificationPage.unreadCount ?? live.unreadCount}</span></button>
     </div>
+    <ListToolbar q={list.q} onQ={(q) => setList({ q })} searchLabel="Tìm thông báo" placeholder="Tiêu đề hoặc nội dung…" from={list.from} to={list.to} onFrom={(from) => setList({ from })} onTo={(to) => setList({ to })}
+      filters={[{ label: 'Loại', value: list.type, onChange: (type) => setList({ type }), options: typeOptions }]}
+      sort={list.sort} sortOptions={sortOptions} onSort={(sort) => setList({ sort })} onReset={() => setList({ ...defaults })} />
     {error && <p className="form-error" role="alert">{error}</p>}
     <section className="panel-card notification-page-card">
       {loading ? <PageLoader label="Đang tải thông báo…" rows={3} /> : notificationPage.content.length === 0
-        ? <div className="notification-page-empty"><span>✓</span><h2>{unread ? 'Không còn thông báo chưa đọc' : 'Chưa có thông báo'}</h2><p>Các hoạt động tiếp nhận và bàn giao sẽ xuất hiện tại đây.</p></div>
+        ? <div className="notification-page-empty"><span><Icon name="checkCircle" size={24} /></span><h2>{unread ? 'Không còn thông báo chưa đọc' : 'Chưa có thông báo'}</h2><p>Các hoạt động tiếp nhận và bàn giao sẽ xuất hiện tại đây.</p></div>
         : <div className="notification-page-list">{notificationPage.content.map((notification) => <button className={`notification-page-row ${notification.readAt ? '' : 'unread'}`} type="button" key={notification.id} onClick={() => openNotification(notification)}>
           <span className="notification-type-icon">{typeIcon(notification.type)}</span>
           <span className="notification-page-copy"><strong>{notification.title}</strong><small>{notification.message}</small></span>

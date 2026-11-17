@@ -3,7 +3,7 @@
 ## Mã hóa, hồ sơ kết quả và public — 17/11/2026 (P2–P4, đã test tự động, chưa deploy)
 
 - `/api/v1/samples/**` (mã hóa CFC-TN-14): `ADMIN|RECEPTIONIST`; người đối chiếu phải khác người mã hóa (service trả 403). `TECHNICIAN` bị từ chối.
-- `/api/v1/result-releases`: tạo nháp, tải/gỡ file, gửi duyệt, lập phiên bản mới = `TECHNICIAN` (và chỉ chính người lập hồ sơ được tải file/gửi duyệt); trả lại, phát hành, thu hồi = `ADMIN` độc lập (khác người lập và người phân tích); đọc/tải nội bộ = `ADMIN|TECHNICIAN`; `RECEPTIONIST` bị từ chối (cần LAB xác nhận có cho xem trạng thái hay không).
+- `/api/v1/result-releases`: tạo nháp, nhập nội dung, tải/gỡ file, gửi duyệt, lập phiên bản mới = `TECHNICIAN` hoặc `ADMIN` (chỉ chính người lập hồ sơ được sửa/gửi duyệt); trả lại, phát hành, thu hồi = `ADMIN` độc lập (khác người lập và người phân tích); đọc/tải nội bộ = `ADMIN|TECHNICIAN`; `RECEPTIONIST` bị từ chối (cần LAB xác nhận có cho xem trạng thái hay không).
 - `/api/v1/public/results/{lookup,download}`: không đăng nhập, `permitAll` và bỏ CSRF chỉ cho hai đường dẫn này; mọi `/api/v1/public/**` khác `denyAll`. Cookie đăng nhập cũ bị bỏ qua trên đường dẫn public.
 - Quy tắc “độc lập” và vai trò đối chiếu là giả định tạm, cần LAB xác nhận.
 

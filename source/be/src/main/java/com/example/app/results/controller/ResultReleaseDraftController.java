@@ -42,6 +42,10 @@ public class ResultReleaseDraftController {
     public record CreateDraftRequest(@NotNull Long testingRecordId) {}
     public record ReasonRequest(@NotBlank @Size(max = 500) String reason) {}
     public record PublishRequest(Set<Long> publicFileIds) {}
+    public record ReportRow(@Size(max = 200) String parameter, @Size(max = 60) String unit, @Size(max = 200) String method,
+                            @Size(max = 120) String result, @Size(max = 255) String note) {}
+    public record ReportRequest(@jakarta.validation.constraints.NotEmpty @Size(max = 40) List<@Valid ReportRow> rows,
+                                @Size(max = 120) String qualityHeadName, @Size(max = 120) String directorName) {}
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,16 +55,39 @@ public class ResultReleaseDraftController {
 
     @GetMapping
     public PagedResponse<ResultReleaseListItem> list(@RequestParam(required = false) ResultReleaseStatus status,
-                                                     @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "20") int size) {
-        return workflow.list(status, page, size);
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate to,
+            @RequestParam(defaultValue = "updatedAt,desc") String sort,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return workflow.list(status, query, from, to, page, size, sort);
     }
+
+    @GetMapping("/ready")
+    public List<ResultReleaseService.ReadyRecord> ready() { return workflow.readyRecords(); }
 
     @GetMapping("/{id}")
     public ResultReleaseDetailResponse find(@PathVariable Long id) { return workflow.detail(id); }
 
     @GetMapping("/{id}/events")
     public List<ResultReleaseDetailResponse.EventResponse> events(@PathVariable Long id) { return workflow.history(id); }
+
+    @PutMapping("/{id}/report")
+    public ResultReleaseDetailResponse saveReport(@PathVariable Long id, @Valid @RequestBody ReportRequest request,
+                                                  @AuthenticationPrincipal Jwt jwt) {
+        return workflow.updateReport(id, request.rows().stream().map(row -> new ResultReleaseService.ReportRowInput(
+                row.parameter(), row.unit(), row.method(), row.result(), row.note())).toList(),
+                request.qualityHeadName(), request.directorName(), users.getByEmail(jwt.getSubject()));
+    }
+
+    /** Watermarked draft of the KQKN PDF so the dossier can be checked before submission. */
+    @GetMapping("/{id}/report-preview")
+    public ResponseEntity<byte[]> preview(@PathVariable Long id) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename("kqkn-xem-truoc.pdf").build().toString())
+                .header("X-Content-Type-Options", "nosniff").header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .body(workflow.previewPdf(id));
+    }
 
     @PostMapping(value = "/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultReleaseDetailResponse upload(@PathVariable Long id, @RequestPart("files") List<MultipartFile> files,

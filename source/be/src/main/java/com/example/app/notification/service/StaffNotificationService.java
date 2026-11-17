@@ -25,8 +25,6 @@ import java.util.Set;
 
 @Service
 public class StaffNotificationService {
-    private static final int MAX_PAGE_SIZE = 100;
-    private static final Set<String> SORT_FIELDS = Set.of("createdAt", "readAt");
 
     private final StaffNotificationRepository notificationRepository;
     private final UserRepository userRepository;
@@ -40,22 +38,44 @@ public class StaffNotificationService {
         this.eventPublisher = eventPublisher;
     }
 
+    private static final java.util.Map<String, String> LIST_SORT = java.util.Map.of(
+            "createdAt", "createdAt", "type", "type", "title", "title", "readAt", "readAt");
+
     @Transactional(readOnly = true)
-    public StaffNotificationPageResponse findFor(User viewer, int page, int size,
-                                                  String sort, boolean unreadOnly) {
-        if (page < 0 || size < 1 || size > MAX_PAGE_SIZE) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Trang phải từ 0 và kích thước trang từ 1 đến " + MAX_PAGE_SIZE);
+    public StaffNotificationPageResponse findFor(User viewer, int page, int size, String sort, boolean unreadOnly) {
+        return findFor(viewer, page, size, sort, unreadOnly, null, null, null, null);
+    }
+
+    /** Server-side search, type filter and Vietnam-date range; the unread counter ignores the filters. */
+    @Transactional(readOnly = true)
+    public StaffNotificationPageResponse findFor(User viewer, int page, int size, String sort, boolean unreadOnly,
+                                                 String q, StaffNotificationType type,
+                                                 java.time.LocalDate from, java.time.LocalDate to) {
+        com.example.app.common.query.ListQuery.requireOrderedRange(from, to);
+        var parsed = com.example.app.common.query.ListQuery.parseSort(sort, LIST_SORT, "createdAt,desc");
+        org.springframework.data.jpa.domain.Specification<StaffNotification> spec =
+                (root, query, builder) -> builder.equal(root.get("recipient").get("id"), viewer.getId());
+        if (unreadOnly) spec = spec.and((root, query, builder) -> builder.isNull(root.get("readAt")));
+        if (type != null) spec = spec.and((root, query, builder) -> builder.equal(root.get("type"), type));
+        if (from != null) {
+            var start = com.example.app.common.query.ListQuery.startOfDay(from);
+            spec = spec.and((root, query, builder) -> builder.greaterThanOrEqualTo(root.get("createdAt"), start));
         }
-        NotificationSort parsedSort = parseSort(sort);
-        PageRequest pageable = PageRequest.of(page, size,
-                Sort.by(parsedSort.direction(), parsedSort.field()).and(Sort.by(Sort.Direction.DESC, "id")));
-        Page<StaffNotification> result = unreadOnly
-                ? notificationRepository.findByRecipient_IdAndReadAtIsNull(viewer.getId(), pageable)
-                : notificationRepository.findByRecipient_Id(viewer.getId(), pageable);
+        if (to != null) {
+            var end = com.example.app.common.query.ListQuery.endExclusive(to);
+            spec = spec.and((root, query, builder) -> builder.lessThan(root.get("createdAt"), end));
+        }
+        if (com.example.app.common.query.ListQuery.hasText(q)) {
+            String pattern = com.example.app.common.query.ListQuery.contains(q);
+            spec = spec.and((root, query, builder) -> builder.or(
+                    builder.like(builder.lower(root.get("title")), pattern, '\\'),
+                    builder.like(builder.lower(root.get("message")), pattern, '\\')));
+        }
+        Page<StaffNotification> result = notificationRepository.findAll(spec,
+                com.example.app.common.query.ListQuery.page(page, size, parsed));
         return new StaffNotificationPageResponse(result.getContent().stream().map(this::toResponse).toList(),
                 result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages(),
-                result.isFirst(), result.isLast(), parsedSort.canonical(),
+                result.isFirst(), result.isLast(), parsed.canonical(),
                 notificationRepository.countByRecipient_IdAndReadAtIsNull(viewer.getId()));
     }
 
@@ -103,24 +123,4 @@ public class StaffNotificationService {
                 notification.getCreatedAt());
     }
 
-    private NotificationSort parseSort(String rawSort) {
-        String value = rawSort == null || rawSort.isBlank() ? "createdAt,desc" : rawSort.trim();
-        String[] parts = value.split(",", -1);
-        if (parts.length != 2 || !SORT_FIELDS.contains(parts[0].trim())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Sort thông báo không hợp lệ");
-        }
-        Sort.Direction direction;
-        try {
-            direction = Sort.Direction.fromString(parts[1].trim());
-        } catch (IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Chiều sort chỉ nhận asc hoặc desc");
-        }
-        String field = parts[0].trim();
-        return new NotificationSort(field, direction,
-                field + "," + direction.name().toLowerCase(Locale.ROOT));
-    }
-
-    private record NotificationSort(String field, Sort.Direction direction, String canonical) {}
 }

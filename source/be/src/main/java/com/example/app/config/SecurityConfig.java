@@ -105,10 +105,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/samples/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receiving/**").hasAnyRole("ADMIN", "TECHNICIAN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases").hasRole("TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/files", "/api/v1/result-releases/*/submit",
-                                "/api/v1/result-releases/*/revisions").hasRole("TECHNICIAN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/result-releases/*/files/*").hasRole("TECHNICIAN")
+                                "/api/v1/result-releases/*/revisions").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/result-releases/*/files/*").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/result-releases/*/report").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/return", "/api/v1/result-releases/*/publish",
                                 "/api/v1/result-releases/*/revoke").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/result-releases", "/api/v1/result-releases/**").hasAnyRole("ADMIN", "TECHNICIAN")

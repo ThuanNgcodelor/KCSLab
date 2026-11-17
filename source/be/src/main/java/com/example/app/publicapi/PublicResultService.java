@@ -4,6 +4,7 @@ import com.example.app.results.entity.ResultRelease;
 import com.example.app.results.entity.ResultReleaseFile;
 import com.example.app.results.entity.ResultReleaseStatus;
 import com.example.app.results.repository.ResultReleaseFileRepository;
+import com.example.app.results.repository.ResultReleaseItemRepository;
 import com.example.app.results.repository.ResultReleaseRepository;
 import com.example.app.results.service.ResultReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class PublicResultService {
 
     private final ResultReleaseRepository releases;
     private final ResultReleaseFileRepository files;
+    private final ResultReleaseItemRepository items;
     private final ResultReleaseService storage;
     private final PublicLookupAudit audit;
     private final String pepper;
@@ -46,22 +48,24 @@ public class PublicResultService {
 
     @Autowired
     public PublicResultService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
-                               ResultReleaseService storage, PublicLookupAudit audit,
+                               ResultReleaseItemRepository items, ResultReleaseService storage, PublicLookupAudit audit,
                                @Value("${app.security.jwt-secret}") String pepper) {
-        this(releases, files, storage, audit, pepper, Clock.systemUTC());
+        this(releases, files, items, storage, audit, pepper, Clock.systemUTC());
     }
 
     PublicResultService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
-                        ResultReleaseService storage, PublicLookupAudit audit, String pepper, Clock clock) {
-        this.releases = releases; this.files = files; this.storage = storage; this.audit = audit; this.pepper = pepper;
+                        ResultReleaseItemRepository items, ResultReleaseService storage, PublicLookupAudit audit, String pepper, Clock clock) {
+        this.releases = releases; this.files = files; this.items = items; this.storage = storage; this.audit = audit; this.pepper = pepper;
         this.codeFailures = new PublicLookupRateLimiter(MAX_CODE_FAILURES, Duration.ofMinutes(15), clock);
         this.clientFailures = new PublicLookupRateLimiter(MAX_CLIENT_FAILURES, Duration.ofMinutes(15), clock);
         this.clientRequests = new PublicLookupRateLimiter(MAX_CLIENT_REQUESTS, Duration.ofMinutes(10), clock);
     }
 
     public record PublicFile(Long id, String name, String contentType, long size) {}
-    public record PublicResult(String resultNumber, int version, String sampleCode, Instant publishedAt,
-                               List<PublicFile> files) {}
+    /** What a customer may see: the report's result rows and the PDF. No customer name, address or phone. */
+    public record PublicItem(String parameter, String unit, String method, String result, String note) {}
+    public record PublicResult(String resultNumber, int version, String sampleCode, String sampleName,
+                               Instant publishedAt, List<PublicItem> items, List<PublicFile> files) {}
     public record Download(ResultReleaseService.StoredFile file) {}
 
     /** Thrown for throttling; mapped to HTTP 429 with Retry-After by the controller advice. */
@@ -77,8 +81,12 @@ public class PublicResultService {
         List<PublicFile> publicFiles = files.findByRelease_IdAndRemovedAtIsNullOrderByIdAsc(release.getId()).stream()
                 .filter(ResultReleaseFile::isPublicDownload)
                 .map(f -> new PublicFile(f.getId(), f.getOriginalName(), f.getContentType(), f.getSize())).toList();
-        return new PublicResult(release.getResultNumber(), release.getVersion(),
-                release.getTestingRecord().getTransferItem().getSampleCode(), release.getPublishedAt(), publicFiles);
+        List<PublicItem> rows = items.findByRelease_IdOrderByRowOrderAsc(release.getId()).stream()
+                .map(row -> new PublicItem(row.getParameterName(), row.getUnit(), row.getMethod(), row.getResultValue(),
+                        row.getNote())).toList();
+        var item = release.getTestingRecord().getTransferItem();
+        return new PublicResult(release.getResultNumber(), release.getVersion(), item.getSampleCode(),
+                item.getTransfer().getReceipt().getSampleName(), release.getPublishedAt(), rows, publicFiles);
     }
 
     @Transactional(readOnly = true)

@@ -28,6 +28,33 @@ public class UserService {
         this.avatarStorageService = avatarStorageService;
     }
 
+    private static final java.util.Map<String, String> SORT_FIELDS = java.util.Map.of(
+            "displayName", "displayName", "email", "email", "role", "role", "enabled", "enabled", "createdAt", "createdAt");
+
+    /** Server-side search/filter/sort for the staff list. */
+    @Transactional(readOnly = true)
+    public com.example.app.common.dto.PagedResponse<UserResponse> search(String q, com.example.app.user.entity.Role role, Boolean enabled,
+                                                                         int page, int size, String sort) {
+        var parsed = com.example.app.common.query.ListQuery.parseSort(sort, SORT_FIELDS, "createdAt,desc");
+        org.springframework.data.jpa.domain.Specification<User> spec = (root, query, builder) -> builder.conjunction();
+        if (role != null) spec = spec.and((root, query, builder) -> builder.equal(root.get("role"), role));
+        if (enabled != null) spec = spec.and((root, query, builder) -> builder.equal(root.get("enabled"), enabled));
+        if (com.example.app.common.query.ListQuery.hasText(q)) {
+            String pattern = com.example.app.common.query.ListQuery.contains(q);
+            spec = spec.and((root, query, builder) -> builder.or(
+                    builder.like(builder.lower(root.get("displayName")), pattern, '\\'),
+                    builder.like(builder.lower(root.get("email")), pattern, '\\')));
+        }
+        return com.example.app.common.dto.PagedResponse.from(userRepository.findAll(spec,
+                com.example.app.common.query.ListQuery.page(page, size, parsed)).map(this::toResponse), parsed.canonical());
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse findOne(Long id) {
+        return toResponse(userRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhân viên")));
+    }
+
     @Transactional(readOnly = true)
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream().map(this::toResponse).toList();

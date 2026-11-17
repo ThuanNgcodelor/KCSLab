@@ -1,6 +1,9 @@
 import { request } from '../../../shared/api/httpClient';
+import { cleanParams } from '../../../shared/hooks/useListState';
 
-export function listTransfers() { return request('/transfers'); }
+export function listTransfers(params = {}) {
+  return request(`/transfers?${new URLSearchParams(cleanParams({ size: 20, ...params }))}`);
+}
 export function getTransfer(id) { return request(`/transfers/${id}`); }
 export function createTransfer(data) { return request('/transfers', { method: 'POST', body: JSON.stringify(data) }); }
 export function updateTransfer(id, data) { return request(`/transfers/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }

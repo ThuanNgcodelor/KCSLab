@@ -13,15 +13,23 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
         int version, String status, String resultNumber, String lookupCode,
         Long createdByUserId, String createdByName, Instant createdAt, Instant updatedAt,
         Instant submittedAt, String submittedByName, Instant decidedAt, String decidedByName, String decisionNote,
-        Instant publishedAt, Instant revokedAt, String revokedByName, String revokeReason, List<FileResponse> files) {
+        Instant publishedAt, Instant revokedAt, String revokedByName, String revokeReason, List<FileResponse> files,
+        List<ItemResponse> items, String qualityHeadName, String directorName,
+        Reference reference, List<ItemResponse> suggestedItems) {
+
+    public record Measurement(String type, String replicate, String resultPerReplicate, String result, String deviation) {}
+    public record Reference(Long testingRecordId, String recordCode, Instant analysisStart, Instant analysisEnd,
+            java.math.BigDecimal recoveryPercent, String requestedParameters, String testMethod, List<Measurement> measurements) {}
+
+    public record ItemResponse(Long id, int rowOrder, String parameter, String unit, String method, String result, String note) {}
 
     public record FileResponse(Long id, String originalName, String contentType, long size, String checksum,
-            boolean publicDownload, String uploadedByName, Instant uploadedAt, String contentUrl) {
+            boolean publicDownload, String uploadedByName, Instant uploadedAt, String contentUrl, String kind) {
         public static FileResponse from(ResultReleaseFile file) {
             return new FileResponse(file.getId(), file.getOriginalName(), file.getContentType(), file.getSize(),
                     file.getChecksum(), file.isPublicDownload(), file.getUploadedBy().getDisplayName(),
                     file.getUploadedAt(), "/api/v1/result-releases/%d/files/%d/content".formatted(
-                            file.getRelease().getId(), file.getId()));
+                            file.getRelease().getId(), file.getId()), file.getKind());
         }
     }
 
@@ -33,7 +41,9 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
         }
     }
 
-    public static ResultReleaseDetailResponse from(ResultRelease release, List<ResultReleaseFile> files) {
+    public static ResultReleaseDetailResponse from(ResultRelease release, List<ResultReleaseFile> files,
+            List<com.example.app.results.entity.ResultReleaseItem> rows, String defaultQualityHead, String defaultDirector,
+            Reference reference, List<ItemResponse> suggestedItems) {
         var record = release.getTestingRecord();
         boolean issued = release.getStatus() == ResultReleaseStatus.PUBLISHED
                 || release.getStatus() == ResultReleaseStatus.REVOKED;
@@ -44,8 +54,13 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
                 release.getUpdatedAt(), release.getSubmittedAt(), name(release.getSubmittedBy()),
                 release.getDecidedAt(), name(release.getDecidedBy()), release.getDecisionNote(),
                 release.getPublishedAt(), release.getRevokedAt(), name(release.getRevokedBy()),
-                release.getRevokeReason(), files.stream().map(FileResponse::from).toList());
+                release.getRevokeReason(), files.stream().map(FileResponse::from).toList(),
+                rows.stream().map(row -> new ItemResponse(row.getId(), row.getRowOrder(), row.getParameterName(), row.getUnit(),
+                        row.getMethod(), row.getResultValue(), row.getNote())).toList(),
+                blank(release.getQualityHeadName()) ? defaultQualityHead : release.getQualityHeadName(),
+                blank(release.getDirectorName()) ? defaultDirector : release.getDirectorName(), reference, suggestedItems);
     }
 
+    private static boolean blank(String value) { return value == null || value.isBlank(); }
     private static String name(User user) { return user == null ? null : user.getDisplayName(); }
 }

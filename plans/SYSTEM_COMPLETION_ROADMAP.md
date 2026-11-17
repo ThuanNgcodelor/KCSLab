@@ -9,7 +9,7 @@
 | P0 | **Xong** (môi trường cô lập) | Baseline 38 test; Docker MySQL/Redis tạm; `scripts/run-be-tests-docker.sh`. Máy không có Java/Maven cài sẵn nên chạy qua Docker. |
 | P1 | **Xong phần tự động; chưa nghiệm thu thủ công** | E2E HTTP + Chrome 4 viewport; 401/403/409, KCS projection, đồng thời nhận/từ chối (test). **Chưa:** mở DOCX bằng Word thật, hai phiên WebSocket thật, Phiếu 5 nhiều file riêng. |
 | P2 | **Đã code + test; chờ LAB** | Sequence nguyên tử, xác minh hai người, lịch sử, gate (kể cả API cũ). **Chưa:** `-V/-R`, QC/mã mù (chờ LAB). Mẫu cũ = `VERIFIED/legacy` (giả định). |
-| P3 | **Đã code + test** | File an toàn, duyệt/phát hành/thu hồi/phiên bản, lịch sử, gate P2, một bản PUBLISHED do DB bảo đảm. **Chưa:** quét virus, backup/retention, số phiếu theo quy tắc LAB, UI click thật, test đồng thời phát hành. |
+| P3 | **Đã code + test** | Phiếu KQKN xuất PDF từ dữ liệu (theo file mẫu), duyệt/phát hành/thu hồi/phiên bản, file đính kèm an toàn, lịch sử, gate P2, một bản PUBLISHED do DB bảo đảm. **Chưa:** quét virus, backup/retention, số phiếu theo quy tắc LAB, UI click thật, test đồng thời phát hành. |
 | P4 | **Đã code + test; chưa deploy** | API public, 4 số cuối, rate limit, audit, no-store/noindex, UI tra cứu. **Chưa:** QR in, domain/TLS/SEO/headers hạ tầng, rate limit Redis khi scale. |
 | P5, P6 | **Chưa làm** | Ngoài phạm vi lượt này. |
 

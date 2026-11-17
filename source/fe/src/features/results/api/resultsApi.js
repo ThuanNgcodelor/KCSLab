@@ -1,10 +1,10 @@
 import { request } from '../../../shared/api/httpClient';
+import { cleanParams } from '../../../shared/hooks/useListState';
 
-export function listResultReleases({ page = 0, size = 20, status } = {}) {
-  const search = new URLSearchParams({ page: String(page), size: String(size) });
-  if (status) search.set('status', status);
-  return request(`/result-releases?${search}`);
+export function listResultReleases(params = {}) {
+  return request(`/result-releases?${new URLSearchParams(cleanParams({ size: 20, ...params }))}`);
 }
+export function listReadyRecords() { return request('/result-releases/ready'); }
 export function getResultRelease(id) { return request(`/result-releases/${id}`); }
 export function getResultReleaseEvents(id) { return request(`/result-releases/${id}/events`); }
 export function createResultRelease(testingRecordId) { return request('/result-releases', { method: 'POST', body: JSON.stringify({ testingRecordId }) }); }
@@ -28,4 +28,15 @@ export async function downloadResultFile(releaseId, file) {
   anchor.href = url; anchor.download = file.originalName;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+export function saveResultReport(id, data) { return request(`/result-releases/${id}/report`, { method: 'PUT', body: JSON.stringify(data) }); }
+export async function openReportPreview(id) {
+  const response = await fetch(`/api/v1/result-releases/${id}/report-preview`, { credentials: 'include' });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    throw new Error(detail.detail ?? 'Không thể tạo bản xem trước.');
+  }
+  const url = URL.createObjectURL(await response.blob());
+  window.open(url, '_blank', 'noopener');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }

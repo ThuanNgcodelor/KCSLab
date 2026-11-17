@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
+import { Icon } from './Icon';
 
 /** A shared, accessible confirmation dialog for actions across the application. */
 export function ConfirmDialog({ title, description, confirmLabel = 'Xác nhận', cancelLabel = 'Quay lại',
@@ -17,7 +18,7 @@ export function ConfirmDialog({ title, description, confirmLabel = 'Xác nhận'
     aria-labelledby={titleId} aria-describedby={descriptionId}
     onCancel={(event) => { event.preventDefault(); onCancel(); }}>
     <div className="cfc-confirm__mark" aria-hidden="true">
-      {tone === 'danger' ? '!' : '✓'}
+      <Icon name={tone === 'danger' ? 'alert' : 'check'} size={20} />
     </div>
     <div className="cfc-confirm__content">
       <p className="cfc-confirm__eyebrow">CFC LAB · XÁC NHẬN THAO TÁC</p>

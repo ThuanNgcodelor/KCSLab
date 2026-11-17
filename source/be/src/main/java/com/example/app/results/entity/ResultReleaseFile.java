@@ -21,6 +21,7 @@ public class ResultReleaseFile {
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "uploaded_by_user_id", updatable = false)
     private User uploadedBy;
     @Column(nullable = false, updatable = false) private Instant uploadedAt;
+    @Column(nullable = false, length = 20) private String kind = "UPLOAD";
     private Instant removedAt;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "removed_by_user_id") private User removedBy;
 
@@ -32,6 +33,8 @@ public class ResultReleaseFile {
         this.uploadedBy = uploadedBy; this.uploadedAt = Instant.now();
     }
 
+    public ResultReleaseFile asGeneratedReport() { this.kind = "GENERATED_REPORT"; this.publicDownload = true; return this; }
+    public String getKind() { return kind; }
     public void remove(User actor) { this.removedAt = Instant.now(); this.removedBy = actor; this.publicDownload = false; }
     public void setPublicDownload(boolean value) { this.publicDownload = value; }
     public boolean isRemoved() { return removedAt != null; }

@@ -6,13 +6,14 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Long> {
+public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Long>, JpaSpecificationExecutor<ResultRelease> {
     boolean existsByTestingRecord_IdAndVersion(Long testingRecordId, int version);
 
     boolean existsByTestingRecord_IdAndStatus(Long testingRecordId, ResultReleaseStatus status);
@@ -34,6 +35,11 @@ public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Lo
     @Query("select r from ResultRelease r where r.id = :id")
     Optional<ResultRelease> findByIdForUpdate(@Param("id") Long id);
 
-    @Query("select r from ResultRelease r where (:status is null or r.status = :status)")
-    Page<ResultRelease> search(@Param("status") ResultReleaseStatus status, Pageable pageable);
+    /** Reviewed testing records that have no result dossier yet (ready to start one). */
+    @Query("""
+            select t from TestingRecord t
+            where t.status = com.example.app.testing.entity.TestRecordStatus.REVIEWED
+              and not exists (select 1 from ResultRelease x where x.testingRecord = t)
+            """)
+    Page<com.example.app.testing.entity.TestingRecord> findReadyRecords(Pageable pageable);
 }

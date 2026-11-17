@@ -184,3 +184,12 @@
 - Kiểm thử (Docker cô lập, không đụng DB làm việc): BE 66 test pass (`scripts/run-be-tests-docker.sh`); E2E HTTP 52/52 (`scripts/e2e-results-flow.py`); Chrome headless 4 viewport 58/58; FE build pass; migration V7/V8 thử trên DB có dữ liệu cũ.
 - Chưa kiểm chứng: Word thật cho Phiếu 3, WebSocket hai phiên thật, QR in, hạ tầng/deploy, migration trên DB làm việc, click thật các thao tác mã hóa/phát hành trên UI. Chưa làm: `-V/-R`, QC/mã mù, ZBS/SMS (P6), dashboard Admin (P5), upload file cho Phiếu 5 (file nằm ở hồ sơ kết quả).
 - Tất cả thay đổi chưa commit.
+
+## Phiếu KQKN xuất PDF + danh sách backend — 17/11/2026
+
+- Theo file mẫu `KQKN-SR-CT001-092026.docx`: V9, `ReportPdfService` (OpenPDF + zxing, font Liberation nhúng), nhập bảng kết quả/người ký, xem trước, phát hành tự tạo PDF + số phiếu `SR092026-001` + mã tra cứu; tra cứu public trả bảng kết quả và cho tải PDF. Số phiếu, người ký mặc định cần LAB xác nhận.
+- Sort/tìm/lọc ngày/phân trang ở backend cho chuyển mẫu, biên bản, hồ sơ kết quả, thông báo, nhân viên; ô chụp ảnh + thumbnail; chuỗi bàn giao lớn hơn; Vite proxy hết EPIPE.
+- Kiểm thử: BE 74 pass; E2E HTTP 77/77; Chrome 4 viewport 101/101 + 38/38 + 58/58. Chưa kiểm chứng: Word thật, mở PDF trong Word/Zalo, QR in thực tế, deploy, migration V7–V9 trên DB làm việc. Chưa commit.
+
+## Đồng bộ badge + hồ sơ kết quả — 17/11/2026
+- `StatusBadge`/`shared/status.js` là nơi duy nhất định nghĩa nhãn và màu trạng thái; không thêm lớp pill riêng. Hồ sơ kết quả hiện số liệu Phiếu 5 và điền sẵn chỉ tiêu từ Phiếu 4; Admin được lập hồ sơ nhưng không tự duyệt. BE 76 test, E2E 77/77, Chrome 57/57. Chưa commit.

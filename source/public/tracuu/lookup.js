@@ -69,17 +69,35 @@
       var dd = document.createElement('dd'); dd.textContent = pair[1];
       dl.appendChild(dt); dl.appendChild(dd);
     });
+    if (result.sampleName) {
+      var sampleDt = document.createElement('dt'); sampleDt.textContent = 'Tên mẫu';
+      var sampleDd = document.createElement('dd'); sampleDd.textContent = result.sampleName;
+      dl.insertBefore(sampleDd, dl.children[2]); dl.insertBefore(sampleDt, sampleDd);
+    }
+    var table = null;
+    if (result.items && result.items.length) {
+      table = document.createElement('table'); table.className = 'result-table';
+      var caption = document.createElement('caption'); caption.textContent = 'Kết quả thử nghiệm'; table.appendChild(caption);
+      var thead = table.createTHead().insertRow();
+      ['Chỉ tiêu', 'Đơn vị', 'Kết quả', 'Ghi chú'].forEach(function (name) { var th = document.createElement('th'); th.scope = 'col'; th.textContent = name; thead.appendChild(th); });
+      var tbody = table.createTBody();
+      result.items.forEach(function (item) {
+        var tr = tbody.insertRow();
+        [item.parameter, item.unit || '', item.result, item.note || ''].forEach(function (text) { tr.insertCell().textContent = text; });
+      });
+    }
     var list = document.createElement('ul');
     result.files.forEach(function (file) {
       var li = document.createElement('li');
       var name = document.createElement('span');
       name.textContent = file.name + ' (' + formatSize(file.size) + ')';
       var button = document.createElement('button');
-      button.type = 'button'; button.textContent = 'Tải xuống';
+      button.type = 'button'; button.textContent = 'Tải PDF';
       button.addEventListener('click', function () { download(file, button); });
       li.appendChild(name); li.appendChild(button); list.appendChild(li);
     });
     panel.appendChild(title); panel.appendChild(dl);
+    if (table) panel.appendChild(table);
     if (result.files.length) panel.appendChild(list);
     else { var none = document.createElement('p'); none.textContent = 'Hồ sơ chưa có tệp công khai. Vui lòng liên hệ CFC.'; panel.appendChild(none); }
     panel.hidden = false;

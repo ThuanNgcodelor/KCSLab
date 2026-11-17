@@ -78,7 +78,8 @@ class PublicResultFlowTest {
     private User admin;
     private Long releaseId;
     private String code;
-    private Long pdfId;
+    private Long pdfId;        // the generated KQKN report (set when published)
+    private Long uploadedPdfId; // a technician attachment, internal by default
     private Long docxId;
 
     @BeforeEach
@@ -115,14 +116,18 @@ class PublicResultFlowTest {
                 new MockMultipartFile("files", "du-lieu.docx",
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         com.example.app.results.service.ResultFilePolicyTestSupport.docx())), technician);
-        pdfId = withFiles.files().get(0).id();
+        uploadedPdfId = withFiles.files().get(0).id();
         docxId = withFiles.files().get(1).id();
+        workflow.updateReport(releaseId, List.of(
+                new com.example.app.results.service.ResultReleaseService.ReportRowInput("Cadimium (Cd)", "µg/kg", "CFC-02:2026", "< LOQ", "LOQ = 30 µg/kg")),
+                "Phan Trường Tiền", "Nguyễn Công Huân", technician);
         workflow.submit(releaseId, technician);
     }
 
     private ResultReleaseDetailResponse publish() {
         var published = workflow.publish(releaseId, null, admin);
         code = published.lookupCode();
+        pdfId = published.files().stream().filter(f -> f.kind().equals("GENERATED_REPORT")).findFirst().orElseThrow().id();
         return published;
     }
 
@@ -147,7 +152,10 @@ class PublicResultFlowTest {
         lookup(pretty, "5678").andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultNumber").exists())
                 .andExpect(jsonPath("$.files.length()").value(1))
-                .andExpect(jsonPath("$.files[0].name").value("ket-qua.pdf"))
+                .andExpect(jsonPath("$.files[0].name").value(org.hamcrest.Matchers.startsWith("KQKN-")))
+                .andExpect(jsonPath("$.items[0].parameter").value("Cadimium (Cd)"))
+                .andExpect(jsonPath("$.items[0].result").value("< LOQ"))
+                .andExpect(jsonPath("$.sampleName").value("Sầu riêng"))
                 .andExpect(header().string("Cache-Control", containsString("no-store")))
                 .andExpect(header().string("X-Robots-Tag", containsString("noindex")))
                 .andExpect(content().string(not(containsString("Bí Mật"))))
@@ -177,7 +185,12 @@ class PublicResultFlowTest {
                 .andExpect(header().string("Content-Type", "application/pdf"))
                 .andExpect(header().string("X-Content-Type-Options", "nosniff"))
                 .andExpect(header().string("Cache-Control", containsString("no-store")))
-                .andExpect(header().string("Content-Disposition", containsString("attachment")));
+                .andExpect(header().string("Content-Disposition", containsString("attachment")))
+                .andExpect(result -> assertThat(new String(result.getResponse().getContentAsByteArray(), 0, 5)).isEqualTo("%PDF-"));
+        // A technician's uploaded PDF is internal unless the Admin lists it at publication.
+        mvc.perform(post("/api/v1/public/results/download").contentType("application/json").with(from())
+                        .content("{\"code\":\"" + code + "\",\"phoneLast4\":\"5678\",\"fileId\":" + uploadedPdfId + "}"))
+                .andExpect(status().isNotFound());
         // Word is not public unless the Admin enabled it at publication.
         mvc.perform(post("/api/v1/public/results/download").contentType("application/json").with(from())
                         .content("{\"code\":\"" + code + "\",\"phoneLast4\":\"5678\",\"fileId\":" + docxId + "}"))

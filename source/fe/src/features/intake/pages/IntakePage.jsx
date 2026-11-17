@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { getAdminDashboard, getReceptionistDashboard, listReceipts } from '../api/intakeApi';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { labelsOf } from '../../../shared/status';
 import { PageLoader } from '../../../shared/components/Loading';
+import { Icon } from '../../../shared/components/Icon';
+import { DateInput } from '../../../shared/components/DateInput';
 
-const statusLabels = {
-  RECEIVED: 'Đã tiếp nhận', ACCEPTED_WITH_CONDITION: 'Có điều kiện', REJECTED: 'Từ chối',
-  TRANSFER_PENDING: 'Chờ KCS nhận', TRANSFERRED: 'Đã chuyển KCS', IN_TESTING: 'Đang thử nghiệm',
-  AWAITING_REVIEW: 'Chờ kiểm tra', TEST_REVIEWED: 'Đã kiểm tra', DRAFT: 'Bản nháp',
-};
+const statusLabels = labelsOf('receipt');
 
 const sortOptions = [
   ['receivedAt,desc', 'Ngày nhận: mới nhất'], ['receivedAt,asc', 'Ngày nhận: cũ nhất'],
@@ -86,8 +86,8 @@ export function IntakePage() {
 
     <section className="panel-card intake-filter-card">
       <div className="intake-search-field"><span aria-hidden="true">⌕</span><label><small>Tìm nhanh</small><input value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder="Mã phiếu, mã mẫu, khách hàng, số điện thoại…" /></label></div>
-      <label><small>Từ ngày</small><input type="date" max={filters.to || undefined} value={filters.from} onChange={updateFilter('from')} /></label>
-      <label><small>Đến ngày</small><input type="date" min={filters.from || undefined} value={filters.to} onChange={updateFilter('to')} /></label>
+      <label><small>Từ ngày</small><DateInput max={filters.to || undefined} value={filters.from} onChange={updateFilter('from')} /></label>
+      <label><small>Đến ngày</small><DateInput min={filters.from || undefined} value={filters.to} onChange={updateFilter('to')} /></label>
       <label><small>Trạng thái</small><select value={filters.status} onChange={updateFilter('status')}><option value="">Tất cả trạng thái</option>{Object.entries(statusLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
       <label><small>Loại sản phẩm</small><input value={filters.productType} onChange={updateFilter('productType')} placeholder="Ví dụ: Sầu riêng" /></label>
       <button className="filter-reset" type="button" onClick={resetFilters}>Xóa bộ lọc</button>
@@ -95,8 +95,8 @@ export function IntakePage() {
 
     <section className="panel-card intake-list-card"><div className="panel-heading intake-list-heading"><div><p className="section-kicker">Phân trang từ máy chủ · 20 phiếu/trang</p><h2>Danh sách phiếu tiếp nhận</h2></div><div className="intake-list-tools"><label>Sắp xếp<select value={sort} onChange={(event) => { setSort(event.target.value); setPage(0); }}>{sortOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><button className="outline-button small-button" onClick={() => setRefreshKey((value) => value + 1)}>↻ Làm mới</button></div></div>
       {loading ? <PageLoader label="Đang tải phiếu từ hệ thống…" rows={4} /> : receipts.length === 0
-        ? <div className="empty-intake"><span>⌕</span><h3>Không tìm thấy phiếu phù hợp</h3><p>Thử xóa bộ lọc hoặc tạo phiếu tiếp nhận mới.</p><button className="outline-button" onClick={resetFilters}>Xóa bộ lọc</button></div>
-        : <><div className="table-wrap"><table className="staff-table intake-table"><thead><tr><th>Mã phiếu / khách hàng</th><th>Mẫu</th><th>Người tiếp nhận</th><th>Trạng thái</th><th>Ngày nhận</th><th /></tr></thead><tbody>{receipts.map((receipt) => <tr key={receipt.id}><td data-label="Phiếu"><span className="intake-cell-content"><strong className="receipt-code">{receipt.receiptCode}</strong><small>{receipt.customerName} · {receipt.customerPhone}</small></span></td><td data-label="Mẫu"><span className="intake-cell-content"><strong>{receipt.samples?.length ?? 0} mẫu · {receipt.sampleName}</strong><small>{receipt.samples?.map((sample) => sample.sampleCode).join(', ')}</small></span></td><td data-label="Tiếp nhận"><span className="intake-cell-content"><strong>{receipt.receivedByName}</strong><small>Nhận từ {receipt.deliveredBy}</small></span></td><td data-label="Trạng thái"><span className={`status-pill ${receipt.status === 'REJECTED' ? 'disabled' : 'active'}`}><i />{statusLabels[receipt.status] ?? receipt.status}</span></td><td data-label="Ngày nhận" className="muted-cell">{new Date(receipt.receivedAt).toLocaleDateString('vi-VN')}</td><td data-label="Hồ sơ"><button className="table-action" onClick={() => navigate(`/admin/intake/${receipt.id}`)}>Xem hồ sơ</button></td></tr>)}</tbody></table></div><div className="list-pagination"><p>Hiển thị <strong>{firstItem}–{lastItem}</strong> trong <strong>{receiptPage.totalElements}</strong> phiếu · 20 phiếu/trang</p><nav aria-label="Phân trang phiếu tiếp nhận"><button type="button" className="pagination-button" disabled={receiptPage.first || loading} onClick={() => setPage((value) => Math.max(0, value - 1))}>← Trước</button>{pageWindow(receiptPage.page, receiptPage.totalPages).map((pageNumber) => <button type="button" className={`pagination-button page-number ${pageNumber === receiptPage.page ? 'current' : ''}`} aria-current={pageNumber === receiptPage.page ? 'page' : undefined} key={pageNumber} onClick={() => setPage(pageNumber)}>{pageNumber + 1}</button>)}<button type="button" className="pagination-button" disabled={receiptPage.last || loading} onClick={() => setPage((value) => value + 1)}>Sau →</button></nav></div></>}
+        ? <div className="empty-intake"><span><Icon name="search" size={22} /></span><h3>Không tìm thấy phiếu phù hợp</h3><p>Thử xóa bộ lọc hoặc tạo phiếu tiếp nhận mới.</p><button className="outline-button" onClick={resetFilters}>Xóa bộ lọc</button></div>
+        : <><div className="table-wrap"><table className="staff-table intake-table"><thead><tr><th>Mã phiếu / khách hàng</th><th>Mẫu</th><th>Người tiếp nhận</th><th>Trạng thái</th><th>Ngày nhận</th><th /></tr></thead><tbody>{receipts.map((receipt) => <tr key={receipt.id}><td data-label="Phiếu"><span className="intake-cell-content"><strong className="receipt-code">{receipt.receiptCode}</strong><small>{receipt.customerName} · {receipt.customerPhone}</small></span></td><td data-label="Mẫu"><span className="intake-cell-content"><strong>{receipt.samples?.length ?? 0} mẫu · {receipt.sampleName}</strong><small>{receipt.samples?.map((sample) => sample.sampleCode).join(', ')}</small></span></td><td data-label="Tiếp nhận"><span className="intake-cell-content"><strong>{receipt.receivedByName}</strong><small>Nhận từ {receipt.deliveredBy}</small></span></td><td data-label="Trạng thái"><StatusBadge domain="receipt" value={receipt.status} /></td><td data-label="Ngày nhận" className="muted-cell">{new Date(receipt.receivedAt).toLocaleDateString('vi-VN')}</td><td data-label="Hồ sơ"><button className="table-action" onClick={() => navigate(`/admin/intake/${receipt.id}`)}>Xem hồ sơ</button></td></tr>)}</tbody></table></div><div className="list-pagination"><p>Hiển thị <strong>{firstItem}–{lastItem}</strong> trong <strong>{receiptPage.totalElements}</strong> phiếu · 20 phiếu/trang</p><nav aria-label="Phân trang phiếu tiếp nhận"><button type="button" className="pagination-button" disabled={receiptPage.first || loading} onClick={() => setPage((value) => Math.max(0, value - 1))}>← Trước</button>{pageWindow(receiptPage.page, receiptPage.totalPages).map((pageNumber) => <button type="button" className={`pagination-button page-number ${pageNumber === receiptPage.page ? 'current' : ''}`} aria-current={pageNumber === receiptPage.page ? 'page' : undefined} key={pageNumber} onClick={() => setPage(pageNumber)}>{pageNumber + 1}</button>)}<button type="button" className="pagination-button" disabled={receiptPage.last || loading} onClick={() => setPage((value) => value + 1)}>Sau →</button></nav></div></>}
     </section>
   </section>;
 }

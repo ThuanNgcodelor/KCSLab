@@ -1,6 +1,10 @@
 package com.example.app.testing.service;
 
+import com.example.app.common.dto.PagedResponse;
+import com.example.app.common.query.ListQuery;
 import com.example.app.intake.entity.ReceiptStatus;
+import jakarta.persistence.criteria.JoinType;
+import org.springframework.data.jpa.domain.Specification;
 import com.example.app.testing.dto.EquipmentRequest;
 import com.example.app.testing.dto.EquipmentResponse;
 import com.example.app.testing.dto.MeasurementRequest;
@@ -31,6 +35,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -42,6 +47,58 @@ public class TestingRecordService {
                                 SampleTransferItemRepository transferItemRepository) {
         this.recordRepository = recordRepository;
         this.transferItemRepository = transferItemRepository;
+    }
+
+    private static final Map<String, String> SORT_FIELDS = Map.of(
+            "createdAt", "createdAt", "recordCode", "recordCode", "status", "status",
+            "analysisStart", "analysisStart", "sampleCode", "transferItem.sampleCode",
+            "resultsDueDate", "transferItem.transfer.resultsDueDate");
+
+    public record Candidate(Long transferItemId, Long sampleId, String sampleCode, String sampleName, String quantity,
+                            String requestedParameters, String testMethod, String transferCode, String receiptCode,
+                            java.time.LocalDate transferDate, java.time.LocalDate resultsDueDate) {}
+
+    /** Paged, sorted, filtered list; everything is executed by the database. */
+    @Transactional(readOnly = true)
+    public PagedResponse<TestingRecordResponse> search(String q, TestRecordStatus status, LocalDate from, LocalDate to,
+                                                       int page, int size, String sort) {
+        ListQuery.requireOrderedRange(from, to);
+        var parsed = ListQuery.parseSort(sort, SORT_FIELDS, "createdAt,desc");
+        Specification<TestingRecord> spec = (root, query, builder) -> builder.conjunction();
+        if (status != null) spec = spec.and((root, query, builder) -> builder.equal(root.get("status"), status));
+        if (from != null) {
+            var start = ListQuery.startOfDay(from);
+            spec = spec.and((root, query, builder) -> builder.greaterThanOrEqualTo(root.get("createdAt"), start));
+        }
+        if (to != null) {
+            var end = ListQuery.endExclusive(to);
+            spec = spec.and((root, query, builder) -> builder.lessThan(root.get("createdAt"), end));
+        }
+        if (ListQuery.hasText(q)) {
+            String pattern = ListQuery.contains(q);
+            spec = spec.and((root, query, builder) -> {
+                var item = root.join("transferItem", JoinType.INNER);
+                var transfer = item.join("transfer", JoinType.INNER);
+                return builder.or(
+                        builder.like(builder.lower(root.get("recordCode")), pattern, '\\'),
+                        builder.like(builder.lower(item.get("sampleCode")), pattern, '\\'),
+                        builder.like(builder.lower(item.get("sampleName")), pattern, '\\'),
+                        builder.like(builder.lower(item.get("testMethod")), pattern, '\\'),
+                        builder.like(builder.lower(transfer.get("transferCode")), pattern, '\\'));
+            });
+        }
+        return PagedResponse.from(recordRepository.findAll(spec, ListQuery.page(page, size, parsed))
+                .map(this::toResponse), parsed.canonical());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Candidate> candidates() {
+        return recordRepository.findCandidates(org.springframework.data.domain.PageRequest.of(0, 200,
+                        org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")))
+                .stream().map(item -> new Candidate(item.getId(), item.getSample().getId(), item.getSampleCode(),
+                        item.getSampleName(), item.getQuantity(), item.getRequestedParameters(), item.getTestMethod(),
+                        item.getTransfer().getTransferCode(), item.getTransfer().getReceipt().getReceiptCode(),
+                        item.getTransfer().getTransferDate(), item.getTransfer().getResultsDueDate())).toList();
     }
 
     @Transactional(readOnly = true)

@@ -1,5 +1,7 @@
 package com.example.app.transfer.service;
 
+import com.example.app.common.dto.PagedResponse;
+import com.example.app.common.query.ListQuery;
 import com.example.app.intake.entity.Receipt;
 import com.example.app.intake.entity.ReceiptStatus;
 import com.example.app.intake.entity.Sample;
@@ -23,6 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.persistence.criteria.JoinType;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -58,6 +63,56 @@ public class TransferService {
         this.receiptRepository = receiptRepository;
         this.sampleRepository = sampleRepository;
         this.notificationService = notificationService;
+    }
+
+    private static final Map<String, String> SORT_FIELDS = Map.of(
+            "createdAt", "createdAt", "transferDate", "transferDate", "resultsDueDate", "resultsDueDate",
+            "transferCode", "transferCode", "status", "status", "receiptCode", "receipt.receiptCode",
+            "customerName", "receipt.customer.name");
+
+    /**
+     * Paged, sorted and filtered list. Sorting and filtering happen in the database. Technicians never see drafts,
+     * cannot search or sort by customer data and keep the projection that hides the customer name.
+     */
+    @Transactional(readOnly = true)
+    public PagedResponse<TransferResponse> search(User viewer, String q, TransferStatus status,
+                                                  LocalDate from, LocalDate to, int page, int size, String sort) {
+        boolean technician = viewer.getRole() == Role.TECHNICIAN;
+        ListQuery.requireOrderedRange(from, to);
+        var fields = new java.util.HashMap<>(SORT_FIELDS);
+        if (technician) fields.remove("customerName");
+        var parsed = ListQuery.parseSort(sort, fields, "createdAt,desc");
+
+        Specification<SampleTransfer> spec = (root, query, builder) -> builder.conjunction();
+        if (technician) {
+            spec = spec.and((root, query, builder) -> builder.notEqual(root.get("status"), TransferStatus.DRAFT));
+        }
+        if (status != null) {
+            if (technician && status == TransferStatus.DRAFT) {
+                return PagedResponse.from(new org.springframework.data.domain.PageImpl<>(List.of(),
+                        ListQuery.page(page, size, parsed), 0), parsed.canonical());
+            }
+            spec = spec.and((root, query, builder) -> builder.equal(root.get("status"), status));
+        }
+        if (from != null) spec = spec.and((root, query, builder) -> builder.greaterThanOrEqualTo(root.get("transferDate"), from));
+        if (to != null) spec = spec.and((root, query, builder) -> builder.lessThanOrEqualTo(root.get("transferDate"), to));
+        if (ListQuery.hasText(q)) {
+            String pattern = ListQuery.contains(q);
+            spec = spec.and((root, query, builder) -> {
+                var receipt = root.join("receipt", JoinType.INNER);
+                var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+                predicates.add(builder.like(builder.lower(root.get("transferCode")), pattern, '\\'));
+                predicates.add(builder.like(builder.lower(receipt.get("receiptCode")), pattern, '\\'));
+                predicates.add(builder.like(builder.lower(root.get("receivingDepartment")), pattern, '\\'));
+                if (!technician) {
+                    predicates.add(builder.like(builder.lower(receipt.join("customer", JoinType.INNER).get("name")), pattern, '\\'));
+                }
+                return builder.or(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+            });
+        }
+        var result = transferRepository.findAll(spec, ListQuery.page(page, size, parsed))
+                .map(transfer -> toResponse(transfer, viewer));
+        return PagedResponse.from(result, parsed.canonical());
     }
 
     @Transactional(readOnly = true)

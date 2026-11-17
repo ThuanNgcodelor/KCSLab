@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { labelsOf } from '../../../shared/status';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import {
   correctSampleCoding, getSampleCoding, getSampleCodingEvents, rejectSampleCoding,
   submitSampleCoding, verifySampleCoding,
 } from '../api/intakeApi';
 
-export const codingLabels = {
-  PENDING_CODING: 'Chờ mã hóa', PENDING_VERIFICATION: 'Chờ đối chiếu',
-  VERIFIED: 'Đã xác minh', CORRECTION_REQUIRED: 'Cần hiệu chỉnh',
-};
+export const codingLabels = labelsOf('coding');
 const eventLabels = { SUBMITTED: 'Gửi đối chiếu', VERIFIED: 'Xác minh', REJECTED: 'Đối chiếu không đạt', CORRECTED: 'Hiệu chỉnh mã' };
 
 /** CFC-TN-14 coding verification for one sample: the verifier must be a different person than the coder. */
@@ -46,7 +45,7 @@ export function SampleCodingPanel({ sample, onChanged }) {
   const status = coding.codingStatus;
   return <div className="coding-panel">
     <div className="coding-line">
-      <span className={`coding-badge coding-${status.toLowerCase()}`}>{codingLabels[status]}</span>
+      <StatusBadge domain="coding" value={status} />
       {coding.legacy && <small className="muted">Mã cũ trước khi có bước xác minh (cần LAB xác nhận)</small>}
       {coding.codedBy && <small>Mã hóa: {coding.codedBy}</small>}
       {coding.verifiedBy && <small>Xác minh: {coding.verifiedBy}</small>}

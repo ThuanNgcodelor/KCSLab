@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../hooks/useNotifications';
+import { Icon } from '../../../shared/components/Icon';
 
 export function NotificationCenter() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export function NotificationCenter() {
       <header><div><strong>Thông báo</strong><small><i className={`realtime-dot ${connectionState}`} />{connectionState === 'connected' ? 'Đang cập nhật trực tiếp' : 'Đang kết nối lại'}</small></div>{unreadCount > 0 && <button type="button" onClick={() => markAllRead().catch(() => undefined)}>Đọc tất cả</button>}</header>
       <div className="notification-preview-list">
         {notifications.length === 0
-          ? <div className="notification-empty"><span>✓</span><p>Chưa có thông báo mới.</p></div>
+          ? <div className="notification-empty"><span><Icon name="checkCircle" size={22} /></span><p>Chưa có thông báo mới.</p></div>
           : notifications.map((notification) => <button className={`notification-preview ${notification.readAt ? '' : 'unread'}`} type="button" key={notification.id} onClick={() => openNotification(notification)}>
             <span className="notification-type-icon">{typeIcon(notification.type)}</span>
             <span><strong>{notification.title}</strong><small>{notification.message}</small><time>{formatTime(notification.createdAt)}</time></span>
@@ -43,10 +44,10 @@ export function NotificationCenter() {
 }
 
 export function typeIcon(type) {
-  if (type === 'INTAKE_RECORDED') return 'TN';
-  if (type === 'TRANSFER_SUBMITTED') return 'KCS';
-  if (type === 'TRANSFER_ACCEPTED') return '✓';
-  return '!';
+  if (type === 'INTAKE_RECORDED') return <Icon name="inbox" size={16} />;
+  if (type === 'TRANSFER_SUBMITTED') return <Icon name="send" size={16} />;
+  if (type === 'TRANSFER_ACCEPTED') return <Icon name="checkCircle" size={16} />;
+  return <Icon name="alert" size={16} />;
 }
 
 export function formatTime(value) {

@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import { createReceipt, downloadReceiptForm3, uploadReceiptFile } from '../api/intakeApi';
+import { Icon } from '../../../shared/components/Icon';
+import { DateInput } from '../../../shared/components/DateInput';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -44,10 +47,7 @@ export function ReceiptCreatePage() {
   const updateSample = (index, field) => (event) => setSamples((current) => current.map((sample, itemIndex) => (
     itemIndex === index ? { ...sample, [field]: event.target.value } : sample
   )));
-  const updateFiles = (group) => (event) => setFiles((current) => ({
-    ...current,
-    [group]: Array.from(event.target.files ?? []),
-  }));
+  const updateFiles = (group) => (next) => setFiles((current) => ({ ...current, [group]: next }));
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -97,7 +97,7 @@ export function ReceiptCreatePage() {
 
   if (created) return <section className="staff-page receipt-success-page">
     <div className="receipt-success">
-      <span className="success-check">✓</span><p className="section-kicker">Đã lưu hồ sơ tiếp nhận</p>
+      <span className="success-check"><Icon name="check" size={26} /></span><p className="section-kicker">Đã lưu hồ sơ tiếp nhận</p>
       <h1>Phiếu đã được tạo</h1>
       <p>Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.</p>
       {uploadWarning && <div className="toast toast-warning" role="alert">{uploadWarning}</div>}
@@ -105,7 +105,7 @@ export function ReceiptCreatePage() {
         <small>MÃ MẪU HIỆN TẠI</small>
         {created.samples?.map((sample) => <strong key={sample.id}>{sample.sampleCode}</strong>)}
       </div>
-      <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mã mẫu hiện tại chưa mang ý nghĩa “đã xác minh hai người”; Phase 2 sẽ bổ sung cổng xác minh này.</p>
+      <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mã mẫu cần được người thứ hai xác minh (mở chi tiết phiếu → Mã hóa) trước khi chuyển mẫu sang KCS.</p>
       <div className="receipt-success-actions">
         <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất Phiếu 3</button>
         <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Về danh sách</button>
@@ -174,7 +174,7 @@ export function ReceiptCreatePage() {
           <div className="form-two-columns">
             <label>Nhiệt độ khi nhận (°C)<input type="number" step="0.1" value={form.receivedTemperature} onChange={update('receivedTemperature')} /></label>
             <label>Điều kiện bảo quản<input value={form.storageCondition} onChange={update('storageCondition')} /></label>
-            <label>Thời hạn dự kiến<input type="date" value={form.expectedDate} onChange={update('expectedDate')} /></label>
+            <label>Thời hạn dự kiến<DateInput value={form.expectedDate} onChange={update('expectedDate')} /></label>
             <label className="full-span">Mô tả tình trạng<textarea value={form.conditionDetail} onChange={update('conditionDetail')} rows="3" /></label>
             <label className="full-span">Yêu cầu đặc biệt<textarea value={form.specialRequest} onChange={update('specialRequest')} rows="3" /></label>
           </div>
@@ -185,12 +185,12 @@ export function ReceiptCreatePage() {
 
       <aside className="receipt-form-aside">
         <section className="panel-card upload-card"><FormHeading number="05" title="Ảnh và hồ sơ" copy="Ảnh được phân loại và ghi nhận người tải lên." />
-          <FilePicker label="Phiếu số 3" copy="PDF, DOCX hoặc ảnh" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
-          <FilePicker label="Ảnh mẫu" copy="Có thể chụp trực tiếp bằng điện thoại" accept="image/*" capture="environment" multiple files={files.samples} onChange={updateFiles('samples')} />
-          <FilePicker label="Ảnh lô hàng" copy="Toàn cảnh lô/xe/container khi nhận" accept="image/*" capture="environment" multiple files={files.lot} onChange={updateFiles('lot')} />
-          <small className="field-help">Tối đa 5 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
+          <PhotoPicker label="Phiếu số 3" hint="PDF, DOCX hoặc ảnh chụp phiếu" camera accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
+          <PhotoPicker label="Ảnh mẫu" hint="Chụp trực tiếp hoặc chọn nhiều ảnh" files={files.samples} onChange={updateFiles('samples')} />
+          <PhotoPicker label="Ảnh lô hàng" hint="Toàn cảnh lô/xe/container khi nhận" files={files.lot} onChange={updateFiles('lot')} />
+          <small className="field-help">Tối đa 10 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
         </section>
-        <div className="form-submit-panel"><p><strong>Kiểm tra trước khi lưu</strong><span>Mã hiện được sinh theo CFC-TN-14; xác minh độc lập sẽ được bổ sung ở Phase 2.</span></p><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Đang lưu hồ sơ…' : 'Lưu phiếu tiếp nhận'}</button></div>
+        <div className="form-submit-panel"><p><strong>Kiểm tra trước khi lưu</strong><span>Mã sinh theo CFC-TN-14; sau khi lưu cần người thứ hai xác minh mã trước khi chuyển mẫu.</span></p><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Đang lưu hồ sơ…' : 'Lưu phiếu tiếp nhận'}</button></div>
       </aside>
     </form>
   </section>;
@@ -216,8 +216,4 @@ function validateForm(form, samples) {
 
 function FormHeading({ number, title, copy }) {
   return <div className="form-card-heading"><span className="form-number">{number}</span><div><h2>{title}</h2><p>{copy}</p></div></div>;
-}
-
-function FilePicker({ label, copy, files, multiple = false, ...inputProps }) {
-  return <label className="file-drop compact-file-drop"><input type="file" multiple={multiple} {...inputProps} /><span className="upload-symbol">↑</span><strong>{label}</strong><small>{files.length ? `${files.length} file đã chọn` : copy}</small></label>;
 }

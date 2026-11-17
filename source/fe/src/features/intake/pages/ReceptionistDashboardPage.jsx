@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { getReceptionistDashboard } from '../api/intakeApi';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { labelsOf } from '../../../shared/status';
 import { PageLoader } from '../../../shared/components/Loading';
+import { DateInput } from '../../../shared/components/DateInput';
 
 const TIME_ZONE = 'Asia/Ho_Chi_Minh';
-const statusLabels = {
-  DRAFT: 'Bản nháp', RECEIVED: 'Đã tiếp nhận', ACCEPTED_WITH_CONDITION: 'Có điều kiện', REJECTED: 'Từ chối',
-  TRANSFER_PENDING: 'Chờ KCS nhận', TRANSFERRED: 'Đã chuyển KCS', IN_TESTING: 'Đang thử nghiệm',
-  AWAITING_REVIEW: 'Chờ kiểm tra', TEST_REVIEWED: 'Đã kiểm tra',
-};
+const statusLabels = labelsOf('receipt');
 const presets = [['today', 'Hôm nay'], ['week', 'Tuần này'], ['month', 'Tháng này'], ['custom', 'Tùy chọn']];
 
 export function ReceptionistDashboardPage() {
@@ -57,8 +56,8 @@ export function ReceptionistDashboardPage() {
         {presets.map(([value, label]) => <button type="button" key={value} className={preset === value ? 'primary-button small-button' : 'outline-button small-button'} aria-pressed={preset === value} onClick={() => setPreset(value)}>{label}</button>)}
       </div>
       {preset === 'custom' && <>
-        <label><small>Từ ngày</small><input type="date" max={custom.to || undefined} value={custom.from} onChange={(event) => setCustom((c) => ({ ...c, from: event.target.value }))} /></label>
-        <label><small>Đến ngày</small><input type="date" min={custom.from || undefined} value={custom.to} onChange={(event) => setCustom((c) => ({ ...c, to: event.target.value }))} /></label>
+        <label><small>Từ ngày</small><DateInput max={custom.to || undefined} value={custom.from} onChange={(event) => setCustom((c) => ({ ...c, from: event.target.value }))} /></label>
+        <label><small>Đến ngày</small><DateInput min={custom.from || undefined} value={custom.to} onChange={(event) => setCustom((c) => ({ ...c, to: event.target.value }))} /></label>
       </>}
       <button type="button" className="outline-button small-button" onClick={() => setRefreshKey((v) => v + 1)}>↻ Làm mới</button>
     </section>
@@ -72,7 +71,7 @@ export function ReceptionistDashboardPage() {
       <article className="panel-card activity-panel">
         <div className="panel-heading"><div><p className="section-kicker">Hoạt động của bạn</p><h2>Phiếu tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách phiếu <span>→</span></button></div>
         {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : recent.length
-          ? <div className="activity-list">{recent.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · {statusLabels[receipt.status] ?? receipt.status}{receipt.expectedDate ? ` · Hạn ${formatShortDate(receipt.expectedDate)}` : ''}</small></div></button>)}</div>
+          ? <div className="activity-list">{recent.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · <StatusBadge domain="receipt" value={receipt.status} />{receipt.expectedDate ? ` · Hạn ${formatShortDate(receipt.expectedDate)}` : ''}</small></div></button>)}</div>
           : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu trong khoảng này</h3><p>Tạo phiếu tiếp nhận mới hoặc chọn khoảng thời gian khác.</p></div>}
       </article>
       <article className="panel-card intake-health-panel">

@@ -24,5 +24,14 @@ app:
   storage:
     avatar-root: ${AVATAR_STORAGE_ROOT:storage/avatars}
 
+  # KQKN-DV report. Signatory names are defaults taken from the LAB's sample template and can be edited per dossier;
+  # LAB must confirm who signs. lookup-url is the public page printed in the QR code (empty = no QR, code text only).
+  report:
+    quality-head-name: ${REPORT_QUALITY_HEAD_NAME:Phan Trường Tiền}
+    director-name: ${REPORT_DIRECTOR_NAME:Nguyễn Công Huân}
+  public:
+    lookup-url: ${PUBLIC_LOOKUP_URL:}
+    client-ip-header: ${PUBLIC_CLIENT_IP_HEADER:}
+
 server:
   port: ${PORT:8080}

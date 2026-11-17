@@ -29,6 +29,8 @@ public class ResultRelease {
     private Instant revokedAt;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "revoked_by_user_id") private User revokedBy;
     @Column(length = 500) private String revokeReason;
+    @Column(length = 120) private String qualityHeadName;
+    @Column(length = 120) private String directorName;
 
     protected ResultRelease() {}
     public ResultRelease(TestingRecord testingRecord, User createdBy) { this(testingRecord, createdBy, 1); }
@@ -60,6 +62,9 @@ public class ResultRelease {
         this.status = ResultReleaseStatus.REVOKED; this.revokedBy = actor; this.revokedAt = Instant.now();
         this.revokeReason = reason; touch();
     }
+    public void setSignatories(String qualityHeadName, String directorName) {
+        this.qualityHeadName = qualityHeadName; this.directorName = directorName; touch();
+    }
     public void touch() { this.updatedAt = Instant.now(); }
 
     private static void require(boolean condition, String message) {
@@ -84,4 +89,6 @@ public class ResultRelease {
     public Instant getRevokedAt() { return revokedAt; }
     public User getRevokedBy() { return revokedBy; }
     public String getRevokeReason() { return revokeReason; }
+    public String getQualityHeadName() { return qualityHeadName; }
+    public String getDirectorName() { return directorName; }
 }

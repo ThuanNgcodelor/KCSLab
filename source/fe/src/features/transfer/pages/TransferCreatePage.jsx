@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, listReceipts } from '../../intake/api/intakeApi';
 import { createTransfer, getTransfer, updateTransfer } from '../api/transferApi';
 import { PageLoader } from '../../../shared/components/Loading';
+import { DateInput } from '../../../shared/components/DateInput';
 
 const today = businessDate();
 const dueDefault = businessDate(7);
@@ -132,7 +133,7 @@ export function TransferCreatePage() {
         </section>
       </div>
       <aside className="receipt-form-aside transfer-form-aside">
-        <section className="panel-card intake-form-card"><FormHeading number="03" title="Nơi nhận, thời hạn và lưu mẫu" copy="Theo mục III của Phiếu chuyển mẫu số 4." /><label>Phòng / bộ phận nhận<input value="KCS" readOnly aria-readonly="true" /><small className="field-help">Hiện hệ thống chỉ vận hành một phòng KCS.</small></label><label>Ngày chuyển mẫu<input type="date" value={form.transferDate} onChange={updateForm('transferDate')} required /></label><label>Hạn trả kết quả<input type="date" min={form.transferDate} value={form.resultsDueDate} onChange={updateForm('resultsDueDate')} required /></label><label className="switch-label"><input type="checkbox" checked={form.returnToCustomer} onChange={updateForm('returnToCustomer')} /><span className="fake-switch" />Lưu và trả mẫu cho khách</label>{form.returnToCustomer && <label>Ngày trả/lưu đến<input type="date" min={form.transferDate} value={form.customerReturnDate} onChange={updateForm('customerReturnDate')} required /></label>}<label>Thay đổi / ghi chú<textarea value={form.changesNote} onChange={updateForm('changesNote')} rows="4" /></label></section>
+        <section className="panel-card intake-form-card"><FormHeading number="03" title="Nơi nhận, thời hạn và lưu mẫu" copy="Theo mục III của Phiếu chuyển mẫu số 4." /><label>Phòng / bộ phận nhận<input value="KCS" readOnly aria-readonly="true" /><small className="field-help">Hiện hệ thống chỉ vận hành một phòng KCS.</small></label><label>Ngày chuyển mẫu<DateInput value={form.transferDate} onChange={updateForm('transferDate')} required /></label><label>Hạn trả kết quả<DateInput min={form.transferDate} value={form.resultsDueDate} onChange={updateForm('resultsDueDate')} required /></label><label className="switch-label"><input type="checkbox" checked={form.returnToCustomer} onChange={updateForm('returnToCustomer')} /><span className="fake-switch" />Lưu và trả mẫu cho khách</label>{form.returnToCustomer && <label>Ngày trả/lưu đến<DateInput min={form.transferDate} value={form.customerReturnDate} onChange={updateForm('customerReturnDate')} required /></label>}<label>Thay đổi / ghi chú<textarea value={form.changesNote} onChange={updateForm('changesNote')} rows="4" /></label></section>
         <div className="form-submit-panel"><p><strong>{editing ? 'Cập nhật bản nháp' : 'Lưu bản nháp'}</strong><span>Kiểm tra lại Phiếu số 4 rồi bấm “Gửi bàn giao” ở màn chi tiết để KCS nhận yêu cầu.</span></p><button className="primary-button" type="submit" disabled={saving || !receipt}>{saving ? 'Đang lưu bản nháp…' : editing ? 'Lưu thay đổi' : 'Lưu bản nháp phiếu chuyển'}</button></div>
       </aside>
     </form>

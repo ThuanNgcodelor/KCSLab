@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """E2E HTTP P1→P4: tiếp nhận → mã hóa → chuyển mẫu → Phiếu 5 → hồ sơ kết quả → tra cứu public.
 Tham số: E2E_BASE, E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD; KEEP=1 để giữ hồ sơ đã phát hành."""
-import json, sys, uuid, http.cookiejar, urllib.request, urllib.error, io
+import json, sys, uuid, urllib.parse, http.cookiejar, urllib.request, urllib.error, io
 
 import os
 # Chạy trên backend CÔ LẬP (MySQL/Redis tạm), KHÔNG chạy trên database làm việc: script tạo user và dữ liệu thử.
@@ -149,30 +149,43 @@ s, r = tech1.j("POST", f"/result-releases/{rid}/files", raw=body, ctype=ct); che
 body, ct = multipart([("kq.pdf", "application/pdf", PDF), ("bang.docx", DOCX_T, docx())])
 s, r = tech1.j("POST", f"/result-releases/{rid}/files", raw=body, ctype=ct); check("P3 PDF+DOCX uploaded", s == 200 and len(r["files"]) == 2, (s, r))
 s, r = admin.j("POST", f"/result-releases/{rid}/publish"); check("P3 publish before submit -> 409", s == 409, (s, r))
+s, r = tech1.j("POST", f"/result-releases/{rid}/submit"); check("P3 submit without report rows -> 409", s == 409, (s, r))
+s, r = tech2.j("PUT", f"/result-releases/{rid}/report", {"rows": [{"parameter": "Cd", "result": "KPH"}]}); check("P3 other technician cannot edit report (403)", s == 403, (s, r))
+s, r = tech1.j("PUT", f"/result-releases/{rid}/report", {"rows": [], "qualityHeadName": "A"}); check("P3 empty report rows -> 400", s == 400, (s, r))
+s, r = tech1.j("PUT", f"/result-releases/{rid}/report", {"rows": [{"parameter": "Auramine O (Phần vỏ)", "unit": "µg/kg", "method": "CFC-01:2026 (1)(2)(3)", "result": "KPH", "note": "LOQ = 1,5 µg/kg"}, {"parameter": "Cadimium (Cd)", "unit": "µg/kg", "method": "CFC-02:2026 (1)(2)(3)", "result": "< LOQ", "note": "LOQ = 30 µg/kg"}], "qualityHeadName": "Phan Trường Tiền", "directorName": "Nguyễn Công Huân"})
+check("P3 report rows saved", s == 200 and len(r["items"]) == 2, (s, r))
+s, p, h = tech1.call("GET", f"/result-releases/{rid}/report-preview"); check("P3 report preview is a PDF", s == 200 and p[:5] == b"%PDF-" and h.get("Content-Type") == "application/pdf", (s, p[:20]))
+check("P3 receptionist cannot preview (403)", rec1.call("GET", f"/result-releases/{rid}/report-preview")[0] == 403)
 check("P3 submit for review", tech1.call("POST", f"/result-releases/{rid}/submit")[0] == 200)
 check("P3 technician cannot publish (403)", tech1.call("POST", f"/result-releases/{rid}/publish")[0] == 403)
 s, pub = admin2.j("POST", f"/result-releases/{rid}/publish"); check("P3 admin publishes", s == 200 and pub["status"] == "PUBLISHED" and len(pub["lookupCode"]) == 16, (s, pub))
 code = pub["lookupCode"]
-check("P3 only PDF public by default", [f["originalName"] for f in pub["files"] if f["publicDownload"]] == ["kq.pdf"], pub["files"])
-s, evs = admin.j("GET", f"/result-releases/{rid}/events"); check("P3 history", [e["eventType"] for e in evs] == ["CREATED", "FILE_ADDED", "FILE_ADDED", "SUBMITTED", "PUBLISHED"], evs)
+import re as _re
+check("P3 result number like SR092026-001", _re.fullmatch(r"SR\d{6}-\d{3}", pub["resultNumber"] or ""), pub["resultNumber"])
+check("P3 only the generated KQKN PDF is public by default", [f["originalName"] for f in pub["files"] if f["publicDownload"]] == ["KQKN-" + pub["resultNumber"] + ".pdf"], pub["files"])
+s, evs = admin.j("GET", f"/result-releases/{rid}/events"); check("P3 history", [e["eventType"] for e in evs] == ["CREATED", "FILE_ADDED", "FILE_ADDED", "REPORT_UPDATED", "SUBMITTED", "PUBLISHED"], evs)
 
 # --- P4: public lookup -------------------------------------------------------
 pub_c = Client("customer")
 s, r, h = pub_c.call("POST", "/public/results/lookup", {"code": code, "phoneLast4": "5678"})
 res = json.loads(r) if s == 200 else r
-check("P4 lookup with code + last4 -> 200", s == 200 and res["files"][0]["name"] == "kq.pdf", (s, r))
+check("P4 lookup with code + last4 -> 200 (result rows + KQKN PDF)", s == 200 and res["files"][0]["name"].startswith("KQKN-") and len(res["items"]) == 2 and res["items"][1]["result"] == "< LOQ", (s, r))
 check("P4 headers no-store + noindex", "no-store" in h.get("Cache-Control", "") and "noindex" in h.get("X-Robots-Tag", ""), dict(h))
 check("P4 no PII in response", all(x not in r.decode() for x in ["Khách E2E", "0912345678", "kh@example.test", "Cần Thơ"]), r.decode())
 s, r, h = pub_c.call("POST", "/public/results/download", {"code": code, "phoneLast4": "5678", "fileId": res["files"][0]["id"]})
-check("P4 download PDF bytes", s == 200 and r.startswith(b"%PDF") and "attachment" in h.get("Content-Disposition", ""), (s, r[:20]))
+if os.environ.get("E2E_SAVE_PDF") and s == 200: open(os.environ["E2E_SAVE_PDF"], "wb").write(r)
+check("P4 download generated KQKN PDF", s == 200 and r.startswith(b"%PDF") and len(r) > 5000 and "attachment" in h.get("Content-Disposition", ""), (s, r[:20]))
 docx_id = [f for f in pub["files"] if f["originalName"] == "bang.docx"][0]["id"]
-check("P4 non-public Word download blocked (404)", pub_c.call("POST", "/public/results/download", {"code": code, "phoneLast4": "5678", "fileId": docx_id})[0] == 404)
+check("P4 internal attachment download blocked (404)", pub_c.call("POST", "/public/results/download", {"code": code, "phoneLast4": "5678", "fileId": docx_id})[0] == 404)
 check("P4 wrong phone -> 404 neutral", pub_c.call("POST", "/public/results/lookup", {"code": code, "phoneLast4": "0000"})[0] == 404)
 check("P4 internal API closed to anonymous (401)", pub_c.call("GET", f"/result-releases/{rid}")[0] == 401)
 check("P4 other public paths denied", pub_c.call("GET", "/public/results/lookup")[0] in (401, 403, 405))
 if os.environ.get("KEEP"):
     # leave receipt/release published for UI checks; also a second submitted-awaiting scenario is not needed
-    json.dump({"sfx": sfx, "code": code, "rid": rid, "receiptId": receipt["id"], "sampleIds": [sid1, sid2], "trecId": trec["id"]}, open(os.environ.get("E2E_STATE", "e2e-state.json"), "w"))
+    # also leave an editable v2 draft (revoke v1 then revise) so UI checks can exercise the report editor
+    admin2.j("POST", f"/result-releases/{rid}/revoke", {"reason": "Tạo bản nháp v2 để thử giao diện"})
+    s, v2 = tech1.j("POST", f"/result-releases/{rid}/revisions")
+    json.dump({"sfx": sfx, "code": code, "rid": rid, "draftId": v2["id"], "receiptId": receipt["id"], "sampleIds": [sid1, sid2], "trecId": trec["id"]}, open(os.environ.get("E2E_STATE", "e2e-state.json"), "w"))
     print("KEEP: state saved"); sys.exit(0)
 s, r = admin2.j("POST", f"/result-releases/{rid}/revoke", {"reason": "Kiểm thử thu hồi"}); check("P3 revoke", s == 200 and r["status"] == "REVOKED", (s, r))
 check("P4 revoked -> lookup 404", Client("c2").call("POST", "/public/results/lookup", {"code": code, "phoneLast4": "5678"})[0] == 404)
@@ -182,6 +195,26 @@ bf = Client("attacker"); codes_seen = []
 for i in range(6): codes_seen.append(bf.call("POST", "/public/results/lookup", {"code": code, "phoneLast4": f"{i:04d}"})[0])
 first429 = codes_seen.index(429) if 429 in codes_seen else -1
 check("P4 brute force throttled: 5 failed tries per code in total (2 already used above) then 429", codes_seen[:3] == [404] * 3 and first429 == 3 and set(codes_seen[3:]) == {429}, codes_seen)
+
+# --- Danh sách: sort/tìm/lọc ngày do backend xử lý ---------------------------------------
+s, r = admin.j("GET", "/transfers?sort=transferCode,asc&size=5"); check("LIST transfers paged + sorted by server", s == 200 and r["sort"] == "transferCode,asc" and "totalElements" in r, (s, r))
+codes_sorted = [x["transferCode"] for x in r["content"]]; check("LIST transfers order is ascending", codes_sorted == sorted(codes_sorted), codes_sorted)
+s, r = admin.j("GET", "/transfers?sort=transferCode,desc&size=5"); d = [x["transferCode"] for x in r["content"]]; check("LIST transfers descending", d == sorted(d, reverse=True), d)
+check("LIST transfers invalid sort -> 400", admin.call("GET", "/transfers?sort=passwordHash,asc")[0] == 400)
+check("LIST transfers size>100 -> 400", admin.call("GET", "/transfers?size=101")[0] == 400)
+check("LIST transfers technician cannot sort by customer -> 400", tech1.call("GET", "/transfers?sort=customerName,asc")[0] == 400)
+s, r = admin.j("GET", "/transfers?q=" + urllib.parse.quote("Khách E2E")); check("LIST transfers search by customer (admin)", s == 200 and r["totalElements"] >= 1, (s, r))
+s, r = tech1.j("GET", "/transfers?q=" + urllib.parse.quote("Khách E2E")); check("LIST transfers technician cannot search customer", s == 200 and r["totalElements"] == 0, (s, r))
+s, r = admin.j("GET", "/transfers?from=2099-01-01"); check("LIST transfers date filter", s == 200 and r["totalElements"] == 0, r)
+check("LIST transfers bad date range -> 400", admin.call("GET", "/transfers?from=2030-02-01&to=2030-01-01")[0] == 400)
+s, r = admin.j("GET", "/testing-records?q=" + trec["recordCode"] + "&sort=recordCode,asc"); check("LIST testing records search + sort", s == 200 and r["totalElements"] == 1, (s, r))
+s, r = tech1.j("GET", "/testing-records/candidates"); check("LIST testing candidates endpoint", s == 200 and isinstance(r, list), (s, r))
+s, r = admin.j("GET", "/result-releases?sort=updatedAt,desc&q=" + trec["recordCode"]); check("LIST result releases search + sort", s == 200 and r["totalElements"] >= 1, (s, r))
+s, r = tech1.j("GET", "/result-releases/ready"); check("LIST ready records endpoint", s == 200 and isinstance(r, list), (s, r))
+s, r = tech1.j("GET", "/notifications?q=" + urllib.parse.quote("mẫu") + "&sort=title,asc"); check("LIST notifications search + sort", s == 200 and "content" in r, (s, r))
+check("LIST notifications invalid sort -> 400", tech1.call("GET", "/notifications?sort=message,asc")[0] == 400)
+s, r = admin.j("GET", "/users?role=TECHNICIAN&sort=displayName,asc&q=tech"); check("LIST users search/filter/sort", s == 200 and r["totalElements"] >= 2 and all(u["role"] == "TECHNICIAN" for u in r["content"]), (s, r))
+check("LIST users forbidden for technician", tech1.call("GET", "/users")[0] == 403)
 
 failed = [r for r in results if not r[1]]
 print(f"\n{len(results) - len(failed)}/{len(results)} checks passed")

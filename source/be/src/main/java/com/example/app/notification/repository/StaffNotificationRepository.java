@@ -11,7 +11,8 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.Optional;
 
-public interface StaffNotificationRepository extends JpaRepository<StaffNotification, Long> {
+public interface StaffNotificationRepository extends JpaRepository<StaffNotification, Long>,
+        org.springframework.data.jpa.repository.JpaSpecificationExecutor<StaffNotification> {
     Page<StaffNotification> findByRecipient_Id(Long recipientId, Pageable pageable);
     Page<StaffNotification> findByRecipient_IdAndReadAtIsNull(Long recipientId, Pageable pageable);
     long countByRecipient_IdAndReadAtIsNull(Long recipientId);

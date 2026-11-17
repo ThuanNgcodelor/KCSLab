@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /** Formatting rules of the base sample code: {@code SOURCE-PRODUCT-DDMMYYYY-SEQUENCE}. */
-final class SampleCodes {
+public final class SampleCodes {
     private static final DateTimeFormatter SAMPLE_DATE = DateTimeFormatter.ofPattern("ddMMyyyy");
     private static final Map<String, String> COMMON_PRODUCT_CODES = Map.of(
             "sr", "SR", "sau rieng", "SR", "mit", "MIT", "thanh long", "THANHLONG");
@@ -26,7 +26,7 @@ final class SampleCodes {
         return sourceCode.trim().toUpperCase(Locale.ROOT);
     }
 
-    static String productCode(String productType) {
+    public static String productCode(String productType) {
         String normalized = Normalizer.normalize(productType, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}+", "")
                 .toLowerCase(Locale.ROOT)
