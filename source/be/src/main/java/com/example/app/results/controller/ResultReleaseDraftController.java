@@ -34,9 +34,11 @@ public class ResultReleaseDraftController {
     private final ResultReleaseDraftService drafts;
     private final ResultReleaseService workflow;
     private final UserService users;
+    private final com.example.app.results.service.ResultReportFileService reportFiles;
 
-    public ResultReleaseDraftController(ResultReleaseDraftService drafts, ResultReleaseService workflow, UserService users) {
-        this.drafts = drafts; this.workflow = workflow; this.users = users;
+    public ResultReleaseDraftController(ResultReleaseDraftService drafts, ResultReleaseService workflow, UserService users,
+                                      com.example.app.results.service.ResultReportFileService reportFiles) {
+        this.drafts = drafts; this.workflow = workflow; this.users = users; this.reportFiles = reportFiles;
     }
 
     public record CreateDraftRequest(@NotNull Long testingRecordId) {}
@@ -93,6 +95,18 @@ public class ResultReleaseDraftController {
     public ResultReleaseDetailResponse upload(@PathVariable Long id, @RequestPart("files") List<MultipartFile> files,
                                               @AuthenticationPrincipal Jwt jwt) {
         return workflow.addFiles(id, files, users.getByEmail(jwt.getSubject()));
+    }
+
+    /** The KQKN report as one DOCX (converted to PDF on the server) or PDF file. Replaces any earlier report file. */
+    @PostMapping(value = "/{id}/report-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResultReleaseDetailResponse uploadReportFile(@PathVariable Long id, @RequestPart("file") MultipartFile file,
+                                                        @AuthenticationPrincipal Jwt jwt) {
+        return reportFiles.upload(id, file, users.getByEmail(jwt.getSubject()));
+    }
+
+    @DeleteMapping("/{id}/report-file")
+    public ResultReleaseDetailResponse removeReportFile(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return workflow.removeReport(id, users.getByEmail(jwt.getSubject()));
     }
 
     @DeleteMapping("/{id}/files/{fileId}")

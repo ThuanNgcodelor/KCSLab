@@ -13,6 +13,12 @@ export function uploadResultFiles(id, files) {
   files.forEach((file) => form.append('files', file));
   return request(`/result-releases/${id}/files`, { method: 'POST', body: form });
 }
+export function uploadReportFile(id, file) {
+  const form = new FormData();
+  form.append('file', file);
+  return request(`/result-releases/${id}/report-file`, { method: 'POST', body: form });
+}
+export function removeReportFile(id) { return request(`/result-releases/${id}/report-file`, { method: 'DELETE' }); }
 export function removeResultFile(id, fileId) { return request(`/result-releases/${id}/files/${fileId}`, { method: 'DELETE' }); }
 export function submitResultRelease(id) { return request(`/result-releases/${id}/submit`, { method: 'POST' }); }
 export function returnResultRelease(id, reason) { return request(`/result-releases/${id}/return`, { method: 'POST', body: JSON.stringify({ reason }) }); }

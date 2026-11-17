@@ -79,7 +79,12 @@ public class PublicResultController {
     private String client(HttpServletRequest request) {
         if (!clientIpHeader.isBlank()) {
             String forwarded = request.getHeader(clientIpHeader);
-            if (forwarded != null && !forwarded.isBlank()) return forwarded.split(",")[0].trim();
+            // Use the entry appended by our own proxy (the last one): earlier entries are supplied by the client and spoofable.
+            if (forwarded != null && !forwarded.isBlank()) {
+                String[] hops = forwarded.split(",");
+                String last = hops[hops.length - 1].trim();
+                if (!last.isEmpty()) return last;
+            }
         }
         return request.getRemoteAddr();
     }

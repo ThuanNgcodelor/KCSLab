@@ -33,7 +33,14 @@ public class ResultReleaseFile {
         this.uploadedBy = uploadedBy; this.uploadedAt = Instant.now();
     }
 
-    public ResultReleaseFile asGeneratedReport() { this.kind = "GENERATED_REPORT"; this.publicDownload = true; return this; }
+    public static final String UPLOAD = "UPLOAD", REPORT_SOURCE = "REPORT_SOURCE", REPORT_PDF = "REPORT_PDF",
+            GENERATED_REPORT = "GENERATED_REPORT";
+    public ResultReleaseFile asGeneratedReport() { this.kind = GENERATED_REPORT; this.publicDownload = true; return this; }
+    /** Uploaded KQKN DOCX kept for the record; never public. */
+    public ResultReleaseFile asReportSource() { this.kind = REPORT_SOURCE; this.publicDownload = false; return this; }
+    /** PDF of the uploaded KQKN (converted or uploaded as PDF); the QR is stamped on a copy at publication. */
+    public ResultReleaseFile asReportPdf() { this.kind = REPORT_PDF; this.publicDownload = false; return this; }
+    public boolean isAttachment() { return UPLOAD.equals(kind); }
     public String getKind() { return kind; }
     public void remove(User actor) { this.removedAt = Instant.now(); this.removedBy = actor; this.publicDownload = false; }
     public void setPublicDownload(boolean value) { this.publicDownload = value; }

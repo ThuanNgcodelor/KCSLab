@@ -64,6 +64,7 @@ public class ResultReleaseService {
     private final ResultReleaseEventRepository events;
     private final com.example.app.results.repository.ResultReleaseItemRepository items;
     private final ReportPdfService pdf;
+    private final ReportFileStamper stamper;
     private final ResultNumberSequence numbers;
     private final String defaultQualityHead;
     private final String defaultDirector;
@@ -73,12 +74,12 @@ public class ResultReleaseService {
     public ResultReleaseService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
                                 ResultReleaseEventRepository events,
                                 com.example.app.results.repository.ResultReleaseItemRepository items,
-                                ReportPdfService pdf, ResultNumberSequence numbers,
+                                ReportPdfService pdf, ReportFileStamper stamper, ResultNumberSequence numbers,
                                 @Value("${app.report.quality-head-name:}") String defaultQualityHead,
                                 @Value("${app.report.director-name:}") String defaultDirector,
                                 @Value("${app.storage.results-root:storage/results}") String storageRoot) {
         this.releases = releases; this.files = files; this.events = events;
-        this.items = items; this.pdf = pdf; this.numbers = numbers;
+        this.items = items; this.pdf = pdf; this.stamper = stamper; this.numbers = numbers;
         this.defaultQualityHead = defaultQualityHead; this.defaultDirector = defaultDirector;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
     }
@@ -152,7 +153,7 @@ public class ResultReleaseService {
         if (uploads == null || uploads.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chưa chọn file kết quả");
         }
-        long current = files.countByRelease_IdAndRemovedAtIsNull(id);
+        long current = activeFiles(id).stream().filter(ResultReleaseFile::isAttachment).count();
         if (current + uploads.size() > ResultFilePolicy.MAX_FILES_PER_RELEASE) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Mỗi hồ sơ kết quả tối đa " + ResultFilePolicy.MAX_FILES_PER_RELEASE + " file");
@@ -188,6 +189,84 @@ public class ResultReleaseService {
         written.add(destination);
         return files.save(new ResultReleaseFile(release, originalName, contentType, extension, storageName,
                 content.length, sha256(content), actor));
+    }
+
+    /** A KQKN report delivered as a file, already validated and converted to PDF outside the transaction. */
+    public record PreparedReport(String originalName, String extension, String contentType, byte[] source, byte[] pdf,
+                                 String documentNumber, boolean placeholderFound) {}
+
+    /** Fails fast (before an expensive conversion) when the actor may not change this dossier's report. */
+    @Transactional(readOnly = true)
+    public void requireReportEditable(Long id, User actor) {
+        ResultRelease release = get(id);
+        requireCreator(release, actor);
+        requireEditable(release);
+    }
+
+    /** Replaces the report file of an editable dossier: keeps the uploaded DOCX (internal) and the PDF to be stamped. */
+    @Transactional
+    public ResultReleaseDetailResponse attachReport(Long id, PreparedReport report, User actor) {
+        ResultRelease release = lock(id);
+        requireCreator(release, actor);
+        requireEditable(release);
+        for (ResultReleaseFile file : activeFiles(id)) {
+            if (ResultReleaseFile.REPORT_SOURCE.equals(file.getKind()) || ResultReleaseFile.REPORT_PDF.equals(file.getKind())) {
+                file.remove(actor);
+            }
+        }
+        List<Path> written = new ArrayList<>();
+        registerCleanupOnRollback(written);
+        try {
+            String base = report.originalName().replaceFirst("\\.[^.]+$", "");
+            if (report.source() != null) {
+                files.save(store(release, report.originalName(), report.contentType(), report.extension(), report.source(),
+                        actor, written).asReportSource());
+            }
+            files.save(store(release, base + ".pdf", "application/pdf", "pdf", report.pdf(), actor, written).asReportPdf());
+            files.flush();
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể lưu file phiếu kết quả", exception);
+        }
+        release.setDocumentNumber(report.documentNumber());
+        String note = report.originalName() + (report.documentNumber() == null ? " · không đọc được Số/No." : " · Số " + report.documentNumber())
+                + (report.placeholderFound() ? "" : " · không thấy ô 'mã QR', QR sẽ in ở góc trên bên phải trang 1");
+        events.save(new ResultReleaseEvent(release, "REPORT_FILE_UPLOADED", release.getStatus(), release.getStatus(),
+                note.length() > 500 ? note.substring(0, 500) : note, actor));
+        return toDetail(release);
+    }
+
+    @Transactional
+    public ResultReleaseDetailResponse removeReport(Long id, User actor) {
+        ResultRelease release = lock(id);
+        requireCreator(release, actor);
+        requireEditable(release);
+        boolean removed = false;
+        for (ResultReleaseFile file : activeFiles(id)) {
+            if (ResultReleaseFile.REPORT_SOURCE.equals(file.getKind()) || ResultReleaseFile.REPORT_PDF.equals(file.getKind())) {
+                file.remove(actor);
+                removed = true;
+            }
+        }
+        if (!removed) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hồ sơ chưa có file phiếu kết quả");
+        release.setDocumentNumber(null);
+        events.save(new ResultReleaseEvent(release, "REPORT_FILE_REMOVED", release.getStatus(), release.getStatus(), null, actor));
+        return toDetail(release);
+    }
+
+    private List<ResultReleaseFile> activeFiles(Long id) { return files.findByRelease_IdAndRemovedAtIsNullOrderByIdAsc(id); }
+
+    private ResultReleaseFile reportPdf(Long id) {
+        return activeFiles(id).stream().filter(file -> ResultReleaseFile.REPORT_PDF.equals(file.getKind())).findFirst().orElse(null);
+    }
+
+    private byte[] read(ResultReleaseFile file) {
+        Path path = storageRoot.resolve(file.getStorageName()).normalize();
+        try {
+            if (!path.startsWith(storageRoot)) throw new IOException("Invalid storage path");
+            return Files.readAllBytes(path);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không đọc được file phiếu kết quả đã lưu", exception);
+        }
     }
 
     public record ReportRowInput(String parameter, String unit, String method, String result, String note) {}
@@ -230,8 +309,10 @@ public class ResultReleaseService {
     @Transactional(readOnly = true)
     public byte[] previewPdf(Long id) {
         ResultRelease release = get(id);
+        ResultReleaseFile uploaded = reportPdf(id);
+        if (uploaded != null) return stamper.stamp(read(uploaded), null, true);
         if (items.countByRelease_Id(id) == 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Chưa nhập chỉ tiêu cho phiếu kết quả");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Chưa có file phiếu hoặc chỉ tiêu cho phiếu kết quả");
         }
         return pdf.render(buildReport(release, release.getLookupCode(), release.getResultNumber(),
                 LocalDate.now(BUSINESS_ZONE), true));
@@ -295,6 +376,9 @@ public class ResultReleaseService {
         ResultReleaseFile file = files.findByIdAndRelease_Id(fileId, id)
                 .filter(candidate -> !candidate.isRemoved())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy file kết quả"));
+        if (!file.isAttachment()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "File phiếu kết quả được thay hoặc gỡ ở mục phiếu, không ở mục đính kèm");
+        }
         file.remove(actor);
         events.save(new ResultReleaseEvent(release, "FILE_REMOVED", release.getStatus(), release.getStatus(),
                 file.getOriginalName(), actor));
@@ -329,13 +413,16 @@ public class ResultReleaseService {
         if (release.getTestingRecord().getStatus() != TestRecordStatus.REVIEWED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Biên bản thử nghiệm chưa ở trạng thái đã kiểm tra");
         }
-        if (items.countByRelease_Id(id) == 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cần nhập ít nhất một chỉ tiêu cho phiếu kết quả trước khi gửi duyệt");
+        boolean fileReport = reportPdf(id) != null;
+        if (!fileReport && items.countByRelease_Id(id) == 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cần tải lên file phiếu kết quả (DOCX/PDF) hoặc nhập ít nhất một chỉ tiêu trước khi gửi duyệt");
         }
-        if (effective(release.getQualityHeadName(), defaultQualityHead) == null
+        // Signatories are printed only on system-generated reports; an uploaded file carries its own.
+        if (!fileReport && (effective(release.getQualityHeadName(), defaultQualityHead) == null
                 || effective(release.getDirectorName(), defaultDirector) == null
                 || effective(release.getQualityHeadName(), defaultQualityHead).isBlank()
-                || effective(release.getDirectorName(), defaultDirector).isBlank()) {
+                || effective(release.getDirectorName(), defaultDirector).isBlank())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cần nhập tên người ký (Trưởng phòng QLCLSP, Tổng Giám đốc)");
         }
         ResultReleaseStatus from = release.getStatus();
@@ -377,17 +464,20 @@ public class ResultReleaseService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Biên bản này đang có một phiên bản đã phát hành; hãy thu hồi trước");
         }
-        if (items.countByRelease_Id(id) == 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phiếu kết quả chưa có chỉ tiêu");
+        ResultReleaseFile uploadedReport = reportPdf(id);
+        if (uploadedReport == null && items.countByRelease_Id(id) == 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phiếu kết quả chưa có file hoặc chỉ tiêu");
         }
         List<ResultReleaseFile> active = files.findByRelease_IdAndRemovedAtIsNullOrderByIdAsc(id);
         Set<Long> activeIds = new HashSet<>();
-        active.forEach(file -> activeIds.add(file.getId()));
+        active.stream().filter(ResultReleaseFile::isAttachment).forEach(file -> activeIds.add(file.getId()));
         if (publicFileIds != null && !activeIds.containsAll(publicFileIds)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Danh sách file công khai có file không thuộc hồ sơ");
         }
         // The generated KQKN PDF is always public. Uploaded attachments stay internal unless the Admin lists them.
-        for (ResultReleaseFile file : active) file.setPublicDownload(publicFileIds != null && publicFileIds.contains(file.getId()));
+        for (ResultReleaseFile file : active) {
+            file.setPublicDownload(file.isAttachment() && publicFileIds != null && publicFileIds.contains(file.getId()));
+        }
 
         LocalDate today = LocalDate.now(BUSINESS_ZONE);
         String prefix = SampleCodes.productCode(sample.getProductType())
@@ -399,8 +489,11 @@ public class ResultReleaseService {
             releases.saveAndFlush(release);
             List<Path> written = new ArrayList<>();
             registerCleanupOnRollback(written);
-            byte[] report = pdf.render(buildReport(release, lookupCode, resultNumber, today, false));
-            ResultReleaseFile generated = store(release, "KQKN-" + resultNumber + ".pdf", "application/pdf", "pdf",
+            byte[] report = uploadedReport != null
+                    ? stamper.stamp(read(uploadedReport), lookupCode, false)
+                    : pdf.render(buildReport(release, lookupCode, resultNumber, today, false));
+            String fileName = "KQKN-" + release.getDisplayNumber().replaceAll("[^A-Za-z0-9._-]", "_") + ".pdf";
+            ResultReleaseFile generated = store(release, fileName, "application/pdf", "pdf",
                     report, actor, written).asGeneratedReport();
             files.saveAndFlush(generated);
         } catch (DataIntegrityViolationException exception) {

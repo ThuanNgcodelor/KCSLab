@@ -1248,3 +1248,41 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .date-input-button:hover { background: #e9f4ec; color: #15592e; }
 .date-input-native { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 .date-input .date-input-native { position: absolute !important; right: 0; bottom: 0; width: 1px !important; min-height: 0 !important; height: 1px !important; padding: 0 !important; border: 0 !important; opacity: 0; pointer-events: none; }
+
+/* Result dossier detail: aligned with testing record detail (numbered cards, shared tables, timeline aside) */
+.report-table td { padding-top: 8px; padding-bottom: 8px; vertical-align: middle; }
+.report-table th:first-child, .report-table td.report-no { width: 44px; text-align: center; }
+.report-table input { width: 100%; min-width: 90px; min-height: 38px; padding: 0 10px; border: 1px solid #d5e5d8; border-radius: 8px; background: #fbfdfb; color: #214a36; font: inherit; font-size: 13px; }
+.report-table input:disabled { border-color: transparent; background: transparent; color: #2f4f3d; padding-left: 0; }
+.report-table td:nth-child(2) input { min-width: 170px; }
+.row-remove { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #f0d4d0; border-radius: 8px; color: #b2463a; background: #fff; cursor: pointer; }
+.row-remove:hover:not(:disabled) { background: #fdf0ee; }
+.row-remove:disabled { opacity: .4; cursor: not-allowed; }
+.add-row-button { justify-self: start; }
+.inline-link, .inline-link:visited { color: #27834c; font-weight: 700; text-decoration: none; }
+.inline-link:hover { text-decoration: underline; }
+.scope-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 99px; color: #5f7468; background: #eef3ef; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.scope-pill.public { color: #15592e; background: #d9f5e1; }
+.staff-table .table-action.danger { border-color: #f0d4d0; color: #b2463a; }
+.staff-table .table-action.danger:hover { background: #fdf0ee; }
+.result-detail-page .result-upload { display: grid; gap: 12px; margin-top: 4px; }
+.history-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.history-list li { display: grid; gap: 3px; padding-left: 12px; border-left: 2px solid #dbe7dd; }
+.history-list strong { color: #2f4f3d; font-size: 13px; }
+.history-list small { color: #7f9588; font-size: 12px; }
+.history-list span { color: #5d7a68; font-size: 12px; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .report-table td { align-items: center; }
+  .report-table td.report-no { width: auto; text-align: left; }
+  .report-table td::before { flex: 0 0 82px; }
+  .report-table input { min-width: 0 !important; flex: 1 1 auto; }
+}
+.report-value { display: block; color: #2f4f3d; font-size: 13px; overflow-wrap: anywhere; }
+
+/* KQKN report delivered as a file */
+.report-file-card { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; padding: 14px; border: 1px solid #cfe5d5; border-radius: 12px; background: #f3faf4; }
+.report-file-card > div:nth-child(2) { flex: 1 1 220px; min-width: 0; }
+.report-file-card strong, .report-file-card small { display: block; overflow-wrap: anywhere; }
+.report-file-card strong { color: #244e38; font-size: 14px; }
+.report-file-card small { margin-top: 3px; color: #5d7a68; font-size: 12px; }
+.report-file-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; color: #297743; background: #e1f3e6; }

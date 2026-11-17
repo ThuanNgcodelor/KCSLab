@@ -26,7 +26,7 @@ export function PhotoPicker({ label, hint, files, onChange, accept = 'image/*', 
     <div className="photo-picker-actions">
       {camera && <label htmlFor={cameraId}><Icon name="camera" /> Chụp ảnh
         <input id={cameraId} type="file" accept="image/*" capture="environment" onChange={add} /></label>}
-      <label htmlFor={galleryId}><Icon name="image" /> {camera ? 'Chọn từ máy' : 'Chọn file'}
+      <label htmlFor={galleryId}><Icon name={camera ? 'image' : 'file'} /> {camera ? 'Chọn từ máy' : 'Chọn file'}
         <input id={galleryId} type="file" accept={accept} multiple={multiple} onChange={add} /></label>
     </div>
     {previews.length > 0 && <div className="photo-grid" role="list" aria-label={`${label} đã chọn`}>

@@ -1,5 +1,7 @@
 # Project State
 
+> 17/11/2026: Bản đọc nhanh cho người dùng là `docs/DOC_HIEU_HE_THONG.md`; plan điều phối tại `plans/SYSTEM_COMPLETION_ROADMAP.md`. Test gần nhất trong môi trường cô lập: backend 83 test/0 lỗi/1 skip, HTTP 77/77; Chrome MCP thử DOCX giả → duyệt → tra cứu/tải PDF. Phát hiện UI cho chọn công khai nhầm file nguồn khiến phát hành lỗi 400. Không sửa code hoặc chạy test mới trong lượt cập nhật tài liệu.
+
 > 17/11/2026: đã lập plan điều phối `plans/SYSTEM_COMPLETION_ROADMAP.md`, liên kết các plan hiện có và bổ sung thứ tự nghiệm thu/triển khai. Đây chỉ là cập nhật tài liệu, chưa chạy test chức năng.
 
 > **17/11/2026:** `docs/SYSTEM_STATUS.md` tổng hợp trạng thái mới nhất; các mục dưới đây lưu lịch sử theo phiên, có thể mâu thuẫn khi chức năng được triển khai về sau. Không có test mới trong lần tổng hợp tài liệu này.
@@ -193,3 +195,17 @@
 
 ## Đồng bộ badge + hồ sơ kết quả — 17/11/2026
 - `StatusBadge`/`shared/status.js` là nơi duy nhất định nghĩa nhãn và màu trạng thái; không thêm lớp pill riêng. Hồ sơ kết quả hiện số liệu Phiếu 5 và điền sẵn chỉ tiêu từ Phiếu 4; Admin được lập hồ sơ nhưng không tự duyệt. BE 76 test, E2E 77/77, Chrome 57/57. Chưa commit.
+
+## 17/11/2026 — QR tra cứu qua IP LAN (chưa commit)
+
+- `app.public.lookup-url` mặc định `http://192.168.1.132:5173/tracuu/` (ghi đè bằng `PUBLIC_LOOKUP_URL`; `.env.example` đã có dòng mẫu). QR trong PDF = URL + `?code=`. Đổi domain chỉ ảnh hưởng phiếu phát hành sau đó.
+- `vite.config.js`: plugin `cfc-public-landing` phục vụ `source/public/tracuu` tại `/tracuu/` (dev + preview, chặn path traversal, `no-store`, `noindex`), build chép vào `dist/tracuu`; proxy `/api` bật `xfwd`.
+- `PublicResultController.client()`: lấy phần tử **cuối** của header IP (giá trị do proxy thêm), không lấy phần tử đầu (client giả mạo được).
+- Kiểm thử: test BE liên quan 29/29; QR giải mã từ PDF thật = `…/tracuu/?code=<mã>`; Chrome 390×844 7/7 (tự điền mã, xóa mã khỏi URL, tra cứu, tải PDF). Chưa thử điện thoại thật quét QR trên giấy.
+- Phiên này cũng: trang danh sách/chi tiết hồ sơ kết quả dùng bảng/timeline chung (Chrome 24/24), ô ngày `DateInput` dd/mm/yyyy cho mọi bộ lọc/form, bộ icon SVG `shared/components/Icon.jsx` thay emoji, `PhotoPicker` v2.
+
+## Phiếu kết quả từ DOCX/PDF — tiếp tục ngày 17/11/2026
+
+- Tiếp tục các thay đổi chưa commit của Claude: tải phiếu DOCX/PDF, chuyển đổi và đóng QR. Sửa an toàn: không tìm thấy ô QR thì thêm trang tra cứu, không phủ trắng góc trang gốc; chỉ nhận marker `Dấu/ảnh mã QR` hoặc `Dán/in mã QR`.
+- Test `ReportFileStamperTest` trên Java 21/container không mạng, dùng PDF chuyển từ mẫu DOCX thật: `Tests run: 5, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS`. Frontend `npm run build`: `✓ built in 989ms`.
+- PDF chuyển từ mẫu bằng LibreOffice có hai trang, trang thứ hai gần như trống; đã xem trang đầu đóng QR, chưa so sánh Word thật hoặc nghiệm thu bố cục. Chưa test HTTP/E2E upload, publish, QR trên điện thoại hay full suite trong phiên này. LibreOffice cần cài riêng trên backend; không coi tính năng đã sẵn sàng production.

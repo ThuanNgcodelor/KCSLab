@@ -85,7 +85,7 @@ public class PublicResultService {
                 .map(row -> new PublicItem(row.getParameterName(), row.getUnit(), row.getMethod(), row.getResultValue(),
                         row.getNote())).toList();
         var item = release.getTestingRecord().getTransferItem();
-        return new PublicResult(release.getResultNumber(), release.getVersion(), item.getSampleCode(),
+        return new PublicResult(release.getDisplayNumber(), release.getVersion(), item.getSampleCode(),
                 item.getTransfer().getReceipt().getSampleName(), release.getPublishedAt(), rows, publicFiles);
     }
 

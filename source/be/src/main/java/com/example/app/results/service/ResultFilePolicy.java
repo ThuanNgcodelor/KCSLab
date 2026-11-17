@@ -78,7 +78,7 @@ final class ResultFilePolicy {
         return name;
     }
 
-    private static void checkPdf(byte[] content) {
+    static void checkPdf(byte[] content) {
         String head = new String(content, 0, Math.min(content.length, 1024), StandardCharsets.ISO_8859_1);
         if (!head.startsWith("%PDF-")) throw bad(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Nội dung không phải PDF hợp lệ");
         int tailStart = Math.max(0, content.length - 2048);

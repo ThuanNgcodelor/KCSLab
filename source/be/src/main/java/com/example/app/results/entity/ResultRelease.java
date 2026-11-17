@@ -20,6 +20,7 @@ public class ResultRelease {
     @Column(nullable = false) private Instant updatedAt;
     @Column(length = 32) private String lookupCode;
     @Column(length = 40) private String resultNumber;
+    @Column(length = 60) private String documentNumber;
     private Instant submittedAt;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "submitted_by_user_id") private User submittedBy;
     private Instant decidedAt;
@@ -80,6 +81,11 @@ public class ResultRelease {
     public Instant getUpdatedAt() { return updatedAt; }
     public String getLookupCode() { return lookupCode; }
     public String getResultNumber() { return resultNumber; }
+    public String getDocumentNumber() { return documentNumber; }
+    /** "Số/No." printed on an uploaded report file; null when the report is entered as structured rows. */
+    public void setDocumentNumber(String documentNumber) { this.documentNumber = documentNumber; touch(); }
+    /** Number customers see: the one printed on the uploaded file if any, otherwise the system result number. */
+    public String getDisplayNumber() { return documentNumber != null && !documentNumber.isBlank() ? documentNumber : resultNumber; }
     public Instant getSubmittedAt() { return submittedAt; }
     public User getSubmittedBy() { return submittedBy; }
     public Instant getDecidedAt() { return decidedAt; }

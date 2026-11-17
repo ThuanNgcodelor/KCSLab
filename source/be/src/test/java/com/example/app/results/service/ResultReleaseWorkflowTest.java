@@ -163,6 +163,59 @@ class ResultReleaseWorkflowTest {
     }
 
     @Test
+    void reportFileAloneCanBeSubmittedPublishedAndKeepsItsOwnNumber(@org.springframework.beans.factory.annotation.Autowired ReportFileStamper stamper) throws Exception {
+        var out = new java.io.ByteArrayOutputStream();
+        var document = new com.lowagie.text.Document();
+        com.lowagie.text.pdf.PdfWriter.getInstance(document, out);
+        document.open();
+        document.add(new com.lowagie.text.Paragraph("PHIEU KET QUA"));
+        document.add(new com.lowagie.text.Paragraph("So/ No.: SR092026-777"));
+        document.close();
+        byte[] pdfBytes = out.toByteArray();
+        var inspection = stamper.inspect(pdfBytes);
+        assertThat(inspection.documentNumber()).isEqualTo("SR092026-777");
+
+        expect(409, () -> workflow.submit(releaseId, technician)); // nothing yet
+        var attached = workflow.attachReport(releaseId, new ResultReleaseService.PreparedReport("KQKN.docx",
+                "docx", ResultFilePolicyTest.DOCX, ResultFilePolicyTest.docx(), pdfBytes, inspection.documentNumber(), false), technician);
+        assertThat(attached.documentNumber()).isEqualTo("SR092026-777");
+        assertThat(attached.files()).extracting(ResultReleaseDetailResponse.FileResponse::kind)
+                .containsExactlyInAnyOrder("REPORT_SOURCE", "REPORT_PDF");
+        assertThat(attached.files()).noneMatch(ResultReleaseDetailResponse.FileResponse::publicDownload);
+        assertThat(workflow.previewPdf(releaseId)).startsWith("%PDF".getBytes());
+        expect(403, () -> workflow.attachReport(releaseId, new ResultReleaseService.PreparedReport("x.pdf", "pdf",
+                ResultFilePolicyTest.PDF, null, pdfBytes, null, false), otherTechnician));
+
+        // No rows and no signatories are needed when a report file exists.
+        assertThat(workflow.submit(releaseId, technician).status()).isEqualTo("SUBMITTED");
+        var published = workflow.publish(releaseId, null, admin);
+        var publicFiles = published.files().stream().filter(ResultReleaseDetailResponse.FileResponse::publicDownload).toList();
+        assertThat(publicFiles).hasSize(1);
+        assertThat(publicFiles.getFirst().kind()).isEqualTo("GENERATED_REPORT");
+        assertThat(publicFiles.getFirst().originalName()).isEqualTo("KQKN-SR092026-777.pdf");
+        var stamped = workflow.loadFile(releaseId, publicFiles.getFirst().id());
+        String text = pdfText(stamped.resource().getContentAsByteArray());
+        assertThat(text).contains("SR092026-777").contains(published.lookupCode().substring(0, 4));
+        // The uploaded DOCX and unstamped PDF never become public.
+        assertThat(published.files().stream().filter(f -> !f.kind().equals("GENERATED_REPORT")))
+                .allSatisfy(f -> assertThat(f.publicDownload()).isFalse());
+    }
+
+    @Test
+    void reportFileCanBeRemovedWhileEditable() throws Exception {
+        var out = new java.io.ByteArrayOutputStream();
+        var document = new com.lowagie.text.Document();
+        com.lowagie.text.pdf.PdfWriter.getInstance(document, out);
+        document.open(); document.add(new com.lowagie.text.Paragraph("x")); document.close();
+        workflow.attachReport(releaseId, new ResultReleaseService.PreparedReport("a.pdf", "pdf", ResultFilePolicyTest.PDF,
+                null, out.toByteArray(), null, false), technician);
+        var removed = workflow.removeReport(releaseId, technician);
+        assertThat(removed.files()).isEmpty();
+        assertThat(removed.documentNumber()).isNull();
+        expect(404, () -> workflow.removeReport(releaseId, technician));
+    }
+
+    @Test
     void submitNeedsFilesAndOnlyTheCreatingTechnicianMayUploadOrSubmit() throws Exception {
         expect(409, () -> workflow.submit(releaseId, technician)); // no result rows yet
         expect(403, () -> workflow.addFiles(releaseId, List.of(pdf("a.pdf")), otherTechnician));

@@ -101,6 +101,9 @@
     if (result.files.length) panel.appendChild(list);
     else { var none = document.createElement('p'); none.textContent = 'Hồ sơ chưa có tệp công khai. Vui lòng liên hệ CFC.'; panel.appendChild(none); }
     panel.hidden = false;
+    // On phones the result renders below the form: bring it into view (respecting reduced motion).
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (panel.scrollIntoView) panel.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }
 
   function formatSize(bytes) {

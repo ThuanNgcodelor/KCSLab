@@ -15,7 +15,7 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
         Instant submittedAt, String submittedByName, Instant decidedAt, String decidedByName, String decisionNote,
         Instant publishedAt, Instant revokedAt, String revokedByName, String revokeReason, List<FileResponse> files,
         List<ItemResponse> items, String qualityHeadName, String directorName,
-        Reference reference, List<ItemResponse> suggestedItems) {
+        Reference reference, List<ItemResponse> suggestedItems, String documentNumber) {
 
     public record Measurement(String type, String replicate, String resultPerReplicate, String result, String deviation) {}
     public record Reference(Long testingRecordId, String recordCode, Instant analysisStart, Instant analysisEnd,
@@ -58,7 +58,8 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
                 rows.stream().map(row -> new ItemResponse(row.getId(), row.getRowOrder(), row.getParameterName(), row.getUnit(),
                         row.getMethod(), row.getResultValue(), row.getNote())).toList(),
                 blank(release.getQualityHeadName()) ? defaultQualityHead : release.getQualityHeadName(),
-                blank(release.getDirectorName()) ? defaultDirector : release.getDirectorName(), reference, suggestedItems);
+                blank(release.getDirectorName()) ? defaultDirector : release.getDirectorName(), reference, suggestedItems,
+                release.getDocumentNumber());
     }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }

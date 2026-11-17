@@ -1,5 +1,15 @@
 # Kế hoạch hoàn thiện và nghiệm thu hệ thống CFC Lab
 
+## Việc cần làm trước — cập nhật 17/11/2026
+
+1. **Sửa lỗi duyệt file nguồn:** trên trang chi tiết hồ sơ, không cho chọn DOCX/PDF nguồn làm file đính kèm công khai; test lại Admin duyệt và các file đính kèm thực sự. Lỗi đã tái hiện trên Chrome MCP.
+2. **Nghiệm thu tài liệu:** so sánh DOCX → PDF với Word thật, xử lý/đánh giá trang trống của mẫu, test Phiếu 3 Word và QR in bằng điện thoại.
+3. **Rà soát quy trình và bảo mật:** thử hai phiên WebSocket thật, attachment/401/403/409 trên UI, upload/publish đồng thời và kiểm tra PDF có dữ liệu khách; xác nhận backup, quét virus và giới hạn abuse trước khi public.
+4. **LAB chốt mã hóa:** hoàn thiện `-V/-R`, QC/mã mù và xác nhận cách xử lý mẫu cũ, người xác minh, số phiếu/người ký.
+5. Hoàn thiện dashboard Admin, frontend và ZBS/SMS; triển khai public chỉ sau khi hoàn thành bảo mật/hạ tầng và được duyệt.
+
+Kết quả mới nhất: backend `Tests run: 83, Failures: 0, Errors: 0, Skipped: 1`; HTTP `77/77 checks passed`; Chrome MCP thử DOCX giả → duyệt → phát hành → tra cứu/tải PDF trên môi trường cô lập. Chi tiết giới hạn: `docs/DOC_HIEU_HE_THONG.md`. Chưa xem các giai đoạn là nghiệm thu production.
+
 **Ngày lập:** 17/11/2026 · **Loại tài liệu:** plan điều phối, chưa phải bằng chứng hoàn thành.
 
 ## 0. Tiến độ thực hiện — 17/11/2026
@@ -37,7 +47,7 @@ Plan này liên kết và sắp thứ tự, không thay thế hợp đồng API,
 ## 3. Quyết định đã chốt và ràng buộc
 
 - Giữ ba role `ADMIN`, `RECEPTIONIST`, `TECHNICIAN`; Technician nhận mẫu và có thể lập Phiếu 5. Không tự tạo role mới.
-- KQKN-DV là hồ sơ kết quả được nói đến. Chỉ tạo/lưu nháp ở giai đoạn hiện tại; **không phát hành cho tới khi hoàn tất gate mã hóa CFC-TN-14**.
+- KQKN-DV là hồ sơ kết quả được nói đến. Source đã cho phát hành thử khi mẫu `VERIFIED`; CFC-TN-14 còn thiếu `-V/-R`, QC/mã mù và các quyết định LAB. Theo yêu cầu trước đó, **chưa phát hành vận hành thật cho đến khi gate mã hóa hoàn tất và được nghiệm thu**.
 - Cả mã tra cứu nhập tay và QR đều yêu cầu 4 số cuối điện thoại. Dự kiến tối đa 10 MB/file và 10 file/hồ sơ; mặc định chỉ PDF public, Admin có thể bật Word/Excel khi phát hành.
 - Giữ phân tách API public và nội bộ; không đưa PII, file tiếp nhận, dữ liệu thô hoặc bản nháp ra public. `noindex` không thay cho kiểm soát truy cập.
 - Duy trì cảnh báo thiếu ảnh theo hành vi hiện tại, không tự biến thành quy định LAB. Chính sách tên khách trong thông báo cần LAB xác nhận.

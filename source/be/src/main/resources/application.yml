@@ -25,12 +25,17 @@ app:
     avatar-root: ${AVATAR_STORAGE_ROOT:storage/avatars}
 
   # KQKN-DV report. Signatory names are defaults taken from the LAB's sample template and can be edited per dossier;
-  # LAB must confirm who signs. lookup-url is the public page printed in the QR code (empty = no QR, code text only).
+  # LAB must confirm who signs. lookup-url is the public page printed in the QR code of every newly published PDF
+  # (QR = lookup-url + ?code=...). Default = LAN address of the Vite dev server; set PUBLIC_LOOKUP_URL to the real
+  # domain later (e.g. https://tracuu.example.vn/tracuu/). Set it to an empty value to print the code as text only.
   report:
     quality-head-name: ${REPORT_QUALITY_HEAD_NAME:Phan Trường Tiền}
     director-name: ${REPORT_DIRECTOR_NAME:Nguyễn Công Huân}
+    # DOCX -> PDF needs LibreOffice on the server (apt install libreoffice-writer-nogui fonts-liberation fonts-crosextra-carlito).
+    office-command: ${REPORT_OFFICE_COMMAND:soffice}
+    office-timeout-seconds: ${REPORT_OFFICE_TIMEOUT_SECONDS:90}
   public:
-    lookup-url: ${PUBLIC_LOOKUP_URL:}
+    lookup-url: ${PUBLIC_LOOKUP_URL:http://192.168.1.132:5173/tracuu/}
     client-ip-header: ${PUBLIC_CLIENT_IP_HEADER:}
 
 server:

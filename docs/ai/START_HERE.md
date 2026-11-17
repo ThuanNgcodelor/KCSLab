@@ -5,8 +5,8 @@
 
 ## Đọc theo thứ tự
 
-1. File này để biết bản đồ tài liệu và trạng thái thật.
-2. `docs/SYSTEM_STATUS.md` để xem tổng hợp hiện hành và giới hạn nghiệm thu.
+1. `docs/DOC_HIEU_HE_THONG.md` để hiểu nhanh trạng thái và việc cần làm.
+2. File này để xem cách chạy; `docs/SYSTEM_STATUS.md` nếu cần chi tiết kỹ thuật.
 3. `docs/ai/CONTEXT.md` để lấy context ngắn của hệ thống.
 4. `docs/ai/STATE.md` để xem các thay đổi đã xác minh gần nhất.
 5. `plans/SYSTEM_COMPLETION_ROADMAP.md` để biết kế hoạch triển khai/nghiệm thu hiện hành; `plans/CURRENT.md` để tham khảo lịch sử và kế hoạch chi tiết.

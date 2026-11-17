@@ -32,6 +32,12 @@
             <artifactId>core</artifactId>
             <version>3.5.3</version>
         </dependency>
+        <!-- Reads text positions in uploaded KQKN PDFs (QR placeholder, "Số/No.") and stamps the QR at publication. -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.4</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
