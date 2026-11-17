@@ -132,6 +132,7 @@ public class TransferService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " không còn sẵn sàng để chuyển");
             }
+            requireCodingVerified(sample);
             if (itemRepository.existsBySample_IdAndTransfer_StatusIn(sample.getId(), ACTIVE_TRANSFER_STATUSES)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " đang có phiếu chuyển hiệu lực");
@@ -172,6 +173,9 @@ public class TransferService {
                     "Cần nhập ngày lưu mẫu tại phòng phân tích");
         }
 
+        if (request.decision() == TransferStatus.ACCEPTED) {
+            transfer.getItems().forEach(item -> requireCodingVerified(item.getSample()));
+        }
         transfer.decide(request.decision(), receiver, blankToNull(request.receivingNote()),
                 blankToNull(request.labOpinion()), request.labRetain(), request.labRetentionUntil());
         if (request.decision() == TransferStatus.ACCEPTED) {
@@ -250,6 +254,7 @@ public class TransferService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " chưa sẵn sàng để lập phiếu chuyển");
             }
+            requireCodingVerified(sample);
         }
         return samples;
     }
@@ -265,6 +270,14 @@ public class TransferService {
                     itemRequest.testMethod().trim()));
         }
         return items;
+    }
+
+    /** CFC-TN-14 gate: only samples whose code was independently verified may leave the receiving desk. */
+    private void requireCodingVerified(Sample sample) {
+        if (!sample.isCodingVerified()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Mẫu " + sample.getSampleCode() + " chưa được xác minh mã hóa (" + sample.getCodingStatus() + ")");
+        }
     }
 
     private void requireDraft(SampleTransfer transfer) {

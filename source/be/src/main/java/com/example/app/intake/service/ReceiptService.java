@@ -42,7 +42,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -57,7 +56,6 @@ import java.util.UUID;
 @Service
 public class ReceiptService {
     private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
-    private static final DateTimeFormatter SAMPLE_DATE = DateTimeFormatter.ofPattern("ddMMyyyy");
     private static final DateTimeFormatter RECEIPT_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final long MAX_ATTACHMENT_SIZE = 10L * 1024 * 1024;
     private static final int MAX_PAGE_SIZE = 100;
@@ -70,12 +68,6 @@ public class ReceiptService {
             "status", "status",
             "expectedDate", "expectedDate"
     );
-    private static final Map<String, String> COMMON_PRODUCT_CODES = Map.of(
-            "sr", "SR",
-            "sau rieng", "SR",
-            "mit", "MIT",
-            "thanh long", "THANHLONG"
-    );
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "application/pdf",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -86,6 +78,7 @@ public class ReceiptService {
     private final ReceiptAttachmentRepository attachmentRepository;
     private final CustomerRepository customerRepository;
     private final SampleRepository sampleRepository;
+    private final SampleCodeSequence sampleCodeSequence;
     private final StaffNotificationService notificationService;
     private final ReceiptForm3Exporter form3Exporter;
     private final Path storageRoot;
@@ -94,6 +87,7 @@ public class ReceiptService {
                           ReceiptAttachmentRepository attachmentRepository,
                           CustomerRepository customerRepository,
                           SampleRepository sampleRepository,
+                          SampleCodeSequence sampleCodeSequence,
                           StaffNotificationService notificationService,
                           ReceiptForm3Exporter form3Exporter,
                           @Value("${app.storage.root:storage/receipts}") String storageRoot) {
@@ -101,6 +95,7 @@ public class ReceiptService {
         this.attachmentRepository = attachmentRepository;
         this.customerRepository = customerRepository;
         this.sampleRepository = sampleRepository;
+        this.sampleCodeSequence = sampleCodeSequence;
         this.notificationService = notificationService;
         this.form3Exporter = form3Exporter;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
@@ -172,13 +167,11 @@ public class ReceiptService {
         receipt.setSealStatus(request.sealStatus());
 
         LocalDate date = receivedAt.atZone(BUSINESS_ZONE).toLocalDate();
-        int sequence = (int) sampleRepository.countByReceivedDate(date);
         for (SampleRequest sampleRequest : request.samples()) {
-            sequence++;
-            String source = sampleRequest.sourceCode().trim().toUpperCase(Locale.ROOT);
+            int sequence = sampleCodeSequence.next(date);
+            String source = SampleCodes.normalizeSource(sampleRequest.sourceCode());
             String productType = sampleRequest.productType().trim();
-            String productCode = productCode(productType);
-            String code = "%s-%s-%s-%03d".formatted(source, productCode, SAMPLE_DATE.format(date), sequence);
+            String code = SampleCodes.format(source, productType, date, sequence);
             receipt.addSample(new Sample(code, source, productType, date, sequence, sampleRequest.name().trim(),
                     sampleRequest.quantity(), sampleRequest.packaging(), sampleRequest.condition(),
                     sampleRequest.requestedParameters()));
@@ -270,34 +263,6 @@ public class ReceiptService {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
-    private String productCode(String productType) {
-        String normalized = Normalizer.normalize(productType, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}+", "")
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", " ")
-                .trim();
-        String knownCode = COMMON_PRODUCT_CODES.get(normalized);
-        if (knownCode != null) return knownCode;
-
-        String compact = normalized.replace(" ", "").toUpperCase(Locale.ROOT);
-        if (compact.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Loại sản phẩm phải có ít nhất một chữ hoặc số");
-        }
-        if (compact.length() <= 10) return compact;
-
-        String[] words = normalized.split(" +");
-        if (words.length > 1) {
-            String initials = java.util.Arrays.stream(words)
-                    .filter(word -> !word.isBlank())
-                    .map(word -> word.substring(0, 1))
-                    .reduce("", String::concat)
-                    .toUpperCase(Locale.ROOT);
-            if (initials.length() >= 2) return initials.substring(0, Math.min(10, initials.length()));
-        }
-        return compact.substring(0, 10);
-    }
-
     private ReceiptSort parseSort(String rawSort) {
         String value = rawSort == null || rawSort.isBlank() ? "receivedAt,desc" : rawSort.trim();
         String[] parts = value.split(",", -1);
@@ -351,7 +316,8 @@ public class ReceiptService {
                 receipt.getStatus(), receipt.getSamples().stream().map(sample -> new SampleResponse(
                         sample.getId(), sample.getSampleCode(), sample.getSourceCode(), sample.getProductType(),
                         sample.getName(), sample.getQuantity(), sample.getPackaging(), sample.getCondition(),
-                        sample.getRequestedParameters(), sample.getStatus())).toList(),
+                        sample.getRequestedParameters(), sample.getStatus(), sample.getCodingStatus(),
+                        sample.getVerifiedAt())).toList(),
                 receipt.getAttachments().stream().map(this::toAttachmentResponse).toList());
     }
 

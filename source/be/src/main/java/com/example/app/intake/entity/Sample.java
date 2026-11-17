@@ -12,6 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import com.example.app.user.entity.User;
+
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -30,6 +33,13 @@ public class Sample {
     @Column(columnDefinition = "TEXT") private String requestedParameters;
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 30) private ReceiptStatus status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "receipt_id") private Receipt receipt;
+    @Enumerated(EnumType.STRING) @Column(name = "coding_status", nullable = false, length = 30)
+    private SampleCodingStatus codingStatus = SampleCodingStatus.PENDING_CODING;
+    @Column(name = "coding_legacy", nullable = false) private boolean codingLegacy;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "coded_by_user_id") private User codedBy;
+    private Instant codedAt;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "verified_by_user_id") private User verifiedBy;
+    private Instant verifiedAt;
 
     protected Sample() {}
     public Sample(String sampleCode, String sourceCode, String productType, LocalDate receivedDate, Integer dailySequence,
@@ -46,6 +56,29 @@ public class Sample {
     public void markInTesting() { this.status = ReceiptStatus.IN_TESTING; }
     public void markAwaitingReview() { this.status = ReceiptStatus.AWAITING_REVIEW; }
     public void markTestReviewed() { this.status = ReceiptStatus.TEST_REVIEWED; }
+    public void submitCoding(User coder) {
+        this.codingStatus = SampleCodingStatus.PENDING_VERIFICATION;
+        this.codedBy = coder; this.codedAt = Instant.now();
+        this.verifiedBy = null; this.verifiedAt = null;
+    }
+    public void verifyCoding(User verifier) {
+        this.codingStatus = SampleCodingStatus.VERIFIED;
+        this.verifiedBy = verifier; this.verifiedAt = Instant.now();
+    }
+    public void rejectCoding() {
+        this.codingStatus = SampleCodingStatus.CORRECTION_REQUIRED;
+        this.verifiedBy = null; this.verifiedAt = null;
+    }
+    /** Replaces the code after a rejected verification. The caller records the old code in an event. */
+    public void applyCorrection(String sampleCode, String sourceCode, String productType, Integer dailySequence) {
+        this.sampleCode = sampleCode; this.sourceCode = sourceCode; this.productType = productType;
+        this.dailySequence = dailySequence;
+        this.codingStatus = SampleCodingStatus.PENDING_CODING;
+        this.codedBy = null; this.codedAt = null; this.verifiedBy = null; this.verifiedAt = null;
+    }
+    /** Marks a sample coded before the gate existed (V7 migration semantics). */
+    public Sample markLegacyVerified() { this.codingStatus = SampleCodingStatus.VERIFIED; this.codingLegacy = true; return this; }
+    public boolean isCodingVerified() { return codingStatus == SampleCodingStatus.VERIFIED; }
     public Long getId() { return id; }
     public String getSampleCode() { return sampleCode; }
     public String getSourceCode() { return sourceCode; }
@@ -59,4 +92,10 @@ public class Sample {
     public String getRequestedParameters() { return requestedParameters; }
     public ReceiptStatus getStatus() { return status; }
     public Receipt getReceipt() { return receipt; }
+    public SampleCodingStatus getCodingStatus() { return codingStatus; }
+    public boolean isCodingLegacy() { return codingLegacy; }
+    public User getCodedBy() { return codedBy; }
+    public Instant getCodedAt() { return codedAt; }
+    public User getVerifiedBy() { return verifiedBy; }
+    public Instant getVerifiedAt() { return verifiedAt; }
 }

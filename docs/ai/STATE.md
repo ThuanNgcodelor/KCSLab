@@ -1,5 +1,7 @@
 # Project State
 
+> 17/11/2026: đã lập plan điều phối `plans/SYSTEM_COMPLETION_ROADMAP.md`, liên kết các plan hiện có và bổ sung thứ tự nghiệm thu/triển khai. Đây chỉ là cập nhật tài liệu, chưa chạy test chức năng.
+
 > **17/11/2026:** `docs/SYSTEM_STATUS.md` tổng hợp trạng thái mới nhất; các mục dưới đây lưu lịch sử theo phiên, có thể mâu thuẫn khi chức năng được triển khai về sau. Không có test mới trong lần tổng hợp tài liệu này.
 
 ## Workspace nhận mẫu KCS — 16/11/2026
@@ -174,3 +176,11 @@
 - Có landing tĩnh tách biệt tại `source/public/tracuu/`, không yêu cầu đăng nhập. Chạy thử theo `source/public/README.md`; form bị vô hiệu hóa và thông báo rõ chưa thể tra cứu/tải kết quả.
 - Playwright đã kiểm tra localhost HTTP 200, không redirect login, không tràn ngang toàn trang tại 390×844, 1024×768, 1440×900, 2560×952. Bản xem trước dùng `noindex`, chưa có domain/canonical/sitemap.
 - Chưa có lookup API, hồ sơ phát hành, QR, rate limit, no-store/signed download, SEO production hoặc triển khai Internet. Không xem đây là chức năng tra cứu hoàn chỉnh.
+
+
+## P0–P4 — 17/11/2026 (Claude viết code theo yêu cầu trực tiếp của người dùng; Codex MCP không khả dụng do model_not_found)
+
+- Đã code + test: V7 (sequence nguyên tử, xác minh mã hóa hai người, lịch sử, gate chuyển mẫu), V8 (hồ sơ kết quả: file, duyệt, phát hành, thu hồi, phiên bản, lịch sử bất biến, audit), API public lookup/download, UI `/admin/results`, UI mã hóa trên Phiếu 3, form tra cứu `source/public/tracuu` nối API. Chi tiết và giả định cần LAB xác nhận: `docs/SYSTEM_STATUS.md` mục 4–5, 7.
+- Kiểm thử (Docker cô lập, không đụng DB làm việc): BE 66 test pass (`scripts/run-be-tests-docker.sh`); E2E HTTP 52/52 (`scripts/e2e-results-flow.py`); Chrome headless 4 viewport 58/58; FE build pass; migration V7/V8 thử trên DB có dữ liệu cũ.
+- Chưa kiểm chứng: Word thật cho Phiếu 3, WebSocket hai phiên thật, QR in, hạ tầng/deploy, migration trên DB làm việc, click thật các thao tác mã hóa/phát hành trên UI. Chưa làm: `-V/-R`, QC/mã mù, ZBS/SMS (P6), dashboard Admin (P5), upload file cho Phiếu 5 (file nằm ở hồ sơ kết quả).
+- Tất cả thay đổi chưa commit.

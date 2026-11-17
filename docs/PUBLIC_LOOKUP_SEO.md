@@ -1,7 +1,7 @@
 # Kế hoạch trang tra cứu public và SEO
 
 **Cập nhật:** 15/11/2026  
-**Trạng thái:** Chưa triển khai runtime; đây là kiến trúc đã chốt.
+**Trạng thái:** API public và form tra cứu đã được code + test tự động (17/11/2026), chưa deploy; domain/TLS/SEO/sitemap/QR in thực tế chưa làm. **Đường dẫn thực tế khác bản kiến trúc bên dưới:** API là `POST /api/v1/public/results/lookup|download` (không phải `/api/public/v1/lookup`); khi dùng reverse proxy chỉ cho phép đúng hai đường dẫn này và đặt `app.public.client-ip-header`.
 
 ## Mục tiêu
 

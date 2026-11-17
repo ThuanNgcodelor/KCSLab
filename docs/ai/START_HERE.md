@@ -9,7 +9,7 @@
 2. `docs/SYSTEM_STATUS.md` để xem tổng hợp hiện hành và giới hạn nghiệm thu.
 3. `docs/ai/CONTEXT.md` để lấy context ngắn của hệ thống.
 4. `docs/ai/STATE.md` để xem các thay đổi đã xác minh gần nhất.
-5. `plans/CURRENT.md` để biết kế hoạch tổng thể và thứ tự triển khai.
+5. `plans/SYSTEM_COMPLETION_ROADMAP.md` để biết kế hoạch triển khai/nghiệm thu hiện hành; `plans/CURRENT.md` để tham khảo lịch sử và kế hoạch chi tiết.
 6. `docs/ai/HANDOFF.md` để tiếp tục công việc kỹ thuật từ phiên trước.
 7. Chỉ đọc tài liệu chuyên môn theo tác vụ:
    - Tiếp nhận: `plans/intake/OVERVIEW.md`, `RECEPTIONIST.md`, `ADMIN.md`, `TECHNICIAN_KCS.md`.

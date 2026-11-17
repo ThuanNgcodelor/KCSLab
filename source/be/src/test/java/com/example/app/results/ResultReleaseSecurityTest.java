@@ -24,11 +24,33 @@ class ResultReleaseSecurityTest {
         mvc.perform(get("/api/v1/result-releases/1").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
                 .andExpect(status().isForbidden());
     }
-    @Test void noRoleCanPublishWhileGateIsUnavailable() throws Exception {
-        for (String role : new String[]{"ROLE_ADMIN", "ROLE_TECHNICIAN"}) {
-            mvc.perform(post("/api/v1/result-releases/1/decision").with(csrf()).with(jwt().authorities(new SimpleGrantedAuthority(role))))
+    @Test void onlyAdminCanDecideAndTechnicianCannotPublishOrRevoke() throws Exception {
+        for (String action : new String[]{"publish", "revoke", "return"}) {
+            mvc.perform(post("/api/v1/result-releases/1/" + action).with(csrf())
+                            .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_TECHNICIAN"))))
+                    .andExpect(status().isForbidden());
+            mvc.perform(post("/api/v1/result-releases/1/" + action).with(csrf())
+                            .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
                     .andExpect(status().isForbidden());
         }
+    }
+    @Test void adminCannotUploadOrSubmitAndUnknownDecisionPathIsDenied() throws Exception {
+        for (String action : new String[]{"submit", "revisions"}) {
+            mvc.perform(post("/api/v1/result-releases/1/" + action).with(csrf())
+                            .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                    .andExpect(status().isForbidden());
+        }
+        mvc.perform(post("/api/v1/result-releases/1/decision").with(csrf())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isForbidden());
+    }
+    @Test void receptionistAndAnonymousCannotListOrDownload() throws Exception {
+        mvc.perform(get("/api/v1/result-releases").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/result-releases/1/files/1/content")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_RECEPTIONIST"))))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/result-releases/1")).andExpect(status().isUnauthorized());
     }
     @Test void onlyTechnicianCanCreateDraft() throws Exception {
         mvc.perform(post("/api/v1/result-releases").with(csrf()).with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))

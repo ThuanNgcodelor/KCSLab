@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { getTestingRecord, reviewTestingRecord, submitTestingRecord } from '../api/testingApi';
 import { PageLoader } from '../../../shared/components/Loading';
+import { createResultRelease } from '../../results/api/resultsApi';
 
 const statusLabels = { DRAFT: 'Bản nháp', SUBMITTED: 'Chờ kiểm tra', REVIEWED: 'Đã kiểm tra', RETURNED: 'Cần bổ sung' };
 
@@ -22,6 +23,13 @@ export function TestingRecordDetailPage() {
   const [confirm, setConfirm] = useState(null);
   function ask(config) { setConfirm(config); }
   async function runConfirmed() { const action = confirm?.run; setConfirm(null); if (action && !saving) await action(); }
+
+  async function createRelease() {
+    setSaving(true); setError('');
+    try { const release = await createResultRelease(record.id); navigate(`/admin/results/${release.id}`); }
+    catch (exception) { setError(exception.message); }
+    finally { setSaving(false); }
+  }
 
   async function submit() {
     setSaving(true); setError('');
@@ -57,6 +65,7 @@ export function TestingRecordDetailPage() {
       <section className="panel-card custody-card"><p className="section-kicker">Luồng kiểm tra</p><Timeline complete title="Đã lập biên bản" detail={`${record.analyst} · ${formatDateTime(record.createdAt)}`} /><Timeline complete={record.status !== 'DRAFT' && record.status !== 'RETURNED'} title="Gửi kiểm tra" detail={record.submittedAt ? formatDateTime(record.submittedAt) : 'Chưa gửi'} /><Timeline complete={record.status === 'REVIEWED'} title={record.status === 'RETURNED' ? 'Đã trả lại' : 'Kiểm tra hoàn tất'} detail={record.reviewedAt ? `${record.checkedBy} · ${formatDateTime(record.reviewedAt)}` : 'Đang chờ'} /></section>
       {record.reviewNote && <section className={`handoff-result ${record.status === 'RETURNED' ? 'rejected' : 'accepted'}`}><strong>Ý kiến kiểm tra</strong><span>{record.reviewNote}</span></section>}
       {editable && <section className="form-submit-panel testing-action-panel"><p><strong>Biên bản đang mở</strong><span>Cập nhật số liệu nếu cần, sau đó gửi người kiểm tra.</span></p><button className="outline-button light-outline" onClick={() => navigate(`/admin/testing/${id}/edit`)}>Sửa biên bản</button><button className="primary-button" disabled={saving} onClick={() => ask({ title: 'Gửi biên bản đi kiểm tra?', description: 'Sau khi gửi, biên bản chờ người kiểm tra và không thể sửa cho đến khi được trả lại.', confirmLabel: 'Xác nhận gửi', run: submit })}>{saving ? 'Đang gửi…' : 'Gửi kiểm tra'}</button></section>}
+      {record.status === 'REVIEWED' && user?.role === 'TECHNICIAN' && <section className="form-submit-panel testing-action-panel"><p><strong>Hồ sơ kết quả</strong><span>Biên bản đã kiểm tra. Lập hồ sơ kết quả để tải file và gửi duyệt phát hành.</span></p><button className="primary-button" disabled={saving} onClick={createRelease}>{saving ? 'Đang tạo…' : 'Lập hồ sơ kết quả'}</button></section>}
       {record.status === 'SUBMITTED' && user?.role === 'ADMIN' && <section className="panel-card intake-form-card testing-review-panel"><div className="form-card-heading"><span className="form-number">✓</span><div><h2>Kiểm tra biên bản</h2><p>Duyệt hoặc trả lại kỹ thuật viên bổ sung.</p></div></div><label>Ý kiến kiểm tra<textarea value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} placeholder="Bắt buộc khi trả lại" /></label><div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={saving} onClick={() => { if (!reviewNote.trim()) { setError('Vui lòng ghi ý kiến khi trả lại biên bản.'); return; } setError(''); ask({ title: 'Trả lại biên bản?', description: 'Biên bản sẽ quay về kỹ thuật viên để bổ sung theo ý kiến của bạn.', confirmLabel: 'Xác nhận trả lại', tone: 'danger', run: () => review('RETURNED') }); }}>Trả lại</button><button className="primary-button" disabled={saving} onClick={() => ask({ title: 'Xác nhận biên bản đạt?', description: 'Biên bản chuyển sang trạng thái Đã kiểm tra.', confirmLabel: 'Xác nhận đạt', run: () => review('REVIEWED') })}>{saving ? 'Đang lưu…' : 'Xác nhận đạt'}</button></div></section>}
     </aside></div>
   {confirm && <ConfirmDialog title={confirm.title} description={confirm.description} confirmLabel={confirm.confirmLabel} tone={confirm.tone} onCancel={() => setConfirm(null)} onConfirm={runConfirmed} />}

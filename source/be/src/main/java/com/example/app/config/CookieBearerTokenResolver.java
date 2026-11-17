@@ -19,7 +19,8 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
 
     @Override
     public String resolve(HttpServletRequest request) {
-        if (PUBLIC_AUTH_PATHS.contains(request.getRequestURI())) return null;
+        String uri = request.getRequestURI();
+        if (PUBLIC_AUTH_PATHS.contains(uri) || uri.startsWith("/api/v1/public/")) return null;
         String headerToken = headerResolver.resolve(request);
         if (headerToken != null) return headerToken;
         if (request.getCookies() == null) return null;

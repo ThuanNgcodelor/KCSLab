@@ -64,7 +64,7 @@
 | GET/PUT | `/api/v1/testing-records/{id}` | Xem/cập nhật biên bản nháp hoặc được trả lại | Đã triển khai |
 | POST | `/api/v1/testing-records/{id}/submit` | Gửi biên bản chờ kiểm tra | Đã triển khai |
 | POST | `/api/v1/testing-records/{id}/review` | Admin kiểm tra hoàn tất hoặc trả lại | Đã triển khai |
-| POST | `/api/v1/result-releases` | Duyệt và phát hành PDF kết quả | Đề xuất |
+| POST | `/api/v1/result-releases/{id}/publish` | Duyệt và phát hành hồ sơ kết quả | Đã có (xem mục dưới) |
 | POST | `/api/v1/public/lookups` | Tra cứu tiến độ có kiểm soát | Đề xuất bảo mật, chưa chốt |
 | GET | `/api/v1/notifications` | Danh sách notification nội bộ phân trang; size=3 dùng cho header | Đề xuất Intake I2 |
 | PATCH | `/api/v1/notifications/{id}` | Owner đánh dấu notification đã đọc | Đề xuất Intake I2 |
@@ -124,6 +124,9 @@ Runtime dùng access JWT cookie `access_token`, refresh session phía server, ro
 
 ## Hồ sơ kết quả: bước nháp ban đầu
 
-- `POST /api/v1/result-releases` với `{ "testingRecordId": 1 }`: TECHNICIAN tạo nháp cho Phiếu 5 `REVIEWED`; trả DTO có mã biên bản, trạng thái `DRAFT` và người tạo. Không tạo hai phiên bản 1 cho cùng biên bản.
-- `GET /api/v1/result-releases/{id}`: ADMIN/TECHNICIAN đọc DTO nháp.
-- Chưa có upload, gửi duyệt, phát hành, thu hồi, QR hay API public; các method/đường còn lại dưới `/api/v1/result-releases/**` bị chặn. Gate CFC-TN-14 phải hoàn tất trước phát hành.
+- `POST /api/v1/result-releases` `{ "testingRecordId": 1 }` (TECHNICIAN) tạo nháp v1 cho Phiếu 5 `REVIEWED`.
+- `GET /api/v1/result-releases?status=&page=&size=`, `GET /{id}`, `GET /{id}/events` (ADMIN/TECHNICIAN).
+- TECHNICIAN lập hồ sơ: `POST /{id}/files` (multipart `files`, nhiều file; một file lỗi thì không lưu file nào), `DELETE /{id}/files/{fileId}`, `POST /{id}/submit`, `POST /{id}/revisions` (từ phiên bản mới nhất đã thu hồi). `GET /{id}/files/{fileId}/content` (ADMIN/TECHNICIAN, `attachment`, `nosniff`, `no-store`).
+- ADMIN (độc lập với người lập và người phân tích): `POST /{id}/return {reason}`, `POST /{id}/publish {publicFileIds?}` (mặc định chỉ PDF công khai), `POST /{id}/revoke {reason}`. Phát hành cần biên bản `REVIEWED`, mẫu `VERIFIED` mã hóa, ≥1 file công khai; lỗi trạng thái → 409, sai quyền → 403, file sai → 413/415.
+- Mã hóa mẫu: `GET /api/v1/samples/{id}/coding`, `GET …/coding/events`, `POST …/coding/submit|verify|reject|correct` (ADMIN/RECEPTIONIST). Chuyển mẫu chưa `VERIFIED` → 409.
+- **Public (không đăng nhập, tách khỏi API nội bộ):** `POST /api/v1/public/results/lookup` `{code, phoneLast4}` và `POST /api/v1/public/results/download` `{code, phoneLast4, fileId}`. Chỉ hồ sơ `PUBLISHED`; mọi thất bại là 404 trung tính, quá giới hạn là 429 + `Retry-After`; phản hồi `no-store`, `noindex`, không PII. Các đường dẫn `/api/v1/public/**` khác bị chặn.

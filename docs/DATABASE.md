@@ -121,3 +121,10 @@ erDiagram
 ## Câu hỏi dữ liệu mở
 
 Chốt quy tắc số Phiếu kết quả; có version chỉ tiêu/phương pháp không; kết quả phát hành từng phần không; thời gian lưu dữ liệu/PDF bao lâu; ai được xem bảng mã mù và mapping mã–khách hàng.
+
+
+## Migration V7–V8 — 17/11/2026
+
+- V7: `sample_code_counters` (sequence theo ngày, seed từ `samples`), cột `coding_status/coding_legacy/coded_by/coded_at/verified_by/verified_at` trên `samples` (mẫu cũ → `VERIFIED` + `coding_legacy`), `sample_code_events` (append-only).
+- V8: mở rộng `result_releases` (mã tra cứu, số phiếu, mốc gửi/duyệt/phát hành/thu hồi; cột sinh `published_marker` + unique `(testing_record_id, published_marker)` đảm bảo tối đa một bản `PUBLISHED`), `result_release_files` (xóa mềm, checksum, cờ công khai), `result_release_events` (append-only), `public_lookup_audit` (không lưu SĐT/mã/IP thô).
+- Đã chạy trên DB trống và DB V6 có dữ liệu cũ (database thử, Docker). **Chưa chạy trên database làm việc**: backup rồi kiểm tra `flyway_schema_history` trước khi áp dụng. Không sửa V1–V8 sau khi đã chạy.

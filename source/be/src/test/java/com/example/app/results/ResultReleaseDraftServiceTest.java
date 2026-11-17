@@ -17,7 +17,8 @@ import static org.mockito.Mockito.*;
 class ResultReleaseDraftServiceTest {
     private final ResultReleaseRepository releases = mock(ResultReleaseRepository.class);
     private final TestingRecordRepository records = mock(TestingRecordRepository.class);
-    private final ResultReleaseDraftService service = new ResultReleaseDraftService(releases, records);
+    private final ResultReleaseDraftService service = new ResultReleaseDraftService(releases, records,
+            mock(com.example.app.results.repository.ResultReleaseEventRepository.class));
     private final User creator = mock(User.class);
 
     @Test void onlyReviewedRecordCanCreateDraft() {

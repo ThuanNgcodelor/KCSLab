@@ -44,6 +44,7 @@ export function AdminLayout() {
           {user?.role === 'TECHNICIAN' && <NavLink to="/admin/receiving" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           <NavLink to={user?.role === 'TECHNICIAN' ? '/admin/receiving/transfers' : '/admin/transfers'} onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>{user?.role === 'TECHNICIAN' ? 'Nhận mẫu' : 'Chuyển mẫu'}</span></NavLink>
           {canTest && <NavLink to="/admin/testing" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Thử nghiệm</span></NavLink>}
+          {canTest && <NavLink to="/admin/results" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Hồ sơ kết quả</span></NavLink>}
           <NavLink to="/admin/notifications" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="bell" /><span>Thông báo</span></NavLink>
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
@@ -67,6 +68,7 @@ function getPageTitle(pathname) {
   if (pathname.includes('/receiving/transfers')) return 'Nhận mẫu';
   if (pathname.includes('/receiving')) return 'Tổng quan nhận mẫu';
   if (pathname.includes('/transfers')) return 'Chuyển mẫu';
+  if (pathname.includes('/results')) return 'Hồ sơ kết quả';
   if (pathname.includes('/testing')) return 'Thử nghiệm';
   if (pathname.includes('/users')) return 'Nhân viên';
   return 'Tổng quan';

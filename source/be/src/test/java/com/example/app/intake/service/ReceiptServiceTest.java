@@ -107,7 +107,11 @@ class ReceiptServiceTest {
         Instant now = Instant.now();
         ReceiptResponse unavailable = receiptService.create(
                 receiptRequest("Alpha Unavailable", "0900000201", now.minusSeconds(60)), receptionist);
-        receiptService.create(receiptRequest("Beta Available", "0900000202", now), receptionist);
+        ReceiptResponse available = receiptService.create(
+                receiptRequest("Beta Available", "0900000202", now), receptionist);
+        var availableSample = sampleRepository.findById(available.samples().getFirst().id()).orElseThrow();
+        availableSample.markLegacyVerified();
+        sampleRepository.saveAndFlush(availableSample);
 
         var sample = sampleRepository.findById(unavailable.samples().getFirst().id()).orElseThrow();
         sample.markTransferPending();

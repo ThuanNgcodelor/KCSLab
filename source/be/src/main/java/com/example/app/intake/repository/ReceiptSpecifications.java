@@ -4,6 +4,7 @@ import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.entity.Receipt;
 import com.example.app.intake.entity.ReceiptStatus;
 import com.example.app.intake.entity.Sample;
+import com.example.app.intake.entity.SampleCodingStatus;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -72,7 +73,8 @@ public final class ReceiptSpecifications {
                 var sample = availableSample.from(Sample.class);
                 availableSample.select(sample.get("id")).where(
                         builder.equal(sample.get("receipt").get("id"), root.get("id")),
-                        builder.equal(sample.get("status"), ReceiptStatus.RECEIVED)
+                        builder.equal(sample.get("status"), ReceiptStatus.RECEIVED),
+                        builder.equal(sample.get("codingStatus"), SampleCodingStatus.VERIFIED)
                 );
                 return builder.and(
                         builder.notEqual(root.get("status"), ReceiptStatus.REJECTED),

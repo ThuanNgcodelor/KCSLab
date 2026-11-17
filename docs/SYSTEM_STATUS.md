@@ -22,7 +22,7 @@ Không tạo role SAMPLE_RECEIVER. `receivedBy` là nhân viên lập Phiếu 3;
 
 - Backend: Java 21, Spring Boot, Maven, package-by-feature tại `source/be`. Frontend nội bộ: React/Vite/JSX tại `source/fe`.
 - MySQL lưu dữ liệu; Redis hỗ trợ refresh session. Cấu hình được lấy từ môi trường/.env, không ghi credentials vào tài liệu.
-- Flyway quản lý migration `source/be/src/main/resources/db/migration/`; Hibernate dùng `validate`, không tự viết migration. Trong source có V1–V6; V5/V6 đã được thử trên database tạm, **chưa xác nhận đã chạy trên database làm việc**. Kiểm tra `flyway_schema_history` trên đúng database trước khi kết luận.
+- Flyway quản lý migration `source/be/src/main/resources/db/migration/`; Hibernate dùng `validate`, không tự viết migration. Trong source có V1–V8; V7/V8 (mã hóa, quy trình hồ sơ kết quả, audit tra cứu) đã được thử trên database tạm trống và trên DB có dữ liệu cũ, **chưa xác nhận đã chạy trên database làm việc**. Backup trước khi migrate DB làm việc. Kiểm tra `flyway_schema_history` trên đúng database trước khi kết luận.
 - File hồ sơ/avatar hiện lưu filesystem local; cần xác định backup, retention và lưu trữ khi triển khai thực tế.
 - Lệnh chạy backend/frontend và hướng dẫn theo hệ điều hành: `docs/ai/START_HERE.md`. Không thay đổi database đang có chỉ để kiểm tra tài liệu.
 
@@ -38,17 +38,18 @@ Không tạo role SAMPLE_RECEIVER. `receivedBy` là nhân viên lập Phiếu 3;
 | Thông báo nội bộ | Lưu DB, notification center, WebSocket và toast; event tiếp nhận/chuyển/nhận/từ chối. | Chưa nghiệm thu đầy đủ hai phiên WebSocket thật, sau commit/rollback và tình huống lỗi. Chính sách hiển thị tên khách trong notification cần LAB xác nhận. |
 | Dashboard Admin | Có route/trang Admin hiện hữu. | Chưa coi dashboard bao quát toàn hệ thống là hoàn thành. |
 
-## 4. Mã hóa CFC-TN-14
+## 4. Mã hóa CFC-TN-14 (P2 — đã code và test, chờ LAB chốt một phần)
 
-Mã gốc theo dạng `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE` (ví dụ `CT001-SR-15112026-001`). Chưa có bộ gate đầy đủ: sequence nguyên tử, xác minh hai người và các trạng thái xác minh, mã `-V/-R`, QC/mã mù, lịch sử hiệu chỉnh, chặn chuyển mẫu chưa xác minh. Không coi mã hiện tại đã tuân thủ đầy đủ CFC-TN-14; xem `docs/SAMPLE_CODING.md` và tài liệu gốc.
+- **Đã có (V7):** sequence nguyên tử theo ngày giờ Việt Nam (`sample_code_counters`, `INSERT … ON DUPLICATE KEY UPDATE`; không dùng `COUNT+1`; không tái sử dụng kể cả khi hiệu chỉnh); trạng thái `PENDING_CODING → PENDING_VERIFICATION → VERIFIED` và `CORRECTION_REQUIRED`; người mã hóa không thể tự xác minh (403); lịch sử append-only `sample_code_events` (gửi/xác minh/không đạt/hiệu chỉnh có mã cũ–mới, người, lý do, thời điểm); **gate chuyển mẫu**: tạo/sửa/gửi Phiếu 4 và nhận phiếu đều từ chối mẫu chưa `VERIFIED` (409), kể cả qua API transfer cũ; danh sách “có thể chuyển” chỉ gồm mẫu đã xác minh. API: `/api/v1/samples/{id}/coding[/submit|verify|reject|correct|events]` (ADMIN, RECEPTIONIST). UI: ô trạng thái/hành động trên chi tiết Phiếu 3.
+- **Giả định tạm, cần LAB xác nhận:** (1) mẫu có sẵn trước V7 được đánh dấu `VERIFIED` + `coding_legacy=true`; (2) vai trò được đối chiếu = ADMIN/RECEPTIONIST khác người mã hóa (Technician không đối chiếu); (3) hiệu chỉnh cấp mã mới từ counter ngày, chưa có bước “người duyệt hiệu chỉnh” riêng; (4) mã nguồn `SOURCE` chưa kiểm định dạng `2 chữ + 3 số`.
+- **Chưa làm (chờ LAB):** hậu tố `-V/-R`, mẫu QC (`BL/SP/D`), mã mù và bảng đối chiếu có quyền riêng, nhãn in. Không coi mã hiện tại tuân thủ đầy đủ CFC-TN-14.
 
-## 5. Hồ sơ kết quả, public lookup và tin nhắn khách
+## 5. Hồ sơ kết quả và tra cứu public (P3/P4 — đã code và test, chưa deploy)
 
-- `V6__result_release_drafts.sql` và feature `results` là thay đổi **chưa commit**. API hiện có `POST /api/v1/result-releases` cho TECHNICIAN tạo nháp từ Phiếu 5 `REVIEWED`, và `GET /api/v1/result-releases/{id}` cho ADMIN/TECHNICIAN đọc. Chưa có UI hồ sơ kết quả, upload, submit/duyệt, phát hành, thu hồi hoặc quản lý phiên bản hoàn chỉnh.
-- Quyết định đã chốt: chỉ cho tạo/lưu nháp; **chặn phát hành đến khi hoàn tất gate mã hóa**. KQKN-DV là hồ sơ kết quả đã nói tới. Định hướng file: tối đa 10 MB/file, 10 file/hồ sơ; mặc định chỉ PDF public, Admin có thể bật Word/Excel. Đây chưa phải tính năng đã chạy.
-- `source/public/tracuu/` là site tĩnh **xem trước cục bộ, không login**; form vô hiệu hóa, có thông báo chưa khả dụng và `noindex`. Ảnh hero là minh họa AI, không phải ảnh phòng lab thật. Cách chạy: `source/public/README.md`.
-- Chưa có kết quả public, API tra cứu, mã/QR phát hành, tải file, rate limit, bảo vệ chống dò, SEO production, domain hoặc Cloudflare Tunnel. QR và tra mã tay trong tương lai đều yêu cầu thêm 4 số cuối điện thoại. Không expose API nội bộ; `noindex` không thay thế bảo mật.
-- ZBS/SMS/outbox/provider/callback gửi khách chưa triển khai. WebSocket nội bộ không phải là Zalo/SMS.
+- **Hồ sơ kết quả (V8):** `DRAFT/RETURNED → SUBMITTED → PUBLISHED → REVOKED`, phiên bản `v2…` sau khi thu hồi. Technician lập hồ sơ tải/gỡ file và gửi duyệt (chỉ người lập); ADMIN độc lập (khác người lập và người phân tích) trả lại/phát hành/thu hồi. Phát hành yêu cầu biên bản `REVIEWED`, mẫu đã `VERIFIED` mã hóa, ≥1 file công khai; DB đảm bảo tối đa một phiên bản `PUBLISHED` cho mỗi biên bản; khóa hàng khi chuyển trạng thái; lịch sử bất biến `result_release_events`. File: PDF/DOCX/XLSX, ≤10 MB, ≤10 file; kiểm tra đuôi + MIME khai báo + magic bytes, PDF chủ động (`/JavaScript`, `/Launch`, `/EmbeddedFile`), OOXML (macro, nhúng OLE/ActiveX, liên kết ngoài, mẫu đính kèm, zip-slip); tên lưu ngẫu nhiên, SHA-256, lưu hoặc xóa theo transaction; tải nội bộ qua API kiểm quyền (`nosniff`, `no-store`). Mặc định chỉ PDF công khai; Admin bật Word/Excel khi phát hành. API `/api/v1/result-releases/**`; UI `/admin/results`.
+- **Giả định/cần xác nhận:** số phiếu kết quả hiện là `KQ-yyyyMMdd-XXXXXX` ngẫu nhiên (quy tắc LAB chưa chốt); quy tắc người duyệt độc lập; Receptionist không xem hồ sơ kết quả; chưa có quét virus, backup, retention; file kết quả lưu `storage/results` local.
+- **Tra cứu public (API):** `POST /api/v1/public/results/lookup` và `/download` — mã tra cứu 16 ký tự (~80 bit) + 4 số cuối SĐT cho cả nhập tay và QR; chỉ `PUBLISHED`; sai mã/sai SĐT/nháp/thu hồi cùng một phản hồi 404 trung tính; kiểm tra lại quyền ở mỗi lần tải; chỉ file công khai; không trả PII; `Cache-Control: no-store`, `X-Robots-Tag: noindex`; mã và SĐT chỉ ở body POST; rate limit trong bộ nhớ (5 lần sai/mã/15 phút, 15 sai/client/15 phút, 60 yêu cầu/client/10 phút; khóa cả mã không tồn tại để không thành “oracle”); audit `public_lookup_audit` không chứa SĐT, mã hoặc IP thô. **Khi chạy sau proxy/Cloudflare phải đặt `app.public.client-ip-header` (ví dụ `CF-Connecting-IP`), nếu không mọi khách dùng chung một IP và bị khóa chung.** Rate limit theo từng instance; scale ngang cần chuyển sang Redis.
+- `source/public/tracuu/` đã nối form với API (`lookup.js`); vẫn `noindex`, **chưa deploy**, chưa có domain/TLS/canonical/sitemap/QR in thực tế, chưa kiểm tra tường lửa/headers hạ tầng. ZBS/SMS/outbox/provider chưa triển khai (P6).
 
 ## 6. Route và ranh giới
 
@@ -58,17 +59,21 @@ Mã gốc theo dạng `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE` (ví dụ `CT001-SR-151
 
 ## 7. Bằng chứng kiểm thử đã ghi nhận
 
-- Lần trước: backend Java 21/MySQL/Redis thử nghiệm cho bước nháp hồ sơ kết quả ghi nhận **38 test, 0 failures, 0 errors, 0 skipped**; không đồng nghĩa database làm việc đã được migrate hay toàn bộ nghiệp vụ được nghiệm thu.
-- KCS: bộ trước đó ghi nhận 32 test, 0 failures/errors/skipped, có HTTP/MySQL kiểm tra attachment chéo và KPI/phân trang; vẫn còn khoảng trống E2E, WebSocket sau commit/rollback, một số ranh giới/sort.
-- Frontend `npm run build` đã pass ở các lượt trước; nhiều ảnh/breakpoint và WebSocket được kiểm tra bằng API giả lập. Landing preview đã được kiểm tra HTTP 200 và không tràn ngang ở 390 và 1440 px.
-- **Ngày cập nhật tài liệu này không chạy lại Maven, frontend build hoặc E2E.** Không suy diễn kết quả cũ là kết quả mới.
+Lượt 17/11/2026 (P0–P4), chạy trong Docker cô lập (MySQL 8.4 + Redis tạm; **không** đụng database làm việc):
+
+- Backend: `scripts/run-be-tests-docker.sh` → **66 test, 0 failures, 0 errors, 0 skipped** (gồm `ReceivingConcurrencyTest` và `SampleSequenceConcurrencyTest` bật bằng `KCS_ISOLATED_DB=true`). Baseline trước thay đổi: 38 test pass khi có MySQL/Redis (29 lỗi nếu không có DB).
+- Flyway: V1–V8 chạy trên DB trống; V7/V8 chạy trên DB V6 có dữ liệu cũ (sequence được seed từ dữ liệu cũ, mẫu cũ `VERIFIED/legacy`).
+- E2E HTTP thật trên backend cô lập (`scripts/e2e-results-flow.py`): **52/52** kiểm tra (tiếp nhận → mã hóa → chuyển mẫu → KCS → Phiếu 5 → hồ sơ kết quả → tra cứu public; 401/403/409/413/415/429).
+- Chrome thật (headless, CDP) tại 390×844, 1024×768, 1440×900, 2560×952: **58/58** (trang tra cứu public từ link QR, validation, lỗi trung tính, kết quả + nút tải, không PII; danh sách/chi tiết hồ sơ kết quả; ô mã hóa trên Phiếu 3; không tràn ngang; không console error).
+- Frontend `npm run build` pass.
+- **Chưa kiểm chứng:** mở DOCX Phiếu 3 bằng Microsoft Word thật; tải/mở file PDF trong trình duyệt thật; hai phiên WebSocket thật; dashboard Admin; QR in thực tế; hạ tầng/TLS/domain; chạy migration trên database làm việc; thao tác UI mã hóa/phát hành bằng click thật (mới kiểm tra hiển thị).
 
 ## 8. Ưu tiên tiếp theo và quyết định còn mở
 
-1. Nghiệm thu luồng thật RECEPTIONIST → KCS → thử nghiệm, notification, file thật và export Phiếu 3 bằng Word; không tự thay đổi dữ liệu sản xuất để thử.
-2. Hoàn thiện gate mã hóa và các quy tắc còn thiếu, kèm test cạnh tranh/kiểm soát quyền.
-3. Hoàn thiện hồ sơ kết quả nội bộ và cơ chế duyệt/phát hành sau gate; xác định chữ ký, số phiếu, lưu trữ/backup và quét file.
-4. Chỉ sau đó triển khai API/site tra cứu public an toàn, QR, rate limit và hạ tầng/domain; tiếp tục hoàn thiện dashboard Admin và frontend theo plan.
+1. Nghiệm thu thủ công bằng người dùng thật: Word cho Phiếu 3, UI mã hóa/phát hành, hai phiên WebSocket.
+2. LAB chốt quy tắc còn mở (mục 4–5) rồi làm `-V/-R`, QC/mã mù, số phiếu kết quả, quy tắc người duyệt.
+3. Quyết định lưu trữ/backup/quét virus file; sinh QR; domain/TLS/proxy (`app.public.client-ip-header`), rồi mới deploy trang tra cứu.
+4. P5 dashboard Admin và rà frontend; P6 ZBS/SMS.
 5. Triển khai ZBS/SMS khi có tài khoản provider, template được duyệt và quyết định về consent.
 
 Cần LAB xác nhận: quy định thiếu ảnh, nội dung/tên khách trong notification, người kiểm tra/ký, quyền xem trạng thái kết quả của Receptionist, chứng nhận được công bố, chính sách lưu trữ và nội dung thông báo kết quả.

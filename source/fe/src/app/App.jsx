@@ -20,6 +20,8 @@ const TestingRecordFormPage = lazy(() => import('../features/testing/pages/Testi
 const TestingRecordDetailPage = lazy(() => import('../features/testing/pages/TestingRecordDetailPage').then(m => ({ default: m.TestingRecordDetailPage })));
 const NotificationsPage = lazy(() => import('../features/notifications/pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const ProfilePage = lazy(() => import('../features/profile/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const ResultReleasesPage = lazy(() => import('../features/results/pages/ResultReleasesPage').then(m => ({ default: m.ResultReleasesPage })));
+const ResultReleaseDetailPage = lazy(() => import('../features/results/pages/ResultReleaseDetailPage').then(m => ({ default: m.ResultReleaseDetailPage })));
 const ReceivingDashboardPage = lazy(() => import('../features/receiving/pages/ReceivingDashboardPage').then(m => ({ default: m.ReceivingDashboardPage })));
 const ReceivingListPage = lazy(() => import('../features/receiving/pages/ReceivingListPage').then(m => ({ default: m.ReceivingListPage })));
 const ReceivingDetailPage = lazy(() => import('../features/receiving/pages/ReceivingDetailPage').then(m => ({ default: m.ReceivingDetailPage })));
@@ -82,6 +84,8 @@ export function App() {
           <Route path="/admin/testing/new" element={<TestingRecordFormPage />} />
           <Route path="/admin/testing/:id" element={<TestingRecordDetailPage />} />
           <Route path="/admin/testing/:id/edit" element={<TestingRecordFormPage />} />
+          <Route path="/admin/results" element={<ResultReleasesPage />} />
+          <Route path="/admin/results/:id" element={<ResultReleaseDetailPage />} />
         </Route>
         <Route path="/users" element={<Navigate to="/admin/users" replace />} />
       </Route>

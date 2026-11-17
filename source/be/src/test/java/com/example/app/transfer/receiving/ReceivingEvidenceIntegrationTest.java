@@ -68,7 +68,7 @@ class ReceivingEvidenceIntegrationTest {
                 true, "Tốt", null, null, null, "Thường", "Cd", LocalDate.now().plusDays(1), null,
                 AcceptanceDecision.ACCEPTED, null);
         receipt.addSample(new Sample(sampleCode, "CT001", "Sầu riêng", LocalDate.now(), 1,
-                "Mẫu", "1", "Túi", "Tốt", "Cd"));
+                "Mẫu", "1", "Túi", "Tốt", "Cd").markLegacyVerified());
         return receipts.saveAndFlush(receipt);
     }
 }

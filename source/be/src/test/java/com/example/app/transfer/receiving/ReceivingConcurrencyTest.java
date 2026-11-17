@@ -55,7 +55,7 @@ class ReceivingConcurrencyTest {
                     "Túi", null, true, "Nguyên vẹn", null, null, null, "Thường", "Cd",
                     LocalDate.now().plusDays(1), null, AcceptanceDecision.ACCEPTED, null);
             receipt.addSample(new Sample("SM-" + key, "CT001", "Sầu riêng", LocalDate.now(), 1,
-                    "Test", "1", "Túi", "Nguyên vẹn", "Cd"));
+                    "Test", "1", "Túi", "Nguyên vẹn", "Cd").markLegacyVerified());
             receipt = receipts.saveAndFlush(receipt);
             var request = new CreateTransferRequest(receipt.getId(), "KCS", LocalDate.now(),
                     LocalDate.now().plusDays(1), false, null, null,

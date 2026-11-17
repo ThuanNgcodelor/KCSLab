@@ -41,3 +41,10 @@ function dashboardSearch(filters) {
   });
   return search;
 }
+
+export function getSampleCoding(sampleId) { return request(`/samples/${sampleId}/coding`); }
+export function getSampleCodingEvents(sampleId) { return request(`/samples/${sampleId}/coding/events`); }
+export function submitSampleCoding(sampleId) { return request(`/samples/${sampleId}/coding/submit`, { method: 'POST' }); }
+export function verifySampleCoding(sampleId) { return request(`/samples/${sampleId}/coding/verify`, { method: 'POST' }); }
+export function rejectSampleCoding(sampleId, reason) { return request(`/samples/${sampleId}/coding/reject`, { method: 'POST', body: JSON.stringify({ reason }) }); }
+export function correctSampleCoding(sampleId, data) { return request(`/samples/${sampleId}/coding/correct`, { method: 'POST', body: JSON.stringify(data) }); }

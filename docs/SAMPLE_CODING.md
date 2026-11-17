@@ -1,8 +1,10 @@
 # Quy trình tiếp nhận hồ sơ và mã hóa mẫu
 
-**Phiên bản:** 0.3 · **Cập nhật:** 15/11/2026 · **Trạng thái:** CFC-TN-14 là nguồn chuẩn; runtime mới có mã gốc, gate mã hóa đầy đủ chưa triển khai
+**Phiên bản:** 0.4 · **Cập nhật:** 17/11/2026 · **Trạng thái:** CFC-TN-14 là nguồn chuẩn; đã có sequence nguyên tử, trạng thái xác minh hai người, lịch sử hiệu chỉnh và gate chuyển mẫu (V7, có test); chưa có `-V/-R`, QC/mã mù (chờ LAB)
 
 ## Trạng thái runtime hiện tại
+
+> **Cập nhật 17/11/2026:** các mục “chưa” về sequence nguyên tử, `PENDING_CODING/PENDING_VERIFICATION/VERIFIED`, người xác minh thứ hai, lịch sử hiệu chỉnh và chặn chuyển mẫu chưa xác minh đã được triển khai (xem `docs/SYSTEM_STATUS.md` mục 4). Còn thiếu: `-V/-R`, QC, mã mù, nhãn in. Mẫu có trước V7 là `VERIFIED/legacy` (cần LAB xác nhận). Các dòng bên dưới là mô tả lịch sử.
 
 - Phiếu 3 đã lưu `sourceCode`, `productType`, ngày nhận và sinh mã gốc dạng `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`.
 - Ví dụ `CT001` trong form là mã nguồn mẫu do người nhập cung cấp; nó chưa phải danh mục nguồn được Admin duyệt.

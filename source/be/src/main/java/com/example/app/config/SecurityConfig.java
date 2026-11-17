@@ -87,12 +87,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh"))
+                        .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/public/**"))
                 .cors(cors -> { })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/public/results/lookup", "/api/v1/public/results/download").permitAll()
+                        .requestMatchers("/api/v1/public/**").denyAll()
                         .requestMatchers("/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                         .requestMatchers("/ws/notifications", "/api/v1/notifications/**").authenticated()
                         .requestMatchers("/api/v1/users/me", "/api/v1/users/me/**").authenticated()
@@ -101,9 +103,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/intake/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/receptionist").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/v1/samples/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receiving/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/result-releases").hasRole("TECHNICIAN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/result-releases/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/files", "/api/v1/result-releases/*/submit",
+                                "/api/v1/result-releases/*/revisions").hasRole("TECHNICIAN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/result-releases/*/files/*").hasRole("TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/return", "/api/v1/result-releases/*/publish",
+                                "/api/v1/result-releases/*/revoke").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/result-releases", "/api/v1/result-releases/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers("/api/v1/result-releases/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/transfers/**").hasAnyRole("ADMIN", "RECEPTIONIST", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/transfers/*/decision").hasAnyRole("ADMIN", "TECHNICIAN")

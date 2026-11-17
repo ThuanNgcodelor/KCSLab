@@ -67,7 +67,7 @@ class TransferServiceTest {
         sample = new Sample(
                 "SM-TEST-001", "VT-01", "Sầu riêng", LocalDate.now(), 1,
                 "Mẫu cơm sầu riêng", "500 g", "Túi PE", "Nguyên vẹn",
-                "Cadimi, dư lượng thuốc BVTV");
+                "Cadimi, dư lượng thuốc BVTV").markLegacyVerified();
         receipt.addSample(sample);
         receipt = receiptRepository.save(receipt);
         sample = receipt.getSamples().getFirst();
@@ -160,7 +160,7 @@ class TransferServiceTest {
     void receivingDashboardAndPaginationIncludeMoreThanOnePage() {
         for (int i = 0; i < 21; i++) {
             Sample item = new Sample("SM-PAGE-" + i, "VT-01", "Sầu riêng", LocalDate.now(), i + 10,
-                    "Mẫu " + i, "1", "Túi", "Tốt", "Cd");
+                    "Mẫu " + i, "1", "Túi", "Tốt", "Cd").markLegacyVerified();
             receipt.addSample(item);
             entityManager.persist(item);
             entityManager.flush();

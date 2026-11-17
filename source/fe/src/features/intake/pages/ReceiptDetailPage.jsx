@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, uploadReceiptFile } from '../api/intakeApi';
 import { PageLoader } from '../../../shared/components/Loading';
+import { SampleCodingPanel } from '../components/SampleCodingPanel';
 
 const categoryLabels = {
   FORM_3: 'Phiếu tiếp nhận số 3', LOT_PHOTO: 'Ảnh lô hàng', SAMPLE_PHOTO: 'Ảnh mẫu',
@@ -58,7 +59,7 @@ export function ReceiptDetailPage() {
           </div>
         </section>
         <section className="panel-card intake-form-card"><DetailHeading title={`Danh sách mẫu (${receipt.samples.length})`} />
-          <div className="receipt-sample-list">{receipt.samples.map((sample) => <article className="receipt-sample-item" key={sample.id}><div><strong>{sample.sampleCode}</strong><small>{sample.sourceCode} · {sample.productType}</small></div><div><strong>{sample.name}</strong><small>{sample.quantity || 'Chưa ghi lượng'} · {sample.packaging || 'Chưa ghi bao bì'}</small></div><div><strong>{sample.sampleCondition || 'Chưa ghi tình trạng'}</strong><small>{sample.requestedParameters || 'Chưa ghi chỉ tiêu'}</small></div></article>)}</div>
+          <div className="receipt-sample-list">{receipt.samples.map((sample) => <article className="receipt-sample-item" key={sample.id}><div><strong>{sample.sampleCode}</strong><small>{sample.sourceCode} · {sample.productType}</small></div><div><strong>{sample.name}</strong><small>{sample.quantity || 'Chưa ghi lượng'} · {sample.packaging || 'Chưa ghi bao bì'}</small></div><div><strong>{sample.sampleCondition || 'Chưa ghi tình trạng'}</strong><small>{sample.requestedParameters || 'Chưa ghi chỉ tiêu'}</small></div><SampleCodingPanel sample={sample} onChanged={() => getReceipt(id).then(setReceipt).catch(() => {})} /></article>)}</div>
         </section>
         <section className="panel-card intake-form-card"><DetailHeading title={`Ảnh và hồ sơ (${receipt.attachments.length})`} />
           {receipt.attachments.length === 0 ? <p className="muted">Chưa có ảnh hoặc file đính kèm.</p> : <div className="attachment-list">{receipt.attachments.map((attachment) => <a className="attachment-item" href={attachment.contentUrl} target="_blank" rel="noreferrer" key={attachment.id}><span>{attachment.contentType.startsWith('image/') ? '▧' : '▤'}</span><div><strong>{categoryLabels[attachment.category] ?? attachment.category}</strong><small>{attachment.originalName} · {formatSize(attachment.size)}</small><small>{attachment.uploadedByName || 'Không rõ người tải'} · {formatDateTime(attachment.capturedAt || attachment.uploadedAt)}</small></div></a>)}</div>}
@@ -67,7 +68,7 @@ export function ReceiptDetailPage() {
       <aside className="receipt-form-aside"><form className="panel-card intake-form-card" onSubmit={handleUpload}><DetailHeading title="Bổ sung bằng chứng" />
         <label>Loại hồ sơ<select value={category} onChange={(event) => setCategory(event.target.value)}>{Object.entries(categoryLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
         <label>Mô tả<input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Góc chụp, tình trạng…" /></label>
-        <label className="file-drop compact-file-drop"><input type="file" accept={photoCategory ? 'image/*' : 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*'} capture={photoCategory ? 'environment' : undefined} onChange={(event) => setFile(event.target.files?.[0] ?? null)} /><span className="upload-symbol">↑</span><strong>{file?.name || (photoCategory ? 'Chụp hoặc chọn ảnh' : 'Chọn file')}</strong><small>Tối đa 5 MB</small></label>
+        <label className="file-drop compact-file-drop"><input type="file" accept={photoCategory ? 'image/*' : 'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*'} capture={photoCategory ? 'environment' : undefined} onChange={(event) => setFile(event.target.files?.[0] ?? null)} /><span className="upload-symbol">↑</span><strong>{file?.name || (photoCategory ? 'Chụp hoặc chọn ảnh' : 'Chọn file')}</strong><small>Tối đa 10 MB</small></label>
         <button className="primary-button" type="submit" disabled={!file || saving}>{saving ? 'Đang tải lên…' : 'Lưu vào hồ sơ'}</button>
       </form></aside>
     </div>

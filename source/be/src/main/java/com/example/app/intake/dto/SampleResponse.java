@@ -1,6 +1,9 @@
 package com.example.app.intake.dto;
 
 import com.example.app.intake.entity.ReceiptStatus;
+import com.example.app.intake.entity.SampleCodingStatus;
+
+import java.time.Instant;
 
 public record SampleResponse(
         Long id,
@@ -12,5 +15,7 @@ public record SampleResponse(
         String packaging,
         String sampleCondition,
         String requestedParameters,
-        ReceiptStatus status
+        ReceiptStatus status,
+        SampleCodingStatus codingStatus,
+        Instant codingVerifiedAt
 ) {}

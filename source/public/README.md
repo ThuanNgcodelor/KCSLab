@@ -1,11 +1,11 @@
-# Trang tra cứu CFC — bản xem trước nội bộ
+# Trang tra cứu CFC
 
-Trang tĩnh riêng tại `/tracuu/` không cần đăng nhập. Chưa kết nối API, chưa có QR hoặc kết quả; biểu mẫu bị vô hiệu hóa để tránh hiểu nhầm. Metadata `noindex` là tạm thời cho bản xem trước, không dùng thay bảo mật.
+Trang tĩnh riêng tại `/tracuu/`, không cần đăng nhập. Form đã nối với API công khai `POST /api/v1/public/results/lookup` và `/download` (same-origin; reverse proxy phải chỉ chuyển tiếp hai đường dẫn này, không mở `/api/v1/*` khác). Mã tra cứu và 4 số cuối chỉ đi trong body POST, không nằm trong URL. QR chỉ cần mã: `/tracuu/?code=MÃ`; khách vẫn phải nhập 4 số cuối.
 
-Từ thư mục gốc dự án, chạy:
+Trạng thái: **đã kiểm thử API ở mức tự động (MockMvc), chưa kiểm thử trên Chrome thật và chưa triển khai/public**. Metadata `noindex` vẫn giữ cho tới khi có domain, canonical, sitemap và được duyệt triển khai. Python `http.server` bên dưới không proxy API nên form sẽ báo lỗi kết nối; để thử đầy đủ hãy dùng Vite proxy hoặc reverse proxy.
 
 ```bash
 python3 -m http.server 4174 --bind 127.0.0.1 --directory source/public
 ```
 
-Mở `http://127.0.0.1:4174/tracuu/`. Lệnh này chỉ để xem thử trên máy, không dùng làm server production hoặc expose ra Internet. Trang chỉ kết nối tra cứu sau khi có hồ sơ phát hành, API riêng, kiểm soát mã + bốn số điện thoại, rate limit, no-store và kiểm thử bảo mật. Tên miền/canonical/sitemap sẽ chốt khi có hostname thật.
+Lệnh trên chỉ để xem giao diện trên máy, không dùng làm server production hoặc expose ra Internet.

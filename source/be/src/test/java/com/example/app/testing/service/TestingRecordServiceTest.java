@@ -72,7 +72,7 @@ class TestingRecordServiceTest {
                 "Xe lạnh", 18.0, "Nhiệt độ phòng", "Cadimi", LocalDate.now().plusDays(5),
                 null, AcceptanceDecision.ACCEPTED, null);
         sample = new Sample("SM-TEST-RECORD", "VT-02", "Sầu riêng", LocalDate.now(), 2,
-                "Mẫu ruột sầu riêng", "500 g", "Túi PE", "Nguyên vẹn", "Cadimi");
+                "Mẫu ruột sầu riêng", "500 g", "Túi PE", "Nguyên vẹn", "Cadimi").markLegacyVerified();
         receipt.addSample(sample);
         receipt = receiptRepository.save(receipt);
         sample = receipt.getSamples().getFirst();

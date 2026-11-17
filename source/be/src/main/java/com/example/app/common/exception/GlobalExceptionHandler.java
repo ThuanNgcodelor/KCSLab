@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     ProblemDetail uploadTooLarge() {
-        return problem(HttpStatus.PAYLOAD_TOO_LARGE, "Tệp tải lên vượt quá giới hạn 5 MB");
+        return problem(HttpStatus.PAYLOAD_TOO_LARGE, "Tệp tải lên vượt quá giới hạn dung lượng cho phép");
     }
 
     private ProblemDetail problem(HttpStatus status, String message) {
