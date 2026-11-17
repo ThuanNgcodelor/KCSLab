@@ -24,7 +24,8 @@ class ReceivingServiceTest {
     private final TransferService transfers = mock(TransferService.class);
     private final ReceiptService receipts = mock(ReceiptService.class);
     private final ReceivingService service = new ReceivingService(transfers, receipts,
-            mock(SampleTransferRepository.class), mock(JdbcTemplate.class));
+            mock(SampleTransferRepository.class), mock(JdbcTemplate.class),
+            mock(com.example.app.intake.service.SampleCodingService.class));
     private final User viewer = new User("kcs@example.test", "KCS", "unused", Role.TECHNICIAN);
 
     @Test

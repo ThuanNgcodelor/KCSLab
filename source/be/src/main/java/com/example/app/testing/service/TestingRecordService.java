@@ -120,6 +120,9 @@ public class TestingRecordService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Mẫu phải được phòng phân tích xác nhận nhận trước khi lập biên bản");
         }
+        if (!transferItem.getSample().isCodingVerified()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "KCS cần đối chiếu và xác minh mã mẫu trước khi thử nghiệm");
+        }
         if (recordRepository.existsByTransferItem_Id(transferItem.getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Mẫu đã có biên bản thử nghiệm");
         }

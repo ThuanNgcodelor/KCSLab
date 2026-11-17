@@ -1,0 +1,143 @@
+- main [ref=e1027]:
+  - generic [ref=e1028]:
+    - button "CFC Lab" [ref=e1029] [cursor=pointer]
+    - button "Mở menu" [ref=e1030] [cursor=pointer]: ☰
+  - generic [ref=e1031]:
+    - generic [ref=e1032]:
+      - generic [ref=e1033]: Không gian làm việc
+      - strong [ref=e1034]: Nhận mẫu
+    - button "Thông báo, 0 chưa đọc" [ref=e1036] [cursor=pointer]
+  - generic [ref=e1173]:
+    - generic [ref=e1175]:
+      - heading "Nhận mẫu KCS" [level=1] [ref=e1176]
+      - paragraph [ref=e1177]: Theo dõi phiếu bàn giao và đối chiếu mẫu trước khi xác nhận.
+    - navigation "Trạng thái phiếu" [ref=e1178]:
+      - button "Chờ nhận" [ref=e1179] [cursor=pointer]
+      - button "Đã nhận" [active] [pressed] [ref=e1180] [cursor=pointer]
+      - button "Đã từ chối" [ref=e1181] [cursor=pointer]
+    - generic [ref=e1182]:
+      - generic [ref=e1183]:
+        - text: Tìm mã phiếu hoặc mã mẫu
+        - textbox "Tìm mã phiếu hoặc mã mẫu" [ref=e1184]
+      - generic [ref=e1185]:
+        - text: Từ ngày
+        - generic [ref=e1186]:
+          - textbox "Từ ngày Chọn ngày từ lịch" [ref=e1187]:
+            - /placeholder: dd/mm/yyyy
+          - button "Chọn ngày từ lịch" [ref=e1188] [cursor=pointer]
+          - textbox [aria-hidden]
+      - generic [ref=e1192]:
+        - text: Đến ngày
+        - generic [ref=e1193]:
+          - textbox "Đến ngày Chọn ngày từ lịch" [ref=e1194]:
+            - /placeholder: dd/mm/yyyy
+          - button "Chọn ngày từ lịch" [ref=e1195] [cursor=pointer]
+          - textbox [aria-hidden]
+      - generic [ref=e1199]:
+        - text: Sắp xếp
+        - combobox "Sắp xếp" [ref=e1200]:
+          - option "Mặc định" [selected]
+          - 'option "Gửi: mới nhất"'
+          - 'option "Gửi: cũ nhất"'
+          - 'option "Nhận: mới nhất"'
+          - 'option "Hạn trả: gần nhất"'
+          - 'option "Mã phiếu: A → Z"'
+      - generic [ref=e1201]:
+        - text: Số phiếu mỗi trang
+        - combobox "Số phiếu mỗi trang" [ref=e1202]:
+          - option "20" [selected]
+          - option "50"
+    - generic [ref=e1214]:
+      - generic [ref=e1215]:
+        - generic [ref=e1216]:
+          - heading "Đã nhận" [level=2] [ref=e1217]
+          - paragraph [ref=e1218]: Danh sách phiếu chuyển mẫu đến phòng KCS
+        - generic [ref=e1219]: 3 phiếu
+      - generic [ref=e1220]:
+        - article [ref=e1221]:
+          - generic [ref=e1222]:
+            - strong [ref=e1223]: CM-20261117-30AF8F
+            - generic [ref=e1224]: Phiếu tiếp nhận TN-20261116-BAEFE4 · 1 mẫu
+            - generic [ref=e1225]: CT001-SR-16112026-001
+          - generic [ref=e1226]:
+            - generic [ref=e1227]: Đã nhận mẫu
+            - generic [ref=e1228]:
+              - generic [ref=e1229]: Người giao
+              - text: Nguyễn Trung Thuận
+            - generic [ref=e1230]:
+              - generic [ref=e1231]: Thời gian gửi
+              - text: 08:48:38 17/11/2026
+          - button "Xem phiếu" [ref=e1232] [cursor=pointer]: Xem phiếu →
+        - article [ref=e1233]:
+          - generic [ref=e1234]:
+            - strong [ref=e1235]: CM-20261116-B88024
+            - generic [ref=e1236]: Phiếu tiếp nhận TN-20261116-C5E835 · 1 mẫu
+            - generic [ref=e1237]: TST01-THANHLONG-16112026-003
+          - generic [ref=e1238]:
+            - generic [ref=e1239]: Đã nhận mẫu
+            - generic [ref=e1240]:
+              - generic [ref=e1241]: Người giao
+              - text: Nguyễn Trung Thuận
+            - generic [ref=e1242]:
+              - generic [ref=e1243]: Thời gian gửi
+              - text: 15:56:39 16/11/2026
+          - button "Xem phiếu" [ref=e1244] [cursor=pointer]: Xem phiếu →
+        - article [ref=e1245]:
+          - generic [ref=e1246]:
+            - strong [ref=e1247]: CM-20261116-F20ED7
+            - generic [ref=e1248]: Phiếu tiếp nhận TN-20261116-C9CC5A · 1 mẫu
+            - generic [ref=e1249]: CT001-SR-16112026-002
+          - generic [ref=e1250]:
+            - generic [ref=e1251]: Đã nhận mẫu
+            - generic [ref=e1252]:
+              - generic [ref=e1253]: Người giao
+              - text: Nguyễn Trung Thuận
+            - generic [ref=e1254]:
+              - generic [ref=e1255]: Thời gian gửi
+              - text: 11:03:31 16/11/2026
+          - button "Xem phiếu" [ref=e1256] [cursor=pointer]: Xem phiếu →
+      - navigation "Phân trang" [ref=e1257]:
+        - button "Trước" [disabled] [ref=e1258]
+        - generic [ref=e1259]: Trang 1 / 1
+        - button "Sau" [disabled] [ref=e1260]
+  - generic [ref=e1135]:
+    - generic [ref=e1136]:
+      - generic [ref=e1137]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e1146] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e1147]:
+            - strong [ref=e1148]: CFC CÒ BAY
+            - generic [ref=e1149]: Agriculture & Technology
+        - paragraph [ref=e1150]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e1151] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e1152]: ↗
+      - generic [ref=e1153]:
+        - generic [ref=e1154]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e1155]
+          - generic [ref=e1156]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e1157]:
+            - link "1900 5307" [ref=e1158] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e1159] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e1160]:
+          - heading "Về CFC" [level=2] [ref=e1161]
+          - link "Giới thiệu" [ref=e1162] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e1163] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e1164] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e1165]:
+          - heading "Hỗ trợ" [level=2] [ref=e1166]
+          - link "Tìm kiếm" [ref=e1167] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e1168] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e1169] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e1170]:
+      - generic [ref=e1171]: © 2026 CFC Cò Bay
+      - generic [ref=e1172]: CFC Lab Management — hệ thống nội bộ

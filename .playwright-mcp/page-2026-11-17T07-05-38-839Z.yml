@@ -1,0 +1,271 @@
+- main [ref=e66]:
+  - generic [ref=e67]:
+    - button "CFC Lab" [ref=e68] [cursor=pointer]
+    - button "Mở menu" [ref=e69] [cursor=pointer]: ☰
+  - generic [ref=e70]:
+    - generic [ref=e71]:
+      - generic [ref=e72]: Không gian làm việc
+      - strong [ref=e73]: Tiếp nhận mẫu
+    - button "Thông báo, 0 chưa đọc" [ref=e75] [cursor=pointer]
+  - generic [ref=e394]:
+    - generic [ref=e395]:
+      - generic [ref=e396]:
+        - paragraph [ref=e397]: Vận hành / Phiếu số 3
+        - heading "Tiếp nhận mẫu" [level=1] [ref=e398]
+        - paragraph [ref=e399]: "Không gian làm việc của người nhận mẫu: ghi nhận hồ sơ, ảnh hiện trường và theo dõi bàn giao."
+      - button "＋ Tạo phiếu tiếp nhận" [ref=e400] [cursor=pointer]
+    - generic [ref=e401]:
+      - generic [ref=e402]:
+        - generic [ref=e403]: "01"
+        - generic [ref=e404]:
+          - strong [ref=e405]: Tiếp nhận
+          - generic [ref=e406]: Phiếu số 3
+      - generic [ref=e408]:
+        - generic [ref=e409]: "02"
+        - generic [ref=e410]:
+          - strong [ref=e411]: Chuyển mẫu
+          - generic [ref=e412]: Phiếu số 4 → KCS
+      - generic [ref=e414]:
+        - generic [ref=e415]: "03"
+        - generic [ref=e416]:
+          - strong [ref=e417]: Thử nghiệm
+          - generic [ref=e418]: Hồ sơ phân tích
+    - region "Tổng quan tiếp nhận" [ref=e419]:
+      - article [ref=e420]:
+        - generic [ref=e421]: Phiếu tiếp nhận
+        - strong [ref=e422]: "6"
+        - generic [ref=e423]: Trong 7 ngày gần nhất
+      - article [ref=e424]:
+        - generic [ref=e425]: Số mẫu đã ghi nhận
+        - strong [ref=e426]: "6"
+        - generic [ref=e427]: Đã gắn mã mẫu
+      - article [ref=e428]:
+        - generic [ref=e429]: Chờ chuyển KCS
+        - strong [ref=e430]: "4"
+        - generic [ref=e431]: Cần lập Phiếu số 4
+      - article [ref=e432]:
+        - generic [ref=e433]: Có điều kiện / từ chối
+        - strong [ref=e434]: "0"
+        - generic [ref=e435]: Cần chú ý hồ sơ
+    - generic [ref=e436]:
+      - generic [ref=e437]:
+        - generic [aria-hidden] [ref=e438]: ⌕
+        - generic [ref=e439]:
+          - generic [ref=e440]: Tìm nhanh
+          - textbox "Tìm nhanh" [ref=e441]:
+            - /placeholder: Mã phiếu, mã mẫu, khách hàng, số điện thoại…
+      - generic [ref=e442]:
+        - generic [ref=e443]: Từ ngày
+        - generic [ref=e444]:
+          - textbox "Từ ngày Chọn ngày từ lịch" [ref=e445]:
+            - /placeholder: dd/mm/yyyy
+          - button "Chọn ngày từ lịch" [ref=e446] [cursor=pointer]
+          - textbox [aria-hidden]
+      - generic [ref=e450]:
+        - generic [ref=e451]: Đến ngày
+        - generic [ref=e452]:
+          - textbox "Đến ngày Chọn ngày từ lịch" [ref=e453]:
+            - /placeholder: dd/mm/yyyy
+          - button "Chọn ngày từ lịch" [ref=e454] [cursor=pointer]
+          - textbox [aria-hidden]
+      - generic [ref=e458]:
+        - generic [ref=e459]: Trạng thái
+        - combobox "Trạng thái" [ref=e460]:
+          - option "Tất cả trạng thái" [selected]
+          - option "Bản nháp"
+          - option "Đã tiếp nhận"
+          - option "Có điều kiện"
+          - option "Từ chối"
+          - option "Chờ KCS nhận"
+          - option "Đã chuyển KCS"
+          - option "Đang thử nghiệm"
+          - option "Chờ kiểm tra"
+          - option "Đã kiểm tra"
+      - generic [ref=e461]:
+        - generic [ref=e462]: Loại sản phẩm
+        - textbox "Loại sản phẩm" [ref=e463]:
+          - /placeholder: "Ví dụ: Sầu riêng"
+      - button "Xóa bộ lọc" [ref=e464] [cursor=pointer]
+    - generic [ref=e465]:
+      - generic [ref=e466]:
+        - generic [ref=e467]:
+          - paragraph [ref=e468]: Phân trang từ máy chủ · 20 phiếu/trang
+          - heading "Danh sách phiếu tiếp nhận" [level=2] [ref=e469]
+        - generic [ref=e470]:
+          - generic [ref=e471]:
+            - text: Sắp xếp
+            - combobox "Sắp xếp" [ref=e472]:
+              - 'option "Ngày nhận: mới nhất" [selected]'
+              - 'option "Ngày nhận: cũ nhất"'
+              - 'option "Mã phiếu: A → Z"'
+              - 'option "Mã phiếu: Z → A"'
+              - 'option "Khách hàng: A → Z"'
+              - 'option "Khách hàng: Z → A"'
+              - 'option "Tên mẫu: A → Z"'
+              - 'option "Trạng thái: A → Z"'
+              - 'option "Hạn trả: gần nhất"'
+          - button "↻ Làm mới" [ref=e473] [cursor=pointer]
+      - table [ref=e475]:
+        - rowgroup [ref=e476]:
+          - row [ref=e477]:
+            - columnheader "Mã phiếu / khách hàng" [ref=e478]
+            - columnheader "Mẫu" [ref=e479]
+            - columnheader "Người tiếp nhận" [ref=e480]
+            - columnheader "Trạng thái" [ref=e481]
+            - columnheader "Ngày nhận" [ref=e482]
+            - columnheader [ref=e483]
+        - rowgroup [ref=e484]:
+          - row [ref=e485]:
+            - cell "TN-20261117-72F08E Khách hàng kiểm thử MCP · 0900000000" [ref=e486]:
+              - generic [ref=e487]:
+                - strong [ref=e488]: TN-20261117-72F08E
+                - generic [ref=e489]: Khách hàng kiểm thử MCP · 0900000000
+            - cell "1 mẫu · Mẫu sầu riêng E2E CT001-SR-17112026-004" [ref=e490]:
+              - generic [ref=e491]:
+                - strong [ref=e492]: 1 mẫu · Mẫu sầu riêng E2E
+                - generic [ref=e493]: CT001-SR-17112026-004
+            - cell "Nguyễn Trung Thuận Nhận từ Nguyễn Văn Test" [ref=e494]:
+              - generic [ref=e495]:
+                - strong [ref=e496]: Nguyễn Trung Thuận
+                - generic [ref=e497]: Nhận từ Nguyễn Văn Test
+            - cell "Đã tiếp nhận" [ref=e498]
+            - cell "17/11/2026" [ref=e500]
+            - cell [ref=e501]:
+              - button "Xem hồ sơ" [ref=e502] [cursor=pointer]
+          - row [ref=e503]:
+            - cell "TN-20261117-D5BD6E David Nguyễn · 0388509406" [ref=e504]:
+              - generic [ref=e505]:
+                - strong [ref=e506]: TN-20261117-D5BD6E
+                - generic [ref=e507]: David Nguyễn · 0388509406
+            - cell "1 mẫu · mẫu 1 CT001-THANHLONG-17112026-003" [ref=e508]:
+              - generic [ref=e509]:
+                - strong [ref=e510]: 1 mẫu · mẫu 1
+                - generic [ref=e511]: CT001-THANHLONG-17112026-003
+            - cell "Nguyễn Trung Thuận Nhận từ Huhu" [ref=e512]:
+              - generic [ref=e513]:
+                - strong [ref=e514]: Nguyễn Trung Thuận
+                - generic [ref=e515]: Nhận từ Huhu
+            - cell "Đã tiếp nhận" [ref=e516]
+            - cell "17/11/2026" [ref=e518]
+            - cell [ref=e519]:
+              - button "Xem hồ sơ" [ref=e520] [cursor=pointer]
+          - row [ref=e521]:
+            - cell "TN-20261117-A76EED David Nguyễn · 0388509406" [ref=e522]:
+              - generic [ref=e523]:
+                - strong [ref=e524]: TN-20261117-A76EED
+                - generic [ref=e525]: David Nguyễn · 0388509406
+            - cell "1 mẫu · mẫu 1 CT001-SR-17112026-002" [ref=e526]:
+              - generic [ref=e527]:
+                - strong [ref=e528]: 1 mẫu · mẫu 1
+                - generic [ref=e529]: CT001-SR-17112026-002
+            - cell "Nguyễn Trung Thuận Nhận từ Nguyễn Trung Thuận" [ref=e530]:
+              - generic [ref=e531]:
+                - strong [ref=e532]: Nguyễn Trung Thuận
+                - generic [ref=e533]: Nhận từ Nguyễn Trung Thuận
+            - cell "Đã tiếp nhận" [ref=e534]
+            - cell "17/11/2026" [ref=e536]
+            - cell [ref=e537]:
+              - button "Xem hồ sơ" [ref=e538] [cursor=pointer]
+          - row [ref=e539]:
+            - cell "TN-20261117-3F88DF Nguyễn Trung Hiếu · 0388509046" [ref=e540]:
+              - generic [ref=e541]:
+                - strong [ref=e542]: TN-20261117-3F88DF
+                - generic [ref=e543]: Nguyễn Trung Hiếu · 0388509046
+            - cell "1 mẫu · Mẫu 1 CT001-SR-17112026-001" [ref=e544]:
+              - generic [ref=e545]:
+                - strong [ref=e546]: 1 mẫu · Mẫu 1
+                - generic [ref=e547]: CT001-SR-17112026-001
+            - cell "Nguyễn Trung Thuận Nhận từ Nguyễn Trung Thuận" [ref=e548]:
+              - generic [ref=e549]:
+                - strong [ref=e550]: Nguyễn Trung Thuận
+                - generic [ref=e551]: Nhận từ Nguyễn Trung Thuận
+            - cell "Đã tiếp nhận" [ref=e552]
+            - cell "17/11/2026" [ref=e554]
+            - cell [ref=e555]:
+              - button "Xem hồ sơ" [ref=e556] [cursor=pointer]
+          - row [ref=e557]:
+            - cell "TN-20261116-C5E835 Khách TEST-RA-SOAT · 0901234567" [ref=e558]:
+              - generic [ref=e559]:
+                - strong [ref=e560]: TN-20261116-C5E835
+                - generic [ref=e561]: Khách TEST-RA-SOAT · 0901234567
+            - cell "1 mẫu · Thanh long TEST TST01-THANHLONG-16112026-003" [ref=e562]:
+              - generic [ref=e563]:
+                - strong [ref=e564]: 1 mẫu · Thanh long TEST
+                - generic [ref=e565]: TST01-THANHLONG-16112026-003
+            - cell "Nguyễn Trung Thuận Nhận từ Người giao TEST-RA-SOAT" [ref=e566]:
+              - generic [ref=e567]:
+                - strong [ref=e568]: Nguyễn Trung Thuận
+                - generic [ref=e569]: Nhận từ Người giao TEST-RA-SOAT
+            - cell "Đã chuyển KCS" [ref=e570]
+            - cell "16/11/2026" [ref=e572]
+            - cell [ref=e573]:
+              - button "Xem hồ sơ" [ref=e574] [cursor=pointer]
+          - row [ref=e575]:
+            - cell "TN-20261116-C9CC5A Khách hàng kiểm thử MCP · 0900000000" [ref=e576]:
+              - generic [ref=e577]:
+                - strong [ref=e578]: TN-20261116-C9CC5A
+                - generic [ref=e579]: Khách hàng kiểm thử MCP · 0900000000
+            - cell "1 mẫu · Mẫu kiểm thử Chrome CT001-SR-16112026-002" [ref=e580]:
+              - generic [ref=e581]:
+                - strong [ref=e582]: 1 mẫu · Mẫu kiểm thử Chrome
+                - generic [ref=e583]: CT001-SR-16112026-002
+            - cell "Nguyễn Trung Thuận Nhận từ Nguyễn Trung Thuận - kiểm thử Chrome" [ref=e584]:
+              - generic [ref=e585]:
+                - strong [ref=e586]: Nguyễn Trung Thuận
+                - generic [ref=e587]: Nhận từ Nguyễn Trung Thuận - kiểm thử Chrome
+            - cell "Đã chuyển KCS" [ref=e588]
+            - cell "16/11/2026" [ref=e590]
+            - cell [ref=e591]:
+              - button "Xem hồ sơ" [ref=e592] [cursor=pointer]
+      - generic [ref=e593]:
+        - paragraph [ref=e594]:
+          - text: Hiển thị
+          - strong [ref=e595]: 1–6
+          - text: trong
+          - strong [ref=e596]: "6"
+          - text: phiếu · 20 phiếu/trang
+        - navigation "Phân trang phiếu tiếp nhận" [ref=e597]:
+          - button "← Trước" [disabled] [ref=e598]
+          - button "1" [ref=e599] [cursor=pointer]
+          - button "Sau →" [disabled] [ref=e600]
+  - generic [ref=e151]:
+    - generic [ref=e152]:
+      - generic [ref=e153]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e162] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e163]:
+            - strong [ref=e164]: CFC CÒ BAY
+            - generic [ref=e165]: Agriculture & Technology
+        - paragraph [ref=e166]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e167] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e168]: ↗
+      - generic [ref=e169]:
+        - generic [ref=e170]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e171]
+          - generic [ref=e172]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e173]:
+            - link "1900 5307" [ref=e174] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e175] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e176]:
+          - heading "Về CFC" [level=2] [ref=e177]
+          - link "Giới thiệu" [ref=e178] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e179] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e180] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e181]:
+          - heading "Hỗ trợ" [level=2] [ref=e182]
+          - link "Tìm kiếm" [ref=e183] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e184] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e185] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e186]:
+      - generic [ref=e187]: © 2026 CFC Cò Bay
+      - generic [ref=e188]: CFC Lab Management — hệ thống nội bộ

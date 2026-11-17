@@ -1,5 +1,7 @@
 # REST API conventions
 
+> Cập nhật thử nghiệm 17/11/2026: `POST /api/v1/receiving/transfers/{id}/samples/{sampleId}/coding/verify` cho ADMIN/TECHNICIAN đối chiếu độc lập mẫu thuộc Phiếu 4 đã ACCEPTED; không mở receipt API cho KCS. Phiếu có thể bàn giao khi mẫu đã xác nhận dán nhãn và đang chờ đối chiếu; lập Phiếu 5 vẫn chặn đến khi mã VERIFIED. Nhánh xử lý mã không khớp sau bàn giao chưa hoàn thiện.
+
 ## Workspace nhận mẫu KCS — 16/11/2026
 
 - Các endpoint dưới đây chỉ cho `ADMIN|TECHNICIAN` qua security filter và method security. Không cấp thêm quyền gọi `/api/v1/receipts/**` cho `TECHNICIAN`.

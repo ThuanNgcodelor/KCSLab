@@ -7,6 +7,12 @@
 - Backend 29 test pass trên MySQL/Redis Docker tạm với `KCS_ISOLATED_DB=true` (gồm test hai giao dịch và security); frontend build pass. Chrome đã kiểm tra không tràn ngang trên bốn kích thước với API mô phỏng; chưa chạy E2E thật với hai role và file upload.
 - API transfer cũ giữ contract cho Admin/Receptionist và trả `customerName=null` với Technician; receiving DTO mới không có trường này. File gốc/ghi chú vẫn có thể chứa PII. Dashboard đã nhóm xu hướng theo ngày tại database; chưa load test quy mô production.
 
+## Thứ tự bàn giao và xác minh mã — 17/11/2026
+
+- Tiếp nhận hoàn tất dán nhãn và gửi mã (`PENDING_VERIFICATION`) trước khi lập/gửi Phiếu 4.
+- KCS nhận bàn giao trước, sau đó đối chiếu/xác minh mã trên Phiếu 4. Chỉ mẫu `VERIFIED` mới xuất hiện trong ứng viên lập Biên bản thử nghiệm/Phiếu 5.
+- Không dùng xác minh mã của người tiếp nhận làm điều kiện chặn bàn giao; đây là xác minh độc lập sau bàn giao. Test Docker Java 21/MySQL 8.4/Redis đã pass `Tests run: 85, Failures: 0, Errors: 0, Skipped: 1`; frontend build cũng đã pass.
+
 **Cập nhật:** 17/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
 
 > Đọc `docs/ai/START_HERE.md` và `docs/SYSTEM_STATUS.md` trước. Phần kiểm thử bên dưới là kết quả lịch sử, không phải test mới; đối chiếu source khi làm việc.

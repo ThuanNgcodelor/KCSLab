@@ -1,0 +1,152 @@
+- generic [ref=e65]:
+  - complementary [ref=e718]:
+    - generic [ref=e720]:
+      - strong [ref=e721]: CFC Lab
+      - generic [ref=e722]: Management system
+    - generic [ref=e723]: Không gian quản trị
+    - navigation "Điều hướng quản trị" [ref=e724]:
+      - link "Tổng quan" [ref=e725] [cursor=pointer]:
+        - /url: /admin/intake
+      - link "Tiếp nhận mẫu" [ref=e729] [cursor=pointer]:
+        - /url: /admin/intake/receipts
+      - link "Chuyển mẫu" [ref=e733] [cursor=pointer]:
+        - /url: /admin/transfers
+      - link "Thông báo" [ref=e737] [cursor=pointer]:
+        - /url: /admin/notifications
+    - generic [ref=e741]: Hệ thống
+    - navigation [ref=e742]:
+      - link "Thông tin cá nhân" [ref=e743] [cursor=pointer]:
+        - /url: /admin/profile
+      - link "Cài đặt chung" [ref=e747]:
+        - /url: "#settings"
+    - generic [ref=e751]:
+      - generic [ref=e752]: Hệ thống hoạt động
+      - button "Nguyễn Trung Thuận Nhân viên tiếp nhận •••" [ref=e754] [cursor=pointer]:
+        - generic [ref=e756]: "N"
+        - generic [ref=e757]:
+          - strong [ref=e758]: Nguyễn Trung Thuận
+          - generic [ref=e759]: Nhân viên tiếp nhận
+        - generic [ref=e760]: •••
+      - button "Đăng xuất" [ref=e761] [cursor=pointer]
+  - main [ref=e66]:
+    - generic [ref=e67]:
+      - button "CFC Lab" [ref=e68] [cursor=pointer]
+      - button "Đóng menu" [expanded] [active] [ref=e973] [cursor=pointer]: ×
+    - button "Đóng menu" [ref=e974] [cursor=pointer]
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]: Không gian làm việc
+        - strong [ref=e73]: Chuyển mẫu
+      - button "Thông báo, 0 chưa đọc" [ref=e75] [cursor=pointer]
+    - generic [ref=e905]:
+      - generic [ref=e907]:
+        - button "← Quay lại danh sách" [ref=e908] [cursor=pointer]
+        - paragraph [ref=e909]: Phiếu số 4
+        - heading "Lập phiếu chuyển mẫu" [level=1] [ref=e910]
+        - paragraph [ref=e911]: Chuẩn bị hồ sơ bàn giao mẫu cho KCS/phòng phân tích; bản nháp chưa khóa mẫu.
+      - generic [ref=e912]:
+        - generic [ref=e913]:
+          - generic [ref=e914]:
+            - generic [ref=e915]:
+              - generic [ref=e916]: "01"
+              - generic [ref=e917]:
+                - heading "Phiếu yêu cầu" [level=2] [ref=e918]
+                - paragraph [ref=e919]: Tìm trên toàn bộ hồ sơ và chọn phiếu còn mẫu sẵn sàng bàn giao.
+            - generic [ref=e920]:
+              - generic [ref=e921]: Tìm phiếu tiếp nhận
+              - generic [ref=e922]:
+                - generic [aria-hidden] [ref=e923]: ⌕
+                - combobox "Tìm phiếu tiếp nhận" [expanded] [ref=e924]
+              - generic [ref=e925]:
+                - generic [ref=e926]: Tìm trực tiếp trên toàn bộ dữ liệu
+                - generic [ref=e927]: 0 phiếu phù hợp
+              - listbox "Kết quả phiếu tiếp nhận" [ref=e928]:
+                - paragraph [ref=e929]: Không có phiếu còn mẫu sẵn sàng chuyển.
+          - generic [ref=e930]:
+            - generic [ref=e931]:
+              - generic [ref=e932]: "02"
+              - generic [ref=e933]:
+                - heading "Danh sách mẫu" [level=2] [ref=e934]
+                - paragraph [ref=e935]: Thông tin được chụp lại tại thời điểm lập Phiếu số 4.
+            - generic [ref=e936]:
+              - strong [ref=e937]: Chưa chọn phiếu tiếp nhận
+              - generic [ref=e938]: Tìm theo mã phiếu, mã mẫu, khách hàng hoặc số điện thoại ở bước 01.
+        - complementary [ref=e939]:
+          - generic [ref=e940]:
+            - generic [ref=e941]:
+              - generic [ref=e942]: "03"
+              - generic [ref=e943]:
+                - heading "Nơi nhận, thời hạn và lưu mẫu" [level=2] [ref=e944]
+                - paragraph [ref=e945]: Theo mục III của Phiếu chuyển mẫu số 4.
+            - generic [ref=e946]:
+              - text: Phòng / bộ phận nhận
+              - textbox "Phòng / bộ phận nhận Hiện hệ thống chỉ vận hành một phòng KCS." [ref=e947]: KCS
+              - generic [ref=e948]: Hiện hệ thống chỉ vận hành một phòng KCS.
+            - generic [ref=e949]:
+              - text: Ngày chuyển mẫu
+              - generic [ref=e950]:
+                - textbox "Ngày chuyển mẫu Chọn ngày từ lịch" [ref=e951]:
+                  - /placeholder: dd/mm/yyyy
+                  - text: 17/11/2026
+                - button "Chọn ngày từ lịch" [ref=e952] [cursor=pointer]
+                - textbox [aria-hidden]: 2026-11-17
+            - generic [ref=e956]:
+              - text: Hạn trả kết quả
+              - generic [ref=e957]:
+                - textbox "Hạn trả kết quả Chọn ngày từ lịch" [ref=e958]:
+                  - /placeholder: dd/mm/yyyy
+                  - text: 24/11/2026
+                - button "Chọn ngày từ lịch" [ref=e959] [cursor=pointer]
+                - textbox [aria-hidden]: 2026-11-24
+            - generic [ref=e963]:
+              - checkbox "Lưu và trả mẫu cho khách" [ref=e964]
+              - text: Lưu và trả mẫu cho khách
+            - generic [ref=e966]:
+              - text: Thay đổi / ghi chú
+              - textbox "Thay đổi / ghi chú" [ref=e967]
+          - generic [ref=e968]:
+            - paragraph [ref=e969]:
+              - strong [ref=e970]: Lưu bản nháp
+              - generic [ref=e971]: Kiểm tra lại Phiếu số 4 rồi bấm “Gửi bàn giao” ở màn chi tiết để KCS nhận yêu cầu.
+            - button "Lưu bản nháp phiếu chuyển" [disabled] [ref=e972]
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - generic [ref=e153]:
+          - link "CFC CÒ BAY Agriculture & Technology" [ref=e162] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/
+            - generic [ref=e163]:
+              - strong [ref=e164]: CFC CÒ BAY
+              - generic [ref=e165]: Agriculture & Technology
+          - paragraph [ref=e166]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+          - link "Khám phá CFC Cò Bay" [ref=e167] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/
+            - text: Khám phá CFC Cò Bay
+            - generic [aria-hidden] [ref=e168]: ↗
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - heading "Liên hệ phòng LAB" [level=2] [ref=e171]
+            - generic [ref=e172]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+            - generic [ref=e173]:
+              - link "1900 5307" [ref=e174] [cursor=pointer]:
+                - /url: tel:19005307
+              - link "info@cfccobay.com" [ref=e175] [cursor=pointer]:
+                - /url: mailto:info@cfccobay.com
+          - generic [ref=e176]:
+            - heading "Về CFC" [level=2] [ref=e177]
+            - link "Giới thiệu" [ref=e178] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/gioi-thieu
+            - link "Tin doanh nghiệp" [ref=e179] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/tin-tuc
+            - link "Khảo nghiệm đồng ruộng" [ref=e180] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+          - generic [ref=e181]:
+            - heading "Hỗ trợ" [level=2] [ref=e182]
+            - link "Tìm kiếm" [ref=e183] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/search
+            - link "Liên hệ" [ref=e184] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/lien-he
+            - link "Chính sách" [ref=e185] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/chinh-sach
+      - generic [ref=e186]:
+        - generic [ref=e187]: © 2026 CFC Cò Bay
+        - generic [ref=e188]: CFC Lab Management — hệ thống nội bộ

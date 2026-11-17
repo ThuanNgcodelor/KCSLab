@@ -1,0 +1,185 @@
+- generic [ref=e65]:
+  - complementary [ref=e718]:
+    - generic [ref=e720]:
+      - strong [ref=e721]: CFC Lab
+      - generic [ref=e722]: Management system
+    - generic [ref=e723]: Không gian quản trị
+    - navigation "Điều hướng quản trị" [ref=e724]:
+      - link "Tổng quan" [ref=e725] [cursor=pointer]:
+        - /url: /admin/intake
+      - link "Tiếp nhận mẫu" [ref=e729] [cursor=pointer]:
+        - /url: /admin/intake/receipts
+      - link "Chuyển mẫu" [ref=e733] [cursor=pointer]:
+        - /url: /admin/transfers
+      - link "Thông báo" [ref=e737] [cursor=pointer]:
+        - /url: /admin/notifications
+    - generic [ref=e741]: Hệ thống
+    - navigation [ref=e742]:
+      - link "Thông tin cá nhân" [ref=e743] [cursor=pointer]:
+        - /url: /admin/profile
+      - link "Cài đặt chung" [ref=e747]:
+        - /url: "#settings"
+    - generic [ref=e751]:
+      - generic [ref=e752]: Hệ thống hoạt động
+      - button "Nguyễn Trung Thuận Nhân viên tiếp nhận •••" [ref=e754] [cursor=pointer]:
+        - generic [ref=e756]: "N"
+        - generic [ref=e757]:
+          - strong [ref=e758]: Nguyễn Trung Thuận
+          - generic [ref=e759]: Nhân viên tiếp nhận
+        - generic [ref=e760]: •••
+      - button "Đăng xuất" [ref=e761] [cursor=pointer]
+  - main [ref=e66]:
+    - generic [ref=e67]:
+      - button "CFC Lab" [ref=e68] [cursor=pointer]
+      - button "Đóng menu" [expanded] [active] [ref=e762] [cursor=pointer]: ×
+    - button "Đóng menu" [ref=e763] [cursor=pointer]
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]: Không gian làm việc
+        - strong [ref=e73]: Tiếp nhận mẫu
+      - button "Thông báo, 0 chưa đọc" [ref=e75] [cursor=pointer]
+    - generic [ref=e601]:
+      - generic [ref=e603]:
+        - button "← Danh sách tiếp nhận" [ref=e604] [cursor=pointer]
+        - paragraph [ref=e605]: Phiếu số 3 / TN-20261117-72F08E
+        - heading "Mẫu sầu riêng E2E" [level=1] [ref=e606]
+        - paragraph [ref=e607]: Tiếp nhận bởi Nguyễn Trung Thuận · 14:05:32 17/11/2026
+      - generic [ref=e608]:
+        - main [ref=e609]:
+          - generic [ref=e610]:
+            - generic [ref=e611]:
+              - generic [ref=e612]: •
+              - heading "Nguồn và chuỗi tiếp nhận" [level=2] [ref=e614]
+            - generic [ref=e615]:
+              - generic [ref=e616]:
+                - generic [ref=e617]: Khách hàng
+                - strong [ref=e618]: Khách hàng kiểm thử MCP · 0900000000
+              - generic [ref=e619]:
+                - generic [ref=e620]: Người giao
+                - strong [ref=e621]: Nguyễn Văn Test
+              - generic [ref=e622]:
+                - generic [ref=e623]: Người lấy mẫu
+                - strong [ref=e624]: Nguyễn Văn Test
+              - generic [ref=e625]:
+                - generic [ref=e626]: Thời điểm lấy
+                - strong [ref=e627]: —
+              - generic [ref=e628]:
+                - generic [ref=e629]: Vùng trồng / nguồn
+                - strong [ref=e630]: Cần Thơ
+              - generic [ref=e631]:
+                - generic [ref=e632]: Cơ sở đóng gói
+                - strong [ref=e633]: CFC Cò Bay
+              - generic [ref=e634]:
+                - generic [ref=e635]: Xe / moóc
+                - strong [ref=e636]: 65A-12345 / M001
+              - generic [ref=e637]:
+                - generic [ref=e638]: Container / seal
+                - strong [ref=e639]: C001 / S001
+          - generic [ref=e640]:
+            - generic [ref=e641]:
+              - generic [ref=e642]: •
+              - heading "Danh sách mẫu (1)" [level=2] [ref=e644]
+            - article [ref=e646]:
+              - generic [ref=e647]:
+                - strong [ref=e648]: CT001-SR-17112026-004
+                - generic [ref=e649]: CT001 · Sầu riêng
+              - generic [ref=e650]:
+                - strong [ref=e651]: Mẫu sầu riêng E2E
+                - generic [ref=e652]: 1 mẫu; 2 kg · Túi PE
+              - generic [ref=e653]:
+                - strong [ref=e654]: Nguyên vẹn
+                - generic [ref=e655]: KQKN-SR-CT001-092026
+              - generic [ref=e656]:
+                - generic [ref=e657]:
+                  - generic [ref=e658]: Chờ đối chiếu
+                  - generic [ref=e713]: "Mã hóa: Nguyễn Trung Thuận"
+                  - button "Lịch sử mã" [ref=e659] [cursor=pointer]
+                - generic [ref=e714]:
+                  - textbox "Lý do đối chiếu không đạt" [ref=e715]:
+                    - /placeholder: Lý do (bắt buộc khi không đạt)
+                  - button "Xác minh" [ref=e716] [cursor=pointer]
+                  - button "Không đạt" [disabled] [ref=e717]
+          - generic [ref=e662]:
+            - generic [ref=e663]:
+              - generic [ref=e664]: •
+              - heading "Ảnh và hồ sơ (1)" [level=2] [ref=e666]
+            - link "▤ Phiếu tiếp nhận số 3 KQKN-SR-CT001-092026.docx · 154 KB Nguyễn Trung Thuận · 08:04:32 16/11/2026" [ref=e668] [cursor=pointer]:
+              - /url: /api/v1/receipts/10/attachments/15/content
+              - generic [ref=e669]: ▤
+              - generic [ref=e670]:
+                - strong [ref=e671]: Phiếu tiếp nhận số 3
+                - generic [ref=e672]: KQKN-SR-CT001-092026.docx · 154 KB
+                - generic [ref=e673]: Nguyễn Trung Thuận · 08:04:32 16/11/2026
+        - complementary [ref=e674]:
+          - generic [ref=e675]:
+            - generic [ref=e676]:
+              - generic [ref=e677]: •
+              - heading "Bổ sung bằng chứng" [level=2] [ref=e679]
+            - generic [ref=e680]:
+              - text: Loại hồ sơ
+              - combobox "Loại hồ sơ" [ref=e681]:
+                - option "Phiếu tiếp nhận số 3"
+                - option "Ảnh lô hàng"
+                - option "Ảnh mẫu" [selected]
+                - option "Ảnh bao bì"
+                - option "Ảnh niêm phong"
+                - option "Ảnh hư hỏng"
+                - option "Ảnh nhãn mẫu"
+                - option "Tài liệu khác"
+            - generic [ref=e682]:
+              - text: Mô tả
+              - textbox "Mô tả" [ref=e683]:
+                - /placeholder: Góc chụp, tình trạng…
+            - generic [ref=e684]:
+              - generic [ref=e686]:
+                - strong [ref=e687]: Ảnh / file
+                - generic [ref=e688]: Chụp trực tiếp hoặc chọn từ máy
+              - generic [ref=e689]:
+                - generic [ref=e690] [cursor=pointer]:
+                  - text: Chụp ảnh
+                  - button "Chụp ảnh" [ref=e694]
+                - generic [ref=e695] [cursor=pointer]:
+                  - text: Chọn từ máy
+                  - button "Chọn từ máy" [ref=e700]
+            - button "Lưu file vào hồ sơ" [disabled] [ref=e701]
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - generic [ref=e153]:
+          - link "CFC CÒ BAY Agriculture & Technology" [ref=e162] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/
+            - generic [ref=e163]:
+              - strong [ref=e164]: CFC CÒ BAY
+              - generic [ref=e165]: Agriculture & Technology
+          - paragraph [ref=e166]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+          - link "Khám phá CFC Cò Bay" [ref=e167] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/
+            - text: Khám phá CFC Cò Bay
+            - generic [aria-hidden] [ref=e168]: ↗
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - heading "Liên hệ phòng LAB" [level=2] [ref=e171]
+            - generic [ref=e172]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+            - generic [ref=e173]:
+              - link "1900 5307" [ref=e174] [cursor=pointer]:
+                - /url: tel:19005307
+              - link "info@cfccobay.com" [ref=e175] [cursor=pointer]:
+                - /url: mailto:info@cfccobay.com
+          - generic [ref=e176]:
+            - heading "Về CFC" [level=2] [ref=e177]
+            - link "Giới thiệu" [ref=e178] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/gioi-thieu
+            - link "Tin doanh nghiệp" [ref=e179] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/tin-tuc
+            - link "Khảo nghiệm đồng ruộng" [ref=e180] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+          - generic [ref=e181]:
+            - heading "Hỗ trợ" [level=2] [ref=e182]
+            - link "Tìm kiếm" [ref=e183] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/search
+            - link "Liên hệ" [ref=e184] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/lien-he
+            - link "Chính sách" [ref=e185] [cursor=pointer]:
+              - /url: https://www.cfccobay.com/chinh-sach
+      - generic [ref=e186]:
+        - generic [ref=e187]: © 2026 CFC Cò Bay
+        - generic [ref=e188]: CFC Lab Management — hệ thống nội bộ

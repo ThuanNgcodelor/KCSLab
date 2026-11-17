@@ -37,15 +37,18 @@ public class ReceivingService {
     private final ReceiptService receipts;
     private final SampleTransferRepository repository;
     private final JdbcTemplate jdbc;
+    private final com.example.app.intake.service.SampleCodingService coding;
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     private static final Set<String> SORT_FIELDS = Set.of("submittedAt", "receivedAt", "transferCode", "resultsDueDate");
 
     public ReceivingService(TransferService transfers, ReceiptService receipts,
-                            SampleTransferRepository repository, JdbcTemplate jdbc) {
+                            SampleTransferRepository repository, JdbcTemplate jdbc,
+                            com.example.app.intake.service.SampleCodingService coding) {
         this.transfers = transfers;
         this.receipts = receipts;
         this.repository = repository;
         this.jdbc = jdbc;
+        this.coding = coding;
     }
 
     @Transactional(readOnly = true)
@@ -175,6 +178,20 @@ public class ReceivingService {
         // Do not read the entity before the locking query: a stale managed entity
         // could otherwise survive while another transaction commits its decision.
         return ReceivingTransferResponse.from(transfers.decide(id, request, viewer));
+    }
+
+    @Transactional
+    public ReceivingTransferResponse verifyCoding(Long id, Long sampleId, User viewer) {
+        SampleTransfer transfer = repository.findByIdForDecision(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy phiếu chuyển mẫu"));
+        if (transfer.getStatus() != TransferStatus.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cần xác nhận nhận bàn giao trước khi đối chiếu mã");
+        }
+        if (transfer.getItems().stream().noneMatch(item -> item.getSample().getId().equals(sampleId))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Mẫu không thuộc phiếu chuyển này");
+        }
+        coding.verifyAtKcs(sampleId, viewer);
+        return ReceivingTransferResponse.from(transfers.findById(id, viewer));
     }
 
     private TransferResponse visibleTransfer(Long id, User viewer) {

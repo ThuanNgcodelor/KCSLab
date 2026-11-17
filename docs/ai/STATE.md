@@ -1,5 +1,14 @@
 # Project State
 
+## Sửa thứ tự bàn giao và xác minh mã — 17/11/2026
+
+- Phiếu 4 được phép lập/gửi và KCS được nhận khi mẫu đã dán nhãn, trạng thái mã là `PENDING_VERIFICATION`; KCS xác minh độc lập sau khi nhận bàn giao.
+- `TransferService.decide(ACCEPTED)` không còn gọi gate mã hóa trước khi ghi nhận bàn giao. Gate `VERIFIED` vẫn giữ ở danh sách ứng viên lập biên bản thử nghiệm.
+- `ReceiptSpecifications.transferable` đã bao gồm `PENDING_VERIFICATION`; test service xác nhận mẫu đã gửi mã xuất hiện trong bộ chọn Phiếu 4 và được nhận trước xác minh KCS.
+- Kiểm tra: `scripts/run-be-tests-docker.sh` chạy compile Java 21 + MySQL 8.4 + Redis và pass: `Tests run: 85, Failures: 0, Errors: 0, Skipped: 1`, `BUILD SUCCESS`; `npm run build` pass (`✓ built in 1.03s`). Host shell vẫn không có Java/JDK nên `mvn test` trực tiếp không chạy được. Chrome DevTools MCP đã cài user-local và cấu hình trong `~/.codex/config.toml`; cần khởi động lại Codex để nạp server.
+
+> 17/11/2026 — thử nghiệm luồng KCS đối chiếu sau bàn giao theo xác nhận người dùng: Tiếp nhận xác nhận dán nhãn rồi gửi; KCS nhận, sau đó xác minh độc lập trên Phiếu 4; backend chặn lập biên bản thử nghiệm và ẩn khỏi candidates khi chưa verified. API scoped theo Phiếu 4 `POST /api/v1/receiving/transfers/{id}/samples/{sampleId}/coding/verify`. Test MySQL/Redis tạm: `Tests run: 85, Failures: 0, Errors: 0, Skipped: 1`; FE `✓ built in 1.11s`. Chưa nghiệm thu Chrome/E2E. Nhánh mã không khớp sau khi đã nhận chưa có quy trình trả/hiệu chỉnh an toàn; dừng thử nghiệm và báo LAB, không coi hoàn tất. CFC-TN-14 cần LAB xác nhận cách áp dụng luồng bàn giao mới.
+
 > 17/11/2026: Bản đọc nhanh cho người dùng là `docs/DOC_HIEU_HE_THONG.md`; plan điều phối tại `plans/SYSTEM_COMPLETION_ROADMAP.md`. Test gần nhất trong môi trường cô lập: backend 83 test/0 lỗi/1 skip, HTTP 77/77; Chrome MCP thử DOCX giả → duyệt → tra cứu/tải PDF. Phát hiện UI cho chọn công khai nhầm file nguồn khiến phát hành lỗi 400. Không sửa code hoặc chạy test mới trong lượt cập nhật tài liệu.
 
 > 17/11/2026: đã lập plan điều phối `plans/SYSTEM_COMPLETION_ROADMAP.md`, liên kết các plan hiện có và bổ sung thứ tự nghiệm thu/triển khai. Đây chỉ là cập nhật tài liệu, chưa chạy test chức năng.

@@ -1,0 +1,127 @@
+- main [ref=e1027]:
+  - generic [ref=e1028]:
+    - button "CFC Lab" [ref=e1029] [cursor=pointer]
+    - button "Mở menu" [ref=e1030] [cursor=pointer]: ☰
+  - generic [ref=e1031]:
+    - generic [ref=e1032]:
+      - generic [ref=e1033]: Không gian làm việc
+      - strong [ref=e1034]: Nhận mẫu
+    - button "Thông báo, 0 chưa đọc" [ref=e1036] [cursor=pointer]
+  - generic [ref=e1261]:
+    - generic [ref=e1263]:
+      - button "← Danh sách nhận mẫu" [ref=e1264] [cursor=pointer]
+      - paragraph [ref=e1265]: Chi tiết phiếu bàn giao
+      - heading "CM-20261117-30AF8F" [level=1] [ref=e1266]
+    - generic [ref=e1267]:
+      - generic [ref=e1268]:
+        - generic [ref=e1269]:
+          - heading "Thông tin bàn giao Đã nhận mẫu" [level=2] [ref=e1270]:
+            - text: Thông tin bàn giao
+            - generic [ref=e1271]: Đã nhận mẫu
+          - paragraph [ref=e1272]: Thông tin phiếu và các mẫu cần đối chiếu
+        - generic [ref=e1273]: Đã nhận
+      - generic [ref=e1274]:
+        - generic [ref=e1275]:
+          - term [ref=e1276]: Phiếu tiếp nhận
+          - definition [ref=e1277]: TN-20261116-BAEFE4
+        - generic [ref=e1278]:
+          - term [ref=e1279]: Người giao nội bộ
+          - definition [ref=e1280]: Nguyễn Trung Thuận
+        - generic [ref=e1281]:
+          - term [ref=e1282]: Ngày chuyển
+          - definition [ref=e1283]: 2026-11-17
+        - generic [ref=e1284]:
+          - term [ref=e1285]: Hạn trả kết quả
+          - definition [ref=e1286]: 2026-11-24
+        - generic [ref=e1287]:
+          - term [ref=e1288]: Phòng nhận
+          - definition [ref=e1289]: KCS
+        - generic [ref=e1290]:
+          - term [ref=e1291]: Người nhận
+          - definition [ref=e1292]: Tiếp nhận
+        - generic [ref=e1293]:
+          - term [ref=e1294]: Trả mẫu cho khách
+          - definition [ref=e1295]: Không
+      - heading "Danh sách mẫu 1" [level=3] [ref=e1296]
+      - table [ref=e1298]:
+        - rowgroup [ref=e1299]:
+          - row [ref=e1300]:
+            - columnheader "Mã mẫu" [ref=e1301]
+            - columnheader "Tên mẫu" [ref=e1302]
+            - columnheader "Số lượng" [ref=e1303]
+            - columnheader "Khối lượng" [ref=e1304]
+            - columnheader "Tình trạng" [ref=e1305]
+            - columnheader "Chỉ tiêu" [ref=e1306]
+            - columnheader "Phương pháp" [ref=e1307]
+        - rowgroup [ref=e1308]:
+          - row [ref=e1309]:
+            - cell "CT001-SR-16112026-001" [ref=e1310]
+            - cell "Mẫu kiểm thử MCP" [ref=e1311]
+            - cell "1 mẫu" [ref=e1312]
+            - cell "1 mẫu" [ref=e1313]
+            - cell "Nguyên vẹn" [ref=e1314]
+            - cell "Kiểm tra chỉ tiêu mẫu" [ref=e1315]
+            - cell "huhuhu" [ref=e1316]
+      - paragraph [ref=e1317]:
+        - strong [ref=e1318]: "Ghi chú:"
+        - text: Không có
+    - generic [ref=e1319]:
+      - generic [ref=e1320]:
+        - generic [ref=e1321]:
+          - heading "Ảnh và hồ sơ đối chiếu" [level=2] [ref=e1322]
+          - paragraph [ref=e1323]: Bằng chứng được đính kèm trong hồ sơ tiếp nhận
+        - generic [ref=e1324]: 0 file
+      - note [ref=e1325]: Chưa có ảnh đối chiếu. Bạn vẫn có thể nhận mẫu sau khi kiểm tra thực tế.
+      - paragraph [ref=e1326]: Chưa có file đính kèm cho phiếu này.
+    - generic [ref=e1327]:
+      - heading "Kết quả bàn giao" [level=2] [ref=e1328]
+      - paragraph [ref=e1329]: ok nhận
+      - paragraph [ref=e1330]: "Ý kiến phòng phân tích: Không có"
+    - generic [ref=e1331]:
+      - heading "Đối chiếu mã mẫu tại KCS" [level=2] [ref=e1332]
+      - paragraph [ref=e1333]: Người đối chiếu phải khác người mã hóa. Kiểm tra nhãn trên mẫu thực tế, hồ sơ và phiếu yêu cầu trước khi xác nhận. Mẫu chưa xác minh không được đưa vào thử nghiệm.
+      - generic [ref=e1334]:
+        - strong [ref=e1335]: CT001-SR-16112026-001
+        - text: · Chờ đối chiếu
+      - paragraph [ref=e1336]: Nếu thông tin không khớp, dừng thử nghiệm và liên hệ người tiếp nhận để xử lý; không xác nhận khi chưa kiểm tra.
+  - generic [ref=e1135]:
+    - generic [ref=e1136]:
+      - generic [ref=e1137]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e1146] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e1147]:
+            - strong [ref=e1148]: CFC CÒ BAY
+            - generic [ref=e1149]: Agriculture & Technology
+        - paragraph [ref=e1150]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e1151] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e1152]: ↗
+      - generic [ref=e1153]:
+        - generic [ref=e1154]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e1155]
+          - generic [ref=e1156]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e1157]:
+            - link "1900 5307" [ref=e1158] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e1159] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e1160]:
+          - heading "Về CFC" [level=2] [ref=e1161]
+          - link "Giới thiệu" [ref=e1162] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e1163] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e1164] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e1165]:
+          - heading "Hỗ trợ" [level=2] [ref=e1166]
+          - link "Tìm kiếm" [ref=e1167] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e1168] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e1169] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e1170]:
+      - generic [ref=e1171]: © 2026 CFC Cò Bay
+      - generic [ref=e1172]: CFC Lab Management — hệ thống nội bộ

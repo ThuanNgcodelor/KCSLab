@@ -1,0 +1,210 @@
+- main [ref=e1027]:
+  - generic [ref=e1028]:
+    - button "CFC Lab" [ref=e1029] [cursor=pointer]
+    - button "Mở menu" [ref=e1383] [cursor=pointer]: ☰
+  - generic [ref=e1031]:
+    - generic [ref=e1032]:
+      - generic [ref=e1033]: Không gian làm việc
+      - strong [ref=e1034]: Thử nghiệm
+    - button "Thông báo, 0 chưa đọc" [ref=e1036] [cursor=pointer]
+  - generic [ref=e1665]:
+    - generic [ref=e1666]:
+      - generic [ref=e1667]:
+        - button "← Danh sách biên bản" [ref=e1668] [cursor=pointer]
+        - paragraph [ref=e1669]: BBTN-20261117-4D957C / CT001-SR-16112026-001
+        - heading "Bản nháp" [level=1] [ref=e1670]
+        - paragraph [ref=e1671]: Mẫu kiểm thử MCP · huhuhu
+      - generic [ref=e1672]: Bản nháp
+    - status [ref=e1673]: ✓ Đã lập biên bản BBTN-20261117-4D957C.
+    - generic [ref=e1674]:
+      - main [ref=e1675]:
+        - generic [ref=e1676]:
+          - generic [ref=e1677]:
+            - generic [ref=e1678]:
+              - text: TEST RECORD
+              - heading "Biên bản thử nghiệm" [level=2] [ref=e1679]
+            - strong [ref=e1680]: BBTN-20261117-4D957C
+          - generic [ref=e1681]:
+            - generic [ref=e1682]:
+              - generic [ref=e1683]: Phiếu yêu cầu
+              - strong [ref=e1684]: TN-20261116-BAEFE4
+            - generic [ref=e1685]:
+              - generic [ref=e1686]: Mã số mẫu
+              - strong [ref=e1687]: CT001-SR-16112026-001
+            - generic [ref=e1688]:
+              - generic [ref=e1689]: Tên mẫu
+              - strong [ref=e1690]: Mẫu kiểm thử MCP
+            - generic [ref=e1691]:
+              - generic [ref=e1692]: Số lượng
+              - strong [ref=e1693]: 1 mẫu
+            - generic [ref=e1694]:
+              - generic [ref=e1695]: Ngày PTN nhận mẫu
+              - strong [ref=e1696]: 17/11/2026
+            - generic [ref=e1697]:
+              - generic [ref=e1698]: Ngày yêu cầu trả KQ
+              - strong [ref=e1699]: 24/11/2026
+            - generic [ref=e1700]:
+              - generic [ref=e1701]: Bắt đầu thử nghiệm
+              - strong [ref=e1702]: —
+            - generic [ref=e1703]:
+              - generic [ref=e1704]: Kết thúc thử nghiệm
+              - strong [ref=e1705]: —
+            - generic [ref=e1706]:
+              - generic [ref=e1707]: Người phân tích
+              - strong [ref=e1708]: Tiếp nhận
+            - generic [ref=e1709]:
+              - generic [ref=e1710]: Người kiểm tra
+              - strong [ref=e1711]: Chưa kiểm tra
+        - generic [ref=e1712]:
+          - heading "II. Thiết bị phân tích" [level=3] [ref=e1713]
+          - table [ref=e1715]:
+            - rowgroup [ref=e1716]:
+              - row [ref=e1717]:
+                - columnheader "Thiết bị" [ref=e1718]
+                - columnheader "Mã hiệu / Serial" [ref=e1719]
+                - columnheader "Nhà sản xuất" [ref=e1720]
+                - columnheader "Mã nhận dạng" [ref=e1721]
+                - columnheader "Hiệu chuẩn" [ref=e1722]
+            - rowgroup [ref=e1723]:
+              - row [ref=e1724]:
+                - cell "ICP-MS E2E" [ref=e1725]
+                - cell "SN-E2E-001" [ref=e1726]
+                - cell "CFC Lab" [ref=e1727]
+                - cell "EQ-E2E-001" [ref=e1728]
+                - cell "1/11/2026" [ref=e1729]
+        - generic [ref=e1730]:
+          - heading "III. Hóa chất và thuốc thử" [level=3] [ref=e1731]
+          - table [ref=e1733]:
+            - rowgroup [ref=e1734]:
+              - row [ref=e1735]:
+                - columnheader "Hóa chất" [ref=e1736]
+                - columnheader "Mã" [ref=e1737]
+                - columnheader "Nguồn gốc" [ref=e1738]
+                - columnheader "Ngày pha / Hạn dùng" [ref=e1739]
+                - columnheader "Bảo quản / Nồng độ" [ref=e1740]
+            - rowgroup [ref=e1741]:
+              - row [ref=e1742]:
+                - cell "Axit nitric" [ref=e1743]
+                - cell "HNO3-E2E-001" [ref=e1744]
+                - cell "Việt Nam" [ref=e1745]
+                - cell "1/11/2026 / 30/11/2026" [ref=e1746]
+                - cell "2-8°C / 65%" [ref=e1747]
+        - generic [ref=e1748]:
+          - generic [ref=e1749]:
+            - heading "IV. Đường chuẩn" [level=3] [ref=e1750]
+            - paragraph [ref=e1751]: y = 1.00x + 0.00; R² = 0.999
+          - generic [ref=e1752]:
+            - heading "V. Công thức tính" [level=3] [ref=e1753]
+            - paragraph [ref=e1754]: KQ = nồng độ đo × hệ số pha loãng
+        - generic [ref=e1755]:
+          - heading "VI. Đảm bảo chất lượng" [level=3] [ref=e1756]
+          - table [ref=e1758]:
+            - rowgroup [ref=e1759]:
+              - row [ref=e1760]:
+                - columnheader "Lần lặp" [ref=e1761]
+                - columnheader "Lượng mẫu" [ref=e1762]
+                - columnheader "Thể tích" [ref=e1763]
+                - columnheader "Pha loãng" [ref=e1764]
+                - columnheader "Nồng độ" [ref=e1765]
+                - columnheader "KQ / lần" [ref=e1766]
+                - columnheader "Kết quả" [ref=e1767]
+                - columnheader "Độ lệch" [ref=e1768]
+            - rowgroup [ref=e1769]:
+              - row [ref=e1770]:
+                - cell "1" [ref=e1771]
+                - cell "1.00 g" [ref=e1772]
+                - cell "50 mL" [ref=e1773]
+                - cell "10" [ref=e1774]
+                - cell "0.50 mg/L" [ref=e1775]
+                - cell "0.498 mg/L" [ref=e1776]
+                - cell "Đạt" [ref=e1777]
+                - cell "0.4%" [ref=e1778]
+        - generic [ref=e1779]:
+          - generic [ref=e1780]:
+            - generic [ref=e1781]: Hiệu suất thu hồi
+            - strong [ref=e1782]: 98.5%
+          - generic [ref=e1783]:
+            - generic [ref=e1784]: Biểu đồ / nhận xét QC
+            - strong [ref=e1785]: QC trong giới hạn chấp nhận; không có cảnh báo.
+        - generic [ref=e1786]:
+          - heading "VII. Số liệu thực nghiệm" [level=3] [ref=e1787]
+          - table [ref=e1789]:
+            - rowgroup [ref=e1790]:
+              - row [ref=e1791]:
+                - columnheader "Lần lặp" [ref=e1792]
+                - columnheader "Lượng mẫu" [ref=e1793]
+                - columnheader "Thể tích" [ref=e1794]
+                - columnheader "Pha loãng" [ref=e1795]
+                - columnheader "Nồng độ" [ref=e1796]
+                - columnheader "KQ / lần" [ref=e1797]
+                - columnheader "Kết quả" [ref=e1798]
+                - columnheader "Độ lệch" [ref=e1799]
+            - rowgroup [ref=e1800]:
+              - row [ref=e1801]:
+                - cell "1" [ref=e1802]
+                - cell "1.00 g" [ref=e1803]
+                - cell "50 mL" [ref=e1804]
+                - cell "10" [ref=e1805]
+                - cell "0.50 mg/L" [ref=e1806]
+                - cell "0.500 mg/L" [ref=e1807]
+                - cell "Đạt" [ref=e1808]
+                - cell "0.0%" [ref=e1809]
+      - complementary [ref=e1810]:
+        - generic [ref=e1811]:
+          - paragraph [ref=e1812]: Luồng kiểm tra
+          - generic [ref=e1815]:
+            - strong [ref=e1816]: Đã lập biên bản
+            - generic [ref=e1817]: Tiếp nhận · 14:07:40 17/11/2026
+          - generic [ref=e1820]:
+            - strong [ref=e1821]: Gửi kiểm tra
+            - generic [ref=e1822]: Chưa gửi
+          - generic [ref=e1825]:
+            - strong [ref=e1826]: Kiểm tra hoàn tất
+            - generic [ref=e1827]: Đang chờ
+        - generic [ref=e1828]:
+          - paragraph [ref=e1829]:
+            - strong [ref=e1830]: Biên bản đang mở
+            - generic [ref=e1831]: Cập nhật số liệu nếu cần, sau đó gửi người kiểm tra.
+          - button "Sửa biên bản" [ref=e1832] [cursor=pointer]
+          - button "Gửi kiểm tra" [ref=e1833] [cursor=pointer]
+  - generic [ref=e1135]:
+    - generic [ref=e1136]:
+      - generic [ref=e1137]:
+        - link "CFC CÒ BAY Agriculture & Technology" [ref=e1146] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - generic [ref=e1147]:
+            - strong [ref=e1148]: CFC CÒ BAY
+            - generic [ref=e1149]: Agriculture & Technology
+        - paragraph [ref=e1150]: Từ một mẫu thử đến một quyết định đáng tin cậy.
+        - link "Khám phá CFC Cò Bay" [ref=e1151] [cursor=pointer]:
+          - /url: https://www.cfccobay.com/
+          - text: Khám phá CFC Cò Bay
+          - generic [aria-hidden] [ref=e1152]: ↗
+      - generic [ref=e1153]:
+        - generic [ref=e1154]:
+          - heading "Liên hệ phòng LAB" [level=2] [ref=e1155]
+          - generic [ref=e1156]: Công ty CP Phân bón & Hóa chất Cần ThơTrục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+          - generic [ref=e1157]:
+            - link "1900 5307" [ref=e1158] [cursor=pointer]:
+              - /url: tel:19005307
+            - link "info@cfccobay.com" [ref=e1159] [cursor=pointer]:
+              - /url: mailto:info@cfccobay.com
+        - generic [ref=e1160]:
+          - heading "Về CFC" [level=2] [ref=e1161]
+          - link "Giới thiệu" [ref=e1162] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/gioi-thieu
+          - link "Tin doanh nghiệp" [ref=e1163] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/tin-tuc
+          - link "Khảo nghiệm đồng ruộng" [ref=e1164] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/khao-nghiem-dong-ruong
+        - generic [ref=e1165]:
+          - heading "Hỗ trợ" [level=2] [ref=e1166]
+          - link "Tìm kiếm" [ref=e1167] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/search
+          - link "Liên hệ" [ref=e1168] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/lien-he
+          - link "Chính sách" [ref=e1169] [cursor=pointer]:
+            - /url: https://www.cfccobay.com/chinh-sach
+    - generic [ref=e1170]:
+      - generic [ref=e1171]: © 2026 CFC Cò Bay
+      - generic [ref=e1172]: CFC Lab Management — hệ thống nội bộ

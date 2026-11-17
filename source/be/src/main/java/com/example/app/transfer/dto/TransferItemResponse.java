@@ -9,5 +9,8 @@ public record TransferItemResponse(
         String quantity,
         String sampleCondition,
         String requestedParameters,
-        String testMethod
+        String testMethod,
+        com.example.app.intake.entity.SampleCodingStatus codingStatus,
+        String codedBy,
+        String verifiedBy
 ) {}

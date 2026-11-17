@@ -20,6 +20,7 @@ public interface TestingRecordRepository extends JpaRepository<TestingRecord, Lo
             select i from SampleTransferItem i
             where i.transfer.status = com.example.app.transfer.entity.TransferStatus.ACCEPTED
               and i.sample.status = com.example.app.intake.entity.ReceiptStatus.TRANSFERRED
+              and i.sample.codingStatus = com.example.app.intake.entity.SampleCodingStatus.VERIFIED
               and not exists (select 1 from TestingRecord r where r.transferItem = i)
             """)
     Page<SampleTransferItem> findCandidates(Pageable pageable);

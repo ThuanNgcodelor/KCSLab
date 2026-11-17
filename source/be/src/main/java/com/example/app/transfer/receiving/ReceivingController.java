@@ -85,4 +85,10 @@ public class ReceivingController {
                                             @AuthenticationPrincipal Jwt jwt) {
         return receiving.decide(id, request, users.getByEmail(jwt.getSubject()));
     }
+
+    @PostMapping("/transfers/{id}/samples/{sampleId}/coding/verify")
+    public ReceivingTransferResponse verifyCoding(@PathVariable Long id, @PathVariable Long sampleId,
+                                                   @AuthenticationPrincipal Jwt jwt) {
+        return receiving.verifyCoding(id, sampleId, users.getByEmail(jwt.getSubject()));
+    }
 }

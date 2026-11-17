@@ -38,6 +38,8 @@ class SampleCodingServiceTest {
     @Autowired private SampleCodingService coding;
     @Autowired private TransferService transfers;
     @Autowired private UserRepository users;
+    @Autowired private com.example.app.transfer.receiving.ReceivingService receiving;
+    @Autowired private com.example.app.testing.service.TestingRecordService testing;
 
     private User coder;
     private User verifier;
@@ -118,19 +120,18 @@ class SampleCodingServiceTest {
     }
 
     @Test
-    void unverifiedSampleCannotBeTransferredButVerifiedOneCan() {
+    void labelAppliedSampleCanBeHandedOverBeforeKcsVerification() {
         ReceiptResponse receipt = receipt("0900100006", "CT107");
         Long sampleId = receipt.samples().getFirst().id();
 
         assertThatThrownBy(() -> transfers.create(transferRequest(receipt.id(), sampleId), coder))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> {
                     assertThat(e.getStatusCode().value()).isEqualTo(409);
-                    assertThat(e.getReason()).contains("xác minh");
+                    assertThat(e.getReason()).contains("dán nhãn");
                 });
         assertThat(searchTransferable()).extracting(ReceiptResponse::id).doesNotContain(receipt.id());
 
         coding.submit(sampleId, coder);
-        coding.verify(sampleId, verifier);
 
         assertThat(searchTransferable()).extracting(ReceiptResponse::id).contains(receipt.id());
         var transfer = transfers.create(transferRequest(receipt.id(), sampleId), coder);
@@ -138,6 +139,41 @@ class SampleCodingServiceTest {
         assertThat(transfers.decide(transfer.id(), new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, null, null, false, null), technician).status())
                 .isEqualTo(TransferStatus.ACCEPTED);
+        assertThat(coding.find(sampleId).codingStatus()).isEqualTo(SampleCodingStatus.PENDING_VERIFICATION);
+    }
+
+    @Test
+    void kcsVerifiesAfterHandoverBeforeTesting() {
+        var receipt = receipt("0900100020", "CT120");
+        Long sampleId = receipt.samples().getFirst().id();
+        coding.submit(sampleId, coder);
+        assertThat(searchTransferable()).extracting(ReceiptResponse::id).contains(receipt.id());
+        var transfer = transfers.create(transferRequest(receipt.id(), sampleId), coder);
+        transfers.submit(transfer.id());
+        assertThatThrownBy(() -> receiving.verifyCoding(transfer.id(), sampleId, technician))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(409));
+        transfers.decide(transfer.id(), new TransferDecisionRequest(TransferStatus.ACCEPTED, null, null, false, null), technician);
+        assertThat(testing.candidates()).noneMatch(candidate -> candidate.sampleId().equals(sampleId));
+        assertThatThrownBy(() -> receiving.verifyCoding(transfer.id(), sampleId, coder))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(403));
+        assertThatThrownBy(() -> receiving.verifyCoding(transfer.id(), sampleId + 999999, technician))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(404));
+        receiving.verifyCoding(transfer.id(), sampleId, technician);
+        assertThat(coding.find(sampleId).codingStatus()).isEqualTo(SampleCodingStatus.VERIFIED);
+        assertThat(testing.candidates()).anyMatch(candidate -> candidate.sampleId().equals(sampleId));
+    }
+
+    @Test
+    void adminWhoCodedCannotVerifyOwnSampleAtKcs() {
+        User admin = users.save(new User("admin-coder@test.local", "Admin coder", "unused", Role.ADMIN));
+        var receipt = receipt("0900100021", "CT121");
+        Long sampleId = receipt.samples().getFirst().id();
+        coding.submit(sampleId, admin);
+        var transfer = transfers.create(transferRequest(receipt.id(), sampleId), coder);
+        transfers.submit(transfer.id());
+        transfers.decide(transfer.id(), new TransferDecisionRequest(TransferStatus.ACCEPTED, null, null, false, null), technician);
+        assertThatThrownBy(() -> receiving.verifyCoding(transfer.id(), sampleId, admin))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(403));
     }
 
     @Test

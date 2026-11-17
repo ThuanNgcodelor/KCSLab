@@ -187,7 +187,7 @@ public class TransferService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " không còn sẵn sàng để chuyển");
             }
-            requireCodingVerified(sample);
+            requireCodingReadyForHandover(sample);
             if (itemRepository.existsBySample_IdAndTransfer_StatusIn(sample.getId(), ACTIVE_TRANSFER_STATUSES)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " đang có phiếu chuyển hiệu lực");
@@ -228,9 +228,9 @@ public class TransferService {
                     "Cần nhập ngày lưu mẫu tại phòng phân tích");
         }
 
-        if (request.decision() == TransferStatus.ACCEPTED) {
-            transfer.getItems().forEach(item -> requireCodingVerified(item.getSample()));
-        }
+        // Acceptance closes the physical handover checkpoint. The independent
+        // CFC-TN-14 coding verification is performed by KCS after acceptance;
+        // testing candidates remain gated by SampleCodingStatus.VERIFIED.
         transfer.decide(request.decision(), receiver, blankToNull(request.receivingNote()),
                 blankToNull(request.labOpinion()), request.labRetain(), request.labRetentionUntil());
         if (request.decision() == TransferStatus.ACCEPTED) {
@@ -309,7 +309,7 @@ public class TransferService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Mẫu " + sample.getSampleCode() + " chưa sẵn sàng để lập phiếu chuyển");
             }
-            requireCodingVerified(sample);
+            requireCodingReadyForHandover(sample);
         }
         return samples;
     }
@@ -327,11 +327,11 @@ public class TransferService {
         return items;
     }
 
-    /** CFC-TN-14 gate: only samples whose code was independently verified may leave the receiving desk. */
-    private void requireCodingVerified(Sample sample) {
-        if (!sample.isCodingVerified()) {
+    /** The label must be applied before handover; KCS verifies independently after receipt. */
+    private void requireCodingReadyForHandover(Sample sample) {
+        if (!sample.isCodingVerified() && sample.getCodingStatus() != com.example.app.intake.entity.SampleCodingStatus.PENDING_VERIFICATION) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Mẫu " + sample.getSampleCode() + " chưa được xác minh mã hóa (" + sample.getCodingStatus() + ")");
+                    "Mẫu " + sample.getSampleCode() + " chưa được xác nhận dán nhãn (" + sample.getCodingStatus() + ")");
         }
     }
 
@@ -384,7 +384,9 @@ public class TransferService {
     private TransferItemResponse toItemResponse(SampleTransferItem item) {
         return new TransferItemResponse(item.getId(), item.getSample().getId(), item.getSampleName(),
                 item.getSampleCode(), item.getWeight(), item.getQuantity(), item.getSampleCondition(),
-                item.getRequestedParameters(), item.getTestMethod());
+                item.getRequestedParameters(), item.getTestMethod(), item.getSample().getCodingStatus(),
+                item.getSample().getCodedBy() == null ? null : item.getSample().getCodedBy().getDisplayName(),
+                item.getSample().getVerifiedBy() == null ? null : item.getSample().getVerifiedBy().getDisplayName());
     }
 
     private String blankToNull(String value) { return isBlank(value) ? null : value.trim(); }

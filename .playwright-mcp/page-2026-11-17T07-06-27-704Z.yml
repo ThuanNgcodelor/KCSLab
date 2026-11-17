@@ -1,0 +1,46 @@
+- main [ref=e975]:
+  - region "Chào mừng trở lại" [ref=e976]:
+    - generic [ref=e977]:
+      - img "Logo CFC Cò Bay" [ref=e978]
+      - generic [ref=e979]:
+        - strong [ref=e980]: CFC Lab
+        - generic [ref=e981]: Phòng kiểm nghiệm
+    - paragraph [ref=e982]: LAB MANAGEMENT
+    - heading "Chào mừng trở lại" [level=1] [ref=e983]
+    - paragraph [ref=e984]: Đăng nhập để làm việc trong hệ thống nội bộ.
+    - generic [ref=e985]:
+      - generic [ref=e986]:
+        - text: Email công việc
+        - textbox "Email công việc" [ref=e987]:
+          - /placeholder: ten@cfc.vn
+      - generic [ref=e988]:
+        - generic [ref=e989]: Mật khẩu
+        - generic [ref=e990]:
+          - textbox "Mật khẩu" [ref=e991]
+          - button "Hiện mật khẩu" [ref=e992] [cursor=pointer]
+      - generic [ref=e996] [cursor=pointer]:
+        - checkbox "Ghi nhớ đăng nhập Duy trì phiên trên thiết bị này trong 30 ngày." [ref=e997]
+        - generic [ref=e998]:
+          - strong [ref=e999]: Ghi nhớ đăng nhập
+          - generic [ref=e1000]: Duy trì phiên trên thiết bị này trong 30 ngày.
+      - button "Đăng nhập" [ref=e1001] [cursor=pointer]
+    - paragraph [ref=e1002]: Chỉ tài khoản do quản trị viên tạo mới có thể truy cập.
+  - complementary [ref=e1003]:
+    - paragraph [ref=e1011]: QUY TRÌNH RÕ RÀNG
+    - heading "Từ tiếp nhận đến kết quả, mọi bước đều có dấu vết." [level=2] [ref=e1012]
+    - list "Quy trình xử lý mẫu" [ref=e1013]:
+      - listitem [ref=e1014]:
+        - generic [ref=e1015]: "01"
+        - generic [ref=e1016]:
+          - strong [ref=e1017]: Tiếp nhận
+          - text: Phiếu số 3 · hồ sơ và ảnh mẫu
+      - listitem [ref=e1018]:
+        - generic [ref=e1019]: "02"
+        - generic [ref=e1020]:
+          - strong [ref=e1021]: Chuyển mẫu
+          - text: Phiếu số 4 · bàn giao sang KCS
+      - listitem [ref=e1022]:
+        - generic [ref=e1023]: "03"
+        - generic [ref=e1024]:
+          - strong [ref=e1025]: Thử nghiệm
+          - text: Phiếu số 5 · số liệu và kiểm tra

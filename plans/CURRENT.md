@@ -120,7 +120,7 @@ Chi tiết contract, schema, retry, bảo mật và acceptance criteria nằm t�
 
 1. Làm N0–N2 của notification bằng fake provider, không chờ tài khoản Zalo/SMS.
 2. Tích hợp ZBS/SMS khi LAB có tài khoản, template đã duyệt và sandbox.
-3. Tiếp tục Phase 2/5A: sequence nguyên tử, chấp nhận mẫu, `-V/-R`, xác minh hai người, QC/mã mù và gate trước Phiếu 4.
+3. Tiếp tục Phase 2/5A: sequence nguyên tử, `-V/-R`, xác minh hai người sau bàn giao, QC/mã mù và gate trước Phiếu 5/thử nghiệm.
 4. Hardening Phase 3 bằng WebSocket nội bộ cho sự kiện gửi/nhận/từ chối Phiếu 4.
 5. Sau đó mới phát hành PDF, public lookup và QR kết quả.
 
@@ -159,7 +159,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp n
 - [x] Bổ sung trường người/ngày lấy mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container/seal.
 - [ ] Tách bước tạo hồ sơ, chấp nhận mẫu, gán mã và xác minh mã; không sinh mã khi hồ sơ chưa đạt.
 - [ ] Thay cấp số bằng counter/locking nguyên tử theo ngày `Asia/Ho_Chi_Minh`; thêm test đồng thời và ranh giới nửa đêm.
-- [ ] Triển khai sample part `-V/-R`, nhãn mẫu và chặn chuyển mẫu trước khi mã được người thứ hai xác minh.
+- [ ] Triển khai sample part `-V/-R`, nhãn mẫu; người thứ hai xác minh sau bàn giao và trước khi mẫu vào thử nghiệm.
 - [ ] Thiết kế mã QC `BL/SP/D`, mã mù và bảng đối chiếu bảo mật.
 - [ ] Lưu actor/thời điểm/lý do cho gán mã, xác minh và hiệu chỉnh; không tái sử dụng mã.
 - [ ] Số hóa Sổ theo dõi mẫu; quản lý mapping mã–thông tin gốc và hồ sơ mã mù bằng quyền truy cập riêng.
@@ -186,7 +186,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp n
 2. Intake I2–I3: notification nội bộ lưu bền, header ba tin, page riêng và WebSocket user destination.
 3. Intake I4–I5: dashboard/list theo role và form Phiếu 3 bám sáu mục, catalog loại sản phẩm nhập tay có kiểm soát.
 4. Customer notification N0–N2 bằng outbox/fake provider; tích hợp ZBS/SMS khi có tài khoản/template/sandbox.
-5. Khóa Phase 2/5A: sequence nguyên tử, `-V/-R`, xác minh hai người, QC/mã mù và gate Phiếu 4.
+5. Khóa Phase 2/5A: sequence nguyên tử, `-V/-R`, xác minh hai người sau bàn giao, QC/mã mù và gate Phiếu 5.
 6. Sửa separation of duties cho thử nghiệm, rồi làm `result_releases`, PDF/QR và public lookup.
 
 ## Chưa làm trong giai đoạn này
@@ -199,7 +199,7 @@ Hoàn thiện chuỗi truy xuất từ hồ sơ nguồn → xác nhận tiếp n
 ## Điều kiện hoàn thành
 
 - Chỉ biên bản `REVIEWED` mới được phát hành; dữ liệu nháp/QC/raw data không xuất hiện trong tài liệu khách.
-- Chỉ mẫu có mã đã được người thứ hai xác minh mới được chuyển sang phòng thử nghiệm.
+- Chỉ mẫu có mã đã được người thứ hai xác minh mới được đưa vào chuẩn bị/phân tích và lập Phiếu 5; việc bàn giao Phiếu 4 được phép khi mã đã dán và đang `PENDING_VERIFICATION`.
 - Mã mẫu được cấp nguyên tử theo ngày Việt Nam, hỗ trợ phần nền/QC/mã mù và không tái sử dụng.
 - Người phân tích không được tự kiểm tra hoặc tự phát hành kết quả của chính mình.
 - Mỗi lần phát hành tạo version và checksum riêng, có thể thu hồi/đính chính nhưng không ghi đè lịch sử.

@@ -1,0 +1,46 @@
+- main [ref=e1836]:
+  - region "Chào mừng trở lại" [ref=e1837]:
+    - generic [ref=e1838]:
+      - img "Logo CFC Cò Bay" [ref=e1839]
+      - generic [ref=e1840]:
+        - strong [ref=e1841]: CFC Lab
+        - generic [ref=e1842]: Phòng kiểm nghiệm
+    - paragraph [ref=e1843]: LAB MANAGEMENT
+    - heading "Chào mừng trở lại" [level=1] [ref=e1844]
+    - paragraph [ref=e1845]: Đăng nhập để làm việc trong hệ thống nội bộ.
+    - generic [ref=e1846]:
+      - generic [ref=e1847]:
+        - text: Email công việc
+        - textbox "Email công việc" [ref=e1848]:
+          - /placeholder: ten@cfc.vn
+      - generic [ref=e1849]:
+        - generic [ref=e1850]: Mật khẩu
+        - generic [ref=e1851]:
+          - textbox "Mật khẩu" [ref=e1852]
+          - button "Hiện mật khẩu" [ref=e1853] [cursor=pointer]
+      - generic [ref=e1857] [cursor=pointer]:
+        - checkbox "Ghi nhớ đăng nhập Duy trì phiên trên thiết bị này trong 30 ngày." [ref=e1858]
+        - generic [ref=e1859]:
+          - strong [ref=e1860]: Ghi nhớ đăng nhập
+          - generic [ref=e1861]: Duy trì phiên trên thiết bị này trong 30 ngày.
+      - button "Đăng nhập" [ref=e1862] [cursor=pointer]
+    - paragraph [ref=e1863]: Chỉ tài khoản do quản trị viên tạo mới có thể truy cập.
+  - complementary [ref=e1864]:
+    - paragraph [ref=e1872]: QUY TRÌNH RÕ RÀNG
+    - heading "Từ tiếp nhận đến kết quả, mọi bước đều có dấu vết." [level=2] [ref=e1873]
+    - list "Quy trình xử lý mẫu" [ref=e1874]:
+      - listitem [ref=e1875]:
+        - generic [ref=e1876]: "01"
+        - generic [ref=e1877]:
+          - strong [ref=e1878]: Tiếp nhận
+          - text: Phiếu số 3 · hồ sơ và ảnh mẫu
+      - listitem [ref=e1879]:
+        - generic [ref=e1880]: "02"
+        - generic [ref=e1881]:
+          - strong [ref=e1882]: Chuyển mẫu
+          - text: Phiếu số 4 · bàn giao sang KCS
+      - listitem [ref=e1883]:
+        - generic [ref=e1884]: "03"
+        - generic [ref=e1885]:
+          - strong [ref=e1886]: Thử nghiệm
+          - text: Phiếu số 5 · số liệu và kiểm tra

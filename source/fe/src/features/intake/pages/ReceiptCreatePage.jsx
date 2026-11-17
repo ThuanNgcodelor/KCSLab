@@ -105,7 +105,7 @@ export function ReceiptCreatePage() {
         <small>MÃ MẪU HIỆN TẠI</small>
         {created.samples?.map((sample) => <strong key={sample.id}>{sample.sampleCode}</strong>)}
       </div>
-      <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mã mẫu cần được người thứ hai xác minh (mở chi tiết phiếu → Mã hóa) trước khi chuyển mẫu sang KCS.</p>
+      <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mở chi tiết phiếu, dán nhãn và xác nhận trước khi chuyển; KCS sẽ đối chiếu độc lập sau khi nhận.</p>
       <div className="receipt-success-actions">
         <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất Phiếu 3</button>
         <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Về danh sách</button>
@@ -190,7 +190,7 @@ export function ReceiptCreatePage() {
           <PhotoPicker label="Ảnh lô hàng" hint="Toàn cảnh lô/xe/container khi nhận" files={files.lot} onChange={updateFiles('lot')} />
           <small className="field-help">Tối đa 10 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
         </section>
-        <div className="form-submit-panel"><p><strong>Kiểm tra trước khi lưu</strong><span>Mã sinh theo CFC-TN-14; sau khi lưu cần người thứ hai xác minh mã trước khi chuyển mẫu.</span></p><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Đang lưu hồ sơ…' : 'Lưu phiếu tiếp nhận'}</button></div>
+        <div className="form-submit-panel"><p><strong>Kiểm tra trước khi lưu</strong><span>Sau khi lưu, dán nhãn và xác nhận tại chi tiết phiếu; KCS đối chiếu độc lập sau bàn giao.</span></p><button className="primary-button" type="submit" disabled={saving}>{saving ? 'Đang lưu hồ sơ…' : 'Lưu phiếu tiếp nhận'}</button></div>
       </aside>
     </form>
   </section>;

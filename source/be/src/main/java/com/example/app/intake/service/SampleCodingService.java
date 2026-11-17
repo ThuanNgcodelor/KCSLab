@@ -58,6 +58,19 @@ public class SampleCodingService {
     @Transactional
     public SampleCodingResponse verify(Long sampleId, User actor) {
         requireCodingRole(actor);
+        return verifyIndependent(sampleId, actor);
+    }
+
+    /** Called only after the receiving service checks the accepted transfer and its sample. */
+    @Transactional
+    public SampleCodingResponse verifyAtKcs(Long sampleId, User actor) {
+        if (actor.getRole() != Role.TECHNICIAN && actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Không có quyền đối chiếu tại KCS");
+        }
+        return verifyIndependent(sampleId, actor);
+    }
+
+    private SampleCodingResponse verifyIndependent(Long sampleId, User actor) {
         Sample sample = lock(sampleId);
         requireStatus(sample, SampleCodingStatus.PENDING_VERIFICATION);
         requireIndependent(sample, actor);
@@ -74,6 +87,7 @@ public class SampleCodingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cần ghi lý do khi đối chiếu mã không đạt");
         }
         Sample sample = lock(sampleId);
+        requireAtIntake(sample);
         requireStatus(sample, SampleCodingStatus.PENDING_VERIFICATION);
         requireIndependent(sample, actor);
         sample.rejectCoding();
@@ -94,6 +108,7 @@ public class SampleCodingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cần ghi lý do hiệu chỉnh mã mẫu");
         }
         Sample sample = lock(sampleId);
+        requireAtIntake(sample);
         requireStatus(sample, SampleCodingStatus.CORRECTION_REQUIRED);
         String newSource = sourceCode == null || sourceCode.isBlank()
                 ? sample.getSourceCode() : SampleCodes.normalizeSource(sourceCode);
@@ -115,6 +130,13 @@ public class SampleCodingService {
 
     private Sample lock(Long id) {
         return samples.findByIdForUpdate(id).orElseThrow(this::notFound);
+    }
+
+    private void requireAtIntake(Sample sample) {
+        if (sample.getStatus() != com.example.app.intake.entity.ReceiptStatus.RECEIVED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Không thể hiệu chỉnh mã khi mẫu đang hoặc đã được bàn giao; cần xử lý bàn giao trước");
+        }
     }
 
     private ResponseStatusException notFound() {

@@ -11,3 +11,6 @@ export function getReceivingEvidence(id) { return request(`/receiving/transfers/
 export function decideReceivingTransfer(id, decision) {
   return request(`/receiving/transfers/${id}/decision`, { method: 'POST', body: JSON.stringify(decision) });
 }
+export function verifyReceivingSample(id, sampleId) {
+  return request(`/receiving/transfers/${id}/samples/${sampleId}/coding/verify`, { method: 'POST' });
+}
