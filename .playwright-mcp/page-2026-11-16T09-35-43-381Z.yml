@@ -1,0 +1,46 @@
+- main [ref=e3]:
+  - region "Chào mừng trở lại" [ref=e4]:
+    - generic [ref=e5]:
+      - img "Logo CFC Cò Bay" [ref=e6]
+      - generic [ref=e7]:
+        - strong [ref=e8]: CFC Lab
+        - generic [ref=e9]: Phòng kiểm nghiệm
+    - paragraph [ref=e10]: LAB MANAGEMENT
+    - heading "Chào mừng trở lại" [level=1] [ref=e11]
+    - paragraph [ref=e12]: Đăng nhập để làm việc trong hệ thống nội bộ.
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - text: Email công việc
+        - textbox "Email công việc" [ref=e15]:
+          - /placeholder: ten@cfc.vn
+      - generic [ref=e16]:
+        - generic [ref=e17]: Mật khẩu
+        - generic [ref=e18]:
+          - textbox "Mật khẩu" [ref=e19]
+          - button "Hiện mật khẩu" [ref=e20] [cursor=pointer]
+      - generic [ref=e24] [cursor=pointer]:
+        - checkbox "Ghi nhớ đăng nhập Duy trì phiên trên thiết bị này trong 30 ngày." [ref=e25]
+        - generic [ref=e26]:
+          - strong [ref=e27]: Ghi nhớ đăng nhập
+          - generic [ref=e28]: Duy trì phiên trên thiết bị này trong 30 ngày.
+      - button "Đăng nhập" [ref=e29] [cursor=pointer]
+    - paragraph [ref=e30]: Chỉ tài khoản do quản trị viên tạo mới có thể truy cập.
+  - complementary [ref=e31]:
+    - paragraph [ref=e39]: QUY TRÌNH RÕ RÀNG
+    - heading "Từ tiếp nhận đến kết quả, mọi bước đều có dấu vết." [level=2] [ref=e40]
+    - list "Quy trình xử lý mẫu" [ref=e41]:
+      - listitem [ref=e42]:
+        - generic [ref=e43]: "01"
+        - generic [ref=e44]:
+          - strong [ref=e45]: Tiếp nhận
+          - text: Phiếu số 3 · hồ sơ và ảnh mẫu
+      - listitem [ref=e46]:
+        - generic [ref=e47]: "02"
+        - generic [ref=e48]:
+          - strong [ref=e49]: Chuyển mẫu
+          - text: Phiếu số 4 · bàn giao sang KCS
+      - listitem [ref=e50]:
+        - generic [ref=e51]: "03"
+        - generic [ref=e52]:
+          - strong [ref=e53]: Thử nghiệm
+          - text: Phiếu số 5 · số liệu và kiểm tra

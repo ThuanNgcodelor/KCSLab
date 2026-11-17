@@ -24,6 +24,7 @@ import com.example.app.transfer.service.TransferService;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import com.example.app.user.repository.UserRepository;
+import com.example.app.results.service.ResultReleaseDraftService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ class TestingRecordServiceTest {
     @Autowired private UserRepository userRepository;
     @Autowired private CustomerRepository customerRepository;
     @Autowired private ReceiptRepository receiptRepository;
+    @Autowired private ResultReleaseDraftService releaseDrafts;
 
     private User technician;
     private User admin;
@@ -114,6 +116,19 @@ class TestingRecordServiceTest {
                 new ReviewTestingRecordRequest(TestRecordStatus.RETURNED, " "), admin))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Cần ghi lý do");
+    }
+
+    @Test
+    void reviewedRecordCanCreateOneResultDraftInDatabase() {
+        var record = testingRecordService.create(recordRequest(), technician);
+        testingRecordService.submit(record.id(), technician);
+        testingRecordService.review(record.id(), new ReviewTestingRecordRequest(TestRecordStatus.REVIEWED, "Đạt"), admin);
+        var draft = releaseDrafts.create(record.id(), technician);
+        assertThat(draft.status()).isEqualTo("DRAFT");
+        assertThat(releaseDrafts.find(draft.id()).testingRecordId()).isEqualTo(record.id());
+        assertThatThrownBy(() -> releaseDrafts.create(record.id(), technician))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        ex -> assertThat(ex.getStatusCode().value()).isEqualTo(409));
     }
 
     private SaveTestingRecordRequest recordRequest() {

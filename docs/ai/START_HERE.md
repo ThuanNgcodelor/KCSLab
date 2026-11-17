@@ -1,16 +1,17 @@
 # CFC Lab — Bắt đầu phiên làm việc
 
-**Cập nhật:** 15/11/2026  
+**Cập nhật:** 17/11/2026
 **Mục đích:** file chỉ dẫn nhanh cho phiên làm việc mới ở công ty.
 
 ## Đọc theo thứ tự
 
 1. File này để biết bản đồ tài liệu và trạng thái thật.
-2. `docs/ai/CONTEXT.md` để lấy context ngắn của hệ thống.
-3. `docs/ai/STATE.md` để xem các thay đổi đã xác minh gần nhất.
-4. `plans/CURRENT.md` để biết kế hoạch tổng thể và thứ tự triển khai.
-5. `docs/ai/HANDOFF.md` để tiếp tục công việc kỹ thuật từ phiên trước.
-6. Chỉ đọc tài liệu chuyên môn theo tác vụ:
+2. `docs/SYSTEM_STATUS.md` để xem tổng hợp hiện hành và giới hạn nghiệm thu.
+3. `docs/ai/CONTEXT.md` để lấy context ngắn của hệ thống.
+4. `docs/ai/STATE.md` để xem các thay đổi đã xác minh gần nhất.
+5. `plans/CURRENT.md` để biết kế hoạch tổng thể và thứ tự triển khai.
+6. `docs/ai/HANDOFF.md` để tiếp tục công việc kỹ thuật từ phiên trước.
+7. Chỉ đọc tài liệu chuyên môn theo tác vụ:
    - Tiếp nhận: `plans/intake/OVERVIEW.md`, `RECEPTIONIST.md`, `ADMIN.md`, `TECHNICIAN_KCS.md`.
    - Mã hóa: `docs/SAMPLE_CODING.md` và tài liệu CFC-TN-14 ở thư mục gốc.
    - Quyền: `docs/RBAC.md`.
@@ -18,7 +19,9 @@
    - SEO/trang tra cứu public: `docs/PUBLIC_LOOKUP_SEO.md`.
    - Database/API: `docs/DATABASE.md`, `docs/API_CONVENTIONS.md`.
 
-## Trạng thái thật ngày 15/11/2026
+## Trạng thái: xem tổng hợp hiện hành
+
+Ưu tiên `docs/SYSTEM_STATUS.md`; các chi tiết bên dưới là ghi chép nền, không thay thế bản tổng hợp.
 
 ### Đã chạy được
 
@@ -35,15 +38,31 @@
 
 ### Chưa được xem là hoàn tất
 
-- Export Phiếu 3: đã có endpoint/template/placeholder nhưng file DOCX vừa gặp lỗi mở bằng Microsoft Word; phải sửa và test mở Word thật trước khi đánh dấu hoàn tất.
+- Export Phiếu 3: đã sửa XML template/exporter, nhưng vẫn phải test mở bằng Microsoft Word thật trước khi đánh dấu hoàn tất.
 - Mã hóa CFC-TN-14: runtime mới có mã gốc; chưa có sequence nguyên tử, xác minh hai người, `-V/-R`, QC/mã mù và correction history.
 - Zalo OA/ZBS/SMS: mới có thiết kế, chưa có provider runtime.
-- Trang tra cứu public/SEO/QR/PDF phát hành: mới là plan, chưa có route/API public.
+- Trang tra cứu: có landing tĩnh xem trước không login, form khóa và `noindex`; chưa có API tra cứu, QR, PDF phát hành hay SEO production.
 - Tách hệ thống nội bộ và public bằng Cloudflare Tunnel: chưa triển khai.
 
 ## Cách chạy bằng tay
 
 Laragon phải bật MySQL và Redis. Database dùng `cfc_lab`.
+
+Trên Linux, bảo đảm MySQL và Redis đang chạy, cấu hình environment phù hợp, sau đó chạy trong hai terminal:
+
+```bash
+cd source/be
+mvn spring-boot:run
+```
+
+```bash
+cd source/fe
+npm run dev
+```
+
+Trang tra cứu chỉ là preview riêng: xem lệnh tại `source/public/README.md`. Backend đọc cấu hình theo môi trường khởi chạy; không đưa mật khẩu vào lệnh hoặc tài liệu.
+
+Ví dụ trên Windows/Laragon:
 
 Backend:
 

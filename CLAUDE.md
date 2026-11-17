@@ -27,14 +27,14 @@ ADMIN: giám sát toàn hệ thống
 
 - Chỉ ba role `ADMIN`, `RECEPTIONIST`, `TECHNICIAN`; không tự thêm role mới.
 - Mã mẫu chuẩn CFC-TN-14: `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`. Hiện mới có mã gốc.
-- **Chưa có**: `-V/-R`, QC/mã mù, xác minh độc lập, result release/PDF, QR/public lookup, gửi ZBS/SMS khách. Không mô tả chúng như đã hoạt động.
+- **Chưa có**: `-V/-R`, QC/mã mù, xác minh độc lập, phát hành result release/PDF, QR/public lookup thật, gửi ZBS/SMS khách. V6 và API tạo/đọc nháp kết quả đã có trong thay đổi chưa commit; landing tra cứu chỉ là preview khóa form. Không mô tả các phần chưa có như đã hoạt động.
 - Phân biệt KPI theo **phiếu** và **mẫu**; thời gian theo `Asia/Ho_Chi_Minh`; aggregate phải lấy từ DB, không tính từ trang đang hiển thị.
 
 ## Tài liệu — đọc theo tác vụ
 
 | Cần gì | Đọc |
 |---|---|
-| Tổng quan nhanh (đọc đầu) | `AGENTS.md`, `docs/ai/CONTEXT.md`, `docs/ai/STATE.md` |
+| Tổng quan nhanh (đọc đầu) | `AGENTS.md`, `docs/SYSTEM_STATUS.md`, `docs/ai/CONTEXT.md`, `docs/ai/STATE.md` |
 | Định vị module | `docs/ai/MODULE_MAP.md` |
 | Quyết định kiến trúc / kế hoạch | `docs/ai/DECISIONS.md`, `plans/CURRENT.md`, `plans/ROADMAP.md` |
 | Workspace theo role | `plans/intake/OVERVIEW.md`, `RECEPTIONIST.md`, `TECHNICIAN_KCS.md`, `ADMIN.md` |

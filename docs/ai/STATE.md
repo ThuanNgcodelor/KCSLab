@@ -1,5 +1,7 @@
 # Project State
 
+> **17/11/2026:** `docs/SYSTEM_STATUS.md` tổng hợp trạng thái mới nhất; các mục dưới đây lưu lịch sử theo phiên, có thể mâu thuẫn khi chức năng được triển khai về sau. Không có test mới trong lần tổng hợp tài liệu này.
+
 ## Workspace nhận mẫu KCS — 16/11/2026
 
 - Đã thêm API `/api/v1/receiving/**` cho dashboard, list, chi tiết, metadata/content file và quyết định; role `ADMIN|TECHNICIAN`, không mở receipt API. DTO mới không có `customerName`; file gốc có thể chứa dữ liệu khách.
@@ -158,3 +160,17 @@
 - Login dùng logo CFC cùng sidebar, favicon được đổi sang cùng asset sau khi frontend khởi tạo; có nút hiện/ẩn mật khẩu. Giữ nguyên xác thực và `ConfirmDialog`; rà source không có `window.confirm/alert/prompt`.
 - `npm run build` pass; kiểm tra logo, toggle, lỗi đăng nhập và bốn breakpoint bằng Playwright/API giả lập. Chưa kiểm tra login thành công và favicon trên bản build thật.
 - Các hạng mục chuẩn hóa toast, xác nhận và validation toàn frontend được đưa vào `plans/NOTIFICATION_REALTIME.md`, chưa hoàn thành toàn bộ.
+
+## Khởi đầu kế hoạch hoàn thiện — 16/11/2026
+
+- Đã tách route React bằng `lazy`/`Suspense`. `npm run build` pass, main JS 276.11 kB (87.57 kB gzip), vẫn chưa đạt mục tiêu dưới 200 kB chưa nén; Playwright dùng API giả lập kiểm tra dashboard ba role và bốn kích thước, không tràn ngang toàn trang.
+- V6 tạo nền `result_releases` cho nháp phiên bản 1. TECHNICIAN tạo nháp cho biên bản `REVIEWED`; ADMIN/TECHNICIAN đọc nháp. Không có upload, gửi duyệt, phát hành hay public API. Test Java 21/MySQL/Redis tạm: 38 test, 0 failures/errors/skipped; V6 chưa kiểm tra trên database làm việc.
+- Quyết định người dùng: chặn phát hành tới khi gate CFC-TN-14 hoàn tất; QR và mã nhập tay đều cần 4 số cuối SĐT; KQKN-DV là hồ sơ được nói đến; file giới hạn 10 MB/file, 10 file/hồ sơ; mặc định chỉ PDF public, Admin có thể bật Word/Excel khi phát hành.
+- Chưa làm gate mã hóa, upload/an toàn OOXML, duyệt, version/thu hồi, site/API public, rate limit, SEO, refactor CSS/font, UI releases và E2E dữ liệu thật. Không xem mục 1–5.4 là hoàn thành.
+
+## Trang tra cứu — bản xem trước nội bộ
+
+- Cập nhật giao diện landing với logo CFC và hình phòng kiểm nghiệm minh họa tạo bằng AI; giữ form vô hiệu hóa, thông báo chưa khả dụng và `noindex`. Playwright kiểm tra HTTP 200, ảnh tải được và không tràn ngang ở 1440px và 390px; chưa kiểm thử chức năng tra cứu thật.
+- Có landing tĩnh tách biệt tại `source/public/tracuu/`, không yêu cầu đăng nhập. Chạy thử theo `source/public/README.md`; form bị vô hiệu hóa và thông báo rõ chưa thể tra cứu/tải kết quả.
+- Playwright đã kiểm tra localhost HTTP 200, không redirect login, không tràn ngang toàn trang tại 390×844, 1024×768, 1440×900, 2560×952. Bản xem trước dùng `noindex`, chưa có domain/canonical/sitemap.
+- Chưa có lookup API, hồ sơ phát hành, QR, rate limit, no-store/signed download, SEO production hoặc triển khai Internet. Không xem đây là chức năng tra cứu hoàn chỉnh.

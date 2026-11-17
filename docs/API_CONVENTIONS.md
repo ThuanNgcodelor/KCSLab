@@ -121,3 +121,9 @@ HTTP status: `200/201/204` thành công; `400` input sai; `401` chưa xác thự
 ## Cookie/JWT đề xuất
 
 Runtime dùng access JWT cookie `access_token`, refresh session phía server, rotation và thu hồi khi logout. CSRF dùng `CookieCsrfTokenRepository`; login/refresh được miễn CSRF. `Secure` được điều khiển bằng cấu hình deployment. Domain/cross-origin production và thời hạn tuyệt đối cần được kiểm tra lại trước phát hành.
+
+## Hồ sơ kết quả: bước nháp ban đầu
+
+- `POST /api/v1/result-releases` với `{ "testingRecordId": 1 }`: TECHNICIAN tạo nháp cho Phiếu 5 `REVIEWED`; trả DTO có mã biên bản, trạng thái `DRAFT` và người tạo. Không tạo hai phiên bản 1 cho cùng biên bản.
+- `GET /api/v1/result-releases/{id}`: ADMIN/TECHNICIAN đọc DTO nháp.
+- Chưa có upload, gửi duyệt, phát hành, thu hồi, QR hay API public; các method/đường còn lại dưới `/api/v1/result-releases/**` bị chặn. Gate CFC-TN-14 phải hoàn tất trước phát hành.

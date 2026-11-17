@@ -1,5 +1,7 @@
 # CFC Lab Management — Bàn giao để tiếp tục ở máy khác
 
+> **17/11/2026 — đọc trước:** `docs/SYSTEM_STATUS.md` là tổng hợp mới hơn các ghi chép lịch sử bên dưới. Dashboard Receptionist và workspace KCS đã có trong source; đã có code nháp hồ sơ kết quả V6 chưa commit và landing tra cứu xem trước. Chưa có phát hành/tra cứu thật. Không chạy migration trên database làm việc chỉ để kiểm tra tài liệu.
+
 ## Bản cập nhật 16/11/2026 — workspace theo role
 
 - Người dùng đã nghiệm thu vertical slice `RECEPTIONIST`: đăng nhập bằng tài khoản role thật và tạo Phiếu 3 thành công trên Chrome hiển thị. Không suy rộng trạng thái này sang draft/completion, coding verification, ZBS/SMS hoặc export Word.

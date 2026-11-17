@@ -1,0 +1,95 @@
+- generic [active] [ref=f5e1]:
+  - link "Chuyển đến nội dung" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f5e3]:
+    - link "CFC Lab — trang tra cứu" [ref=f5e4] [cursor=pointer]:
+      - /url: /tracuu/
+      - generic [ref=f5e5]:
+        - strong [ref=f5e6]: CFC Lab
+        - generic [ref=f5e7]: Tra cứu kết quả kiểm nghiệm
+    - navigation "Điều hướng chính" [ref=f5e8]:
+      - link "Hướng dẫn tra cứu" [ref=f5e9] [cursor=pointer]:
+        - /url: "#huong-dan"
+      - link "Liên hệ" [ref=f5e10] [cursor=pointer]:
+        - /url: "#lien-he"
+    - link "1900 5307" [ref=f5e11] [cursor=pointer]:
+      - /url: tel:19005307
+      - text: ☎ 1900 5307
+  - main [ref=f5e12]:
+    - region "Sự tin cậy bắt đầu từ mỗi mẫu thử." [ref=f5e13]:
+      - generic [ref=f5e14]:
+        - generic [ref=f5e15]:
+          - paragraph [ref=f5e16]: CFC Cò Bay Cần Thơ
+          - heading [level=1] [ref=f5e19]:
+            - text: Sự tin cậybắt đầu từ
+            - emphasis [ref=f5e20]: mỗi mẫu thử.
+          - paragraph [ref=f5e21]: Tra cứu kết quả kiểm nghiệm của bạn tại CFC — thuận tiện, rõ ràng và bảo mật.
+          - link "Khám phá cách tra cứu" [ref=f5e22] [cursor=pointer]:
+            - /url: "#huong-dan"
+            - generic [aria-hidden] [ref=f5e24]: ↓
+          - paragraph [ref=f5e25]: Hình ảnh minh họa
+        - region "Tra cứu kết quả" [ref=f5e26]:
+          - generic [ref=f5e27]: Đang phát triển
+          - heading "Tra cứu kết quả" [level=2] [ref=f5e34]
+          - paragraph [ref=f5e35]: Khi dịch vụ hoạt động, hãy nhập mã tra cứu và 4 số cuối điện thoại đã đăng ký.
+          - generic "Giao diện tra cứu dự kiến" [ref=f5e36]:
+            - generic [ref=f5e37]: Mã tra cứu
+            - textbox "Mã tra cứu" [disabled] [ref=f5e38]:
+              - /placeholder: "Ví dụ: mã trên phiếu kết quả"
+            - generic [ref=f5e39]: 4 số cuối điện thoại
+            - textbox "4 số cuối điện thoại" [disabled] [ref=f5e40]:
+              - /placeholder: Nhập 4 số cuối
+            - button "Tra cứu kết quả" [disabled] [ref=f5e41]:
+              - text: Tra cứu kết quả
+              - generic [aria-hidden] [ref=f5e42]: ↗
+          - status [ref=f5e43]:
+            - generic [aria-hidden] [ref=f5e44]: ⓘ
+            - generic [ref=f5e45]:
+              - strong [ref=f5e46]: Chức năng chưa khả dụng
+              - text: Tra cứu và tải kết quả đang được phát triển. Vui lòng liên hệ CFC để được hỗ trợ.
+      - generic [ref=f5e47]:
+        - generic [ref=f5e48]: Phòng kiểm nghiệm CFC
+        - generic [ref=f5e49]: Một hành trình, từ mẫu thử đến kết quả
+    - generic [ref=f5e50]:
+      - generic [ref=f5e51]:
+        - text: Hướng dẫn tra cứu
+        - heading "Mọi thông tin cần thiết, chỉ trong vài bước." [level=2] [ref=f5e52]: Mọi thông tin cần thiết,chỉ trong vài bước.
+        - paragraph [ref=f5e53]: Khi dịch vụ được triển khai, bạn có thể tra cứu hồ sơ đã phát hành mà không cần tài khoản nhân viên.
+        - link "Cần hỗ trợ? Liên hệ CFC" [ref=f5e54] [cursor=pointer]:
+          - /url: "#lien-he"
+          - text: Cần hỗ trợ? Liên hệ CFC ↗
+      - generic [ref=f5e55]:
+        - article [ref=f5e56]:
+          - generic [ref=f5e57]: "01"
+          - generic [ref=f5e58]:
+            - heading "Chuẩn bị mã tra cứu" [level=3] [ref=f5e59]
+            - paragraph [ref=f5e60]: Sử dụng mã được cung cấp cùng hồ sơ kết quả, hoặc quét mã QR trên phiếu khi tính năng được triển khai.
+        - article [ref=f5e61]:
+          - generic [ref=f5e62]: "02"
+          - generic [ref=f5e63]:
+            - heading "Xác nhận thông tin" [level=3] [ref=f5e64]
+            - paragraph [ref=f5e65]: Nhập 4 số cuối của số điện thoại đã cung cấp. Bước này cũng áp dụng khi tra cứu bằng QR.
+        - article [ref=f5e66]:
+          - generic [ref=f5e67]: "03"
+          - generic [ref=f5e68]:
+            - heading "Xem hồ sơ đã phát hành" [level=3] [ref=f5e69]
+            - paragraph [ref=f5e70]: Xem kết quả và tải tài liệu được phép hiển thị khi dịch vụ hoạt động.
+    - generic [ref=f5e71]:
+      - generic [ref=f5e72]:
+        - text: Liên hệ CFC
+        - heading "Chúng tôi luôn sẵn sàng hỗ trợ bạn." [level=2] [ref=f5e73]: Chúng tôi luôn sẵn sànghỗ trợ bạn.
+        - paragraph [ref=f5e74]: Liên hệ CFC để được hướng dẫn về thông tin tiếp nhận và kết quả kiểm nghiệm.
+        - link "Gọi 1900 5307" [ref=f5e75] [cursor=pointer]:
+          - /url: tel:19005307
+          - text: Gọi 1900 5307
+          - generic [aria-hidden] [ref=f5e76]: ↗
+      - generic [ref=f5e77]:
+        - strong [ref=f5e78]: CFC Cò Bay
+        - generic [ref=f5e79]: Công ty CP Phân bón & Hóa chất Cần Thơ
+        - generic [ref=f5e80]: Trục Chính Khu Công Nghiệp Trà Nóc 1,phường Thới An Đông, thành phố Cần Thơ
+        - link "info@cfccobay.com" [ref=f5e81] [cursor=pointer]:
+          - /url: mailto:info@cfccobay.com
+  - contentinfo [ref=f5e82]:
+    - generic [ref=f5e83]: © CFC Cò Bay · CFC Lab
+    - link "Trang chủ CFC ↗" [ref=f5e84] [cursor=pointer]:
+      - /url: https://www.cfccobay.com/

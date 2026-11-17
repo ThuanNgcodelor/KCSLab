@@ -89,3 +89,7 @@ Khách không nằm trong RBAC nội bộ. Một access grant giới hạn theo 
 - Có cần role `REVIEWER` hoặc `LAB_MANAGER` ngoài ba role hiện tại không?
 - Phạm vi “được giao” là theo người, nhóm, loại mẫu hay đơn vị?
 - Admin có bị tách khỏi quyền phê duyệt chuyên môn không?
+
+## Hồ sơ kết quả nháp
+
+TECHNICIAN có thể tạo nháp cho Phiếu 5 đã `REVIEWED`; ADMIN và TECHNICIAN đọc nháp theo ID. RECEPTIONIST không có quyền truy cập API nháp trong giai đoạn này. Chưa triển khai upload, duyệt hoặc phát hành; không suy diễn nháp là kết quả đã phát hành.

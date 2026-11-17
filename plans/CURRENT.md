@@ -1,5 +1,7 @@
 # Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
+> **Cập nhật điều phối 17/11/2026:** ưu tiên trạng thái tại `docs/SYSTEM_STATUS.md` và kế hoạch chi tiết `plans/COMPLETION_PLAN.md`. Dashboard Receptionist và workspace KCS đã có, cần nghiệm thu thực tế; V6/result release mới chỉ là nháp; landing tra cứu là preview khóa form. Các mục dưới đây giữ lịch sử, không phải toàn bộ trạng thái hiện hành. Thứ tự trước mắt: nghiệm thu luồng hiện có và Word → gate mã hóa → hoàn thiện hồ sơ kết quả → tra cứu public an toàn; ZBS/SMS sau khi có provider.
+
 ## Ưu tiên mới — Dashboard theo role và workspace Người nhận mẫu — 16/11/2026
 
 - Người dùng đã nghiệm thu luồng role `RECEPTIONIST`: đăng nhập → tạo Phiếu 3 → sinh mã phiếu/mã mẫu trên Chrome hiển thị. Chỉ đánh dấu ổn cho vertical slice này; draft/completion, coding verification và customer notification vẫn chưa hoàn tất.

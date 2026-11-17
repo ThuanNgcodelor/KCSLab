@@ -1,26 +1,28 @@
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
-import { LoginPage } from '../features/auth/pages/LoginPage';
+import { lazy, Suspense } from 'react';
 import { useAuth } from '../features/auth/hooks/useAuth';
-import { UsersPage } from '../features/users/pages/UsersPage';
-import { UserFormPage } from '../features/users/pages/UserFormPage';
-import { ReceptionistDashboardPage } from '../features/intake/pages/ReceptionistDashboardPage';
-import { IntakePage } from '../features/intake/pages/IntakePage';
-import { ReceiptCreatePage } from '../features/intake/pages/ReceiptCreatePage';
-import { ReceiptDetailPage } from '../features/intake/pages/ReceiptDetailPage';
-import { AdminLayout } from '../features/admin/components/AdminLayout';
-import { DashboardPage } from '../features/admin/pages/DashboardPage';
-import { TransfersPage } from '../features/transfer/pages/TransfersPage';
-import { TransferCreatePage } from '../features/transfer/pages/TransferCreatePage';
-import { TransferDetailPage } from '../features/transfer/pages/TransferDetailPage';
-import { TestingRecordsPage } from '../features/testing/pages/TestingRecordsPage';
-import { TestingRecordFormPage } from '../features/testing/pages/TestingRecordFormPage';
-import { TestingRecordDetailPage } from '../features/testing/pages/TestingRecordDetailPage';
-import { NotificationsPage } from '../features/notifications/pages/NotificationsPage';
 import { SplashScreen } from '../shared/components/Loading';
-import { ProfilePage } from '../features/profile/pages/ProfilePage';
-import { ReceivingDashboardPage } from '../features/receiving/pages/ReceivingDashboardPage';
-import { ReceivingListPage } from '../features/receiving/pages/ReceivingListPage';
-import { ReceivingDetailPage } from '../features/receiving/pages/ReceivingDetailPage';
+
+const AdminLayout = lazy(() => import('../features/admin/components/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const UsersPage = lazy(() => import('../features/users/pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const UserFormPage = lazy(() => import('../features/users/pages/UserFormPage').then(m => ({ default: m.UserFormPage })));
+const ReceptionistDashboardPage = lazy(() => import('../features/intake/pages/ReceptionistDashboardPage').then(m => ({ default: m.ReceptionistDashboardPage })));
+const IntakePage = lazy(() => import('../features/intake/pages/IntakePage').then(m => ({ default: m.IntakePage })));
+const ReceiptCreatePage = lazy(() => import('../features/intake/pages/ReceiptCreatePage').then(m => ({ default: m.ReceiptCreatePage })));
+const ReceiptDetailPage = lazy(() => import('../features/intake/pages/ReceiptDetailPage').then(m => ({ default: m.ReceiptDetailPage })));
+const DashboardPage = lazy(() => import('../features/admin/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const TransfersPage = lazy(() => import('../features/transfer/pages/TransfersPage').then(m => ({ default: m.TransfersPage })));
+const TransferCreatePage = lazy(() => import('../features/transfer/pages/TransferCreatePage').then(m => ({ default: m.TransferCreatePage })));
+const TransferDetailPage = lazy(() => import('../features/transfer/pages/TransferDetailPage').then(m => ({ default: m.TransferDetailPage })));
+const TestingRecordsPage = lazy(() => import('../features/testing/pages/TestingRecordsPage').then(m => ({ default: m.TestingRecordsPage })));
+const TestingRecordFormPage = lazy(() => import('../features/testing/pages/TestingRecordFormPage').then(m => ({ default: m.TestingRecordFormPage })));
+const TestingRecordDetailPage = lazy(() => import('../features/testing/pages/TestingRecordDetailPage').then(m => ({ default: m.TestingRecordDetailPage })));
+const NotificationsPage = lazy(() => import('../features/notifications/pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const ProfilePage = lazy(() => import('../features/profile/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const ReceivingDashboardPage = lazy(() => import('../features/receiving/pages/ReceivingDashboardPage').then(m => ({ default: m.ReceivingDashboardPage })));
+const ReceivingListPage = lazy(() => import('../features/receiving/pages/ReceivingListPage').then(m => ({ default: m.ReceivingListPage })));
+const ReceivingDetailPage = lazy(() => import('../features/receiving/pages/ReceivingDetailPage').then(m => ({ default: m.ReceivingDetailPage })));
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -48,7 +50,7 @@ function TransferRoleRedirect({ children }) {
 }
 
 export function App() {
-  return <Routes>
+  return <Suspense fallback={<SplashScreen />}><Routes>
     <Route path="/login" element={<LoginPage />} />
     <Route element={<ProtectedRoute />}>
       <Route element={<AdminLayout />}>
@@ -85,5 +87,5 @@ export function App() {
       </Route>
     </Route>
     <Route path="*" element={<Navigate to="/admin" replace />} />
-  </Routes>;
+  </Routes></Suspense>;
 }
