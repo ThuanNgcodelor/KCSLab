@@ -1,5 +1,12 @@
 # Project State
 
+## DOCX KQKN runtime — 17/11/2026
+
+- Backend có `source/be/Dockerfile` cài LibreOffice Writer headless và các font cần thiết cho luồng DOCX → PDF.
+- Chạy backend local bằng `./scripts/run-be-docker.sh`; script đọc `.env` đúng kiểu shell, không truyền nguyên dấu ngoặc kép của `DB_URL`, và giữ secrets ngoài source/documentation.
+- Đã xác minh image chứa LibreOffice 24.2.7.2; file `docs/template/KQKN-SR-CT001-092026.docx` chuyển thành PDF 2 trang, 186020 bytes. Backend chạy MySQL profile thành công trên cổng 8080, Flyway xác nhận schema version 10 đã up-to-date.
+- Chạy `mvn spring-boot:run` trực tiếp trên host vẫn yêu cầu host tự cài `soffice`; Docker script là cách chạy được hỗ trợ khi máy host chưa có LibreOffice.
+
 ## Sửa thứ tự bàn giao và xác minh mã — 17/11/2026
 
 - Phiếu 4 được phép lập/gửi và KCS được nhận khi mẫu đã dán nhãn, trạng thái mã là `PENDING_VERIFICATION`; KCS xác minh độc lập sau khi nhận bàn giao.

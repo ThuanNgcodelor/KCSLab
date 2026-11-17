@@ -51,9 +51,10 @@ Laragon phải bật MySQL và Redis. Database dùng `cfc_lab`.
 Trên Linux, bảo đảm MySQL và Redis đang chạy, cấu hình environment phù hợp, sau đó chạy trong hai terminal:
 
 ```bash
-cd source/be
-mvn spring-boot:run
+./scripts/run-be-docker.sh
 ```
+
+Script này chạy backend Java 21 trong Docker image có LibreOffice, nên có thể tải DOCX KQKN và tự chuyển sang PDF. Nếu chỉ chạy `mvn spring-boot:run` trực tiếp trên host, host phải tự cài `soffice`.
 
 ```bash
 cd source/fe

@@ -25,7 +25,7 @@ Tiếp nhận mẫu → Chuyển mẫu → KCS nhận mẫu → Thử nghiệm
 - **Chuyển mẫu / Phiếu 4:** có nháp, gửi, nhận hoặc từ chối. KCS có dashboard, danh sách, chi tiết và xem bằng chứng.
 - **Mã hóa mẫu:** đã có cấp số nguyên tử, xác minh hai người, lịch sử và gate chặn mẫu chưa xác minh. Chưa đủ CFC-TN-14: còn `-V/-R`, QC/mã mù và các quy tắc LAB cần xác nhận.
 - **Thử nghiệm / Phiếu 5:** đã có biên bản và luồng gửi/kiểm tra. Chưa hoàn tất đính kèm nhiều file trực tiếp vào Phiếu 5.
-- **Hồ sơ kết quả:** có nháp, gửi duyệt, phát hành, thu hồi và phiên bản. Có thể nhập bảng kết quả hoặc tải phiếu DOCX/PDF; DOCX cần LibreOffice để chuyển thành PDF. Phần tải phiếu còn chưa commit và chưa nghiệm thu đầy đủ.
+- **Hồ sơ kết quả:** có nháp, gửi duyệt, phát hành, thu hồi và phiên bản. Có thể nhập bảng kết quả hoặc tải phiếu DOCX/PDF; khi chạy bằng `./scripts/run-be-docker.sh`, backend đã có LibreOffice headless để tự chuyển DOCX sang PDF. Vẫn cần nghiệm thu bố cục Word/PDF thật trước khi vận hành chính thức.
 - **Tra cứu:** đã có trang và API, thử được bằng dữ liệu giả, bao gồm tải PDF sau khi nhập mã + 4 số cuối điện thoại. Chưa đưa ra Internet, chưa có domain/TLS và chưa kiểm thử bảo mật production đầy đủ.
 - **Thông báo:** đã có thông báo nội bộ và realtime; chưa triển khai Zalo ZBS/SMS cho khách.
 

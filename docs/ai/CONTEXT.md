@@ -1,5 +1,11 @@
 # CFC Lab — AI Context
 
+## Runtime DOCX KQKN — 17/11/2026
+
+- Khi chạy trực tiếp trên host, `OfficeConverter` cần executable `soffice` trong PATH.
+- Cách chạy local được hỗ trợ khi host chưa có LibreOffice: `./scripts/run-be-docker.sh`. Script build `source/be/Dockerfile`, trong image đã có LibreOffice Writer headless và font CJK/Latin cần thiết, rồi chạy backend Java 21 với `.env` đã được parse đúng.
+- Đã kiểm tra backend container: `soffice --version` trả `LibreOffice 24.2.7.2`; file KQKN mẫu chuyển thành PDF thành công; backend MySQL/Flyway chạy cổng 8080.
+
 ## Cập nhật workspace KCS — 16/11/2026
 
 - Có workspace `/admin/receiving` cho Technician: dashboard, danh sách Phiếu 4, chi tiết và gallery file, quyết định nhận/từ chối. API projection riêng `/api/v1/receiving/**` dành cho Admin/Technician; receipt API không mở thêm quyền.
