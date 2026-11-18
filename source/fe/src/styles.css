@@ -2,11 +2,17 @@
 
 .receiving-filter { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-bottom: 18px; }
 .receiving-filter button { padding: 0 16px; }
+.receiving-status-tabs { width: fit-content; gap: 8px; padding: 5px; border: 1px solid #dce9df; border-radius: 12px; background: #f3f8f4; }
+.receiving-status-tabs button { min-height: 40px; padding-inline: 16px; font-size: 12px; }
 .receiving-filter label { color: #315841; min-width: min(200px, 100%); }
 .receiving-cards, .receiving-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; margin-bottom: 18px; }
 .receiving-row, .receiving-gallery article { display: grid; gap: 8px; padding: 14px; border: 1px solid #d9e8dc; border-radius: 10px; color: #315841; min-width: 0; overflow-wrap: anywhere; }
 .receiving-preview { padding: 0; border: 0; background: transparent; }
-.receiving-preview img { width: 100%; height: 150px; object-fit: contain; }
+.receiving-gallery article { align-content: start; gap: 10px; padding: 16px; background: #fbfdfb; }
+.receiving-gallery article strong { color: #214b35; font-size: 13px; line-height: 1.45; }
+.receiving-gallery article small { color: #61796a; font-size: 12px; line-height: 1.5; }
+.receiving-preview { width: 100%; overflow: hidden; border: 1px solid #e0eae2; border-radius: 9px; background: #f5f9f6; cursor: zoom-in; }
+.receiving-preview img { display: block; width: 100%; height: clamp(150px, 18vw, 220px); object-fit: contain; }
 .receiving-dialog { max-width: min(95vw, 1100px); max-height: 95vh; border: 0; border-radius: 12px; }
 .receiving-dialog img { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; }
 .receiving-dialog::backdrop { background: rgba(0, 0, 0, .7); }
@@ -795,6 +801,7 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .receiving-queue-empty p { margin: 5px 0 0; color: #668071; font-size: 12px; line-height: 1.5; }
 .receiving-page .dashboard-grid { align-items: stretch; gap: 16px; }
 .receiving-section-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.receiving-section-heading > .status-badge { margin-top: 2px; }
 .receiving-section-heading h2 { margin: 0; }
 .receiving-section-heading p { margin: 6px 0 0; color: #627c6c; font-size: 12px; line-height: 1.5; }
 .receiving-count { flex: 0 0 auto; padding: 6px 10px; border-radius: 20px; color: #27663e; background: #e9f7ec; font-size: 11px; font-weight: 700; }
@@ -807,14 +814,14 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .receiving-wait { color: #8a5c20; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .receiving-empty { padding: 17px 0; color: #607a6a; font-size: 13px; }
 .receiving-list .receiving-cards { grid-template-columns: 1fr; }
-.receiving-list .receiving-row { grid-template-columns: minmax(180px, 1fr) minmax(300px, 1.4fr) auto; align-items: center; gap: 20px; padding: 18px; background: #fbfdfb; }
+.receiving-list .receiving-row { grid-template-columns: minmax(180px, 1fr) minmax(320px, 1.5fr) auto; align-items: center; gap: 22px; padding: 20px; background: #fbfdfb; }
 .receiving-row-main { display: grid; gap: 6px; min-width: 0; }
 .receiving-row-main strong { color: #1d5134; font-size: 14px; }
-.receiving-row-main span, .receiving-row-meta { color: #526e5d; font-size: 12px; line-height: 1.5; }
+.receiving-row-main span, .receiving-row-meta { color: #526e5d; font-size: 13px; line-height: 1.55; }
 .receiving-sample-codes { overflow-wrap: anywhere; }
 .receiving-row-meta { display: flex; flex-wrap: wrap; gap: 12px 24px; }
 .receiving-row-meta span { display: grid; gap: 4px; color: #294f38; }
-.receiving-row-meta small { color: #617b6b; font-size: 11px; }
+.receiving-row-meta small { color: #617b6b; font-size: 12px; }
 .receiving-list .receiving-row > button { width: auto; white-space: nowrap; }
 .receiving-pagination { display: flex; justify-content: flex-end; align-items: center; gap: 12px; color: #536e5d; font-size: 12px; }
 .receiving-detail .admin-heading h1 { font-size: clamp(25px, 3vw, 38px); }
@@ -829,6 +836,9 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .receiving-evidence h3 { margin: 20px 0 10px; color: #285039; font-size: 13px; }
 .receiving-evidence h3 span { color: #668271; }
 .receiving-evidence .receiving-gallery { margin-bottom: 0; }
+.report-mode-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; padding: 5px; width: fit-content; border: 1px solid #dce9df; border-radius: 11px; background: #f4f8f4; }
+.report-mode-switch button { min-height: 38px; padding-inline: 14px; font-size: 12px; }
+.report-mode-help { display: block; margin-top: 12px; line-height: 1.55; }
 @media (max-width: 1080px) {
   .receiving-list .receiving-row { grid-template-columns: 1fr auto; }
   .receiving-row-meta { grid-column: 1; }

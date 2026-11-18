@@ -29,6 +29,7 @@ export function ResultReleaseDetailPage() {
   const [reportChoice, setReportChoice] = useState(null);
   const [publicIds, setPublicIds] = useState([]);
   const [rows, setRows] = useState([]);
+  const [reportInputMode, setReportInputMode] = useState('file');
   const [signers, setSigners] = useState({ qualityHeadName: '', directorName: '' });
   const [confirm, setConfirm] = useState(null);
 
@@ -37,6 +38,7 @@ export function ResultReleaseDetailPage() {
     try {
       const [detail, history] = await Promise.all([getResultRelease(id), getResultReleaseEvents(id)]);
       setRelease(detail); setEvents(history); setPublicIds([]);
+      if (detail.files.some((file) => file.kind === 'REPORT_PDF')) setReportInputMode('file');
       const source = detail.items.length ? detail.items : detail.suggestedItems;
       setRows(source.length ? source.map((item) => ({ parameter: item.parameter, unit: item.unit ?? '', method: item.method ?? '', result: item.result ?? '', note: item.note ?? '' })) : [emptyRow()]);
       setSigners({ qualityHeadName: detail.qualityHeadName ?? '', directorName: detail.directorName ?? '' });
@@ -66,6 +68,16 @@ export function ResultReleaseDetailPage() {
   const reportSource = release.files.find((file) => file.kind === 'REPORT_SOURCE');
   const report = release.files.find((file) => file.kind === 'GENERATED_REPORT');
   const canEdit = isTech && editable;
+  const showTable = !reportPdf && (!canEdit || reportInputMode === 'table');
+
+  function saveTableReport() {
+    const completeRows = rows.filter((row) => row.parameter.trim() || row.result.trim());
+    if (!completeRows.length || completeRows.some((row) => !row.parameter.trim() || !row.result.trim())) {
+      setError('Mỗi dòng nhập tay cần có cả chỉ tiêu và kết quả. Nếu bạn đã có phiếu KQKN, hãy chọn “Tải file phiếu” — không cần nhập bảng.');
+      return;
+    }
+    run(() => saveResultReport(release.id, { rows: completeRows.map(cleanRow), ...signers }));
+  }
 
   return <section className="staff-page testing-detail-page result-detail-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/results')}>← Danh sách hồ sơ kết quả</button><p className="section-kicker">{release.testingRecordCode} / {release.sampleCode}</p><h1>Hồ sơ kết quả v{release.version}</h1><p className="heading-copy">Lập bởi {release.createdByName}{release.documentNumber || release.resultNumber ? ` · Số phiếu ${release.documentNumber || release.resultNumber}` : ''}</p></div><StatusBadge domain="release" value={release.status} size="large" /></header>
@@ -74,16 +86,22 @@ export function ResultReleaseDetailPage() {
     {release.revokeReason && release.status === 'REVOKED' && <p className="handoff-result rejected"><strong>Lý do thu hồi ({release.revokedByName})</strong><span>{release.revokeReason}</span></p>}
     <div className="testing-detail-grid"><main className="receipt-form-main">
       <section className="panel-card intake-form-card report-editor"><FormHeading number="01" title="Phiếu kết quả (KQKN-DV)" copy="Tải lên file DOCX hoặc PDF đã soạn, hoặc nhập bảng kết quả. DOCX được chuyển sang PDF; hãy xem trước và đối chiếu kỹ bố cục, nội dung trước khi gửi duyệt. Nếu không tìm thấy ô QR, mã sẽ được đặt ở trang riêng." />
+        {canEdit && !reportPdf && <div className="report-mode-switch" role="group" aria-label="Cách tạo phiếu kết quả">
+          <button type="button" className={reportInputMode === 'file' ? 'primary-button' : 'outline-button'} aria-pressed={reportInputMode === 'file'} onClick={() => { setReportInputMode('file'); setError(''); }}>Tải file phiếu</button>
+          <button type="button" className={reportInputMode === 'table' ? 'primary-button' : 'outline-button'} aria-pressed={reportInputMode === 'table'} onClick={() => { setReportInputMode('table'); setError(''); }}>Nhập bảng thủ công</button>
+        </div>}
         {reportPdf ? <div className="report-file-card"><span className="report-file-icon"><Icon name="file" size={22} /></span>
           <div><strong>{reportSource ? reportSource.originalName : reportPdf.originalName}</strong><small>{release.documentNumber ? `Số phiếu đọc từ file: ${release.documentNumber}` : 'Không đọc được “Số/ No.” trong file — kiểm tra lại file'} · PDF {formatSize(reportPdf.size)}</small></div>
           <div className="table-actions"><button type="button" className="table-action" disabled={busy} onClick={() => run(() => openReportPreview(release.id), { reload: false })}>Xem trước PDF</button>
             {canEdit && <button type="button" className="table-action danger" disabled={busy} onClick={() => setConfirm({ title: 'Gỡ file phiếu kết quả?', description: 'Bạn có thể tải lên file khác hoặc nhập bảng kết quả.', confirmLabel: 'Gỡ file', tone: 'danger', run: () => run(() => removeReportFile(release.id)) })}>Gỡ</button>}</div></div> : null}
-        {canEdit && <form className="result-upload" onSubmit={(event) => { event.preventDefault(); run(async () => { await uploadReportFile(release.id, reportChoice); setReportChoice(null); }); }}>
+        {canEdit && (!reportPdf ? reportInputMode === 'file' : true) && <form className="result-upload" onSubmit={(event) => { event.preventDefault(); run(async () => { await uploadReportFile(release.id, reportChoice); setReportChoice(null); }); }}>
           <PhotoPicker label={reportPdf ? 'Thay bằng file khác' : 'Tải file phiếu kết quả'} hint="DOCX hoặc PDF, tối đa 10 MB. Không có macro hoặc liên kết ngoài." camera={false} multiple={false} accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" files={reportChoice ? [reportChoice] : []} onChange={(picked) => setReportChoice(picked[0] ?? null)} />
           <div className="form-actions"><button className="primary-button" type="submit" disabled={busy || !reportChoice}>{busy ? 'Đang xử lý (chuyển PDF)…' : 'Tải phiếu lên'}</button></div></form>}
-        {reportPdf ? <p className="field-help">Đang dùng file đã tải lên. Bảng nhập tay bên dưới không được dùng.</p> : <><div className="form-divider" /><p className="field-help">Hoặc nhập bảng kết quả để hệ thống tự lập phiếu PDF:</p></>}
+        {reportPdf ? <p className="field-help report-mode-help">Đang dùng file KQKN đã tải lên. Chỉ cần kiểm tra bản xem trước rồi gửi duyệt; không phải nhập bảng kết quả.</p>
+          : reportInputMode === 'file' ? <p className="field-help report-mode-help">Chọn file DOCX/PDF và bấm “Tải phiếu lên”. Khi file đã tải thành công, bạn có thể gửi duyệt mà không nhập bảng.</p>
+            : <p className="field-help report-mode-help">Nhập bảng chỉ khi không có file KQKN. Mỗi dòng cần có chỉ tiêu và kết quả.</p>}
       </section>
-      {!reportPdf && <section className="panel-card intake-form-card report-editor"><FormHeading number="01b" title="Nhập bảng kết quả" copy="Dùng khi không có file phiếu. Số phiếu, ngày và mã QR được cấp khi phát hành." />
+      {showTable && <section className="panel-card intake-form-card report-editor"><FormHeading number="01b" title="Nhập bảng kết quả" copy="Dùng khi không có file phiếu. Số phiếu, ngày và mã QR được cấp khi phát hành." />
         <div className="table-wrap"><table className="staff-table report-table"><thead><tr><th>STT</th><th>Chỉ tiêu</th><th>Đơn vị</th><th>Phương pháp</th><th>Kết quả</th><th>Ghi chú</th>{canEdit && <th />}</tr></thead><tbody>
           {rows.map((row, index) => <tr key={index}>
             <td className="report-no" data-label="STT">{index + 1}</td>
@@ -103,7 +121,7 @@ export function ResultReleaseDetailPage() {
         <div className="form-actions">
           {(release.items.length > 0 || reportPdf) && release.status !== 'PUBLISHED' && release.status !== 'REVOKED' && <button type="button" className="outline-button" disabled={busy} onClick={() => run(() => openReportPreview(release.id), { reload: false })}>Xem trước PDF</button>}
           {report && <button type="button" className="outline-button" disabled={busy} onClick={() => run(() => downloadResultFile(release.id, report), { reload: false })}>Tải phiếu PDF đã phát hành</button>}
-          {canEdit && <button type="button" className="primary-button" disabled={busy} onClick={() => run(() => saveResultReport(release.id, { rows: rows.filter((row) => row.parameter.trim() || row.result.trim()).map(cleanRow), ...signers }))}>{busy ? 'Đang lưu…' : 'Lưu nội dung'}</button>}
+          {canEdit && <button type="button" className="primary-button" disabled={busy} onClick={saveTableReport}>{busy ? 'Đang lưu…' : 'Lưu bảng kết quả'}</button>}
         </div>
       </section>}
       {release.reference && <section className="panel-card intake-form-card reference-card"><FormHeading number="02" title="Số liệu từ biên bản thử nghiệm (Phiếu 5)" copy={<>Tham chiếu từ biên bản <Link className="inline-link" to={`/admin/testing/${release.reference.testingRecordId}`}>{release.reference.recordCode}</Link>. Đây là hồ sơ làm việc nội bộ; kết quả cuối cùng nhập vào bảng 01 phía trên.</>} />
@@ -133,7 +151,7 @@ export function ResultReleaseDetailPage() {
       </section>
         {release.status === 'PUBLISHED' && <section className="panel-card custody-card"><p className="section-kicker">Tra cứu công khai</p><Info label="Mã tra cứu" value={release.lookupCode} mono /><Info label="Số phiếu" value={release.resultNumber} /><small className="muted">Mã QR trên phiếu PDF trỏ tới trang tra cứu (<code>PUBLIC_LOOKUP_URL</code> + <code>?code=…</code>). Khách quét QR rồi nhập 4 số cuối điện thoại để xem và tải PDF.</small></section>}
         {release.status === 'SUBMITTED' && release.createdByUserId === user?.id && <section className="panel-card custody-card"><p className="section-kicker">Đang chờ duyệt</p><small className="muted">Hồ sơ do bạn lập nên cần một Admin khác duyệt và phát hành (người duyệt phải độc lập).</small></section>}
-        {isTech && editable && <section className="form-submit-panel"><p><strong>Gửi người duyệt</strong><span>Cần tải lên file phiếu kết quả, hoặc lưu ít nhất một chỉ tiêu và tên người ký. Sau khi gửi bạn không thể sửa.</span></p><button className="primary-button" disabled={busy || (release.items.length === 0 && !reportPdf)} onClick={() => setConfirm({ title: 'Gửi hồ sơ để duyệt?', description: 'Sau khi gửi, bạn không thể thêm hoặc gỡ file cho tới khi được trả lại.', confirmLabel: 'Gửi duyệt', run: () => run(() => submitResultRelease(release.id)) })}>Gửi duyệt</button></section>}
+        {isTech && editable && <section className="form-submit-panel"><p><strong>Gửi người duyệt</strong><span>{reportPdf ? 'File KQKN đã tải lên là đủ; hãy kiểm tra bản PDF trước khi gửi.' : 'Tải file KQKN lên, hoặc chủ động chọn nhập bảng và lưu ít nhất một dòng kết quả. Sau khi gửi bạn không thể sửa.'}</span></p><button className="primary-button" disabled={busy || (release.items.length === 0 && !reportPdf)} onClick={() => setConfirm({ title: 'Gửi hồ sơ để duyệt?', description: 'Sau khi gửi, bạn không thể thêm hoặc gỡ file cho tới khi được trả lại.', confirmLabel: 'Gửi duyệt', run: () => run(() => submitResultRelease(release.id)) })}>Gửi duyệt</button></section>}
         {isAdmin && release.status === 'SUBMITTED' && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number"><Icon name="check" size={14} /></span><div><h2>Duyệt hồ sơ</h2><p>Người duyệt phải khác người lập hồ sơ và người phân tích. Phiếu KQKN (PDF) luôn công khai; file đính kèm chỉ công khai nếu bạn tích chọn.</p></div></div>
           <label>Lý do (bắt buộc khi trả lại)<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} /></label>
           <div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={busy || !reason.trim()} onClick={() => setConfirm({ title: 'Trả lại hồ sơ?', description: 'Hồ sơ quay về kỹ thuật viên để bổ sung.', confirmLabel: 'Trả lại', tone: 'danger', run: () => run(() => returnResultRelease(release.id, reason.trim())) })}>Trả lại</button>

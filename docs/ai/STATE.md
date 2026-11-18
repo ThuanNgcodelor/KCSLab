@@ -225,3 +225,10 @@
 - Tiếp tục các thay đổi chưa commit của Claude: tải phiếu DOCX/PDF, chuyển đổi và đóng QR. Sửa an toàn: không tìm thấy ô QR thì thêm trang tra cứu, không phủ trắng góc trang gốc; chỉ nhận marker `Dấu/ảnh mã QR` hoặc `Dán/in mã QR`.
 - Test `ReportFileStamperTest` trên Java 21/container không mạng, dùng PDF chuyển từ mẫu DOCX thật: `Tests run: 5, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS`. Frontend `npm run build`: `✓ built in 989ms`.
 - PDF chuyển từ mẫu bằng LibreOffice có hai trang, trang thứ hai gần như trống; đã xem trang đầu đóng QR, chưa so sánh Word thật hoặc nghiệm thu bố cục. Chưa test HTTP/E2E upload, publish, QR trên điện thoại hay full suite trong phiên này. LibreOffice cần cài riêng trên backend; không coi tính năng đã sẵn sàng production.
+
+## Đồng bộ trạng thái KCS và chỉ tải file KQKN — 17/11/2026
+
+- FE KCS dùng nhãn trạng thái `transfer` tập trung trong `shared/status.js`; tab, danh sách và chi tiết thống nhất “Chờ KCS nhận mẫu”, “Đã nhận mẫu”, “Đã từ chối nhận”. Trang chi tiết cũng hiển thị trạng thái mã của từng mẫu bằng `StatusBadge`.
+- Trang hồ sơ kết quả phân biệt rõ “Tải file phiếu” (mặc định) và “Nhập bảng thủ công”. Chỉ luồng nhập bảng mới yêu cầu từng dòng có chỉ tiêu + kết quả; tải DOCX/PDF không cần nhập bảng. Không đổi API/backend vì luồng upload file-only đã có test tích hợp.
+- Xác minh: `npm run build` pass (`✓ built in 987ms`); test tích hợp backend cô lập Java 21 + MySQL 8.4 + Redis: `Tests run: 1, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS`; `git diff --check` sạch.
+- Chưa kiểm tra giao diện trên Chrome thật trong phiên này (Chrome DevTools MCP không kết nối); chưa chạy toàn bộ backend suite hoặc luồng upload qua HTTP/E2E. Không commit.

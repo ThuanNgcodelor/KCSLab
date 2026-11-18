@@ -7,7 +7,7 @@ const DOMAINS = {
     IN_TESTING: ['Đang thử nghiệm', 'info'], AWAITING_REVIEW: ['Chờ kiểm tra', 'warning'], TEST_REVIEWED: ['Đã kiểm tra', 'success'],
   },
   transfer: {
-    DRAFT: ['Bản nháp', 'neutral'], PENDING: ['Chờ KCS/PTN nhận', 'warning'], ACCEPTED: ['Đã nhận mẫu', 'success'], REJECTED: ['Từ chối nhận', 'danger'],
+    DRAFT: ['Bản nháp', 'neutral'], PENDING: ['Chờ KCS nhận mẫu', 'warning'], ACCEPTED: ['Đã nhận mẫu', 'success'], REJECTED: ['Đã từ chối nhận', 'danger'],
   },
   testing: {
     DRAFT: ['Bản nháp', 'neutral'], SUBMITTED: ['Chờ kiểm tra', 'warning'], REVIEWED: ['Đã kiểm tra', 'success'], RETURNED: ['Cần bổ sung', 'danger'],
