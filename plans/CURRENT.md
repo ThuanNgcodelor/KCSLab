@@ -1,5 +1,7 @@
 # Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
 
+> **Đề xuất mới 18/11/2026:** luồng Phiếu 1 → 7 → 2 → 3 → 4 → 5, nhập mã thủ công và kế thừa dữ liệu đang chờ chốt nghiệp vụ tại `plans/QUY_TRINH_YEU_CAU_LAY_MAU_TIEP_NHAN.md`. Chưa triển khai; các quyết định cũ về gate mã hóa vẫn là hiện trạng cho đến khi LAB xác nhận thay đổi.
+
 > Plan điều phối mới cho toàn bộ phần chưa triển khai và chưa nghiệm thu: `plans/SYSTEM_COMPLETION_ROADMAP.md`. File này và các plan chuyên biệt vẫn được giữ làm tài liệu tham khảo/lịch sử.
 
 > **Cập nhật điều phối 17/11/2026:** ưu tiên trạng thái tại `docs/SYSTEM_STATUS.md` và kế hoạch chi tiết `plans/COMPLETION_PLAN.md`. Dashboard Receptionist và workspace KCS đã có, cần nghiệm thu thực tế; V6/result release mới chỉ là nháp; landing tra cứu là preview khóa form. Các mục dưới đây giữ lịch sử, không phải toàn bộ trạng thái hiện hành. Thứ tự trước mắt: nghiệm thu luồng hiện có và Word → gate mã hóa → hoàn thiện hồ sơ kết quả → tra cứu public an toàn; ZBS/SMS sau khi có provider.

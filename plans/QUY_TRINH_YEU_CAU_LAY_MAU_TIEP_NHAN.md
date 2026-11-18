@@ -1,0 +1,101 @@
+# Kế hoạch: từ yêu cầu kiểm nghiệm đến bàn giao mẫu
+
+> Đề xuất ngày 18/11/2026; **chưa triển khai, chưa nghiệm thu**. Các lựa chọn còn chờ LAB xác nhận được ghi ở cuối. Ưu tiên yêu cầu mới của sếp, nhưng không tự kết luận thay đổi quy trình chất lượng đã được phê duyệt.
+
+### Quyết định người dùng đã xác nhận ngày 18/11/2026
+
+- Mỗi Phiếu 1 có một Phiếu 7 và một Phiếu 2. Mỗi phiếu có số riêng và tham chiếu số Phiếu 1. Nhánh khách tự lấy mẫu chưa chốt.
+- Chị Thúy mã hóa và nhập mã thủ công ở Phiếu 3; bỏ bước xác minh hai người trên hệ thống. Vẫn cần chốt format mã, quyền sửa, xử lý trùng và thời điểm áp dụng cho dữ liệu cũ; đối chiếu/cập nhật CFC-TN-14 theo quy trình phê duyệt của LAB.
+- Phiếu 4 **chính là bước bàn giao mẫu** sau khi tiếp nhận đã mã hóa; KCS nhận/từ chối bàn giao. Không tạo thêm biểu mẫu/biên bản nhận mẫu riêng theo yêu cầu hiện tại.
+- Tại bước 5 dùng chính file kết quả `2026.11.16.docx` làm căn cứ, tải lên thay cho nhập lại thiết bị, hóa chất, đường chuẩn/công thức, QC và số liệu từng dòng trên màn hình. Người dùng chốt **bỏ bước người khác kiểm tra/duyệt trước phát hành**; không tự bỏ các bước bàn giao mẫu hoặc kiểm tra tệp hợp lệ.
+
+## 1. Mục tiêu và phạm vi
+
+Luồng mong muốn khi CFC lấy mẫu hiện trường: **Phiếu 1 yêu cầu kiểm nghiệm → Phiếu 7 kế hoạch lấy mẫu → Phiếu 2 lấy mẫu hiện trường → Phiếu 3 tiếp nhận và bàn giao → Phiếu 4 chuyển mẫu → bước 5 tải file kết quả → phát hành**, không có bước người khác duyệt trước phát hành.
+
+- Tìm bằng số Phiếu yêu cầu để chọn đúng hồ sơ, hiển thị trước các thông tin kế thừa, nhân viên kiểm tra/chỉnh các thông tin thực tế được phép sửa rồi lưu.
+- Mã mẫu do chị Thúy mã hóa và nhập tay ở Phiếu 3; bỏ xác minh hai người trên hệ thống theo xác nhận người dùng, đồng thời sửa các gate tương ứng sau khi thống nhất cách chuyển đổi an toàn.
+- Rà soát riêng số niêm phong mẫu, số seal container và chỉ tiêu yêu cầu; Phiếu 4 là bước bàn giao sau tiếp nhận, không thêm biên bản riêng.
+- Hạn chế thay đổi phần thử nghiệm, kết quả và tra cứu ngoài những điểm chịu ảnh hưởng trực tiếp; giữ dữ liệu cũ.
+
+## 2. Đối chiếu mẫu và hiện trạng
+
+| Mẫu | Dữ liệu đáng chú ý | Hiện trạng hệ thống |
+|---|---|---|
+| 1 — Yêu cầu kiểm nghiệm | Số/No., ngày, khách và liên hệ, lô/giống/nguồn gốc, đơn vị lấy mẫu, từng mẫu/nền mẫu/chỉ tiêu/phương pháp, hạn và xác nhận khách | Chưa thấy chức năng lập và quản lý Phiếu 1 riêng; Phiếu 3 đang nhập `requestNumber` thủ công, bắt buộc, chưa chứng minh có liên kết Phiếu 1. |
+| 7 — Kế hoạch lấy mẫu | Số/No., **Số giấy đề nghị**, nhân sự, thời gian/địa điểm, lô, vùng trồng/đóng gói, phương án và điều kiện vận chuyển | Chưa thấy chức năng lập kế hoạch riêng. Mẫu được cung cấp dành riêng cho sầu riêng; không mặc định áp dụng mọi loại hàng. |
+| 2 — Lấy mẫu hiện trường | Số/No., **Số giấy đề nghị**, thời gian, người lấy mẫu, lô, số xe/moóc/container, mẫu, phương pháp lấy mẫu, khối lượng, chỉ tiêu và số niêm phong | Chưa thấy chức năng lập Phiếu 2 riêng. Cần phân biệt phương pháp **lấy mẫu** và phương pháp **thử nghiệm**. |
+| 3 — Tiếp nhận và bàn giao | Số/No., **Phiếu yêu cầu số**, mã mẫu, người giao/nhận, số niêm phong mẫu, tình trạng, điều kiện, chỉ tiêu và quyết định tiếp nhận | Có Phiếu 3, mẫu, ảnh/file; số yêu cầu đang là chuỗi nhập tay. Hiện có một `sealNumber`; chưa thấy hai trường riêng cho seal container và niêm phong mẫu. Template Phiếu 3 người dùng đang sửa là thay đổi hiện có, cần giữ nguyên khi triển khai. |
+| 4 — Chuyển mẫu | Số/No., **Phiếu yêu cầu số**, từng mẫu, khối lượng, số lượng, tình trạng, chỉ tiêu, phương pháp, hạn trả, bàn giao | Có Phiếu 4; một số màn hình gắn nhãn “Phiếu yêu cầu” nhưng hiển thị `receiptCode` (mã Phiếu 3), cần sửa sau khi có số yêu cầu thật. |
+| 5 — Biên bản thử nghiệm | Số/No., **Phiếu yêu cầu số**, mã mẫu, thời gian, người phân tích/kiểm tra, thiết bị, hóa chất, QC, số liệu | Có Phiếu 5; màn hình cũng có nơi hiển thị `receiptCode` dưới nhãn “Phiếu yêu cầu”. Chưa có upload file trực tiếp cho Phiếu 5; backend hiện yêu cầu thời gian bắt đầu/kết thúc và ít nhất một dòng thực nghiệm khi gửi kiểm tra. |
+
+File `2026.11.16.docx` được cung cấp là **Phiếu kết quả thử nghiệm / Test Report**: có thông tin mẫu, các chỉ tiêu, phương pháp và kết quả để trả khách. Nội dung đọc được không có bảng thiết bị, hóa chất, QC, đường chuẩn hay số liệu thô như mẫu Biên bản thử nghiệm số 5. Theo quyết định người dùng, hệ thống dùng chính file kết quả này ở bước 5; không mô tả nó như thể chứa những dữ liệu không có trong file. Cần cập nhật mô tả quy trình và biểu mẫu thực tế theo quyết định này.
+
+Trong mẫu 1 có cả lựa chọn **Công ty lấy mẫu** và **Khách hàng tự lấy mẫu**. Người dùng yêu cầu tuyến 1 → 7 → 2 → 3 → 4 → 5; cách xử lý khi khách tự lấy mẫu còn phải chốt, không mặc định bỏ bước.
+
+Hiện mã mẫu được hệ thống sinh tự động; có trạng thái `PENDING_CODING → PENDING_VERIFICATION → VERIFIED`, Phiếu 4 chấp nhận mẫu chờ xác minh hoặc đã xác minh, ứng viên Phiếu 5 yêu cầu `VERIFIED`. Vì vậy nhập tay và bỏ kiểm tra cần sửa cả dữ liệu, UI, API, gate chuyển/thử nghiệm/phát hành và test, không chỉ ẩn nút.
+
+## 3. Số hồ sơ và liên kết — thiết kế đề xuất
+
+- `request_id` là khóa nội bộ; **số Phiếu 1** là mã nghiệp vụ có thể tra cứu, duy nhất theo quy tắc LAB duyệt. Chuẩn hóa khoảng trắng/chữ hoa khi tìm; chống trùng và cấp số đồng thời nếu chọn cấp tự động. Không dùng số điện thoại/email làm mã liên kết.
+- **Số/No. của từng phiếu là số riêng**; **Số giấy đề nghị/Phiếu yêu cầu số** tham chiếu số Phiếu 1. Quy tắc định dạng và cấp số còn chờ xác nhận.
+- Một Phiếu 1 có một Phiếu 7 và một Phiếu 2; Phiếu 2 liên kết kế hoạch tương ứng. Phiếu 3 chọn yêu cầu và bản ghi hiện trường liên quan; Phiếu 4 chọn Phiếu 3/các mẫu liên quan; Phiếu 5 chọn mẫu đã bàn giao. Số Phiếu 3/4 và mẫu cho mỗi yêu cầu còn chờ xác nhận; không giả định chỉ có một mẫu.
+- Không join lỏng chỉ bằng text `requestNumber`: tìm số → xác nhận hồ sơ → lưu khóa liên kết. Không tự ghép các hồ sơ cũ chỉ vì trùng chuỗi; đưa ra danh sách đối chiếu/migration riêng.
+- Giữ snapshot dữ liệu khi hoàn tất/gửi từng phiếu; sửa nguồn về sau không âm thầm thay nội dung hồ sơ đã xác nhận. Có lịch sử người sửa, thời điểm và lý do cho chỉnh sửa có ảnh hưởng.
+
+## 4. Tự điền theo nguồn
+
+| Đích | Gợi ý điền | Nhân viên phải kiểm tra / bổ sung |
+|---|---|---|
+| Phiếu 7 từ 1 | Số yêu cầu, khách, địa chỉ, liên hệ, mẫu/lô, giống, chỉ tiêu | Người lấy mẫu, thời gian, địa điểm, lô thực tế, phương án, điều kiện; không suy đoán dữ liệu thiếu. |
+| Phiếu 2 từ 1 + 7 | Số yêu cầu, khách, kế hoạch, mẫu, vùng trồng, cơ sở đóng gói, xe/moóc/container, chỉ tiêu dự kiến | Thời gian và cách lấy thực tế, khối lượng/số lượng, tình trạng, bảo quản, niêm phong mẫu, ghi chú sai khác. |
+| Phiếu 3 từ 1 + 2 | Số yêu cầu, khách, mẫu/lô, người và thời điểm lấy, vùng trồng, đóng gói, xe/moóc/container, số niêm phong mẫu, chỉ tiêu, hạn trả khi có | Người giao/nhận, giờ nhận, số lượng và khối lượng thực nhận, bao bì, tình trạng niêm phong và mẫu, nhiệt độ, kết luận; ghi sai khác, không tự coi là đã kiểm tra. |
+| Phiếu 4 từ 3 + 1 | Số yêu cầu thật, mã mẫu nhập tay, tên, số lượng, khối lượng, tình trạng, chỉ tiêu; gợi ý phương pháp thử và hạn từ yêu cầu nếu có | Đối chiếu trước khi gửi, phương pháp thử hợp lệ, người giao, ngày chuyển, hạn, yêu cầu lưu/trả mẫu và thay đổi. |
+| Bước 5 từ 4 | Số yêu cầu thật, mã/tên mẫu, số lượng, ngày nhận, hạn, chỉ tiêu/phương pháp được bàn giao | Chọn mẫu, tải file kết quả; metadata tối thiểu và quyền phát hành cần chốt. Không bắt nhập các bảng II–VII. |
+
+Thông tin khách có thể cần cho nhân viên tạo Phiếu 1/2/3; KCS tiếp tục dùng projection giới hạn theo RBAC. File gốc được phép xem có thể chứa thông tin khách: xác nhận chính sách với LAB trước khi mở thêm quyền.
+
+## 5. Các điểm nghiệp vụ phải thiết kế kỹ
+
+1. **Hai loại seal:** đề xuất hai trường có tên rõ `sampleSealNumber` và `containerSealNumber`, không coi là cùng một giá trị; cho phép không có khi thực tế không áp dụng, với lý do/ghi chú theo LAB duyệt. Đối chiếu niêm phong mẫu từ Phiếu 2 với thực nhận ở Phiếu 3; ghi chênh lệch thay vì tự ghi “còn nguyên”. Mức bắt buộc và xử lý bất thường chờ LAB xác nhận. Dữ liệu `sealNumber` cũ chưa rõ nghĩa: không tự chia hoặc ghi đè.
+2. **Chỉ tiêu/nền mẫu:** lưu theo từng mẫu và từng nền mẫu khi cần; phân biệt giá trị khách yêu cầu, thực lấy, tiếp nhận và bàn giao. Bất đồng phải hiện cảnh báo/ghi lý do và quyền phê duyệt theo quy định đã duyệt; chưa mặc định chặn hay tự chọn. `-V/-R` và QC/mã mù không tự bỏ khỏi quy trình CFC-TN-14.
+3. **Mã thủ công:** nhập mã cho từng mẫu, kiểm tra rỗng, độ dài, định dạng do LAB chốt, uniqueness phía DB và khi nhiều người nhập cùng lúc; ghi người nhập, thời điểm, lịch sử và lý do sửa. Chốt ai có quyền nhập/sửa, thời điểm gắn nhãn và xử lý mã đã dùng; không ghi mặc định tên một cá nhân thay cho tài khoản thật.
+4. **Bỏ check mã hóa:** bỏ bước xác minh hai người như người dùng đã chốt; cập nhật gate chuyển mẫu, ứng viên thử nghiệm và phát hành cho quy trình mới một cách nhất quán. Giữ kiểm tra trùng/định dạng theo quy tắc được duyệt, nhật ký và truy xuất. Quy trình CFC-TN-14 trước đây yêu cầu đối chiếu độc lập; cập nhật tài liệu áp dụng theo phê duyệt LAB. Không tự chuyển toàn bộ dữ liệu cũ sang `VERIFIED`.
+5. **Bàn giao:** sau Phiếu 3 và nhập mã, lập/gửi Phiếu 4; KCS nhận hoặc từ chối và ghi nhận người, thời gian, tình trạng. Không tạo thêm biên bản riêng.
+6. **File và phát hành:** bước 5 dùng file kết quả do nhân viên tải lên; không yêu cầu nhập lại các bảng II–VII và không chờ người khác kiểm tra/duyệt trước phát hành. Xác định quyền phát hành và metadata tối thiểu; kiểm tra định dạng, kích thước, quyền truy cập và nội dung file theo khả năng hệ thống; lưu nguồn, checksum, người tải/người phát hành, thời điểm, lịch sử và phiên bản để truy xuất. Không xóa dữ liệu thử nghiệm đã có hoặc tự công bố ngay khi tải file nếu hành động phát hành chưa được thực hiện.
+
+## 6. Các giai đoạn triển khai
+
+- [ ] **P0 — Chốt nghiệp vụ:** trả lời các điểm còn mở ở mục 8; rà mẫu 1/7/2/3/4/5 và CFC-TN-14; thống nhất trường bắt buộc, quan hệ, quyền phát hành, số phiếu, gate và ký. Ghi quyết định và người xác nhận.
+- [ ] **P1 — Nền hồ sơ yêu cầu:** thêm bảng/khóa, migration Flyway mới không sửa migration cũ; tạo API/UI Phiếu 1, nháp/hoàn tất, số yêu cầu và tìm kiếm; quy tắc validation/trùng và actor.
+- [ ] **P2 — Lấy mẫu:** tạo API/UI Phiếu 7 và 2 liên kết Phiếu 1; tách dữ liệu kế hoạch và thực tế, mẫu và chỉ tiêu theo dòng; export theo biểu mẫu được duyệt nếu LAB cần.
+- [ ] **P3 — Tiếp nhận:** tìm Phiếu 1, chọn Phiếu 2 phù hợp, xem trước dữ liệu tự điền; bổ sung trường, phân biệt seal, kiểm tra sai khác, nhập mã thủ công theo chính sách được duyệt, ảnh/file và lưu snapshot. Có đường xử lý yêu cầu/phiếu cũ, khách tự lấy mẫu theo quyết định P0.
+- [ ] **P4 — Chuyển và thử nghiệm:** nối Phiếu 4/5 với số yêu cầu thật, sửa nhãn đang hiển thị nhầm mã Phiếu 3, điền đúng từng mẫu, số lượng/khối lượng, chỉ tiêu và phương pháp; bỏ xác minh hai người và điều chỉnh gate có kiểm soát. Phiếu 4 ghi nhận bước KCS nhận/từ chối. Thêm tải file kết quả cho bước 5, xem/tải theo quyền, kiểm tra định dạng/kích thước/nội dung, lưu metadata/checksum và audit; không bắt nhập các bảng II–VII.
+- [ ] **P5 — Kết quả và dữ liệu cũ:** sửa backend lẫn UI để phát hành file từ bước 5 không qua người khác duyệt; chốt role được phát hành và thao tác phát hành rõ ràng, cập nhật trạng thái và lịch sử, giữ dữ liệu cũ. Đối chiếu ý nghĩa seal container; kiểm tra release/public tránh đưa sai seal hay thông tin khách. Migration dữ liệu cũ có báo cáo ngoại lệ và cách rollback/phục hồi, không tự ghép nếu không chắc.
+- [ ] **P6 — Nghiệm thu:** API/MySQL tests cho quan hệ nhiều mẫu, trùng số/mã và đồng thời, sai lệch, quyền, rollback và dữ liệu cũ; test biểu mẫu/export bằng Word thật nếu xuất DOCX; E2E từng role trên Chrome thật, desktop/mobile, đi hết 1 → 7 → 2 → 3 → 4 → 5 và nhánh khách tự lấy mẫu nếu được duyệt. Ghi rõ test chưa chạy.
+
+## 7. Tiêu chí nghiệm thu
+
+- Chọn đúng số Phiếu 1 thì các phiếu sau lấy đúng hồ sơ liên quan, không nhầm giữa hai khách hay hai lô; không tự điền số yêu cầu từ mã Phiếu 3.
+- Dữ liệu thực nhận và các chênh lệch có thể được nhân viên ghi lại, không mất lịch sử/snapshot. Số lượng và khối lượng là hai dữ liệu riêng.
+- Mã mẫu nhập tay đúng chính sách đã duyệt, không trùng; trạng thái/gate phù hợp quyết định LAB và hồ sơ cũ vẫn truy xuất được.
+- Số niêm phong mẫu và seal container không bị trộn; chỉ tiêu, nền mẫu và phương pháp hiển thị đúng từ nguồn được xác nhận.
+- Tải file kết quả tại bước 5 không đòi nhập bảng thiết bị/hóa chất/QC/số liệu và không cần người khác duyệt để phát hành; vẫn phân quyền, ghi người thực hiện và giữ lịch sử phát hành.
+- Phân quyền và bảo vệ thông tin khách không bị nới ngoài quyết định LAB; chạy test và ghi kết quả thật trước khi đánh dấu hoàn thành.
+
+## 8. Câu hỏi cần LAB/sếp xác nhận
+
+1. Một Phiếu 1 có thể liên kết nhiều Phiếu 3, nhiều mẫu/lô không? Một mẫu có thể nằm trong nhiều Phiếu 4 không? Đã chốt một Phiếu 7 và một Phiếu 2 cho mỗi Phiếu 1.
+2. Số/No. của từng loại phiếu cấp tự động hay nhân viên nhập, định dạng và phạm vi duy nhất? Đã chốt mỗi phiếu có số riêng và cùng tham chiếu số Phiếu 1.
+3. Khách tự lấy mẫu có bắt buộc 7/2 không? Thiếu mẫu 7/2 hoặc nhập hồ sơ lịch sử xử lý thế nào?
+4. Format mã thủ công, quyền sửa và xử lý mã cũ ra sao? Ai phê duyệt cập nhật CFC-TN-14? Đã chốt chị Thúy nhập tại Phiếu 3 và bỏ xác minh hai người trên hệ thống.
+5. Số niêm phong mẫu và số seal container có thể có nhiều số không; ai đối chiếu và thiếu/sai thì chặn hay cho nhận có điều kiện? Chỉ tiêu sai khác xử lý tương tự thế nào?
+6. Đã xác nhận Phiếu 4 là bước bàn giao; không yêu cầu biên bản riêng. Cần chốt trường và thao tác KCS khi nhận/từ chối.
+7. Đã chốt dùng file kết quả `2026.11.16.docx` tại bước 5 và bỏ người khác duyệt trước phát hành. Còn cần chốt role nào được bấm phát hành, metadata bắt buộc, loại/kích thước file và cách xử lý khi phát hiện kết quả sai sau phát hành.
+8. Vai trò nào lập/sửa/hoàn tất từng phiếu; ký giấy, upload bản ký hay chữ ký số? Có cho sửa sau khi hoàn tất không?
+9. Khi một yêu cầu thay đổi thông tin sau khi đã tạo phiếu sau, ai duyệt thay đổi và có lập phiên bản mới không? Xuất Word/PDF cho những phiếu nào?
+
+## Nguồn đã đối chiếu
+
+- `docs/template/1. Phiếu yêu cầu kiểm nghiệm.docx`, `7.Ke_hoach_lay_mau_sau_rieng.docx`, `2. Phiếu lấy mẫu hiện trường.docx`, `3. Phiếu tiếp nhận và bàn giao mẫu.docx`, `4.Phieu chuyen mau.docx`, `5.Bien_ban_thu_nghiem.docx`.
+- Source liên quan: `ReceiptService`, `SampleCodingService`, `TransferService`, `TestingRecordRepository`, `ReportPdfService` và các màn hình Phiếu 3/4/5. Đây là khảo sát để lập kế hoạch, không phải nghiệm thu toàn bộ runtime.
