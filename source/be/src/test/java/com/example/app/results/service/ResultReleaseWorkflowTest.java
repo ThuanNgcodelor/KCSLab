@@ -406,24 +406,28 @@ class ResultReleaseWorkflowTest {
         expect(400, () -> userService.search(null, null, null, 0, 10, "passwordHash,asc"));
     }
 
-    // ---- Admin may prepare a dossier too, but never approves their own ----
+    // ---- File-first flow: Admin may check and publish their own uploaded result ----
 
     @Test
-    void adminCanPrepareADossierButAnotherAdminMustApproveIt() {
+    void adminCanPrepareAndPublishTheirOwnUploadedResult(@org.springframework.beans.factory.annotation.Autowired ReportFileStamper stamper) throws Exception {
         // Hand the dossier created in setUp to the admin, as if the admin had opened it.
         entityManager.flush();
         jdbc.update("update result_releases set created_by_user_id = ? where id = ?", admin.getId(), releaseId);
         entityManager.clear();
-        User secondAdmin = users.save(new User("wf-admin2@test.local", "Admin thứ hai", "unused", Role.ADMIN));
-
         var rows = List.of(new ResultReleaseService.ReportRowInput("Cd", "µg/kg", "PP", "KPH", null));
         assertThat(workflow.updateReport(releaseId, rows, "A", "B", admin).items()).hasSize(1);
         expect(403, () -> workflow.updateReport(releaseId, rows, "A", "B", technician)); // not the creator
-        assertThat(workflow.submit(releaseId, admin).status()).isEqualTo("SUBMITTED");
-
-        expect(403, () -> workflow.publish(releaseId, null, admin));        // creator cannot approve own dossier
-        expect(403, () -> workflow.giveBack(releaseId, "Tự trả", admin));
-        assertThat(workflow.publish(releaseId, null, secondAdmin).status()).isEqualTo("PUBLISHED");
+        var reportOut = new java.io.ByteArrayOutputStream();
+        var reportDocument = new com.lowagie.text.Document();
+        com.lowagie.text.pdf.PdfWriter.getInstance(reportDocument, reportOut);
+        reportDocument.open();
+        reportDocument.add(new com.lowagie.text.Paragraph("PHIEU KET QUA ADMIN"));
+        reportDocument.close();
+        byte[] reportBytes = reportOut.toByteArray();
+        var inspection = stamper.inspect(reportBytes);
+        workflow.attachReport(releaseId, new ResultReleaseService.PreparedReport("admin-kq.pdf", "pdf",
+                ResultFilePolicyTest.PDF, null, reportBytes, inspection.documentNumber(), false), admin);
+        assertThat(workflow.publish(releaseId, null, admin).status()).isEqualTo("PUBLISHED");
     }
 
     @Test

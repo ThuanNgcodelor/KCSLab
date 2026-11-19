@@ -451,7 +451,8 @@ public class ResultReleaseService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được phát hành");
         }
         ResultReleaseStatus previousStatus = release.getStatus();
-        boolean directFileFlow = previousStatus == ResultReleaseStatus.DRAFT && reportPdf(id) != null;
+        boolean directFileFlow = reportPdf(id) != null
+                && (previousStatus == ResultReleaseStatus.DRAFT || previousStatus == ResultReleaseStatus.SUBMITTED);
         if (!directFileFlow) {
             requireApprover(release, actor);
             if (previousStatus != ResultReleaseStatus.SUBMITTED) {

@@ -54,7 +54,11 @@ public class ResultRelease {
         this.decisionNote = note; touch();
     }
     public void publish(User actor, String lookupCode, String resultNumber) {
-        require(status == ResultReleaseStatus.SUBMITTED, "Hồ sơ chưa ở trạng thái chờ duyệt");
+        // The agreed file-first flow has no approval step: an Admin checks the uploaded
+        // KQKN file and may publish directly from a draft. SUBMITTED remains accepted
+        // for records created by the previous workflow.
+        require(status == ResultReleaseStatus.DRAFT || status == ResultReleaseStatus.SUBMITTED,
+                "Hồ sơ chưa sẵn sàng phát hành");
         this.status = ResultReleaseStatus.PUBLISHED; this.decidedBy = actor; this.decidedAt = Instant.now();
         this.publishedAt = this.decidedAt; this.lookupCode = lookupCode; this.resultNumber = resultNumber; touch();
     }

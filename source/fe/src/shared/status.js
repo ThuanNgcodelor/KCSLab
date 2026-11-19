@@ -13,7 +13,7 @@ const DOMAINS = {
     DRAFT: ['Bản nháp', 'neutral'], SUBMITTED: ['Chờ kiểm tra', 'warning'], REVIEWED: ['Đã kiểm tra', 'success'], RETURNED: ['Cần bổ sung', 'danger'],
   },
   release: {
-    DRAFT: ['Bản nháp', 'neutral'], SUBMITTED: ['Chờ duyệt', 'warning'], RETURNED: ['Đã trả lại', 'danger'], PUBLISHED: ['Đã phát hành', 'success'], REVOKED: ['Đã thu hồi', 'danger'],
+    DRAFT: ['Bản nháp', 'neutral'], SUBMITTED: ['Chờ Admin phát hành', 'warning'], RETURNED: ['Đã trả lại', 'danger'], PUBLISHED: ['Đã phát hành', 'success'], REVOKED: ['Đã thu hồi', 'danger'],
   },
   coding: {
     PENDING_CODING: ['Chờ mã hóa', 'neutral'], PENDING_VERIFICATION: ['Chờ đối chiếu', 'warning'], VERIFIED: ['Đã xác minh', 'success'], CORRECTION_REQUIRED: ['Cần hiệu chỉnh', 'danger'],

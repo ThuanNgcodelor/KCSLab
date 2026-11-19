@@ -1315,6 +1315,10 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .optional-form { display: grid; gap: 18px; }
 .request-list-panel { display: grid; gap: 18px; }
 .request-search { max-width: 520px; }
+.sampling-empty { display: grid; justify-items: start; gap: 8px; padding: 34px 24px; border: 1px dashed #cfe2d3; border-radius: 14px; background: #f8fcf9; }
+.sampling-empty strong { color: #123e2c; font-size: 16px; }
+.sampling-empty span { color: #637c6c; }
+.sampling-empty .primary-button { margin-top: 8px; }
 .request-list { display: grid; gap: 10px; }
 .request-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(210px, .8fr) auto; gap: 20px; align-items: center; padding: 18px; border: 1px solid #d6e6d9; border-radius: 14px; background: #fbfdfb; }
 .request-row h2 { margin: 8px 0 4px; color: #123e2c; font-size: 18px; }
