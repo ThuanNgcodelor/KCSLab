@@ -1308,7 +1308,7 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .report-file-card small { margin-top: 3px; color: #5d7a68; font-size: 12px; }
 .report-file-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; color: #297743; background: #e1f3e6; }
 
-/* Phiếu 1 → 7 → 2 → 3 workflow */
+/* Luồng hồ sơ lấy mẫu và tiếp nhận */
 .sampling-page { max-width: 1440px; }
 .sampling-workflow, .optional-flow-grid { display: grid; gap: 18px; }
 .sampling-page.form-page { max-width: 1180px; }

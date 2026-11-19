@@ -71,16 +71,16 @@ export function IntakePage() {
   const periodLabel = filters.from || filters.to ? 'Trong khoảng đã chọn' : 'Trong 7 ngày gần nhất';
 
   return <section className="intake-page">
-    <header className="admin-heading"><div><p className="section-kicker">Vận hành / Phiếu số 3</p><h1>Tiếp nhận mẫu</h1><p className="heading-copy">Không gian làm việc của {user?.role === 'ADMIN' ? 'quản trị viên' : 'người nhận mẫu'}: ghi nhận hồ sơ, ảnh hiện trường và theo dõi bàn giao.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo Phiếu tiếp nhận — Phiếu 3</button></header>
+    <header className="admin-heading"><div><p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tiếp nhận mẫu</h1><p className="heading-copy">Không gian làm việc của {user?.role === 'ADMIN' ? 'quản trị viên' : 'người nhận mẫu'}: ghi nhận hồ sơ, ảnh hiện trường và theo dõi bàn giao.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo hồ sơ tiếp nhận</button></header>
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
 
-    <div className="intake-guide"><div className="guide-step current"><span>01</span><div><strong>Tiếp nhận</strong><small>Phiếu số 3</small></div></div><div className="guide-line" /><div className="guide-step"><span>02</span><div><strong>Chuyển mẫu</strong><small>Phiếu số 4 → KCS</small></div></div><div className="guide-line" /><div className="guide-step"><span>03</span><div><strong>Thử nghiệm</strong><small>Hồ sơ phân tích</small></div></div></div>
+    <div className="intake-guide"><div className="guide-step current"><span>01</span><div><strong>Tiếp nhận</strong><small>Hồ sơ tiếp nhận</small></div></div><div className="guide-line" /><div className="guide-step"><span>02</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></div><div className="guide-line" /><div className="guide-step"><span>03</span><div><strong>Thử nghiệm</strong><small>Hồ sơ phân tích</small></div></div></div>
 
     <section className="intake-command-strip" aria-label="Tổng quan tiếp nhận">
       <article><span>Phiếu tiếp nhận</span><strong>{loading ? '…' : dashboard.totalReceipts}</strong><small>{periodLabel}</small></article>
       <article><span>Số mẫu đã ghi nhận</span><strong>{loading ? '…' : dashboard.totalSamples}</strong><small>Đã gắn mã mẫu</small></article>
-      <article><span>Chờ chuyển KCS</span><strong>{loading ? '…' : dashboard.awaitingTransfer}</strong><small>Cần lập Phiếu số 4</small></article>
+      <article><span>Chờ chuyển KCS</span><strong>{loading ? '…' : dashboard.awaitingTransfer}</strong><small>Cần lập hồ sơ chuyển mẫu</small></article>
       <article><span>Có điều kiện / từ chối</span><strong>{loading ? '…' : dashboard.conditional + dashboard.rejected}</strong><small>Cần chú ý hồ sơ</small></article>
     </section>
 

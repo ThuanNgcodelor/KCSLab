@@ -90,9 +90,9 @@ export function LoginPage() {
         <p className="eyebrow">QUY TRÌNH RÕ RÀNG</p>
         <h2>Từ tiếp nhận đến kết quả, mọi bước đều có dấu vết.</h2>
         <ol className="login-steps" aria-label="Quy trình xử lý mẫu">
-          <li><span>01</span><div><strong>Tiếp nhận</strong><small>Phiếu số 3 · hồ sơ và ảnh mẫu</small></div></li>
-          <li><span>02</span><div><strong>Chuyển mẫu</strong><small>Phiếu số 4 · bàn giao sang KCS</small></div></li>
-          <li><span>03</span><div><strong>Thử nghiệm</strong><small>Phiếu số 5 · số liệu và kiểm tra</small></div></li>
+          <li><span>01</span><div><strong>Tiếp nhận</strong><small>Hồ sơ và ảnh mẫu</small></div></li>
+          <li><span>02</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></li>
+          <li><span>03</span><div><strong>Thử nghiệm</strong><small>Số liệu và kiểm tra</small></div></li>
         </ol>
       </aside>
     </main>

@@ -65,7 +65,7 @@ function getPageTitle(pathname) {
   if (pathname.includes('/profile')) return 'Thông tin cá nhân';
   if (pathname.includes('/notifications')) return 'Thông báo';
   if (pathname.includes('/requests')) return 'Phiếu yêu cầu kiểm nghiệm';
-  if (pathname.includes('/intake/new')) return 'Tạo Phiếu tiếp nhận — Phiếu 3';
+  if (pathname.includes('/intake/new')) return 'Tạo hồ sơ tiếp nhận';
   if (pathname.replace(/\/$/, '') === '/admin/intake') return 'Tổng quan';
   if (pathname.includes('/intake')) return 'Tiếp nhận mẫu';
   if (pathname.includes('/receiving/transfers')) return 'Nhận mẫu';

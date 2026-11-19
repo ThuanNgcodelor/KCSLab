@@ -10,14 +10,22 @@ const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
   sampledBy: '', sampledAt: '', growingArea: '', packingFacility: '', vehicleNumber: '',
   trailerNumber: '', containerNumber: '', sealNumber: '', containerSealNumber: '', sealStatus: 'INTACT', conditionDetail: '',
-  transportInfo: '', receivedTemperature: '', storageCondition: 'Thường', expectedDate: '',
+  transportInfo: '', receivedTemperature: '', storageCondition: 'Thường', temperatureOther: '', expectedDate: '',
   specialRequest: '', acceptanceDecision: 'ACCEPTED', acceptanceReason: '',
 };
 
 const newSample = () => ({
   sampleCode: '', sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
-  condition: 'Nguyên vẹn', requestedParameters: '',
+  packagingOther: '', parameterOther: '', condition: 'Nguyên vẹn', requestedParameters: '',
 });
+
+const parameterOptions = ['Cadimi (Cd)', 'Auramine O (Vàng ô)', 'Dư lượng thuốc BVTV'];
+const packagingOptions = ['Túi PE', 'Hộp/thùng', 'Chai/lọ'];
+const temperatureOptions = ['Thường', 'Lạnh', 'Khác'];
+
+function selectedParameters(value) {
+  return (value || '').split(',').map((item) => item.trim()).filter(Boolean);
+}
 
 export function ReceiptCreatePage() {
   const navigate = useNavigate();
@@ -84,8 +92,10 @@ export function ReceiptCreatePage() {
     setSaving(true); setError(''); setUploadWarning('');
     try {
       const primary = samples[0];
+      const { temperatureOther, ...formPayload } = form;
       const receipt = await createReceipt({
-        ...form,
+        ...formPayload,
+        storageCondition: form.storageCondition === 'Khác' && temperatureOther.trim() ? `Khác: ${temperatureOther.trim()}` : form.storageCondition,
         sampledAt: form.sampledAt ? new Date(form.sampledAt).toISOString() : null,
         receivedTemperature: form.receivedTemperature ? Number(form.receivedTemperature) : null,
         expectedDate: form.expectedDate || null,
@@ -94,7 +104,12 @@ export function ReceiptCreatePage() {
         packaging: primary.packaging,
         sampleCondition: primary.condition,
         requestedParameters: primary.requestedParameters,
-        samples,
+        samples: samples.map(({ productType, packagingOther, parameterOther, ...sample }) => ({
+          ...sample,
+          productType: sample.name.trim(),
+          packaging: sample.packaging === 'Khác' && packagingOther.trim() ? `Khác: ${packagingOther.trim()}` : sample.packaging,
+          requestedParameters: `${selectedParameters(sample.requestedParameters).join(', ')}${parameterOther.trim() ? `${selectedParameters(sample.requestedParameters).length ? ', ' : ''}Khác: ${parameterOther.trim()}` : ''}`,
+        })),
       });
       setCreated(receipt);
 
@@ -123,7 +138,7 @@ export function ReceiptCreatePage() {
   if (created) return <section className="staff-page receipt-success-page">
     <div className="receipt-success">
       <span className="success-check"><Icon name="check" size={26} /></span><p className="section-kicker">Đã lưu hồ sơ tiếp nhận</p>
-      <h1>Đã tạo Phiếu tiếp nhận — Phiếu 3</h1>
+      <h1>Đã tạo hồ sơ tiếp nhận</h1>
       <p>Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.</p>
       {uploadWarning && <div className="toast toast-warning" role="alert">{uploadWarning}</div>}
       <div className="code-display"><small>MÃ PHIẾU</small><strong>{created.receiptCode}</strong>
@@ -132,7 +147,7 @@ export function ReceiptCreatePage() {
       </div>
       <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mở chi tiết phiếu, dán nhãn và xác nhận trước khi chuyển; KCS sẽ đối chiếu độc lập sau khi nhận.</p>
       <div className="receipt-success-actions">
-        <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất Phiếu 3</button>
+        <button className="outline-button" onClick={() => downloadReceiptForm3(created.id).catch((exception) => setUploadWarning(exception.message))}>Xuất phiếu tiếp nhận</button>
         <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Về danh sách</button>
         <button className="primary-button" onClick={() => { setForm(initialForm); setSamples([newSample()]); setFiles({ form3: [], samples: [], lot: [] }); setCreated(null); }}>Tạo phiếu khác</button>
       </div>
@@ -142,9 +157,9 @@ export function ReceiptCreatePage() {
   return <section className="staff-page receipt-form-page">
     <header className="admin-heading staff-heading"><div>
       <button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Quay lại danh sách</button>
-      <p className="section-kicker">Vận hành / Phiếu số 3</p><h1>Tạo Phiếu tiếp nhận — Phiếu 3</h1>
+      <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo hồ sơ tiếp nhận</h1>
     </div></header>
-    {sourceRequest && <div className="source-banner"><strong>Đang tạo từ Phiếu 1: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
+    {sourceRequest && <div className="source-banner"><strong>Đang tạo từ yêu cầu: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
     {error && <div className="toast toast-error" role="alert">{error}</div>}
     {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
@@ -185,23 +200,23 @@ export function ReceiptCreatePage() {
               <div className="form-two-columns">
                 <label>Mã mẫu do người tiếp nhận nhập<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
-                <label>Loại sản phẩm<input list="product-type-suggestions" maxLength="80" value={sample.productType} onChange={updateSample(index, 'productType')} placeholder="Nhập loại sản phẩm" required /></label>
                 <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
                 <label>Số lượng / khối lượng<input value={sample.quantity} onChange={updateSample(index, 'quantity')} /></label>
-                <label>Bao bì<input value={sample.packaging} onChange={updateSample(index, 'packaging')} /></label>
+                <label>Loại bao bì<select value={packagingOptions.includes(sample.packaging) ? sample.packaging : sample.packaging ? 'Khác' : ''} onChange={updateSample(index, 'packaging')}><option value="">Chọn loại bao bì</option>{packagingOptions.map((option) => <option value={option} key={option}>{option}</option>)}<option value="Khác">Khác</option></select></label>
+                {sample.packaging === 'Khác' && <label>Loại bao bì khác<input value={sample.packagingOther} onChange={updateSample(index, 'packagingOther')} placeholder="Nhập loại bao bì" required /></label>}
                 <label>Tình trạng<input value={sample.condition} onChange={updateSample(index, 'condition')} /></label>
-                <label className="full-span">Chỉ tiêu yêu cầu<input value={sample.requestedParameters} onChange={updateSample(index, 'requestedParameters')} required /></label>
+                <fieldset className="full-span choice-fieldset"><legend>Chỉ tiêu yêu cầu</legend><div className="choice-grid">{parameterOptions.map((option) => <label className="choice-option" key={option}><input type="checkbox" checked={selectedParameters(sample.requestedParameters).includes(option)} onChange={() => setSamples((current) => current.map((item, itemIndex) => { if (itemIndex !== index) return item; const currentValues = selectedParameters(item.requestedParameters); const next = currentValues.includes(option) ? currentValues.filter((value) => value !== option) : [...currentValues, option]; return { ...item, requestedParameters: next.join(', ') }; }))} /><span>{option}</span></label>)}<label className="choice-option"><input type="checkbox" checked={Boolean(sample.parameterOther)} onChange={() => updateSample(index, 'parameterOther')({ target: { value: sample.parameterOther ? '' : ' ' } })} /><span>Khác</span></label></div>{sample.parameterOther !== undefined && sample.parameterOther !== '' && <input value={sample.parameterOther.trim()} onChange={updateSample(index, 'parameterOther')} placeholder="Nhập chỉ tiêu khác" required />}</fieldset>
               </div>
             </article>)}
           </div>
           <button type="button" className="outline-button add-sample-button" onClick={() => setSamples((current) => [...current, newSample()])}>＋ Thêm mẫu vào phiếu</button>
-          <datalist id="product-type-suggestions"><option value="Sầu riêng" /><option value="Mít" /><option value="Thanh long" /><option value="Xoài" /><option value="Nông sản khác" /></datalist>
         </section>
 
         <section className="panel-card intake-form-card"><FormHeading number="04" title="Điều kiện và kết luận tiếp nhận" copy="Ghi nhận tình trạng chung của lô tại thời điểm nhận." />
           <div className="form-two-columns">
-            <label>Nhiệt độ khi nhận (°C)<input type="number" step="0.1" value={form.receivedTemperature} onChange={update('receivedTemperature')} /></label>
-            <label>Điều kiện bảo quản<input value={form.storageCondition} onChange={update('storageCondition')} /></label>
+            <label>Nhiệt độ / điều kiện khi nhận<select value={temperatureOptions.includes(form.storageCondition) ? form.storageCondition : 'Khác'} onChange={update('storageCondition')}><option value="">Chọn điều kiện</option>{temperatureOptions.map((option) => <option value={option} key={option}>{option}</option>)}</select></label>
+            {form.storageCondition === 'Khác' && <label>Điều kiện khác<input value={form.temperatureOther} onChange={update('temperatureOther')} placeholder="Nhập điều kiện" required /></label>}
+            <label>Nhiệt độ cụ thể (°C)<input type="number" step="0.1" value={form.receivedTemperature} onChange={update('receivedTemperature')} placeholder="Chỉ nhập khi cần" /></label>
             <label>Thời hạn dự kiến<DateInput value={form.expectedDate} onChange={update('expectedDate')} /></label>
             <label className="full-span">Mô tả tình trạng<textarea value={form.conditionDetail} onChange={update('conditionDetail')} rows="3" /></label>
             <label className="full-span">Yêu cầu đặc biệt<textarea value={form.specialRequest} onChange={update('specialRequest')} rows="3" /></label>
@@ -213,7 +228,7 @@ export function ReceiptCreatePage() {
 
       <aside className="receipt-form-aside">
         <section className="panel-card upload-card"><FormHeading number="05" title="Ảnh và hồ sơ" copy="Ảnh được phân loại và ghi nhận người tải lên." />
-          <PhotoPicker label="Phiếu số 3" hint="PDF, DOCX hoặc ảnh chụp phiếu" camera accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
+          <PhotoPicker label="Biên bản tiếp nhận" hint="PDF, DOCX hoặc ảnh chụp phiếu" camera accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
           <PhotoPicker label="Ảnh mẫu" hint="Chụp trực tiếp hoặc chọn nhiều ảnh" files={files.samples} onChange={updateFiles('samples')} />
           <PhotoPicker label="Ảnh lô hàng" hint="Toàn cảnh lô/xe/container khi nhận" files={files.lot} onChange={updateFiles('lot')} />
           <small className="field-help">Tối đa 10 MB mỗi file. Hỗ trợ PDF, DOCX, JPG, PNG, WEBP, HEIC/HEIF.</small>
@@ -232,9 +247,9 @@ function validateForm(form, samples) {
   if (form.customerEmail.trim() && !/^\S+@\S+\.\S+$/.test(form.customerEmail.trim())) return 'Email khách hàng không đúng định dạng.';
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
-  if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim() || !sample.productType.trim()
-    || !sample.sourceCode.trim() || !sample.requestedParameters.trim())) {
-    return 'Mỗi mẫu cần có mã mẫu, tên, loại sản phẩm, mã nguồn và chỉ tiêu yêu cầu.';
+  if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim()
+    || !sample.sourceCode.trim() || !sample.requestedParameters.trim() || (sample.packaging === 'Khác' && !sample.packagingOther.trim()))) {
+    return 'Mỗi mẫu cần có mã mẫu, tên mẫu, mã nguồn, chỉ tiêu yêu cầu và loại bao bì.';
   }
   if (form.acceptanceDecision !== 'ACCEPTED' && !form.acceptanceReason.trim()) {
     return 'Vui lòng nhập lý do hoặc điều kiện tiếp nhận.';

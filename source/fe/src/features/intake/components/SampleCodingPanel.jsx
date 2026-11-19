@@ -52,7 +52,7 @@ export function SampleCodingPanel({ sample, onChanged }) {
       <StatusBadge domain="coding" value={status} />
       {coding.legacy && <small className="muted">Mã cũ trước khi có bước xác minh (cần LAB xác nhận)</small>}
       {coding.codedBy && <small>Mã hóa: {coding.codedBy}</small>}
-      {manualFlow && <small>Mã được nhập tại Phiếu 3 · không yêu cầu xác minh hai người</small>}
+      {manualFlow && <small>Mã được nhập tại khâu tiếp nhận · không yêu cầu xác minh hai người</small>}
       {!manualFlow && coding.verifiedBy && <small>Xác minh: {coding.verifiedBy}</small>}
       <button type="button" className="link-button" onClick={toggleHistory}>{events ? 'Ẩn lịch sử' : 'Lịch sử mã'}</button>
     </div>
@@ -61,7 +61,7 @@ export function SampleCodingPanel({ sample, onChanged }) {
       <input value={manualCode} onChange={(event) => setManualCode(event.target.value)} placeholder="Mã mẫu mới" maxLength={100} aria-label="Mã mẫu mới" />
       <input value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Lý do sửa mã" maxLength={500} aria-label="Lý do sửa mã" />
       <button type="button" className="outline-button small-button" disabled={busy || !manualCode.trim() || !reason.trim()}
-        onClick={() => setConfirm({ title: 'Sửa mã mẫu?', description: `Mã cũ ${coding.sampleCode} được giữ trong lịch sử. Phiếu 4 chưa được lập mới có thể sửa mã.`, confirmLabel: 'Sửa mã', run: () => run(() => replaceManualSampleCode(sample.id, manualCode.trim(), reason.trim())) })}>Sửa mã</button>
+        onClick={() => setConfirm({ title: 'Sửa mã mẫu?', description: `Mã cũ ${coding.sampleCode} được giữ trong lịch sử. Hồ sơ chuyển mẫu chưa được lập mới có thể sửa mã.`, confirmLabel: 'Sửa mã', run: () => run(() => replaceManualSampleCode(sample.id, manualCode.trim(), reason.trim())) })}>Sửa mã</button>
     </div>}
     {status === 'PENDING_CODING' && <div className="coding-actions">
       <button type="button" className="outline-button small-button" disabled={busy}
