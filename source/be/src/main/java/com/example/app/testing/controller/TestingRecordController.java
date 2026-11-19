@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.example.app.common.dto.PagedResponse;
 import com.example.app.testing.entity.TestRecordStatus;
@@ -28,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/testing-records")
 public class TestingRecordController {
+    public record FileResultRequest(@jakarta.validation.constraints.NotNull Long transferItemId) {}
     private final TestingRecordService testingRecordService;
     private final UserService userService;
 
@@ -60,6 +62,15 @@ public class TestingRecordController {
     public TestingRecordResponse create(@Valid @RequestBody SaveTestingRecordRequest request,
                                         @AuthenticationPrincipal Jwt jwt) {
         return testingRecordService.create(request, userService.getByEmail(jwt.getSubject()));
+    }
+
+    @PostMapping("/from-result-file")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
+    public TestingRecordResponse createFromResultFile(@Valid @RequestBody FileResultRequest request,
+                                                       @AuthenticationPrincipal Jwt jwt) {
+        return testingRecordService.createFromResultFile(request.transferItemId(),
+                userService.getByEmail(jwt.getSubject()));
     }
 
     @PutMapping("/{id}")

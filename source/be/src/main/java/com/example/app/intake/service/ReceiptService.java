@@ -21,6 +21,10 @@ import com.example.app.intake.repository.ReceiptSpecifications;
 import com.example.app.intake.repository.SampleRepository;
 import com.example.app.notification.entity.StaffNotificationType;
 import com.example.app.notification.service.StaffNotificationService;
+import com.example.app.sampling.entity.FieldSampling;
+import com.example.app.sampling.entity.TestRequest;
+import com.example.app.sampling.repository.FieldSamplingRepository;
+import com.example.app.sampling.repository.TestRequestRepository;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,6 +85,8 @@ public class ReceiptService {
     private final SampleCodeSequence sampleCodeSequence;
     private final StaffNotificationService notificationService;
     private final ReceiptForm3Exporter form3Exporter;
+    private final TestRequestRepository testRequestRepository;
+    private final FieldSamplingRepository fieldSamplingRepository;
     private final Path storageRoot;
 
     public ReceiptService(ReceiptRepository receiptRepository,
@@ -90,6 +96,8 @@ public class ReceiptService {
                           SampleCodeSequence sampleCodeSequence,
                           StaffNotificationService notificationService,
                           ReceiptForm3Exporter form3Exporter,
+                          TestRequestRepository testRequestRepository,
+                          FieldSamplingRepository fieldSamplingRepository,
                           @Value("${app.storage.root:storage/receipts}") String storageRoot) {
         this.receiptRepository = receiptRepository;
         this.attachmentRepository = attachmentRepository;
@@ -98,6 +106,8 @@ public class ReceiptService {
         this.sampleCodeSequence = sampleCodeSequence;
         this.notificationService = notificationService;
         this.form3Exporter = form3Exporter;
+        this.testRequestRepository = testRequestRepository;
+        this.fieldSamplingRepository = fieldSamplingRepository;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
     }
 
@@ -165,16 +175,44 @@ public class ReceiptService {
                 request.specialRequest(), decision, request.acceptanceReason());
         receipt.setRequestNumber(request.requestNumber().trim());
         receipt.setSealStatus(request.sealStatus());
+        receipt.setContainerSealNumber(blankToNull(request.containerSealNumber()));
+        if (request.testRequestId() != null) {
+            TestRequest testRequest = testRequestRepository.findById(request.testRequestId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Phiếu yêu cầu"));
+            if (!testRequest.getRequestNumber().equalsIgnoreCase(request.requestNumber().trim())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Số Phiếu yêu cầu không khớp hồ sơ đã chọn");
+            }
+            FieldSampling field = null;
+            if (request.fieldSamplingId() != null) {
+                field = fieldSamplingRepository.findById(request.fieldSamplingId()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Phiếu lấy mẫu hiện trường"));
+                if (!field.getTestRequest().getId().equals(testRequest.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Phiếu lấy mẫu không thuộc Phiếu yêu cầu đã chọn");
+                }
+            }
+            receipt.linkRequest(testRequest, field);
+        }
 
         LocalDate date = receivedAt.atZone(BUSINESS_ZONE).toLocalDate();
         for (SampleRequest sampleRequest : request.samples()) {
             int sequence = sampleCodeSequence.next(date);
             String source = SampleCodes.normalizeSource(sampleRequest.sourceCode());
             String productType = sampleRequest.productType().trim();
-            String code = SampleCodes.format(source, productType, date, sequence);
-            receipt.addSample(new Sample(code, source, productType, date, sequence, sampleRequest.name().trim(),
+            String code = sampleRequest.sampleCode() == null || sampleRequest.sampleCode().isBlank()
+                    ? SampleCodes.format(source, productType, date, sequence)
+                    : sampleRequest.sampleCode().trim().toUpperCase(Locale.ROOT);
+            if (sampleRepository.existsBySampleCodeIgnoreCase(code)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Mã mẫu " + code + " đã tồn tại");
+            }
+            Sample sample = new Sample(code, source, productType, date, sequence, sampleRequest.name().trim(),
                     sampleRequest.quantity(), sampleRequest.packaging(), sampleRequest.condition(),
-                    sampleRequest.requestedParameters()));
+                    sampleRequest.requestedParameters());
+            if (sampleRequest.sampleCode() != null && !sampleRequest.sampleCode().isBlank()) {
+                sample.markManuallyCoded(receivedBy);
+            }
+            receipt.addSample(sample);
         }
         Receipt saved = receiptRepository.save(receipt);
         notificationService.notifyRoles(Set.of(Role.ADMIN, Role.TECHNICIAN), receivedBy,
@@ -305,11 +343,13 @@ public class ReceiptService {
     private ReceiptResponse toResponse(Receipt receipt) {
         return new ReceiptResponse(receipt.getId(), receipt.getReceiptCode(), receipt.getCustomer().getName(),
                 receipt.getCustomer().getPhone(), receipt.getReceivedBy().getId(),
-                receipt.getReceivedBy().getDisplayName(), receipt.getDeliveredBy(), receipt.getRequestNumber(), receipt.getSampledBy(),
+                receipt.getReceivedBy().getDisplayName(), receipt.getDeliveredBy(), receipt.getRequestNumber(),
+                receipt.getTestRequest() == null ? null : receipt.getTestRequest().getId(),
+                receipt.getFieldSampling() == null ? null : receipt.getFieldSampling().getId(), receipt.getSampledBy(),
                 receipt.getSampledAt(), receipt.getGrowingArea(), receipt.getPackingFacility(),
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getReceivedAt(), receipt.getSampleName(), receipt.getQuantity(), receipt.getPackaging(),
-                receipt.getSealNumber(), receipt.isSealIntact(), receipt.getSealStatus(), receipt.getSampleCondition(),
+                receipt.getSealNumber(), receipt.getContainerSealNumber(), receipt.isSealIntact(), receipt.getSealStatus(), receipt.getSampleCondition(),
                 receipt.getConditionDetail(), receipt.getTransportInfo(), receipt.getReceivedTemperature(),
                 receipt.getStorageCondition(), receipt.getRequestedParameters(), receipt.getExpectedDate(),
                 receipt.getSpecialRequest(), receipt.getAcceptanceDecision(), receipt.getAcceptanceReason(),

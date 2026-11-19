@@ -447,9 +447,16 @@ public class ResultReleaseService {
     @Transactional
     public ResultReleaseDetailResponse publish(Long id, Set<Long> publicFileIds, User actor) {
         ResultRelease release = lock(id);
-        requireApprover(release, actor);
-        if (release.getStatus() != ResultReleaseStatus.SUBMITTED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Hồ sơ chưa ở trạng thái chờ duyệt");
+        if (actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được phát hành");
+        }
+        ResultReleaseStatus previousStatus = release.getStatus();
+        boolean directFileFlow = previousStatus == ResultReleaseStatus.DRAFT && reportPdf(id) != null;
+        if (!directFileFlow) {
+            requireApprover(release, actor);
+            if (previousStatus != ResultReleaseStatus.SUBMITTED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Hồ sơ chưa ở trạng thái chờ duyệt");
+            }
         }
         var record = release.getTestingRecord();
         if (record.getStatus() != TestRecordStatus.REVIEWED) {
@@ -501,7 +508,7 @@ public class ResultReleaseService {
         } catch (IOException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể lưu PDF phiếu kết quả", exception);
         }
-        events.save(new ResultReleaseEvent(release, "PUBLISHED", ResultReleaseStatus.SUBMITTED,
+        events.save(new ResultReleaseEvent(release, "PUBLISHED", previousStatus,
                 release.getStatus(), release.getResultNumber(), actor));
         return toDetail(release);
     }

@@ -103,6 +103,17 @@ public class TestingRecord {
         updatedAt = reviewedAt;
     }
 
+    /** File-first flow: the uploaded KQKN document is the testing evidence; no separate form review is required. */
+    public void completeFromResultFile(User actor) {
+        Instant now = Instant.now();
+        this.status = TestRecordStatus.REVIEWED;
+        this.submittedAt = now;
+        this.reviewedAt = now;
+        this.checkedBy = actor;
+        this.reviewNote = "Hồ sơ được lập trực tiếp từ file kết quả đã tải lên";
+        this.updatedAt = now;
+    }
+
     private void addEquipment(TestingEquipment item) { equipment.add(item); item.attachTo(this); }
     private void addReagent(TestingReagent item) { reagents.add(item); item.attachTo(this); }
     private void addMeasurement(TestingMeasurement item) { measurements.add(item); item.attachTo(this); }

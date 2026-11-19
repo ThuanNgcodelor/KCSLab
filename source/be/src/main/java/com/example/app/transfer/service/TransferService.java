@@ -327,11 +327,11 @@ public class TransferService {
         return items;
     }
 
-    /** The label must be applied before handover; KCS verifies independently after receipt. */
+    /** The label/code must be assigned before handover. No second verification is required. */
     private void requireCodingReadyForHandover(Sample sample) {
-        if (!sample.isCodingVerified() && sample.getCodingStatus() != com.example.app.intake.entity.SampleCodingStatus.PENDING_VERIFICATION) {
+        if (!sample.isCodingVerified()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Mẫu " + sample.getSampleCode() + " chưa được xác nhận dán nhãn (" + sample.getCodingStatus() + ")");
+                    "Mẫu " + sample.getSampleCode() + " chưa được mã hóa và dán nhãn");
         }
     }
 
@@ -359,7 +359,8 @@ public class TransferService {
 
     private TransferResponse toResponse(SampleTransfer transfer) {
         return new TransferResponse(transfer.getId(), transfer.getTransferCode(), transfer.getReceipt().getId(),
-                transfer.getReceipt().getReceiptCode(), transfer.getReceipt().getCustomer().getName(),
+                transfer.getReceipt().getReceiptCode(), transfer.getReceipt().getRequestNumber(),
+                transfer.getReceipt().getCustomer().getName(),
                 transfer.getReceivingDepartment(), transfer.getDeliveredBy().getDisplayName(),
                 transfer.getReceivedBy() == null ? null : transfer.getReceivedBy().getDisplayName(),
                 transfer.getTransferDate(), transfer.getResultsDueDate(), transfer.isReturnToCustomer(),
@@ -373,7 +374,7 @@ public class TransferService {
         TransferResponse response = toResponse(transfer);
         if (viewer.getRole() != Role.TECHNICIAN) return response;
         return new TransferResponse(response.id(), response.transferCode(), response.receiptId(),
-                response.receiptCode(), null, response.receivingDepartment(), response.deliveredBy(),
+                response.receiptCode(), response.requestNumber(), null, response.receivingDepartment(), response.deliveredBy(),
                 response.receivedBy(), response.transferDate(), response.resultsDueDate(),
                 response.returnToCustomer(), response.customerReturnDate(), response.changesNote(),
                 response.status(), response.receivingNote(), response.labOpinion(), response.labRetain(),

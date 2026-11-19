@@ -25,6 +25,8 @@ public class SampleCodingController {
     public record ReasonRequest(@NotBlank @Size(max = 500) String reason) {}
     public record CorrectionRequest(@Size(max = 20) String sourceCode, @Size(max = 80) String productType,
                                     @NotBlank @Size(max = 500) String reason) {}
+    public record ManualCodeRequest(@NotBlank @Size(max = 80) String sampleCode,
+                                    @NotBlank @Size(max = 500) String reason) {}
 
     private final SampleCodingService coding;
     private final UserService users;
@@ -59,6 +61,14 @@ public class SampleCodingController {
     public SampleCodingResponse correct(@PathVariable Long sampleId, @Valid @RequestBody CorrectionRequest request,
                                         @AuthenticationPrincipal Jwt jwt) {
         return coding.correct(sampleId, request.sourceCode(), request.productType(), request.reason(),
+                users.getByEmail(jwt.getSubject()));
+    }
+
+    @PostMapping("/manual-code")
+    public SampleCodingResponse manualCode(@PathVariable Long sampleId,
+                                           @Valid @RequestBody ManualCodeRequest request,
+                                           @AuthenticationPrincipal Jwt jwt) {
+        return coding.replaceManualCode(sampleId, request.sampleCode(), request.reason(),
                 users.getByEmail(jwt.getSubject()));
     }
 }

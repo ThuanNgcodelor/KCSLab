@@ -56,7 +56,7 @@ public class TestingRecordService {
 
     public record Candidate(Long transferItemId, Long sampleId, String sampleCode, String sampleName, String quantity,
                             String requestedParameters, String testMethod, String transferCode, String receiptCode,
-                            java.time.LocalDate transferDate, java.time.LocalDate resultsDueDate) {}
+                            String requestNumber, java.time.LocalDate transferDate, java.time.LocalDate resultsDueDate) {}
 
     /** Paged, sorted, filtered list; everything is executed by the database. */
     @Transactional(readOnly = true)
@@ -98,6 +98,7 @@ public class TestingRecordService {
                 .stream().map(item -> new Candidate(item.getId(), item.getSample().getId(), item.getSampleCode(),
                         item.getSampleName(), item.getQuantity(), item.getRequestedParameters(), item.getTestMethod(),
                         item.getTransfer().getTransferCode(), item.getTransfer().getReceipt().getReceiptCode(),
+                        item.getTransfer().getReceipt().getRequestNumber(),
                         item.getTransfer().getTransferDate(), item.getTransfer().getResultsDueDate())).toList();
     }
 
@@ -130,6 +131,29 @@ public class TestingRecordService {
         TestingRecord record = new TestingRecord(nextCode(), transferItem, analyst);
         applyContent(record, request);
         transferItem.getSample().markInTesting();
+        return toResponse(recordRepository.save(record));
+    }
+
+    @Transactional
+    public TestingRecordResponse createFromResultFile(Long transferItemId, User actor) {
+        if (actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được lập hồ sơ trực tiếp từ file kết quả");
+        }
+        SampleTransferItem transferItem = transferItemRepository.findById(transferItemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu đã bàn giao"));
+        if (transferItem.getTransfer().getStatus() != TransferStatus.ACCEPTED
+                || transferItem.getSample().getStatus() != ReceiptStatus.TRANSFERRED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Mẫu phải được KCS xác nhận nhận trước khi tải kết quả");
+        }
+        if (!transferItem.getSample().isCodingVerified()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Mẫu chưa có mã hợp lệ");
+        }
+        if (recordRepository.existsByTransferItem_Id(transferItemId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Mẫu đã có hồ sơ kết quả");
+        }
+        TestingRecord record = new TestingRecord(nextCode(), transferItem, actor);
+        record.completeFromResultFile(actor);
+        transferItem.getSample().markTestReviewed();
         return toResponse(recordRepository.save(record));
     }
 
@@ -248,6 +272,7 @@ public class TestingRecordService {
         SampleTransferItem item = record.getTransferItem();
         return new TestingRecordResponse(record.getId(), record.getRecordCode(), item.getId(),
                 item.getTransfer().getTransferCode(), item.getTransfer().getReceipt().getReceiptCode(),
+                item.getTransfer().getReceipt().getRequestNumber(),
                 item.getSample().getId(), item.getSampleCode(), item.getSampleName(), item.getQuantity(),
                 item.getRequestedParameters(), item.getTestMethod(), item.getTransfer().getTransferDate(),
                 item.getTransfer().getResultsDueDate(), record.getAnalyst().getId(), record.getAnalyst().getDisplayName(),

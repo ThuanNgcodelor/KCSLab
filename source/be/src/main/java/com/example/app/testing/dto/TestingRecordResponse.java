@@ -13,6 +13,7 @@ public record TestingRecordResponse(
         Long transferItemId,
         String transferCode,
         String receiptCode,
+        String requestNumber,
         Long sampleId,
         String sampleCode,
         String sampleName,

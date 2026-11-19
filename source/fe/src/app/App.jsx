@@ -25,6 +25,8 @@ const ResultReleaseDetailPage = lazy(() => import('../features/results/pages/Res
 const ReceivingDashboardPage = lazy(() => import('../features/receiving/pages/ReceivingDashboardPage').then(m => ({ default: m.ReceivingDashboardPage })));
 const ReceivingListPage = lazy(() => import('../features/receiving/pages/ReceivingListPage').then(m => ({ default: m.ReceivingListPage })));
 const ReceivingDetailPage = lazy(() => import('../features/receiving/pages/ReceivingDetailPage').then(m => ({ default: m.ReceivingDetailPage })));
+const TestRequestsPage = lazy(() => import('../features/sampling/pages/TestRequestsPage').then(m => ({ default: m.TestRequestsPage })));
+const TestRequestFormPage = lazy(() => import('../features/sampling/pages/TestRequestFormPage').then(m => ({ default: m.TestRequestFormPage })));
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -65,6 +67,9 @@ export function App() {
           <Route path="/admin/users/:id/edit" element={<UserFormPage />} />
         </Route>
         <Route element={<RoleRoute roles={['ADMIN', 'RECEPTIONIST']} />}>
+          <Route path="/admin/requests" element={<TestRequestsPage />} />
+          <Route path="/admin/requests/new" element={<TestRequestFormPage />} />
+          <Route path="/admin/requests/:id" element={<TestRequestFormPage />} />
           <Route path="/admin/intake" element={<IntakeHome />} />
           <Route path="/admin/intake/receipts" element={<IntakePage />} />
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />

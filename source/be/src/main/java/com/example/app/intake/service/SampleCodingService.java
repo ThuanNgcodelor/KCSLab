@@ -128,6 +128,32 @@ public class SampleCodingService {
         return SampleCodingResponse.from(sample);
     }
 
+    @Transactional
+    public SampleCodingResponse replaceManualCode(Long sampleId, String code, String reason, User actor) {
+        if (actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được sửa mã mẫu");
+        }
+        if (code == null || code.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã mẫu không được để trống");
+        }
+        if (reason == null || reason.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cần ghi lý do sửa mã mẫu");
+        }
+        Sample sample = lock(sampleId);
+        requireAtIntake(sample);
+        String normalized = code.trim().toUpperCase(java.util.Locale.ROOT);
+        if (normalized.equalsIgnoreCase(sample.getSampleCode())) return SampleCodingResponse.from(sample);
+        if (samples.existsBySampleCodeIgnoreCase(normalized)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Mã mẫu đã tồn tại");
+        }
+        String old = sample.getSampleCode();
+        sample.replaceManualCode(normalized, actor);
+        samples.flush();
+        events.save(new SampleCodeEvent(sample, SampleCodeEvent.Type.CORRECTED, old, normalized,
+                reason.trim(), actor));
+        return SampleCodingResponse.from(sample);
+    }
+
     private Sample lock(Long id) {
         return samples.findByIdForUpdate(id).orElseThrow(this::notFound);
     }

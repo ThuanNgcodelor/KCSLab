@@ -4,14 +4,16 @@ import { labelsOf } from '../../../shared/status';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import {
   correctSampleCoding, getSampleCoding, getSampleCodingEvents, rejectSampleCoding,
-  submitSampleCoding, verifySampleCoding,
+  replaceManualSampleCode, submitSampleCoding, verifySampleCoding,
 } from '../api/intakeApi';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export const codingLabels = labelsOf('coding');
 const eventLabels = { SUBMITTED: 'Gửi đối chiếu', VERIFIED: 'Xác minh', REJECTED: 'Đối chiếu không đạt', CORRECTED: 'Hiệu chỉnh mã' };
 
-/** CFC-TN-14 coding verification for one sample: the verifier must be a different person than the coder. */
+/** Manual coding is the current flow. Older states remain visible so historical records are not lost. */
 export function SampleCodingPanel({ sample, onChanged }) {
+  const { user } = useAuth();
   const [coding, setCoding] = useState(null);
   const [events, setEvents] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -20,6 +22,7 @@ export function SampleCodingPanel({ sample, onChanged }) {
   const [source, setSource] = useState('');
   const [product, setProduct] = useState('');
   const [confirm, setConfirm] = useState(null);
+  const [manualCode, setManualCode] = useState('');
 
   const load = useCallback(async () => {
     try { setCoding(await getSampleCoding(sample.id)); setError(''); }
@@ -43,15 +46,23 @@ export function SampleCodingPanel({ sample, onChanged }) {
 
   if (!coding) return <div className="coding-panel"><small className="muted">{error || 'Đang tải trạng thái mã hóa…'}</small></div>;
   const status = coding.codingStatus;
+  const manualFlow = status === 'VERIFIED' && !coding.verifiedBy && !coding.legacy;
   return <div className="coding-panel">
     <div className="coding-line">
       <StatusBadge domain="coding" value={status} />
       {coding.legacy && <small className="muted">Mã cũ trước khi có bước xác minh (cần LAB xác nhận)</small>}
       {coding.codedBy && <small>Mã hóa: {coding.codedBy}</small>}
-      {coding.verifiedBy && <small>Xác minh: {coding.verifiedBy}</small>}
+      {manualFlow && <small>Mã được nhập tại Phiếu 3 · không yêu cầu xác minh hai người</small>}
+      {!manualFlow && coding.verifiedBy && <small>Xác minh: {coding.verifiedBy}</small>}
       <button type="button" className="link-button" onClick={toggleHistory}>{events ? 'Ẩn lịch sử' : 'Lịch sử mã'}</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
+    {manualFlow && user?.role === 'ADMIN' && <div className="coding-actions coding-correction">
+      <input value={manualCode} onChange={(event) => setManualCode(event.target.value)} placeholder="Mã mẫu mới" maxLength={100} aria-label="Mã mẫu mới" />
+      <input value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Lý do sửa mã" maxLength={500} aria-label="Lý do sửa mã" />
+      <button type="button" className="outline-button small-button" disabled={busy || !manualCode.trim() || !reason.trim()}
+        onClick={() => setConfirm({ title: 'Sửa mã mẫu?', description: `Mã cũ ${coding.sampleCode} được giữ trong lịch sử. Phiếu 4 chưa được lập mới có thể sửa mã.`, confirmLabel: 'Sửa mã', run: () => run(() => replaceManualSampleCode(sample.id, manualCode.trim(), reason.trim())) })}>Sửa mã</button>
+    </div>}
     {status === 'PENDING_CODING' && <div className="coding-actions">
       <button type="button" className="outline-button small-button" disabled={busy}
         onClick={() => setConfirm({ title: 'Xác nhận đã mã hóa và dán nhãn?', description: `Mã ${coding.sampleCode} sẽ chuyển sang chờ người thứ hai đối chiếu. Bạn không thể tự xác minh mã này.`, confirmLabel: 'Gửi đối chiếu', run: () => run(() => submitSampleCoding(sample.id)) })}>

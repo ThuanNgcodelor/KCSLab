@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import { createReceipt, downloadReceiptForm3, uploadReceiptFile } from '../api/intakeApi';
 import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
+import { getTestRequest } from '../../sampling/api/testRequestApi';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
   sampledBy: '', sampledAt: '', growingArea: '', packingFacility: '', vehicleNumber: '',
-  trailerNumber: '', containerNumber: '', sealNumber: '', sealStatus: 'INTACT', conditionDetail: '',
+  trailerNumber: '', containerNumber: '', sealNumber: '', containerSealNumber: '', sealStatus: 'INTACT', conditionDetail: '',
   transportInfo: '', receivedTemperature: '', storageCondition: 'Thường', expectedDate: '',
   specialRequest: '', acceptanceDecision: 'ACCEPTED', acceptanceReason: '',
 };
 
 const newSample = () => ({
-  sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
+  sampleCode: '', sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
   condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
 export function ReceiptCreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState(initialForm);
   const [samples, setSamples] = useState([newSample()]);
   const [files, setFiles] = useState({ form3: [], samples: [], lot: [] });
@@ -27,6 +29,29 @@ export function ReceiptCreatePage() {
   const [error, setError] = useState('');
   const [uploadWarning, setUploadWarning] = useState('');
   const [created, setCreated] = useState(null);
+  const [sourceRequest, setSourceRequest] = useState(null);
+
+  useEffect(() => {
+    const requestId = searchParams.get('requestId');
+    if (!requestId) return;
+    getTestRequest(requestId).then((data) => {
+      setSourceRequest(data);
+      const field = data.fieldSampling;
+      setForm((current) => ({ ...current,
+        testRequestId: data.id, fieldSamplingId: field?.id ?? null, requestNumber: data.requestNumber,
+        customerName: data.customerName, customerPhone: data.customerPhone, customerEmail: data.customerEmail ?? '',
+        customerAddress: data.customerAddress ?? '', sampledBy: field?.sampleCollector ?? '', sampledAt: localDateTime(field?.samplingEnd),
+        growingArea: field?.growingArea ?? data.origin ?? '', packingFacility: field?.packingFacility ?? '',
+        vehicleNumber: field?.vehicleNumber ?? '', trailerNumber: field?.trailerNumber ?? '', containerNumber: field?.containerNumber ?? '',
+        sealNumber: field?.sampleSealNumber ?? '', sealStatus: field?.sealPresent === false ? 'NOT_PRESENT' : 'INTACT',
+        conditionDetail: field?.sampleCondition ?? '', transportInfo: field?.fieldNotes ?? '', storageCondition: field?.storageCondition ?? 'Thường',
+        expectedDate: data.expectedDate ?? '',
+      }));
+      setSamples((data.items?.length ? data.items : [{ sampleNameOrId: data.sampleName, parameters: '' }]).map((item) => ({
+        ...newSample(), name: item.sampleNameOrId || data.sampleName, requestedParameters: item.parameters ?? '',
+      })));
+    }).catch((exception) => setError(exception.message));
+  }, [searchParams]);
 
   useEffect(() => {
     const phoneInput = document.querySelector('.receipt-form-page input[type="tel"]');
@@ -119,6 +144,7 @@ export function ReceiptCreatePage() {
       <button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Quay lại danh sách</button>
       <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo phiếu tiếp nhận</h1>
     </div></header>
+    {sourceRequest && <div className="source-banner"><strong>Đang tạo từ Phiếu 1: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
     {error && <div className="toast toast-error" role="alert">{error}</div>}
     {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
@@ -127,7 +153,7 @@ export function ReceiptCreatePage() {
           <div className="form-two-columns">
             <label>Họ tên người giao<input value={form.deliveredBy} onChange={update('deliveredBy')} required /></label>
             <label>Số điện thoại<input type="tel" value={form.customerPhone} onChange={update('customerPhone')} required /></label>
-            <label>Số phiếu yêu cầu<input value={form.requestNumber} onChange={update('requestNumber')} required /></label>
+            <label>Số phiếu yêu cầu<input value={form.requestNumber} onChange={update('requestNumber')} required readOnly={Boolean(sourceRequest)} /></label>
             <label>Tên khách hàng / đơn vị<input value={form.customerName} onChange={update('customerName')} required /></label>
             <label>Email<input type="email" value={form.customerEmail} onChange={update('customerEmail')} /></label>
             <label className="full-span">Địa chỉ<input value={form.customerAddress} onChange={update('customerAddress')} /></label>
@@ -143,7 +169,8 @@ export function ReceiptCreatePage() {
             <label>Biển số xe<input value={form.vehicleNumber} onChange={update('vehicleNumber')} /></label>
             <label>Số moóc<input value={form.trailerNumber} onChange={update('trailerNumber')} /></label>
             <label>Số container<input value={form.containerNumber} onChange={update('containerNumber')} /></label>
-            <label>Số niêm phong<input value={form.sealNumber} onChange={update('sealNumber')} /></label>
+            <label>Số niêm phong mẫu<input value={form.sealNumber} onChange={update('sealNumber')} /></label>
+            <label>Số seal container<input value={form.containerSealNumber} onChange={update('containerSealNumber')} /></label>
             <label>Trạng thái niêm phong<select value={form.sealStatus} onChange={update('sealStatus')} required><option value="INTACT">Còn nguyên</option><option value="NOT_PRESENT">Không có</option><option value="OPENED">Đã mở</option></select></label>
             <label className="full-span">Phương tiện / điều kiện vận chuyển<input value={form.transportInfo} onChange={update('transportInfo')} /></label>
           </div>
@@ -156,6 +183,7 @@ export function ReceiptCreatePage() {
                 {samples.length > 1 && <button type="button" className="table-action" onClick={() => setSamples((current) => current.filter((_, itemIndex) => itemIndex !== index))}>Bỏ mẫu</button>}
               </div>
               <div className="form-two-columns">
+                <label>Mã mẫu do người tiếp nhận nhập<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
                 <label>Loại sản phẩm<input list="product-type-suggestions" maxLength="80" value={sample.productType} onChange={updateSample(index, 'productType')} placeholder="Nhập loại sản phẩm" required /></label>
                 <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
@@ -204,14 +232,20 @@ function validateForm(form, samples) {
   if (form.customerEmail.trim() && !/^\S+@\S+\.\S+$/.test(form.customerEmail.trim())) return 'Email khách hàng không đúng định dạng.';
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
-  if (samples.some((sample) => !sample.name.trim() || !sample.productType.trim()
+  if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim() || !sample.productType.trim()
     || !sample.sourceCode.trim() || !sample.requestedParameters.trim())) {
-    return 'Mỗi mẫu cần có tên, loại sản phẩm, mã nguồn và chỉ tiêu yêu cầu.';
+    return 'Mỗi mẫu cần có mã mẫu, tên, loại sản phẩm, mã nguồn và chỉ tiêu yêu cầu.';
   }
   if (form.acceptanceDecision !== 'ACCEPTED' && !form.acceptanceReason.trim()) {
     return 'Vui lòng nhập lý do hoặc điều kiện tiếp nhận.';
   }
   return '';
+}
+
+function localDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value); const pad = (number) => String(number).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function FormHeading({ number, title, copy }) {

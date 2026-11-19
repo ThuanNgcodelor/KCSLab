@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Transfer projection for KCS: never serialize the customer fields from TransferResponse. */
 public record ReceivingTransferResponse(
-        Long id, String transferCode, String receiptCode, String receivingDepartment,
+        Long id, String transferCode, String receiptCode, String requestNumber, String receivingDepartment,
         String deliveredBy, String receivedBy, LocalDate transferDate, LocalDate resultsDueDate,
         boolean returnToCustomer, LocalDate customerReturnDate, String changesNote,
         TransferStatus status, String receivingNote, String labOpinion, boolean labRetain,
@@ -18,7 +18,7 @@ public record ReceivingTransferResponse(
         List<TransferItemResponse> items) {
     public static ReceivingTransferResponse from(TransferResponse transfer) {
         return new ReceivingTransferResponse(transfer.id(), transfer.transferCode(), transfer.receiptCode(),
-                transfer.receivingDepartment(), transfer.deliveredBy(), transfer.receivedBy(),
+                transfer.requestNumber(), transfer.receivingDepartment(), transfer.deliveredBy(), transfer.receivedBy(),
                 transfer.transferDate(), transfer.resultsDueDate(), transfer.returnToCustomer(),
                 transfer.customerReturnDate(), transfer.changesNote(), transfer.status(),
                 transfer.receivingNote(), transfer.labOpinion(), transfer.labRetain(),

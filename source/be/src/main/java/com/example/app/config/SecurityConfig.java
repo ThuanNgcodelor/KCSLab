@@ -102,6 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/receptionist").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/v1/test-requests/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/samples/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receiving/**").hasAnyRole("ADMIN", "TECHNICIAN")

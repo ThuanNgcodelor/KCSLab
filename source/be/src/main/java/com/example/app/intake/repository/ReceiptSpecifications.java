@@ -74,7 +74,7 @@ public final class ReceiptSpecifications {
                 availableSample.select(sample.get("id")).where(
                         builder.equal(sample.get("receipt").get("id"), root.get("id")),
                         builder.equal(sample.get("status"), ReceiptStatus.RECEIVED),
-                        sample.get("codingStatus").in(SampleCodingStatus.VERIFIED, SampleCodingStatus.PENDING_VERIFICATION)
+                        builder.equal(sample.get("codingStatus"), SampleCodingStatus.VERIFIED)
                 );
                 return builder.and(
                         builder.notEqual(root.get("status"), ReceiptStatus.REJECTED),

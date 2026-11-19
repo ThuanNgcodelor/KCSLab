@@ -48,3 +48,6 @@ export function submitSampleCoding(sampleId) { return request(`/samples/${sample
 export function verifySampleCoding(sampleId) { return request(`/samples/${sampleId}/coding/verify`, { method: 'POST' }); }
 export function rejectSampleCoding(sampleId, reason) { return request(`/samples/${sampleId}/coding/reject`, { method: 'POST', body: JSON.stringify({ reason }) }); }
 export function correctSampleCoding(sampleId, data) { return request(`/samples/${sampleId}/coding/correct`, { method: 'POST', body: JSON.stringify(data) }); }
+export function replaceManualSampleCode(sampleId, sampleCode, reason) {
+  return request(`/samples/${sampleId}/coding/manual-code`, { method: 'POST', body: JSON.stringify({ sampleCode, reason }) });
+}

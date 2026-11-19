@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface SampleRepository extends JpaRepository<Sample, Long>, JpaSpecificationExecutor<Sample> {
     long countByReceivedDate(LocalDate receivedDate);
+    boolean existsBySampleCodeIgnoreCase(String sampleCode);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Sample s where s.id = :id")

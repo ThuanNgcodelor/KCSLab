@@ -1,6 +1,8 @@
 package com.example.app.intake.entity;
 
 import com.example.app.user.entity.User;
+import com.example.app.sampling.entity.FieldSampling;
+import com.example.app.sampling.entity.TestRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +35,8 @@ public class Receipt {
     private User receivedBy;
     @Column(nullable = false, length = 160) private String deliveredBy;
     @Column(length = 80) private String requestNumber;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "test_request_id") private TestRequest testRequest;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "field_sampling_id") private FieldSampling fieldSampling;
     @Column(nullable = false) private Instant receivedAt;
     @Column(length = 160) private String sampledBy;
     private Instant sampledAt;
@@ -45,6 +49,7 @@ public class Receipt {
     @Column(length = 80) private String quantity;
     @Column(length = 80) private String packaging;
     @Column(length = 80) private String sealNumber;
+    @Column(length = 80) private String containerSealNumber;
     @Column(nullable = false) private boolean sealIntact;
     @Enumerated(EnumType.STRING) @Column(length = 20) private SealStatus sealStatus;
     @Column(nullable = false, length = 80) private String sampleCondition;
@@ -110,6 +115,9 @@ public class Receipt {
     public String getDeliveredBy() { return deliveredBy; }
     public String getRequestNumber() { return requestNumber; }
     public void setRequestNumber(String requestNumber) { this.requestNumber = requestNumber; }
+    public void linkRequest(TestRequest request, FieldSampling field) { this.testRequest = request; this.fieldSampling = field; }
+    public TestRequest getTestRequest() { return testRequest; }
+    public FieldSampling getFieldSampling() { return fieldSampling; }
     public Instant getReceivedAt() { return receivedAt; }
     public String getSampledBy() { return sampledBy; }
     public Instant getSampledAt() { return sampledAt; }
@@ -122,6 +130,8 @@ public class Receipt {
     public String getQuantity() { return quantity; }
     public String getPackaging() { return packaging; }
     public String getSealNumber() { return sealNumber; }
+    public String getContainerSealNumber() { return containerSealNumber; }
+    public void setContainerSealNumber(String value) { this.containerSealNumber = value; }
     public boolean isSealIntact() { return sealIntact; }
     public SealStatus getSealStatus() { return sealStatus == null ? (sealIntact ? SealStatus.INTACT : SealStatus.OPENED) : sealStatus; }
     public void setSealStatus(SealStatus sealStatus) { this.sealStatus = sealStatus; this.sealIntact = sealStatus == SealStatus.INTACT; }

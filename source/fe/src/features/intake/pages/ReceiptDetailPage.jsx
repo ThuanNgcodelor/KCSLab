@@ -60,7 +60,8 @@ export function ReceiptDetailPage() {
             <Detail label="Vùng trồng / nguồn" value={receipt.growingArea} />
             <Detail label="Cơ sở đóng gói" value={receipt.packingFacility} />
             <Detail label="Xe / moóc" value={[receipt.vehicleNumber, receipt.trailerNumber].filter(Boolean).join(' / ')} />
-            <Detail label="Container / seal" value={[receipt.containerNumber, receipt.sealNumber].filter(Boolean).join(' / ')} />
+            <Detail label="Container / seal container" value={[receipt.containerNumber, receipt.containerSealNumber].filter(Boolean).join(' / ')} />
+            <Detail label="Niêm phong mẫu" value={receipt.sealNumber} />
           </div>
         </section>
         <section className="panel-card intake-form-card"><DetailHeading title={`Danh sách mẫu (${receipt.samples.length})`} />

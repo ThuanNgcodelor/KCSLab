@@ -16,6 +16,8 @@ public record CreateReceiptRequest(
         @NotBlank String customerName,
         @NotBlank String customerPhone,
         @NotBlank @Size(max = 80) String requestNumber,
+        Long testRequestId,
+        Long fieldSamplingId,
         @Email String customerEmail,
         String customerAddress,
         @Size(max = 160) String sampledBy,
@@ -31,6 +33,7 @@ public record CreateReceiptRequest(
         String quantity,
         String packaging,
         String sealNumber,
+        @Size(max = 80) String containerSealNumber,
         SealStatus sealStatus,
         @NotBlank String sampleCondition,
         String conditionDetail,
@@ -44,6 +47,25 @@ public record CreateReceiptRequest(
         String acceptanceReason,
         @NotEmpty List<@Valid SampleRequest> samples
 ) {
+    /** Keeps source compatibility for callers created before Phiếu 1/Phiếu 2 linkage was added. */
+    public CreateReceiptRequest(
+            String customerName, String customerPhone, String requestNumber, String customerEmail,
+            String customerAddress, String sampledBy, Instant sampledAt, String growingArea,
+            String packingFacility, String vehicleNumber, String trailerNumber, String containerNumber,
+            String deliveredBy, Instant receivedAt, String sampleName, String quantity, String packaging,
+            String sealNumber, SealStatus sealStatus, String sampleCondition, String conditionDetail,
+            String transportInfo, Double receivedTemperature, String storageCondition,
+            String requestedParameters, LocalDate expectedDate, String specialRequest,
+            AcceptanceDecision acceptanceDecision, String acceptanceReason, List<SampleRequest> samples
+    ) {
+        this(customerName, customerPhone, requestNumber, null, null, customerEmail, customerAddress,
+                sampledBy, sampledAt, growingArea, packingFacility, vehicleNumber, trailerNumber,
+                containerNumber, deliveredBy, receivedAt, sampleName, quantity, packaging, sealNumber,
+                null, sealStatus, sampleCondition, conditionDetail, transportInfo, receivedTemperature,
+                storageCondition, requestedParameters, expectedDate, specialRequest, acceptanceDecision,
+                acceptanceReason, samples);
+    }
+
     public boolean sealIntact() {
         return sealStatus == SealStatus.INTACT;
     }

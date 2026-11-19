@@ -49,6 +49,17 @@ public class Sample {
         this.packaging = packaging; this.sampleCondition = condition; this.requestedParameters = requestedParameters;
         this.status = ReceiptStatus.RECEIVED;
     }
+    public void markManuallyCoded(User coder) {
+        this.codingStatus = SampleCodingStatus.VERIFIED;
+        this.codedBy = coder; this.codedAt = Instant.now();
+        this.verifiedBy = null; this.verifiedAt = null;
+    }
+    public void replaceManualCode(String newCode, User editor) {
+        this.sampleCode = newCode;
+        this.codedBy = editor; this.codedAt = Instant.now();
+        this.codingStatus = SampleCodingStatus.VERIFIED;
+        this.verifiedBy = null; this.verifiedAt = null;
+    }
     void attachTo(Receipt receipt) { this.receipt = receipt; }
     public void markTransferPending() { this.status = ReceiptStatus.TRANSFER_PENDING; }
     public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; }

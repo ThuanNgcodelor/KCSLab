@@ -11,6 +11,7 @@ public record TransferResponse(
         String transferCode,
         Long receiptId,
         String receiptCode,
+        String requestNumber,
         String customerName,
         String receivingDepartment,
         String deliveredBy,
@@ -29,4 +30,17 @@ public record TransferResponse(
         Instant receivedAt,
         Instant createdAt,
         List<TransferItemResponse> items
-) {}
+) {
+    /** Compatibility constructor for tests/clients compiled before requestNumber was exposed. */
+    public TransferResponse(Long id, String transferCode, Long receiptId, String receiptCode, String customerName,
+                            String receivingDepartment, String deliveredBy, String receivedBy,
+                            LocalDate transferDate, LocalDate resultsDueDate, boolean returnToCustomer,
+                            LocalDate customerReturnDate, String changesNote, TransferStatus status,
+                            String receivingNote, String labOpinion, boolean labRetain, LocalDate labRetentionUntil,
+                            Instant submittedAt, Instant receivedAt, Instant createdAt, List<TransferItemResponse> items) {
+        this(id, transferCode, receiptId, receiptCode, null, customerName, receivingDepartment, deliveredBy,
+                receivedBy, transferDate, resultsDueDate, returnToCustomer, customerReturnDate, changesNote,
+                status, receivingNote, labOpinion, labRetain, labRetentionUntil, submittedAt, receivedAt,
+                createdAt, items);
+    }
+}
