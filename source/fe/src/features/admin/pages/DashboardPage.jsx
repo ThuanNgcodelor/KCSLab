@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { getAdminDashboard } from '../../intake/api/intakeApi';
+import { getAdminOperationsDashboard } from '../../intake/api/intakeApi';
 import { PageLoader } from '../../../shared/components/Loading';
 
 export function DashboardPage() {
@@ -15,7 +15,7 @@ export function DashboardPage() {
     if (user?.role !== 'ADMIN') return;
     let active = true;
     setLoading(true);
-    getAdminDashboard()
+    getAdminOperationsDashboard()
       .then((data) => { if (active) setDashboard(data); })
       .catch((exception) => { if (active) setError(exception.message); })
       .finally(() => { if (active) setLoading(false); });
@@ -26,10 +26,10 @@ export function DashboardPage() {
   if (user?.role === 'TECHNICIAN') return <Navigate to="/admin/receiving" replace />;
 
   const stats = [
-    { label: 'Phiếu tiếp nhận', value: dashboard?.totalReceipts ?? '—', detail: 'Trong khoảng 7 ngày', tone: 'mint' },
-    { label: 'Tổng số mẫu', value: dashboard?.totalSamples ?? '—', detail: 'Gắn với các phiếu tiếp nhận', tone: 'blue' },
-    { label: 'Chờ lập phiếu chuyển', value: dashboard?.awaitingTransfer ?? '—', detail: 'Cần bàn giao sang KCS', tone: 'amber' },
-    { label: 'Từ chối tiếp nhận', value: dashboard?.rejected ?? '—', detail: 'Có lưu lý do trên hồ sơ', tone: 'violet' },
+    { label: 'Phiếu tiếp nhận', value: dashboard?.receiptsInPeriod ?? '—', detail: 'Trong 7 ngày gần nhất', tone: 'mint' },
+    { label: 'Tổng số mẫu', value: dashboard?.samplesInPeriod ?? '—', detail: 'Trong cùng kỳ', tone: 'blue' },
+    { label: 'Chờ KCS nhận', value: dashboard?.transfersPending ?? '—', detail: 'Toàn hệ thống', tone: 'amber' },
+    { label: 'Đã phát hành', value: dashboard?.resultPublished ?? '—', detail: 'Hồ sơ kết quả', tone: 'violet' },
   ];
 
   return <div className="dashboard-page">
@@ -38,16 +38,20 @@ export function DashboardPage() {
     <section className="stats-grid" aria-label="Tổng quan tiếp nhận">{stats.map((stat) => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{loading ? '…' : stat.value}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>
     <section className="dashboard-grid intake-dashboard-grid">
       <article className="panel-card activity-panel"><div className="panel-heading"><div><p className="section-kicker">Dòng công việc</p><h2>Tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Xem danh sách <span>→</span></button></div>
-        {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : dashboard?.recentReceipts?.length
-          ? <div className="activity-list">{dashboard.recentReceipts.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · {receipt.receivedByName}</small></div></button>)}</div>
+        {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : dashboard?.receiptsInPeriod != null
+          ? <div className="admin-flow-summary"><FlowRow label="Phiếu 4 chờ KCS" value={dashboard.transfersPending} tone="warning" /><FlowRow label="Phiếu 4 đã nhận" value={dashboard.transfersAccepted} tone="success" /><FlowRow label="Phiếu 5 đang xử lý" value={(dashboard.testingDraft ?? 0) + (dashboard.testingSubmitted ?? 0)} tone="info" /><FlowRow label="Hồ sơ kết quả chờ phát hành" value={dashboard.resultDraft + dashboard.resultSubmitted} tone="violet" /></div>
           : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu tiếp nhận</h3><p>Tạo hồ sơ đầu tiên để bắt đầu theo dõi.</p></div>}
       </article>
       <article className="panel-card intake-health-panel"><div className="panel-heading"><div><p className="section-kicker">Kết luận tiếp nhận</p><h2>Chất lượng đầu vào</h2></div><span className="ready-badge"><i /> Dữ liệu thật</span></div>
-        <div className="intake-health-number"><strong>{dashboard?.accepted ?? 0}</strong><span>phiếu chấp nhận</span></div>
-        <div className="intake-health-bars"><span><i style={{ '--bar-value': `${ratio(dashboard?.accepted, dashboard?.totalReceipts)}%` }} />Chấp nhận <strong>{dashboard?.accepted ?? 0}</strong></span><span><i style={{ '--bar-value': `${ratio(dashboard?.conditional, dashboard?.totalReceipts)}%` }} />Có điều kiện <strong>{dashboard?.conditional ?? 0}</strong></span><span><i style={{ '--bar-value': `${ratio(dashboard?.rejected, dashboard?.totalReceipts)}%` }} />Từ chối <strong>{dashboard?.rejected ?? 0}</strong></span></div>
+        <div className="intake-health-number"><strong>{(dashboard?.transfersAccepted ?? 0) + (dashboard?.resultPublished ?? 0)}</strong><span>mốc đã hoàn tất</span></div>
+        <div className="intake-health-bars"><span><i style={{ '--bar-value': `${ratio(dashboard?.transfersAccepted, dashboard?.transfersAccepted + dashboard?.transfersPending + dashboard?.transfersRejected)}%` }} />KCS đã nhận <strong>{dashboard?.transfersAccepted ?? 0}</strong></span><span><i style={{ '--bar-value': `${ratio(dashboard?.resultPublished, dashboard?.resultPublished + dashboard?.resultDraft + dashboard?.resultSubmitted + dashboard?.resultRevoked)}%` }} />Đã phát hành <strong>{dashboard?.resultPublished ?? 0}</strong></span><span><i style={{ '--bar-value': `${ratio(dashboard?.transfersRejected, dashboard?.transfersAccepted + dashboard?.transfersPending + dashboard?.transfersRejected)}%` }} />Từ chối bàn giao <strong>{dashboard?.transfersRejected ?? 0}</strong></span></div>
       </article>
     </section>
   </div>;
+}
+
+function FlowRow({ label, value, tone }) {
+  return <div className={`admin-flow-row ${tone}`}><span><i />{label}</span><strong>{value ?? '—'}</strong></div>;
 }
 
 function ratio(value = 0, total = 0) { return total ? Math.max(4, Math.round((value / total) * 100)) : 0; }

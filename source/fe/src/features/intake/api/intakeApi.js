@@ -13,6 +13,9 @@ export function getReceptionistDashboard(filters = {}) {
 export function getAdminDashboard(filters = {}) {
   return request(`/intake/dashboard/admin?${dashboardSearch(filters)}`);
 }
+export function getAdminOperationsDashboard(filters = {}) {
+  return request(`/admin/dashboard?${dashboardSearch(filters)}`);
+}
 export function getReceipt(id) { return request(`/receipts/${id}`); }
 export async function downloadReceiptForm3(id) {
   const response = await fetch(`/api/v1/receipts/${id}/form-3`, { credentials: 'include' });

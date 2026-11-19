@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Long>, JpaSpecificationExecutor<ResultRelease> {
+    long countByStatus(ResultReleaseStatus status);
     boolean existsByTestingRecord_IdAndVersion(Long testingRecordId, int version);
 
     boolean existsByTestingRecord_IdAndStatus(Long testingRecordId, ResultReleaseStatus status);

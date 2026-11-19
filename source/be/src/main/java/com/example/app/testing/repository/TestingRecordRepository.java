@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface TestingRecordRepository extends JpaRepository<TestingRecord, Long>, JpaSpecificationExecutor<TestingRecord> {
+    long countByStatus(TestRecordStatus status);
     boolean existsByTransferItem_Id(Long transferItemId);
     List<TestingRecord> findTop50ByOrderByCreatedAtDesc();
 

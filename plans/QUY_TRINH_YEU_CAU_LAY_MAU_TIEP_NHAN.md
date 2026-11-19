@@ -1,6 +1,22 @@
 # Kế hoạch: từ yêu cầu kiểm nghiệm đến bàn giao mẫu
 
-> Đề xuất ngày 18/11/2026; **chưa triển khai, chưa nghiệm thu**. Các lựa chọn còn chờ LAB xác nhận được ghi ở cuối. Ưu tiên yêu cầu mới của sếp, nhưng không tự kết luận thay đổi quy trình chất lượng đã được phê duyệt.
+> Cập nhật 19/11/2026: P0–P4 đã có implementation trong source; chưa nghiệm thu production và chưa coi toàn bộ suite test là đạt. Các lựa chọn còn chờ LAB xác nhận được ghi ở cuối. Ưu tiên yêu cầu mới của sếp, nhưng không tự kết luận thay đổi quy trình chất lượng đã được phê duyệt.
+
+## Trạng thái triển khai P0–P4
+
+- **P0 — Đã chốt ở mức triển khai:** luồng 1 → (7/2 tùy chọn) → 3 → 4 → 5; một Phiếu 1 có nhiều Phiếu 3/mẫu; mã nhập tay tại Phiếu 3; KCS nhận/từ chối sau bàn giao; ADMIN phát hành file kết quả; không có duyệt thứ hai trước phát hành.
+- **P1 — Đã triển khai:** migration `V11__test_request_sampling_flow.sql`, entity/repository/service/controller cho Phiếu 1, Phiếu 7 và Phiếu 2; API và UI tìm/chọn Phiếu 1, tự điền dữ liệu sang Phiếu 3.
+- **P2 — Đã triển khai một phần:** đã có hồ sơ kế hoạch lấy mẫu và lấy mẫu hiện trường liên kết Phiếu 1, nhưng chưa có export DOCX theo mẫu và chưa chốt toàn bộ validation nghiệp vụ với LAB.
+- **P3 — Đã triển khai:** Phiếu 3 nhận liên kết Phiếu 1/2, tách `sampleSealNumber` và `containerSealNumber`, nhập mã thủ công, kiểm tra trùng và ghi lịch sử chỉnh mã; mã thủ công được coi là sẵn sàng cho bàn giao theo quy trình mới.
+- **P4 — Đã triển khai:** Phiếu 4 lấy đúng mẫu đã mã hóa, KCS nhận/từ chối; Phiếu 5 có luồng ADMIN tải file kết quả DOCX/PDF để tạo hồ sơ và phát hành trực tiếp, không bắt nhập các bảng II–VII.
+- **Chưa nghiệm thu:** Word thật cho export Phiếu 3, Chrome E2E bằng tài khoản thật, file thật qua toàn bộ flow, notification/WebSocket hai phiên, migration trên database làm việc và quy định LAB về format mã/seal/metadata.
+
+### Bằng chứng kiểm tra gần nhất — 19/11/2026
+
+- Backend compile bằng Java 21/Docker: `BUILD SUCCESS`.
+- Frontend: `npm run build` — `✓ built in 951ms`.
+- Backend full suite trên MySQL test cô lập với `allowPublicKeyRetrieval=true`: `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3`; `BUILD FAILURE`. Ba kết quả lỗi còn lại thuộc test cũ của quy trình xác minh hai người (`SampleCodingServiceTest`), chưa được sửa theo quyết định P0 mới.
+- Không chỉnh sửa V1–V4, `.env` hoặc secrets; không tạo commit trong phiên này.
 
 ### Quyết định người dùng đã xác nhận ngày 18/11/2026
 

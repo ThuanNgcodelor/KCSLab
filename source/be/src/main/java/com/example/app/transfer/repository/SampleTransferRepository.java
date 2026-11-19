@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SampleTransferRepository extends JpaRepository<SampleTransfer, Long>, JpaSpecificationExecutor<SampleTransfer> {
+    long countByStatus(com.example.app.transfer.entity.TransferStatus status);
     List<SampleTransfer> findTop50ByOrderByCreatedAtDesc();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

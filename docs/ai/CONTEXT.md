@@ -90,3 +90,19 @@
 - V6 và API nội bộ chỉ tạo/đọc nháp cho Phiếu 5 `REVIEWED`; chưa có upload hoặc phát hành. Người dùng yêu cầu chặn phát hành đến khi hoàn tất gate mã hóa CFC-TN-14.
 - QR và tra mã nhập tay tương lai đều yêu cầu 4 số cuối SĐT; mặc định chỉ PDF public, Admin có thể bật Word/Excel; 10 MB/file và 10 file/hồ sơ. Tra cứu và các bảo vệ công khai chưa triển khai.
 - `source/public/tracuu/` là landing xem trước không login; form bị khóa, chưa tra cứu được. Không public trước khi hoàn thành và kiểm thử bảo mật backend/phát hành.
+
+## P0–P4 hồ sơ yêu cầu và lấy mẫu — cập nhật 19/11/2026
+
+- Đã triển khai feature `sampling` và migration `V11__test_request_sampling_flow.sql` cho Phiếu 1, kế hoạch Phiếu 7, Phiếu 2; các hồ sơ liên kết về Phiếu 3 bằng khóa nội bộ và có UI chọn/tự điền.
+- Phiếu 3 nhận một hoặc nhiều mẫu/lô, có mã mẫu nhập tay, tách seal mẫu/container và kiểm tra trùng. Theo quy trình mới, không chặn bàn giao vì xác minh hai người; KCS nhận/từ chối ở Phiếu 4.
+- Đã nối Phiếu 5 với luồng tải file kết quả DOCX/PDF cho ADMIN, tạo hồ sơ kết quả và phát hành trực tiếp; không bắt nhập các bảng thiết bị, hóa chất, QC và số liệu thô.
+- Kiểm tra gần nhất: Java 21/Docker compile `BUILD SUCCESS`; `npm run build` `✓ built in 951ms`.
+- Full backend suite trên DB test cô lập: `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3`; `BUILD FAILURE`. Lỗi còn lại là test cũ của quy trình xác minh hai người, chưa được chuyển đổi; chưa được coi là pass.
+- Chưa nghiệm thu Chrome E2E tài khoản thật, Word thật, WebSocket hai phiên, upload file thật toàn luồng và migration trên database làm việc. Không sửa V1–V4, `.env` hoặc secrets trong phiên này.
+
+## P5–P6 — cập nhật 19/11/2026
+
+- P5: dashboard Admin đã có API riêng `/api/v1/admin/dashboard` và UI `/admin`, tổng hợp Phiếu 1/mẫu theo kỳ, Phiếu 4, Phiếu 5 và hồ sơ kết quả. Endpoint chỉ cho ADMIN.
+- Chrome MCP đã kiểm tra phiên TECHNICIAN thật ở 390×844, 1024×768, 1440×900 và 2560×952; role redirect và layout không tràn ngang. Chưa có bằng chứng Chrome với ADMIN/RECEPTIONIST cho dashboard mới.
+- P6: phần gửi Zalo/SMS chưa triển khai vì thiếu OA/provider, template, consent và sandbox. Chỉ được triển khai tiếp sau khi LAB cung cấp các đầu vào này; hiện chưa có credential/webhook/worker gửi thật.
+- Kiểm tra lại sau khi cập nhật P5: backend full suite MySQL/Redis test cô lập `Tests run: 85, Failures: 0, Errors: 0, Skipped: 3`, `BUILD SUCCESS`; frontend `npm run build` `✓ built in 1.03s`. Runtime backend đang mở chưa restart nên Chrome gọi endpoint Admin mới nhận 404; chưa coi E2E Admin hoàn tất.

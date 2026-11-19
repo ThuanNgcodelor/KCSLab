@@ -1,5 +1,15 @@
 # Project State
 
+## P0–P4 hồ sơ yêu cầu và lấy mẫu — cập nhật 19/11/2026
+
+- Đã có implementation cho luồng Phiếu 1 → Phiếu 7/Phiếu 2 tùy chọn → Phiếu 3 → Phiếu 4 → file kết quả: feature `sampling`, migration `V11__test_request_sampling_flow.sql`, API/UI chọn hồ sơ yêu cầu và tự điền Phiếu 3.
+- Phiếu 3 lưu liên kết `testRequestId`/`fieldSamplingId`, tách số niêm phong mẫu và seal container, yêu cầu mã mẫu nhập tay và kiểm tra trùng. Không còn bắt xác minh hai người trước khi bàn giao theo quyết định mới.
+- Phiếu 4 nhận/từ chối sau bàn giao; ứng viên thử nghiệm vẫn yêu cầu mẫu đã được KCS xác minh khi quy trình/lab yêu cầu. ADMIN có luồng tải file kết quả DOCX/PDF để tạo hồ sơ kết quả và phát hành trực tiếp, không bắt nhập các bảng thiết bị/hóa chất/QC/số liệu thô.
+- Kiểm tra mới nhất: backend compile Java 21 bằng Docker `BUILD SUCCESS`; frontend `npm run build` `✓ built in 951ms`.
+- Full backend suite trên DB cô lập chạy `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3`, `BUILD FAILURE`. Hai failure và một error là test cũ còn kỳ vọng xác minh hai người (`SampleCodingServiceTest`), chưa được chuyển sang quy trình mã nhập tay mới; không ghi nhận là pass.
+- Migration V11 đã sửa khóa ngoại dùng bảng `users`, không sửa V1–V4. Khi thử DB làm việc trước đó có một row Flyway thất bại của V11 do khóa ngoại cũ; đã xóa metadata row thất bại rồi chạy lại migration thành công, không xóa dữ liệu nghiệp vụ. Chưa coi migration production được nghiệm thu.
+- Chưa kiểm tra Chrome E2E bằng tài khoản thật, Word thật, WebSocket hai phiên, upload file thật qua toàn bộ P0–P4, hoặc test trên điện thoại thật.
+
 ## DOCX KQKN runtime — 17/11/2026
 
 - Backend có `source/be/Dockerfile` cài LibreOffice Writer headless và các font cần thiết cho luồng DOCX → PDF.
@@ -232,3 +242,11 @@
 - Trang hồ sơ kết quả phân biệt rõ “Tải file phiếu” (mặc định) và “Nhập bảng thủ công”. Chỉ luồng nhập bảng mới yêu cầu từng dòng có chỉ tiêu + kết quả; tải DOCX/PDF không cần nhập bảng. Không đổi API/backend vì luồng upload file-only đã có test tích hợp.
 - Xác minh: `npm run build` pass (`✓ built in 987ms`); test tích hợp backend cô lập Java 21 + MySQL 8.4 + Redis: `Tests run: 1, Failures: 0, Errors: 0, Skipped: 0`, `BUILD SUCCESS`; `git diff --check` sạch.
 - Chưa kiểm tra giao diện trên Chrome thật trong phiên này (Chrome DevTools MCP không kết nối); chưa chạy toàn bộ backend suite hoặc luồng upload qua HTTP/E2E. Không commit.
+
+## P5–P6 — cập nhật 19/11/2026
+
+- P5 đã thêm dashboard Admin tổng hợp tại `GET /api/v1/admin/dashboard`, chỉ role ADMIN; UI `/admin` hiển thị số Phiếu 1/mẫu theo kỳ, Phiếu 4 chờ/đã nhận/từ chối, Phiếu 5 và hồ sơ kết quả theo trạng thái.
+- Chrome MCP đã mở phiên test và đăng nhập được tài khoản TECHNICIAN trên runtime đang chạy; đã kiểm tra route role-aware cùng bốn kích thước 390×844, 1024×768, 1440×900, 2560×952. Chưa kiểm tra dashboard Admin bằng tài khoản ADMIN trong phiên này.
+- P6 Zalo/SMS chưa thể tích hợp provider thật vì chưa có OA, template được duyệt, consent, nhà cung cấp SMS và sandbox. Chưa tạo credential, webhook hoặc worker gửi tin; không coi P6 hoàn thành.
+- Build/test sau P5: backend full suite trên MySQL/Redis test cô lập `Tests run: 85, Failures: 0, Errors: 0, Skipped: 3`, `BUILD SUCCESS`; frontend `npm run build` `✓ built in 1.03s`.
+- Chrome MCP gọi runtime đang chạy cho `/api/v1/admin/dashboard` nhận 404 vì backend process chưa restart từ source mới; đây là giới hạn runtime test, không phải kết quả endpoint mới đã nghiệm thu. Cần restart backend rồi test lại bằng tài khoản ADMIN.

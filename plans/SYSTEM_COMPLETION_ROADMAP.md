@@ -12,7 +12,7 @@ Kết quả mới nhất: backend `Tests run: 83, Failures: 0, Errors: 0, Skippe
 
 **Ngày lập:** 17/11/2026 · **Loại tài liệu:** plan điều phối, chưa phải bằng chứng hoàn thành.
 
-## 0. Tiến độ thực hiện — 17/11/2026
+## 0. Tiến độ thực hiện — 19/11/2026
 
 | Phase | Trạng thái | Bằng chứng / còn thiếu |
 |---|---|---|
@@ -21,7 +21,8 @@ Kết quả mới nhất: backend `Tests run: 83, Failures: 0, Errors: 0, Skippe
 | P2 | **Đã code + test; chờ LAB** | Sequence nguyên tử, xác minh hai người, lịch sử, gate (kể cả API cũ). **Chưa:** `-V/-R`, QC/mã mù (chờ LAB). Mẫu cũ = `VERIFIED/legacy` (giả định). |
 | P3 | **Đã code + test** | Phiếu KQKN xuất PDF từ dữ liệu (theo file mẫu), duyệt/phát hành/thu hồi/phiên bản, file đính kèm an toàn, lịch sử, gate P2, một bản PUBLISHED do DB bảo đảm. **Chưa:** quét virus, backup/retention, số phiếu theo quy tắc LAB, UI click thật, test đồng thời phát hành. |
 | P4 | **Đã code + test; chưa deploy** | API public, 4 số cuối, rate limit, audit, no-store/noindex, UI tra cứu. **Chưa:** QR in, domain/TLS/SEO/headers hạ tầng, rate limit Redis khi scale. |
-| P5, P6 | **Chưa làm** | Ngoài phạm vi lượt này. |
+| P5 | **Đã triển khai nền dashboard Admin** | Có API `/api/v1/admin/dashboard` và UI tổng hợp trạng thái tiếp nhận → KCS → Phiếu 5 → hồ sơ kết quả. Chưa nghiệm thu bằng tài khoản ADMIN thật trên runtime mới. |
+| P6 | **Chưa thể hoàn tất** | Phần Zalo/SMS phụ thuộc OA, template, provider, consent và sandbox chưa được cung cấp. Chưa gọi provider thật, chưa tạo secrets hay giả lập là đã triển khai production. |
 
 Chi tiết: `docs/SYSTEM_STATUS.md`. Các checkbox dưới đây giữ nguyên là danh sách gốc, không tự động phản ánh bảng này.
 
@@ -123,15 +124,20 @@ P6 ZBS/SMS: chuẩn bị tài khoản/template song song; tích hợp sau P3/P4
 
 ## 10. P5 — Admin và rà soát frontend
 
-- [ ] Hoàn thiện dashboard Admin tổng hợp theo `plans/intake/ADMIN.md`; thống nhất định nghĩa KPI và quyền trước khi hiển thị.
+- [x] Hoàn thiện nền dashboard Admin tổng hợp theo `plans/intake/ADMIN.md`: KPI Phiếu 1/mẫu theo kỳ; hàng đợi Phiếu 4; trạng thái Phiếu 5; trạng thái hồ sơ kết quả; chỉ ADMIN được gọi API.
+- [ ] Nghiệm thu dashboard bằng tài khoản ADMIN thật và xác nhận định nghĩa KPI với LAB; các trạng thái workflow hiện là số liệu vận hành, không phải SLA. Runtime hiện tại cần restart vì Chrome còn nối backend process cũ và nhận 404 với endpoint mới.
 - [ ] Rà login, favicon/logo, form, validation cạnh trường, toast, modal dùng `ConfirmDialog`; không dùng `window.confirm/alert/prompt` cho luồng ứng dụng.
 - [ ] Chuẩn hóa responsive, loading/error/empty, bàn phím/focus, độ tương phản và typography; chỉ refactor CSS/component theo từng phạm vi có baseline.
-- [ ] Rà frontend theo role, breakpoint chuẩn, API thật và dữ liệu thử; chạy `npm run build` và ghi bằng chứng. Không coi kiểm thử mock là E2E thật.
+- [x] Rà frontend bằng Chrome MCP ở 390×844, 1024×768, 1440×900, 2560×952 cho phiên đăng nhập TECHNICIAN; kiểm tra route role-aware, không tràn ngang và không có lỗi form hiển thị.
+- [x] Chạy `npm run build`; kết quả gần nhất `✓ built in 1.05s`.
+- [ ] Rà frontend bằng tài khoản ADMIN/RECEPTIONIST thật và API dữ liệu mới; không coi kiểm thử role TECHNICIAN là nghiệm thu đủ P5.
 
 **Đạt khi:** tiêu chí role, giao diện và khả năng sử dụng được kiểm tra và lỗi quan trọng đã xử lý; các giới hạn còn lại được ghi rõ.
 
 ## 11. P6 — ZBS/SMS
 
+- [ ] **Trạng thái hiện tại:** chưa tích hợp provider. Không thể triển khai phần gửi thật nếu chưa có OA/provider, template được duyệt, consent và sandbox. Không đưa credential vào source.
+- [ ] Đợt tiếp theo cần triển khai trước phần nền N1: migration outbox/delivery, idempotency, worker sau commit và fake provider; sau đó mới adapter ZBS/SMS.
 - [ ] Chuẩn bị Zalo OA, template, provider SMS, sandbox, consent và chính sách lưu log với LAB; ghi rõ người quản lý tài khoản, không đưa secrets vào repository.
 - [ ] Sau khi xác định event và điều kiện gửi, triển khai outbox/idempotency, worker, callback, thử lại/fallback an toàn và audit; không dựa vào WebSocket nội bộ để gửi khách.
 - [ ] Test bằng fake provider và sandbox: duplicate, timeout, callback, retry, consent và bảo vệ dữ liệu; chỉ bật provider thật khi người dùng phê duyệt.

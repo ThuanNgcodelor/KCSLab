@@ -1223,6 +1223,17 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .role-symbol, .aside-mark, .success-check, .upload-symbol, .receiving-queue-icon, .notification-type-icon, .empty-intake > span, .notification-page-empty > span, .notification-empty > span { line-height: 0; }
 .role-symbol .ui-icon, .aside-mark .ui-icon, .success-check .ui-icon, .upload-symbol .ui-icon, .receiving-queue-icon .ui-icon, .notification-type-icon .ui-icon { vertical-align: middle; }
 .empty-intake > span .ui-icon, .notification-page-empty > span .ui-icon, .notification-empty > span .ui-icon, .receiving-queue-empty > span .ui-icon { vertical-align: middle; }
+
+.admin-flow-summary { display: grid; gap: 8px; padding: 4px 0; }
+.admin-flow-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 0 14px; border: 1px solid #e3ece4; border-radius: 12px; background: #fbfdfb; }
+.admin-flow-row span { display: inline-flex; align-items: center; gap: 9px; color: #587363; font-size: 12px; font-weight: 600; }
+.admin-flow-row span i { width: 8px; height: 8px; border-radius: 50%; background: #79a287; }
+.admin-flow-row strong { color: #183e2c; font: 700 20px 'Space Grotesk', sans-serif; }
+.admin-flow-row.warning span i { background: #d99d3c; }
+.admin-flow-row.success span i { background: #2f9b55; }
+.admin-flow-row.info span i { background: #518bc8; }
+.admin-flow-row.violet span i { background: #8a70bb; }
+@media (max-width: 640px) { .admin-flow-row { min-height: 48px; } .admin-flow-row span { font-size: 11px; } }
 .success-note .ui-icon { vertical-align: -0.15em; }
 
 /* Results page polish: record links, row action button, calmer empty state */
