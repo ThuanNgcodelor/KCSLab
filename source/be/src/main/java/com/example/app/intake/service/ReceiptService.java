@@ -149,8 +149,12 @@ public class ReceiptService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] exportForm3(Long id) {
-        return form3Exporter.export(getReceipt(id));
+    public byte[] exportForm3(Long id, Long sampleId) {
+        Receipt receipt = getReceipt(id);
+        Sample sample = sampleId == null ? null : receipt.getSamples().stream()
+                .filter(item -> sampleId.equals(item.getId())).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu trong phiếu tiếp nhận"));
+        return form3Exporter.export(receipt, sample);
     }
 
     @Transactional
@@ -175,6 +179,7 @@ public class ReceiptService {
                 request.specialRequest(), decision, request.acceptanceReason());
         receipt.setRequestNumber(request.requestNumber().trim());
         receipt.setSealStatus(request.sealStatus());
+        receipt.setStorageAfterReceipt(blankToNull(request.storageAfterReceipt()));
         receipt.setContainerSealNumber(blankToNull(request.containerSealNumber()));
         if (request.testRequestId() != null) {
             TestRequest testRequest = testRequestRepository.findById(request.testRequestId()).orElseThrow(() ->
@@ -351,7 +356,7 @@ public class ReceiptService {
                 receipt.getReceivedAt(), receipt.getSampleName(), receipt.getQuantity(), receipt.getPackaging(),
                 receipt.getSealNumber(), receipt.getContainerSealNumber(), receipt.isSealIntact(), receipt.getSealStatus(), receipt.getSampleCondition(),
                 receipt.getConditionDetail(), receipt.getTransportInfo(), receipt.getReceivedTemperature(),
-                receipt.getStorageCondition(), receipt.getRequestedParameters(), receipt.getExpectedDate(),
+                receipt.getStorageCondition(), receipt.getStorageAfterReceipt(), receipt.getRequestedParameters(), receipt.getExpectedDate(),
                 receipt.getSpecialRequest(), receipt.getAcceptanceDecision(), receipt.getAcceptanceReason(),
                 receipt.getStatus(), receipt.getSamples().stream().map(sample -> new SampleResponse(
                         sample.getId(), sample.getSampleCode(), sample.getSourceCode(), sample.getProductType(),

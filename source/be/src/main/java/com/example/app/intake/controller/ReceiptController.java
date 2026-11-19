@@ -62,11 +62,11 @@ public class ReceiptController {
     }
     @GetMapping("/{id}") public ReceiptResponse get(@PathVariable Long id) { return receiptService.findById(id); }
     @GetMapping("/{id}/form-3")
-    public ResponseEntity<Resource> form3(@PathVariable Long id) {
-        byte[] document = receiptService.exportForm3(id);
+    public ResponseEntity<Resource> form3(@PathVariable Long id, @RequestParam(required = false) Long sampleId) {
+        byte[] document = receiptService.exportForm3(id, sampleId);
         Resource resource = new ByteArrayResource(document);
         ContentDisposition disposition = ContentDisposition.attachment()
-                .filename("phieu-tiep-nhan-" + id + ".docx", StandardCharsets.UTF_8).build();
+                .filename("phieu-tiep-nhan-" + id + (sampleId == null ? "" : "-mau-" + sampleId) + ".docx", StandardCharsets.UTF_8).build();
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString()).body(resource);

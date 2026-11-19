@@ -16,7 +16,7 @@ public record ReceiptResponse(
         String vehicleNumber, String trailerNumber, String containerNumber,
         Instant receivedAt, String sampleName, String quantity, String packaging, String sealNumber, String containerSealNumber,
         boolean sealIntact, SealStatus sealStatus, String sampleCondition, String conditionDetail, String transportInfo,
-        Double receivedTemperature, String storageCondition, String requestedParameters, LocalDate expectedDate,
+        Double receivedTemperature, String storageCondition, String storageAfterReceipt, String requestedParameters, LocalDate expectedDate,
         String specialRequest, AcceptanceDecision acceptanceDecision, String acceptanceReason, ReceiptStatus status,
         List<SampleResponse> samples, List<ReceiptAttachmentResponse> attachments
 ) {}

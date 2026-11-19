@@ -49,6 +49,42 @@ class ReceiptForm3ExporterTest {
         assertThat(new String(documentXml, StandardCharsets.UTF_8)).doesNotContain("{{", "d5p1:", "d8p1:");
     }
 
+    @Test
+    void ticksTheCheckboxesMatchingTheStoredValuesAndFillsTheBlanks() throws Exception {
+        User receivedBy = new User("receptionist@test.local", "Người nhận", "unused", Role.RECEPTIONIST);
+        Receipt receipt = new Receipt(
+                "TN-20261119-TICK", new Customer("Công ty A", "0900000001", null, null), receivedBy,
+                "Người giao", Instant.parse("2026-11-19T02:05:00Z"),
+                "Sầu riêng", "2 kg", "Hộp/thùng", "SEAL-9", false,
+                "Nguyên vẹn", "Mô tả", "Xe tải", 4.0,
+                "Lạnh", "Cadimi (Cd), Dư lượng thuốc BVTV", LocalDate.of(2026, 11, 25),
+                "Không", AcceptanceDecision.ACCEPTED_WITH_CONDITION, "Thiếu ảnh");
+        receipt.setRequestNumber("CFC26.0001");
+        receipt.setSealStatus(SealStatus.OPENED);
+        receipt.setStorageAfterReceipt("Bảo quản 4 °C");
+        receipt.addSample(new Sample(
+                "CT001-SR-19112026-001", "CT001", "SR", LocalDate.of(2026, 11, 19), 1,
+                "Sầu riêng Ri6", "2 kg", "Hộp/thùng", "Rò rỉ; Dấu hiệu bất thường: mốc",
+                "Cadimi (Cd), Auramine O (Vàng ô), Khác: Dư lượng thuốc BVTV"));
+
+        String xml = new String(readDocumentXml(exporter.export(receipt)), StandardCharsets.UTF_8);
+        java.util.List<String> checked = new java.util.ArrayList<>();
+        var matcher = java.util.regex.Pattern.compile(
+                "<w14:checked w14:val=\"1\" />.*?</w:sdt><w:r><w:t xml:space=\"preserve\">([^<]*)</w:t>",
+                java.util.regex.Pattern.DOTALL).matcher(xml);
+        while (matcher.find()) checked.add(matcher.group(1).trim());
+        assertThat(checked).containsExactlyInAnyOrder("Hộp/ thùng", "Không có/ đã mở", "Rò rỉ", "Dấu hiệu bất thường:",
+                "Lạnh", "Cadimi (Cd)", "Auramin O (Vàng Ô)", "Khác:", "Chấp nhận có điều kiện");
+
+        String text = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))).getDocumentElement().getTextContent();
+        assertThat(text).contains("CFC26.0001", "TN-20261119-TEST".replace("TEST", "TICK"), "CT001-SR-19112026-001",
+                "Sầu riêng Ri6", "2 kg", "mốc", "Dư lượng thuốc BVTV", "Bảo quản 4 °C", "4 °C", "09 giờ 05 phút",
+                "ngày 25 / 11 / 2026", "ngày 19 / 11 / 2026");
+        assertThat(text).doesNotContain("{{", "INTACT", "OPENED", "Chưa có phê duyệt");
+        assertThat(text.split("Xe tải", -1)).hasSize(2); // transport text appears once, not also in the heading
+    }
+
     private byte[] readDocumentXml(byte[] docx) throws Exception {
         try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(docx))) {
             var entry = zip.getNextEntry();

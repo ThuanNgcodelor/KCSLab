@@ -17,14 +17,14 @@ export function getAdminOperationsDashboard(filters = {}) {
   return request(`/admin/dashboard?${dashboardSearch(filters)}`);
 }
 export function getReceipt(id) { return request(`/receipts/${id}`); }
-export async function downloadReceiptForm3(id) {
-  const response = await fetch(`/api/v1/receipts/${id}/form-3`, { credentials: 'include' });
+export async function downloadReceiptForm3(id, sampleId) {
+  const response = await fetch(`/api/v1/receipts/${id}/form-3${sampleId ? `?sampleId=${sampleId}` : ''}`, { credentials: 'include' });
   if (!response.ok) throw new Error('Không thể tải Phiếu tiếp nhận và bàn giao mẫu.');
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `phieu-tiep-nhan-${id}.docx`;
+  anchor.download = `phieu-tiep-nhan-${id}${sampleId ? `-mau-${sampleId}` : ''}.docx`;
   anchor.click();
   URL.revokeObjectURL(url);
 }

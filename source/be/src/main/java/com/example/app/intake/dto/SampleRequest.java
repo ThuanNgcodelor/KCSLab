@@ -10,7 +10,7 @@ public record SampleRequest(
         @NotBlank @Size(max = 160) String name,
         @Size(max = 80) String quantity,
         @Size(max = 80) String packaging,
-        @Size(max = 80) String condition,
+        @Size(max = 255) String condition,
         String requestedParameters
 ) {
     public SampleRequest(String sourceCode, String productType, String name, String quantity,

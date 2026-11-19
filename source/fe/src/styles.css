@@ -1454,7 +1454,7 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .receipt-form-page .choice-option { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 42px; padding: 9px 11px; border: 1px solid #dbe8dd; border-radius: 9px; color: #355f45; background: #fff; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
 .receipt-form-page .choice-option:hover { border-color: #9dcfac; background: #f6fbf7; }
 .receipt-form-page .choice-option:has(input:checked) { border-color: #64bd7d; background: #eaf7ed; }
-.receipt-form-page .choice-option input[type="checkbox"] { flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; border-radius: 4px; accent-color: #2f9d57; }
+.receipt-form-page .choice-option input[type="checkbox"], .receipt-form-page .choice-option input[type="radio"] { flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; min-height: 18px; margin: 0; padding: 0; border-radius: 4px; text-align: left; accent-color: #2f9d57; }
 .receipt-form-page .choice-option span { min-width: 0; font-size: 12px; font-weight: 650; line-height: 1.35; }
 .receipt-form-page .choice-option:focus-within { outline: 3px solid rgba(89, 193, 117, .2); outline-offset: 2px; }
 .receipt-form-page .choice-other-field { display: grid; gap: 7px; margin-top: 12px; }
@@ -1484,3 +1484,26 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .request-chip { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 10px; border: 1px solid #dbe8dd; border-radius: 99px; color: #7d9486; background: #f6faf7; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .request-chip--done { border-color: #bfe0c7; color: #176936; background: #e6f5ea; }
 .request-chip--info { border-color: #cfe0ee; color: #2d5d85; background: #eaf3fa; }
+
+/* Tiếp nhận mẫu: mục thu gọn được, chọn Số/No. Phiếu yêu cầu */
+.receipt-form-page .section-toggle, .receipt-form-page .group-toggle { display: flex; align-items: center; gap: 14px; width: 100%; padding: 0; border: 0; color: inherit; background: none; font: inherit; text-align: left; cursor: pointer; }
+.receipt-form-page .section-toggle:focus-visible, .receipt-form-page .group-toggle:focus-visible { outline: 3px solid rgba(89, 193, 117, .35); outline-offset: 4px; border-radius: 10px; }
+.receipt-form-page .section-toggle-text { display: grid; flex: 1; min-width: 0; gap: 3px; }
+.receipt-form-page .section-toggle-text strong { color: #123e2c; font-size: 19px; font-weight: 700; }
+.receipt-form-page .section-toggle-text small { color: #7d9486; font-size: 11px; font-weight: 500; line-height: 1.5; }
+.receipt-form-page .group-toggle { justify-content: space-between; color: #315b42; font-size: 15px; font-weight: 800; }
+.receipt-form-page .group-toggle i { margin-left: 10px; color: #7d9486; font-size: 12px; font-weight: 500; font-style: italic; }
+.receipt-form-page .chevron { flex: none; color: #4b8d60; transition: transform .18s ease; transform: rotate(-90deg); }
+.receipt-form-page .chevron.is-open { transform: rotate(0deg); }
+@media (prefers-reduced-motion: reduce) { .receipt-form-page .chevron { transition: none; } }
+.receipt-form-page .section-body { display: grid; gap: 20px; min-width: 0; padding-top: 18px; }
+.receipt-form-page .section-body[hidden] { display: none; }
+.receipt-form-page .sample-editor-heading { margin-bottom: 0; }
+.receipt-form-page .sample-editor-card .section-body { padding-top: 14px; }
+.receipt-form-page .intake-sample-editor { display: grid; gap: 14px; }
+.request-picker-row { display: flex; gap: 10px; align-items: stretch; }
+.request-picker-row input { flex: 1; min-width: 0; }
+.request-picker-row .outline-button { white-space: nowrap; }
+.receipt-form-page .choice-option input[type="radio"] { border-radius: 50%; }
+.receipt-form-page .choice-option span { text-align: left; }
+.receipt-form-page .sample-editor-heading .table-action { flex: none; width: auto; white-space: nowrap; }

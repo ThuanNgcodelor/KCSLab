@@ -129,3 +129,26 @@
 - 19/11/2026 (sau): Phiếu 07 và 02 tách thành hai trang riêng `/admin/requests/:id/sampling-plan` và `/admin/requests/:id/field-sampling` (`SamplingPlanPage`, `FieldSamplingPage`, dùng chung `components/SamplingParts.jsx` + `samplingModel.js`); trang Phiếu yêu cầu chỉ còn form Phiếu 1 và khối "Các bước tiếp theo" (trạng thái Đã lập/Chưa lập). Đã chụp Chrome headless với API giả (không dùng tài khoản thật) ở 1440 và 390 px: không tràn ngang, radio/checkbox đúng kích thước. Chưa kiểm tra bằng backend và tài khoản thật.
 - 19/11/2026 (tiếp): Phiếu 1 chia mục I–VI đúng file Word (khách hàng; mẫu + radio nguồn lấy mẫu; bảng III; mục đích tick Nội bộ/Đánh giá lô/Yêu cầu khách/Khác; thời gian trả kết quả + thông báo khi chậm Điện thoại/Email/Khác; xác nhận + hoàn tất), nhãn song ngữ. Mục đích và thông báo khi chậm lưu thành chuỗi "A; B; Khác: …" (không đổi schema). Mọi mục của Phiếu 1 và nhóm trong 07/02 có nút thu gọn/mở rộng. `window.confirm` đã thay bằng `ConfirmDialog`. Chrome headless + API giả: thu gọn, hộp thoại, không tràn ngang 390 px, không lỗi console — chưa thử với backend/tài khoản thật. Chưa có: ô "Mã số mẫu" ở Phiếu 02, khối chữ ký/ngày ký, export DOCX.
 - 19/11/2026 (danh sách): `/admin/requests` dùng `ListToolbar` + `Pagination` + `useListState` như các danh sách khác: tìm kiếm có debounce, lọc ngày yêu cầu/trạng thái/nguồn lấy mẫu, 12 kiểu sắp xếp, phân trang 20/trang, bảng responsive, chip tiến độ 07/02. Backend `TestRequestService.search` (Specification, `ListQuery`). Test `TestRequestNumberingTest` 11/11; build FE pass; Chrome headless + API giả ở 1440 và 390 px đúng bố cục. Chưa thử với dữ liệu và tài khoản thật.
+
+## Cập nhật 19/11/2026 — số dùng chung 3 phiếu + kiểm thử thật
+
+- Phiếu yêu cầu, Kế hoạch lấy mẫu (07), Lấy mẫu hiện trường (02) **luôn dùng chung Số/No `CFC{YY}.{NNNN}`**: `savePlan`/`saveField` luôn gán `requestNumber` của Phiếu 1 (kể cả dữ liệu cũ), bỏ qua `formNumber` client gửi; V14 đồng bộ dữ liệu cũ.
+- Kiểm thử: `TestRequestNumberingTest` 11/11; toàn bộ backend 97 test, 0 lỗi, 1 skipped (Docker MySQL/Redis). Đã chạy backend thật trên `cfc_lab` (Flyway tới V14) và thử qua API bằng tài khoản RECEPTIONIST: tạo/lưu 07/02/trùng số 409/tìm kiếm/sắp xếp đều đúng. **Chưa** thử bằng Chrome với backend thật.
+- Dữ liệu thử còn lại trong `cfc_lab`: phiếu `CFC26.0002` (khách "TEST TỰ ĐỘNG - xóa được") — cần xóa tay nếu không giữ. DB còn phiếu cũ `CFC26.00001` (5 chữ số, hợp lệ theo quy tắc 4–6 chữ số).
+- Chưa làm: ô "Mã số mẫu" trong Phiếu 02 (mã đặt ở Phiếu 3), khối chữ ký/ngày và xuất DOCX cho Phiếu 1/07/02.
+
+## Cập nhật 19/11/2026 — Tạo hồ sơ tiếp nhận (Phiếu 3) `/admin/intake/new`
+
+- Ô "Số/No. Phiếu yêu cầu" là combobox (datalist, tìm qua `GET /test-requests?q=`): chọn số → `getTestRequestByNumber` → tự điền khách hàng, lô hàng, lấy mẫu hiện trường và danh sách mẫu; nút "Đổi phiếu" để bỏ liên kết/gõ tay. Link `?requestId=` dùng chung hàm `applyRequest`.
+- Chỉ tiêu mỗi mẫu **chọn một** (radio: Cadimi / Auramine O / Dư lượng BVTV / Khác). Khi điền từ Phiếu yêu cầu, mẫu có nhiều chỉ tiêu được tách thành nhiều dòng (mỗi dòng 1 chỉ tiêu) — đã được người dùng xác nhận ngày 19/11/2026.
+- "Thêm mẫu" sao chép mẫu liền trước (tên, mã nguồn, bao bì, tình trạng…) trừ chỉ tiêu; mã mẫu tự tăng số đuôi (…-001 → …-002) nếu có.
+- Các mục 01–05 và từng mẫu thu gọn/mở được (`FormCard`, `SampleCard`, dùng lại `Chevron` của sampling). Chỉ kiểm bằng Chrome headless + API giả (1440/390 px, không tràn ngang); chưa thử lưu với backend thật.
+
+## Cập nhật 19/11/2026 — Phiếu 3 đồng bộ mẫu Word
+
+- Xuất DOCX (`ReceiptForm3Exporter`, template `templates/phieu-tiep-nhan-ban-giao-mau.docx` đã vá lại): **mỗi mẫu một phiếu** (`GET /receipts/{id}/form-3?sampleId=`; không có `sampleId` = mẫu đầu). Tick các ô ☐ theo dữ liệu (bao bì, niêm phong, tình trạng, nhiệt độ Thường/Lạnh/Khác, chỉ tiêu, kết luận), điền số lượng, ngày giờ nhận, hạn dự kiến, tên người giao/nhận dưới chữ ký; niêm phong in "Còn nguyên"/"Không có/đã mở" (không còn `INTACT`); bỏ chèn đôi nội dung vận chuyển; ô "Người phê duyệt/Ngày" để trống cho ký tay (không còn dòng "Chưa có phê duyệt độc lập").
+- Chỉ tiêu ngoài Cadimi/Auramine (vd. "Dư lượng thuốc BVTV") được in vào ô "Khác:" vì mẫu Word chưa có ô riêng — **cần xác nhận** có thêm ô vào mẫu Word không.
+- Form `/admin/intake/new`: thêm "Bảo quản sau khi nhận"; "Tình trạng mẫu" thành checklist (Nguyên vẹn loại trừ các mục còn lại; "Dấu hiệu bất thường" bắt buộc mô tả); nút xuất Phiếu 3 theo từng mẫu ở màn hình thành công.
+- Niêm phong vẫn 3 trạng thái (Còn nguyên/Không có/Đã mở); Word gộp "Không có/đã mở".
+- Ghi chú cuối file Word mẫu (số niêm phong/seal/chỉ tiêu "cần check"; bỏ bước kiểm tra mã hóa, chị Thúy mã hóa nhập tay; thiếu 1 biên bản nhận mẫu; bỏ loại thiết bị khi xuất kết quả) **chưa xử lý — cần LAB xác nhận**, đặc biệt mâu thuẫn với bước xác minh mã mẫu V7.
+- Kiểm thử: backend 98 test, 0 lỗi, 1 skipped; đã tạo phiếu thật trên `cfc_lab` qua API, xuất DOCX và render PDF bằng LibreOffice để đối chiếu mẫu. Dữ liệu thử còn lại trong `cfc_lab`: 2 phiếu tiếp nhận (4 mẫu `CT999-SR-19112026-0xx`, khách "TEST TỰ ĐỘNG - xóa được") và Phiếu yêu cầu `CFC26.0002`. Chưa mở bằng Word thật.

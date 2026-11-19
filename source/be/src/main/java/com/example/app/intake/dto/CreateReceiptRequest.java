@@ -40,6 +40,7 @@ public record CreateReceiptRequest(
         String transportInfo,
         Double receivedTemperature,
         String storageCondition,
+        @Size(max = 255) String storageAfterReceipt,
         String requestedParameters,
         LocalDate expectedDate,
         String specialRequest,
@@ -62,7 +63,7 @@ public record CreateReceiptRequest(
                 sampledBy, sampledAt, growingArea, packingFacility, vehicleNumber, trailerNumber,
                 containerNumber, deliveredBy, receivedAt, sampleName, quantity, packaging, sealNumber,
                 null, sealStatus, sampleCondition, conditionDetail, transportInfo, receivedTemperature,
-                storageCondition, requestedParameters, expectedDate, specialRequest, acceptanceDecision,
+                storageCondition, null, requestedParameters, expectedDate, specialRequest, acceptanceDecision,
                 acceptanceReason, samples);
     }
 

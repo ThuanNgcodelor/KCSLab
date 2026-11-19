@@ -52,11 +52,12 @@ public class Receipt {
     @Column(length = 80) private String containerSealNumber;
     @Column(nullable = false) private boolean sealIntact;
     @Enumerated(EnumType.STRING) @Column(length = 20) private SealStatus sealStatus;
-    @Column(nullable = false, length = 80) private String sampleCondition;
+    @Column(nullable = false, length = 255) private String sampleCondition;
     @Column(columnDefinition = "TEXT") private String conditionDetail;
     @Column(columnDefinition = "TEXT") private String transportInfo;
     private Double receivedTemperature;
     @Column(length = 80) private String storageCondition;
+    @Column(length = 255) private String storageAfterReceipt;
     @Column(columnDefinition = "TEXT") private String requestedParameters;
     private LocalDate expectedDate;
     @Column(columnDefinition = "TEXT") private String specialRequest;
@@ -140,6 +141,8 @@ public class Receipt {
     public String getTransportInfo() { return transportInfo; }
     public Double getReceivedTemperature() { return receivedTemperature; }
     public String getStorageCondition() { return storageCondition; }
+    public String getStorageAfterReceipt() { return storageAfterReceipt; }
+    public void setStorageAfterReceipt(String value) { this.storageAfterReceipt = value; }
     public String getRequestedParameters() { return requestedParameters; }
     public LocalDate getExpectedDate() { return expectedDate; }
     public String getSpecialRequest() { return specialRequest; }

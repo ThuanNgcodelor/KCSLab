@@ -38,7 +38,7 @@ public class SampleTransferItem {
     @Column(length = 80)
     private String quantity;
 
-    @Column(length = 120)
+    @Column(length = 255)
     private String sampleCondition;
 
     @Column(columnDefinition = "TEXT")

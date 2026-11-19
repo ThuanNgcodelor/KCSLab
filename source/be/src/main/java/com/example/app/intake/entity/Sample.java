@@ -29,7 +29,7 @@ public class Sample {
     @Column(nullable = false, length = 160) private String name;
     @Column(length = 80) private String quantity;
     @Column(length = 80) private String packaging;
-    @Column(name = "sample_condition", length = 80) private String sampleCondition;
+    @Column(name = "sample_condition", length = 255) private String sampleCondition;
     @Column(columnDefinition = "TEXT") private String requestedParameters;
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 30) private ReceiptStatus status;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "receipt_id") private Receipt receipt;
