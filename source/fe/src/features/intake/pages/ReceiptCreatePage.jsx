@@ -123,7 +123,7 @@ export function ReceiptCreatePage() {
   if (created) return <section className="staff-page receipt-success-page">
     <div className="receipt-success">
       <span className="success-check"><Icon name="check" size={26} /></span><p className="section-kicker">Đã lưu hồ sơ tiếp nhận</p>
-      <h1>Phiếu đã được tạo</h1>
+      <h1>Đã tạo Phiếu tiếp nhận — Phiếu 3</h1>
       <p>Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.</p>
       {uploadWarning && <div className="toast toast-warning" role="alert">{uploadWarning}</div>}
       <div className="code-display"><small>MÃ PHIẾU</small><strong>{created.receiptCode}</strong>
@@ -142,7 +142,7 @@ export function ReceiptCreatePage() {
   return <section className="staff-page receipt-form-page">
     <header className="admin-heading staff-heading"><div>
       <button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Quay lại danh sách</button>
-      <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo phiếu tiếp nhận</h1>
+      <p className="section-kicker">Vận hành / Phiếu số 3</p><h1>Tạo Phiếu tiếp nhận — Phiếu 3</h1>
     </div></header>
     {sourceRequest && <div className="source-banner"><strong>Đang tạo từ Phiếu 1: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
     {error && <div className="toast toast-error" role="alert">{error}</div>}

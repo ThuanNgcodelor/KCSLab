@@ -71,7 +71,7 @@ export function IntakePage() {
   const periodLabel = filters.from || filters.to ? 'Trong khoảng đã chọn' : 'Trong 7 ngày gần nhất';
 
   return <section className="intake-page">
-    <header className="admin-heading"><div><p className="section-kicker">Vận hành / Phiếu số 3</p><h1>Tiếp nhận mẫu</h1><p className="heading-copy">Không gian làm việc của {user?.role === 'ADMIN' ? 'quản trị viên' : 'người nhận mẫu'}: ghi nhận hồ sơ, ảnh hiện trường và theo dõi bàn giao.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo phiếu tiếp nhận</button></header>
+    <header className="admin-heading"><div><p className="section-kicker">Vận hành / Phiếu số 3</p><h1>Tiếp nhận mẫu</h1><p className="heading-copy">Không gian làm việc của {user?.role === 'ADMIN' ? 'quản trị viên' : 'người nhận mẫu'}: ghi nhận hồ sơ, ảnh hiện trường và theo dõi bàn giao.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo Phiếu tiếp nhận — Phiếu 3</button></header>
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
 

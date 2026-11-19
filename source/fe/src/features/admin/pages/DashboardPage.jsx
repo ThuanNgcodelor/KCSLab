@@ -33,7 +33,7 @@ export function DashboardPage() {
   ];
 
   return <div className="dashboard-page">
-    <header className="admin-heading"><div><p className="section-kicker">{formatLongDate(new Date())}</p><h1>Chào {user?.displayName?.split(' ').slice(-1)[0] ?? 'quản trị viên'}.</h1><p className="heading-copy">Số liệu vận hành được lấy trực tiếp từ hồ sơ tiếp nhận, không dùng dữ liệu minh họa.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo phiếu tiếp nhận</button></header>
+    <header className="admin-heading"><div><p className="section-kicker">{formatLongDate(new Date())}</p><h1>Chào {user?.displayName?.split(' ').slice(-1)[0] ?? 'quản trị viên'}.</h1><p className="heading-copy">Số liệu vận hành được lấy trực tiếp từ hồ sơ tiếp nhận, không dùng dữ liệu minh họa.</p></div><button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo Phiếu tiếp nhận — Phiếu 3</button></header>
     {error && <p className="form-error" role="alert">{error}</p>}
     <section className="stats-grid" aria-label="Tổng quan tiếp nhận">{stats.map((stat) => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{loading ? '…' : stat.value}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>
     <section className="dashboard-grid intake-dashboard-grid">

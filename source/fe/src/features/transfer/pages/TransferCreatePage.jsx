@@ -118,7 +118,7 @@ export function TransferCreatePage() {
   if (loading) return <section className="staff-page"><PageLoader label="Đang tải hồ sơ tiếp nhận…" /></section>;
 
   return <section className="staff-page transfer-form-page">
-    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(editing ? `/admin/transfers/${id}` : '/admin/transfers')}>← {editing ? 'Quay lại phiếu chuyển' : 'Quay lại danh sách'}</button><p className="section-kicker">Phiếu số 4</p><h1>{editing ? 'Sửa bản nháp chuyển mẫu' : 'Lập phiếu chuyển mẫu'}</h1><p className="heading-copy">Chuẩn bị hồ sơ bàn giao mẫu cho KCS/phòng phân tích; bản nháp chưa khóa mẫu.</p></div></header>
+    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(editing ? `/admin/transfers/${id}` : '/admin/transfers')}>← {editing ? 'Quay lại Phiếu 4' : 'Quay lại danh sách'}</button><p className="section-kicker">Vận hành / Phiếu số 4</p><h1>{editing ? 'Sửa bản nháp — Phiếu chuyển mẫu 4' : 'Tạo Phiếu chuyển mẫu — Phiếu 4'}</h1><p className="heading-copy">Chuẩn bị hồ sơ bàn giao mẫu cho KCS/phòng phân tích; bản nháp chưa khóa mẫu.</p></div></header>
     {error && <p className="form-error form-page-error" role="alert">{error}</p>}
     <form className="transfer-form-layout" onSubmit={handleSubmit}>
       <div className="receipt-form-main">

@@ -48,7 +48,7 @@ export function ReceptionistDashboardPage() {
   return <section className="admin-page receptionist-dashboard">
     <header className="admin-heading">
       <div><p className="section-kicker">{formatLongDate(new Date())}</p><h1>Chào {firstName}.</h1><p className="heading-copy">Công việc tiếp nhận của riêng bạn, tính theo giờ Việt Nam.</p></div>
-      <button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo phiếu tiếp nhận</button>
+      <button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo Phiếu tiếp nhận — Phiếu 3</button>
     </header>
 
     <section className="panel-card intake-filter-card" aria-label="Khoảng thời gian">
@@ -69,7 +69,7 @@ export function ReceptionistDashboardPage() {
 
     <section className="dashboard-grid intake-dashboard-grid">
       <article className="panel-card activity-panel">
-        <div className="panel-heading"><div><p className="section-kicker">Hoạt động của bạn</p><h2>Phiếu tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách phiếu <span>→</span></button></div>
+        <div className="panel-heading"><div><p className="section-kicker">Hoạt động của bạn</p><h2>Phiếu tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách Phiếu 3 <span>→</span></button></div>
         {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : recent.length
           ? <div className="activity-list">{recent.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · <StatusBadge domain="receipt" value={receipt.status} />{receipt.expectedDate ? ` · Hạn ${formatShortDate(receipt.expectedDate)}` : ''}</small></div></button>)}</div>
           : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu trong khoảng này</h3><p>Tạo phiếu tiếp nhận mới hoặc chọn khoảng thời gian khác.</p></div>}
@@ -77,9 +77,9 @@ export function ReceptionistDashboardPage() {
       <article className="panel-card intake-health-panel">
         <div className="panel-heading"><div><p className="section-kicker">Thao tác nhanh</p><h2>Việc tiếp theo</h2></div></div>
         <div style={{ display: 'grid', gap: 10 }}>
-          <button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo phiếu tiếp nhận</button>
-          <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách phiếu</button>
-          <button className="outline-button" onClick={() => navigate('/admin/transfers/new')}>Lập Phiếu 4</button>
+          <button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo Phiếu tiếp nhận — Phiếu 3</button>
+          <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách Phiếu 3</button>
+          <button className="outline-button" onClick={() => navigate('/admin/transfers/new')}>Tạo Phiếu chuyển mẫu — Phiếu 4</button>
         </div>
       </article>
     </section>
