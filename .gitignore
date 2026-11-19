@@ -6,3 +6,4 @@ source/be/target/
 *.m2-local
 /artifacts/
 /source/be/storage/
+/source/be/build/

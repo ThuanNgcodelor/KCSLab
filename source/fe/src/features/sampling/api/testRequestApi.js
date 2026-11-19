@@ -1,6 +1,8 @@
 import { request } from '../../../shared/api/httpClient';
+import { cleanParams } from '../../../shared/hooks/useListState';
 
-export function listTestRequests() { return request('/test-requests'); }
+export function listTestRequests(params = {}) { return request(`/test-requests?${new URLSearchParams(cleanParams({ size: 20, ...params }))}`); }
+export function getNextRequestNumber() { return request('/test-requests/next-number'); }
 export function getTestRequest(id) { return request(`/test-requests/${id}`); }
 export function getTestRequestByNumber(number) {
   return request(`/test-requests/by-number/${encodeURIComponent(number.trim())}`);

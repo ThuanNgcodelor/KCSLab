@@ -1,5 +1,9 @@
 # CFC Lab — AI Context
 
+**Cập nhật:** 19/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
+
+> Đọc `docs/ai/START_HERE.md` và `docs/SYSTEM_STATUS.md` trước. Thứ tự file: mục "Hiện trạng" và "Việc tiếp theo" là hiện hành; các mục có ngày bên dưới là nhật ký bổ sung, mục nào mâu thuẫn thì ưu tiên mục **19/11/2026**. Kết quả kiểm thử luôn ghi kèm ngày; đối chiếu source khi làm việc.
+
 ## Runtime DOCX KQKN — 17/11/2026
 
 - Khi chạy trực tiếp trên host, `OfficeConverter` cần executable `soffice` trong PATH.
@@ -13,21 +17,15 @@
 - Backend 29 test pass trên MySQL/Redis Docker tạm với `KCS_ISOLATED_DB=true` (gồm test hai giao dịch và security); frontend build pass. Chrome đã kiểm tra không tràn ngang trên bốn kích thước với API mô phỏng; chưa chạy E2E thật với hai role và file upload.
 - API transfer cũ giữ contract cho Admin/Receptionist và trả `customerName=null` với Technician; receiving DTO mới không có trường này. File gốc/ghi chú vẫn có thể chứa PII. Dashboard đã nhóm xu hướng theo ngày tại database; chưa load test quy mô production.
 
-## Thứ tự bàn giao và xác minh mã — 17/11/2026
+## Thứ tự bàn giao và xác minh mã — 17/11/2026 (ĐÃ BỊ THAY THẾ)
 
-- Tiếp nhận hoàn tất dán nhãn và gửi mã (`PENDING_VERIFICATION`) trước khi lập/gửi Phiếu 4.
-- KCS nhận bàn giao trước, sau đó đối chiếu/xác minh mã trên Phiếu 4. Chỉ mẫu `VERIFIED` mới xuất hiện trong ứng viên lập Biên bản thử nghiệm/Phiếu 5.
-- Không dùng xác minh mã của người tiếp nhận làm điều kiện chặn bàn giao; đây là xác minh độc lập sau bàn giao. Test Docker Java 21/MySQL 8.4/Redis đã pass `Tests run: 85, Failures: 0, Errors: 0, Skipped: 1`; frontend build cũng đã pass.
-
-**Cập nhật:** 17/11/2026 · **Nguồn sự thật ngắn cho phiên AI mới**
-
-> Đọc `docs/ai/START_HERE.md` và `docs/SYSTEM_STATUS.md` trước. Phần kiểm thử bên dưới là kết quả lịch sử, không phải test mới; đối chiếu source khi làm việc.
+- Quy trình 17/11 (gửi mã `PENDING_VERIFICATION`, KCS xác minh sau bàn giao, chỉ mẫu `VERIFIED` vào Phiếu 5) **đã được thay bằng quyết định 18–19/11**: mã nhập tay tại Phiếu 3, bỏ xác minh hai người, KCS nhận/từ chối ở Phiếu 4. Xem mục "P0–P4" bên dưới. Giữ lại đây chỉ để tra lịch sử.
 
 ## Hiện trạng
 
 - Ứng dụng đang chạy theo modular monolith: Spring Boot 4.1.2/Java 21 ở `source/be`, React 19/Vite 6/JSX ở `source/fe`, MySQL 8.4 cho profile `mysql`.
-- Đã hoàn thành vertical slice: auth email/session/CSRF, user, Phase 1/Phiếu 3 có hồ sơ nguồn + nhiều mẫu + bằng chứng ảnh/file, Phase 3/Phiếu 4 có nháp/gửi/nhận và biên bản 5 đến kiểm tra/trả lại. CFC-TN-14 đã được xác nhận là quy trình chuẩn; runtime hiện mới có mã gốc, chưa đủ `-V/-R`, QC/mã mù và xác minh độc lập.
-- Ranh giới thử nghiệm là `TEST_REVIEWED`; đã có code chưa commit cho nháp `result_releases`, nhưng chưa có PDF phát hành, thu hồi/đính chính hoặc tra cứu khách. Export Phiếu 3 đã sửa XML nhưng vẫn cần test mở Word thật.
+- Đã hoàn thành vertical slice: auth email/session/CSRF, user, Phase 1/Phiếu 3 có hồ sơ nguồn + nhiều mẫu + bằng chứng ảnh/file, Phase 3/Phiếu 4 có nháp/gửi/nhận và biên bản 5 đến kiểm tra/trả lại. CFC-TN-14 là quy trình chuẩn nhưng theo quyết định 18/11 mã mẫu nhập tay ở Phiếu 3 và bỏ xác minh hai người trên hệ thống; runtime chưa có `-V/-R`, QC/mã mù (cần LAB xác nhận việc cập nhật CFC-TN-14).
+- Hồ sơ kết quả (`result_releases`, đã commit): TECHNICIAN/ADMIN tải file DOCX/PDF, ADMIN phát hành trực tiếp (file-first); API tra cứu public có trong source nhưng chưa deploy/nghiệm thu production; chưa có ZBS/SMS. Export Phiếu 3 đã sửa XML nhưng vẫn cần test mở Word thật.
 - Chưa có gửi tin khách hàng. Phase 1B đã chốt plan dùng ZBS Template Message ưu tiên, SMS Brandname/MultiSMS dự phòng qua database outbox; WebSocket được tách riêng cho nhân viên nội bộ.
 - Có dashboard Receptionist riêng ở `/admin/intake`, danh sách ở `/admin/intake/receipts`; KCS có dashboard, danh sách và projection xem file ở `/admin/receiving`. Dashboard Admin toàn hệ thống chưa nghiệm thu hoàn chỉnh. Notification center lưu bền, trang riêng và WebSocket nội bộ.
 - Không có đăng ký công khai. Admin được seed từ biến môi trường; không ghi credentials vào tài liệu.
@@ -56,7 +54,7 @@
 - Bảng hiện có: 6 bảng nền/intake, `sample_transfers`, `sample_transfer_items`, `testing_records`, `testing_equipment`, `testing_reagents`, `testing_measurements`.
 - Schema hiện được quản lý bằng Flyway: baseline là `db/migration/V1__baseline_schema.sql`, migration mới chạy tự động khi backend startup. Hibernate dùng `validate`; các file `db/migration-*.sql` cũ chỉ giữ để tham chiếu. Chuỗi MySQL dùng `VARCHAR/TEXT` + `utf8mb4`, không dùng `NVARCHAR`.
 
-## Xác minh gần nhất
+## Xác minh Phase 1/3 (lịch sử, đầu 16/11/2026 — không phải kết quả mới nhất; kết quả mới nhất ở mục P5–P6 19/11)
 
 - Backend `mvn test` trên Java 21: 9/9 pass; có test nhiều mẫu/attachment, pagination + sort whitelist, sửa nháp và quyền ẩn nháp khỏi KCS.
 - Frontend `npm run build`: pass, 63 modules.
@@ -66,11 +64,11 @@
 
 ## Việc tiếp theo
 
-1. Nghiệm thu workspace KCS với backend/file thật; bổ sung upload nhiều file Phiếu 5 cho `TECHNICIAN`/`ADMIN` theo plan.
-2. Hoàn thiện dashboard `ADMIN` tổng hợp toàn hệ thống; dashboard Receptionist riêng đã có.
-3. Sửa và nghiệm thu export DOCX Phiếu 3 bằng Word thật.
-4. Hoàn tất I4–I6 và Phase 2/5A: draft/completion, catalog, sequence nguyên tử, xác minh độc lập, `-V/-R`, QC/mã mù.
-5. Làm ZBS/SMS, `result_releases`, PDF/QR và public lookup theo các plan chuyên biệt.
+1. Nghiệm thu Chrome E2E bằng tài khoản thật cho từng role (ADMIN, RECEPTIONIST, TECHNICIAN) đi hết Phiếu 1 → 7 → 2 → 3 → 4 → 5 → phát hành, kèm file thật; restart backend để dashboard Admin hết 404.
+2. Nghiệm thu export DOCX Phiếu 3 bằng Word thật; export DOCX Phiếu 1/7/2 chưa có.
+3. Chốt với LAB: format mã nhập tay, quyền sửa mã (chỉ ADMIN), xử lý trùng/dữ liệu cũ, số niêm phong container, số/No. từng phiếu, metadata file kết quả, cập nhật CFC-TN-14; dọn test cũ `SampleCodingServiceTest` nếu còn lệch quy trình.
+4. Chạy migration V11 trên database làm việc sau khi backup; quyết định lưu trữ/backup file, domain/TLS cho tra cứu public.
+5. ZBS/SMS (P6) chỉ làm khi LAB cung cấp OA/provider, template, consent, sandbox.
 
 ## Cách nạp ngữ cảnh tiết kiệm token
 
@@ -118,3 +116,16 @@
 - Màn tạo/chi tiết Phiếu chuyển mẫu tách rõ `requestNumber` của Phiếu yêu cầu kiểm nghiệm và `receiptCode` của hồ sơ tiếp nhận; bảng chi tiết dùng đúng tên mẫu, mã mẫu, chỉ tiêu yêu cầu và phương pháp thử theo biểu mẫu số 4.
 - Bổ sung tải nhiều file hoặc chụp ảnh trực tiếp khi lập/sửa bản nháp chuyển mẫu. File ảnh/PDF/DOCX tối đa 10 MB được lưu vào hồ sơ nguồn với loại `TRANSFER_EVIDENCE`; KCS thấy nhóm riêng “Bằng chứng bàn giao” trong màn nhận mẫu.
 - Kiểm tra: frontend production build pass (95 modules), backend Java 21 `mvn -DskipTests compile` trong Docker `BUILD SUCCESS`, `git diff --check` pass. Phiên Chrome đang ở role KCS nên chưa nghiệm thu trực quan màn tạo Phiếu chuyển mẫu.
+
+## Số Phiếu yêu cầu CFC26.xxxx và liên kết Phiếu 07/02 — cập nhật 19/11/2026
+- Số/No. Phiếu 1 theo `CFC{YY}.{NNNN}` (≥4 chữ số, quá 9999 tự thêm chữ số, tối đa 6); YY mặc định năm hiện hành giờ Việt Nam và sửa được; hệ thống gợi ý số kế tiếp (`GET /api/v1/test-requests/next-number`), người dùng có thể gõ tay, trùng → 409. Bộ đếm `test_request_counters` (V12, `TestRequestNumberSequence`). Phiếu 07/02 dùng chung số Phiếu 1 (UI chỉ đọc, backend bỏ qua số client gửi).
+- Frontend `TestRequestFormPage`: mục III là checklist theo mẫu Word (Cadimi: Ruột; Vàng O: Vỏ/Ruột; phương pháp thử mỗi hàng; không có dòng Khác; một ô tên/mã mẫu mỗi khối, trống → `Mẫu {TT}`; mã mẫu chính thức đặt ở Phiếu 3). 07 tự điền từ Phiếu 1 (người liên hệ, nguồn gốc), 02 tự điền từ 07; có nút "Lấy lại…", tóm tắt chỉ đọc, và khối 07/02 dùng chung style CFC. `ReceiptCreatePage` gom các dòng chỉ tiêu theo mẫu khi tự điền Phiếu 3.
+- Kiểm tra: `TestRequestNumberingTest` 9/9 (gồm tạo song song, đổi năm bằng Clock, >9999, 409/400, 403 TECHNICIAN); full backend suite Docker MySQL/Redis cô lập `Tests run: 95, Failures: 0, Errors: 0, Skipped: 1`; `npm run build` pass.
+- **Chưa kiểm tra:** Chrome thật ở 4 kích thước và thao tác tay (chưa có phiên ADMIN/RECEPTIONIST), migration V12 trên database làm việc, mục IV/V/VI và nhãn song ngữ của Phiếu 1 (chưa làm).
+
+## Phiếu 07/02 theo mẫu Word — cập nhật 19/11/2026
+- Form 07 và 02 trong `TestRequestFormPage` bám hai file `7.Ke_hoach_lay_mau_sau_rieng.docx` và `2. Phiếu lấy mẫu hiện trường.docx`: nhóm I (khách hàng, địa chỉ, email, số giấy đề nghị lấy chỉ đọc từ Phiếu 1; người đại diện/điện thoại lấy sẵn từ người liên hệ/SĐT khách nhưng sửa được), nhóm II (tên mẫu, giống chỉ đọc; mã vùng trồng, cơ sở đóng gói, xe, moóc, container). 07 có checklist dạng mẫu (Nguyên trái/Ruột/Vỏ), cỡ lô → số trái, điều kiện vận chuyển; 02 có tình trạng mẫu, bảo quản (+°C), niêm phong Có/Không và bảng mẫu mỗi dòng tick Vàng O/Cd/Pb/As + khác. Migration V13, bảng `field_sampling_items`.
+- Kiểm tra: `TestRequestNumberingTest` 10/10 (có test khứ hồi checklist); `npm run build` pass. **Chưa kiểm tra bằng Chrome thật**; chưa có "Mã số mẫu" ở Phiếu 02 (mã đặt ở Phiếu 3); chưa export DOCX 07/02.
+- 19/11/2026 (sau): Phiếu 07 và 02 tách thành hai trang riêng `/admin/requests/:id/sampling-plan` và `/admin/requests/:id/field-sampling` (`SamplingPlanPage`, `FieldSamplingPage`, dùng chung `components/SamplingParts.jsx` + `samplingModel.js`); trang Phiếu yêu cầu chỉ còn form Phiếu 1 và khối "Các bước tiếp theo" (trạng thái Đã lập/Chưa lập). Đã chụp Chrome headless với API giả (không dùng tài khoản thật) ở 1440 và 390 px: không tràn ngang, radio/checkbox đúng kích thước. Chưa kiểm tra bằng backend và tài khoản thật.
+- 19/11/2026 (tiếp): Phiếu 1 chia mục I–VI đúng file Word (khách hàng; mẫu + radio nguồn lấy mẫu; bảng III; mục đích tick Nội bộ/Đánh giá lô/Yêu cầu khách/Khác; thời gian trả kết quả + thông báo khi chậm Điện thoại/Email/Khác; xác nhận + hoàn tất), nhãn song ngữ. Mục đích và thông báo khi chậm lưu thành chuỗi "A; B; Khác: …" (không đổi schema). Mọi mục của Phiếu 1 và nhóm trong 07/02 có nút thu gọn/mở rộng. `window.confirm` đã thay bằng `ConfirmDialog`. Chrome headless + API giả: thu gọn, hộp thoại, không tràn ngang 390 px, không lỗi console — chưa thử với backend/tài khoản thật. Chưa có: ô "Mã số mẫu" ở Phiếu 02, khối chữ ký/ngày ký, export DOCX.
+- 19/11/2026 (danh sách): `/admin/requests` dùng `ListToolbar` + `Pagination` + `useListState` như các danh sách khác: tìm kiếm có debounce, lọc ngày yêu cầu/trạng thái/nguồn lấy mẫu, 12 kiểu sắp xếp, phân trang 20/trang, bảng responsive, chip tiến độ 07/02. Backend `TestRequestService.search` (Specification, `ListQuery`). Test `TestRequestNumberingTest` 11/11; build FE pass; Chrome headless + API giả ở 1440 và 390 px đúng bố cục. Chưa thử với dữ liệu và tài khoản thật.

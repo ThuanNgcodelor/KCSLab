@@ -15,7 +15,7 @@
 
 - Backend compile bằng Java 21/Docker: `BUILD SUCCESS`.
 - Frontend: `npm run build` — `✓ built in 951ms`.
-- Backend full suite trên MySQL test cô lập với `allowPublicKeyRetrieval=true`: `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3`; `BUILD FAILURE`. Ba kết quả lỗi còn lại thuộc test cũ của quy trình xác minh hai người (`SampleCodingServiceTest`), chưa được sửa theo quyết định P0 mới.
+- Backend full suite trên MySQL test cô lập: lượt đầu ngày 19/11 `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3` (test cũ `SampleCodingServiceTest` của quy trình xác minh hai người); lượt sau, ghi ở `docs/ai/CONTEXT.md`, là `Failures: 0, Errors: 0, Skipped: 3`, `BUILD SUCCESS`. Lấy lượt sau làm mốc hiện hành, vẫn cần chạy lại trước khi nghiệm thu.
 - Không chỉnh sửa V1–V4, `.env` hoặc secrets; không tạo commit trong phiên này.
 
 ### Quyết định người dùng đã xác nhận ngày 18/11/2026
@@ -57,7 +57,7 @@ File `2026.11.16.docx` được cung cấp là **Phiếu kết quả thử nghi�
 
 Trong mẫu 1 có cả lựa chọn **Công ty lấy mẫu** và **Khách hàng tự lấy mẫu**. Với khách tự lấy mẫu, người dùng có thể lựa chọn 1 → 7 → 2 → 3 hoặc đi trực tiếp 1 → 3; với tuyến hiện trường thông thường theo 1 → 7 → 2 → 3.
 
-Hiện mã mẫu được hệ thống sinh tự động; có trạng thái `PENDING_CODING → PENDING_VERIFICATION → VERIFIED`, Phiếu 4 chấp nhận mẫu chờ xác minh hoặc đã xác minh, ứng viên Phiếu 5 yêu cầu `VERIFIED`. Vì vậy nhập tay và bỏ kiểm tra cần sửa cả dữ liệu, UI, API, gate chuyển/thử nghiệm/phát hành và test, không chỉ ẩn nút.
+Trước P3, mã mẫu do hệ thống sinh và có trạng thái `PENDING_CODING → PENDING_VERIFICATION → VERIFIED` làm gate chuyển/thử nghiệm/phát hành. P3 đã chuyển sang nhập tay và bỏ xác minh hai người (xem trạng thái P0–P4 ở đầu file); dữ liệu cũ mang trạng thái `VERIFIED/legacy` vẫn cần được giữ truy xuất, không tự ghép lại.
 
 ## 3. Số hồ sơ và liên kết — thiết kế đề xuất
 
@@ -90,13 +90,15 @@ Thông tin khách có thể cần cho nhân viên tạo Phiếu 1/2/3; KCS tiế
 
 ## 6. Các giai đoạn triển khai
 
-- [ ] **P0 — Chốt nghiệp vụ:** trả lời các điểm còn mở ở mục 8; rà mẫu 1/7/2/3/4/5 và CFC-TN-14; thống nhất trường bắt buộc, quan hệ, quyền phát hành, số phiếu, gate và ký. Ghi quyết định và người xác nhận.
-- [ ] **P1 — Nền hồ sơ yêu cầu:** thêm bảng/khóa, migration Flyway mới không sửa migration cũ; tạo API/UI Phiếu 1, nháp/hoàn tất, số yêu cầu và tìm kiếm; quy tắc validation/trùng và actor.
-- [ ] **P2 — Lấy mẫu:** tạo API/UI Phiếu 7 và 2 liên kết Phiếu 1; tách dữ liệu kế hoạch và thực tế, mẫu và chỉ tiêu theo dòng; export theo biểu mẫu được duyệt nếu LAB cần.
-- [ ] **P3 — Tiếp nhận:** tìm Phiếu 1, chọn Phiếu 2 phù hợp, xem trước dữ liệu tự điền; bổ sung trường, phân biệt seal, kiểm tra sai khác, nhập mã thủ công theo chính sách được duyệt, ảnh/file và lưu snapshot. Có đường xử lý yêu cầu/phiếu cũ, khách tự lấy mẫu theo quyết định P0.
-- [ ] **P4 — Chuyển và thử nghiệm:** nối Phiếu 4/5 với số yêu cầu thật, sửa nhãn đang hiển thị nhầm mã Phiếu 3, điền đúng từng mẫu, số lượng/khối lượng, chỉ tiêu và phương pháp; bỏ xác minh hai người và điều chỉnh gate có kiểm soát. Phiếu 4 ghi nhận bước KCS nhận/từ chối. Thêm tải file kết quả cho bước 5, xem/tải theo quyền, kiểm tra định dạng/kích thước/nội dung, lưu metadata/checksum và audit; không bắt nhập các bảng II–VII.
-- [ ] **P5 — Kết quả và dữ liệu cũ:** sửa backend lẫn UI để ADMIN phát hành file từ bước 5 không qua người khác duyệt; thao tác phát hành rõ ràng, cập nhật trạng thái và lịch sử, giữ dữ liệu cũ. Đối chiếu ý nghĩa seal container; kiểm tra release/public tránh đưa sai seal hay thông tin khách. Migration dữ liệu cũ có báo cáo ngoại lệ và cách rollback/phục hồi, không tự ghép nếu không chắc.
-- [ ] **P6 — Nghiệm thu:** API/MySQL tests cho quan hệ nhiều mẫu, trùng số/mã và đồng thời, sai lệch, quyền, rollback và dữ liệu cũ; test biểu mẫu/export bằng Word thật nếu xuất DOCX; E2E từng role trên Chrome thật, desktop/mobile, đi hết 1 → 7 → 2 → 3 → 4 → 5 và nhánh khách tự lấy mẫu nếu được duyệt. Ghi rõ test chưa chạy.
+> Chú thích: `[x]` = đã có implementation trong source (chưa nghiệm thu production); `[~]` = làm một phần hoặc còn điểm chờ LAB; `[ ]` = chưa làm. Đánh số P0–P6 **của plan này**; trong `docs/ai/CONTEXT.md` "P5–P6" là dashboard Admin và ZBS/SMS, thuộc roadmap hệ thống.
+
+- [~] **P0 — Chốt nghiệp vụ:** đã chốt luồng 1 → (7/2) → 3 → 4 → 5, mã nhập tay, bỏ xác minh hai người, ADMIN phát hành file; còn chờ LAB các điểm mục 8 (số phiếu, format mã, seal container, metadata file, cập nhật CFC-TN-14). Ghi quyết định và người xác nhận.
+- [x] **P1 — Nền hồ sơ yêu cầu:** thêm bảng/khóa, migration Flyway mới không sửa migration cũ; tạo API/UI Phiếu 1, nháp/hoàn tất, số yêu cầu và tìm kiếm; quy tắc validation/trùng và actor.
+- [~] **P2 — Lấy mẫu (đã có API/UI; chưa export DOCX):** tạo API/UI Phiếu 7 và 2 liên kết Phiếu 1; tách dữ liệu kế hoạch và thực tế, mẫu và chỉ tiêu theo dòng; export theo biểu mẫu được duyệt nếu LAB cần.
+- [x] **P3 — Tiếp nhận:** tìm Phiếu 1, chọn Phiếu 2 phù hợp, xem trước dữ liệu tự điền; bổ sung trường, phân biệt seal, kiểm tra sai khác, nhập mã thủ công theo chính sách được duyệt, ảnh/file và lưu snapshot. Có đường xử lý yêu cầu/phiếu cũ, khách tự lấy mẫu theo quyết định P0.
+- [x] **P4 — Chuyển và thử nghiệm:** nối Phiếu 4/5 với số yêu cầu thật, sửa nhãn đang hiển thị nhầm mã Phiếu 3, điền đúng từng mẫu, số lượng/khối lượng, chỉ tiêu và phương pháp; bỏ xác minh hai người và điều chỉnh gate có kiểm soát. Phiếu 4 ghi nhận bước KCS nhận/từ chối. Thêm tải file kết quả cho bước 5, xem/tải theo quyền, kiểm tra định dạng/kích thước/nội dung, lưu metadata/checksum và audit; không bắt nhập các bảng II–VII.
+- [~] **P5 — Kết quả và dữ liệu cũ (ADMIN phát hành file-first đã có; migration dữ liệu cũ/báo cáo ngoại lệ, seal container và rà public chưa nghiệm thu):** sửa backend lẫn UI để ADMIN phát hành file từ bước 5 không qua người khác duyệt; thao tác phát hành rõ ràng, cập nhật trạng thái và lịch sử, giữ dữ liệu cũ. Đối chiếu ý nghĩa seal container; kiểm tra release/public tránh đưa sai seal hay thông tin khách. Migration dữ liệu cũ có báo cáo ngoại lệ và cách rollback/phục hồi, không tự ghép nếu không chắc.
+- [ ] **P6 — Nghiệm thu (chưa chạy: Chrome E2E ba role, Word thật, WebSocket hai phiên, migration DB làm việc):** API/MySQL tests cho quan hệ nhiều mẫu, trùng số/mã và đồng thời, sai lệch, quyền, rollback và dữ liệu cũ; test biểu mẫu/export bằng Word thật nếu xuất DOCX; E2E từng role trên Chrome thật, desktop/mobile, đi hết 1 → 7 → 2 → 3 → 4 → 5 và nhánh khách tự lấy mẫu nếu được duyệt. Ghi rõ test chưa chạy.
 
 ## 7. Tiêu chí nghiệm thu
 

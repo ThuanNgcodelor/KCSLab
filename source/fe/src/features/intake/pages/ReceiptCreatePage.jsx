@@ -55,9 +55,17 @@ export function ReceiptCreatePage() {
         conditionDetail: field?.sampleCondition ?? '', transportInfo: field?.fieldNotes ?? '', storageCondition: field?.storageCondition ?? 'Thường',
         expectedDate: data.expectedDate ?? '',
       }));
-      setSamples((data.items?.length ? data.items : [{ sampleNameOrId: data.sampleName, parameters: '' }]).map((item) => ({
-        ...newSample(), name: item.sampleNameOrId || data.sampleName, requestedParameters: item.parameters ?? '',
-      })));
+      // Phiếu yêu cầu lưu mỗi (mẫu, chỉ tiêu, nền mẫu) một dòng: gom lại theo mẫu để Phiếu 3 không bị nhân dòng.
+      const groups = new Map();
+      (data.items ?? []).forEach((item) => {
+        const name = item.sampleNameOrId || data.sampleName;
+        const parameter = item.parameters === 'Vàng O (Auramin O)' ? 'Auramine O (Vàng ô)' : item.parameters;
+        const list = groups.get(name) ?? [];
+        if (parameter && !list.includes(parameter)) list.push(parameter);
+        groups.set(name, list);
+      });
+      const requested = groups.size ? [...groups].map(([name, list]) => ({ name, requestedParameters: list.join(', ') })) : [{ name: data.sampleName, requestedParameters: '' }];
+      setSamples(requested.map((item) => ({ ...newSample(), ...item })));
     }).catch((exception) => setError(exception.message));
   }, [searchParams]);
 

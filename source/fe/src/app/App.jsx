@@ -26,6 +26,8 @@ const ReceivingDashboardPage = lazy(() => import('../features/receiving/pages/Re
 const ReceivingListPage = lazy(() => import('../features/receiving/pages/ReceivingListPage').then(m => ({ default: m.ReceivingListPage })));
 const ReceivingDetailPage = lazy(() => import('../features/receiving/pages/ReceivingDetailPage').then(m => ({ default: m.ReceivingDetailPage })));
 const TestRequestsPage = lazy(() => import('../features/sampling/pages/TestRequestsPage').then(m => ({ default: m.TestRequestsPage })));
+const SamplingPlanPage = lazy(() => import('../features/sampling/pages/SamplingPlanPage').then(m => ({ default: m.SamplingPlanPage })));
+const FieldSamplingPage = lazy(() => import('../features/sampling/pages/FieldSamplingPage').then(m => ({ default: m.FieldSamplingPage })));
 const TestRequestFormPage = lazy(() => import('../features/sampling/pages/TestRequestFormPage').then(m => ({ default: m.TestRequestFormPage })));
 
 function ProtectedRoute() {
@@ -70,6 +72,8 @@ export function App() {
           <Route path="/admin/requests" element={<TestRequestsPage />} />
           <Route path="/admin/requests/new" element={<TestRequestFormPage />} />
           <Route path="/admin/requests/:id" element={<TestRequestFormPage />} />
+          <Route path="/admin/requests/:id/sampling-plan" element={<SamplingPlanPage />} />
+          <Route path="/admin/requests/:id/field-sampling" element={<FieldSamplingPage />} />
           <Route path="/admin/intake" element={<IntakeHome />} />
           <Route path="/admin/intake/receipts" element={<IntakePage />} />
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />
