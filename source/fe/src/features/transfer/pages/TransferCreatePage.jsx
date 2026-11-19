@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, listReceipts } from '../../intake/api/intakeApi';
-import { createTransfer, getTransfer, updateTransfer } from '../api/transferApi';
+import { createTransfer, getTransfer, updateTransfer, uploadTransferEvidence } from '../api/transferApi';
 import { PageLoader } from '../../../shared/components/Loading';
 import { DateInput } from '../../../shared/components/DateInput';
+import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 
 const today = businessDate();
 const dueDefault = businessDate(7);
@@ -25,6 +26,7 @@ export function TransferCreatePage() {
   const [loading, setLoading] = useState(editing);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [evidenceFiles, setEvidenceFiles] = useState([]);
 
   useEffect(() => {
     if (!editing) return undefined;
@@ -99,6 +101,10 @@ export function TransferCreatePage() {
     if (!receipt) { setError('Hãy chọn phiếu tiếp nhận cần chuyển mẫu.'); return; }
     const selected = availableSamples.filter((sample) => items[sample.id]?.selected);
     if (selected.length === 0) { setError('Chọn ít nhất một mẫu để chuyển.'); return; }
+    if (evidenceFiles.some((file) => file.size > 10 * 1024 * 1024)) {
+      setError('Mỗi file bằng chứng không được vượt quá 10 MB.');
+      return;
+    }
     setSaving(true); setError('');
     try {
       const payload = {
@@ -110,7 +116,21 @@ export function TransferCreatePage() {
         }),
       };
       const transfer = editing ? await updateTransfer(id, payload) : await createTransfer(payload);
-      navigate(`/admin/transfers/${transfer.id}`, { replace: true, state: { message: `${editing ? 'Đã cập nhật' : 'Đã lưu'} bản nháp ${transfer.transferCode}` } });
+      let uploadWarning = '';
+      if (evidenceFiles.length) {
+        try {
+          await Promise.all(evidenceFiles.map((file) => uploadTransferEvidence(receipt.id, file)));
+        } catch (exception) {
+          uploadWarning = `Bản nháp đã được lưu nhưng có bằng chứng chưa tải lên được: ${exception.message}`;
+        }
+      }
+      navigate(`/admin/transfers/${transfer.id}`, {
+        replace: true,
+        state: {
+          message: `${editing ? 'Đã cập nhật' : 'Đã lưu'} bản nháp ${transfer.transferCode}${evidenceFiles.length && !uploadWarning ? ` cùng ${evidenceFiles.length} file bằng chứng` : ''}.`,
+          warning: uploadWarning,
+        },
+      });
     } catch (exception) { setError(exception.message); }
     finally { setSaving(false); }
   }
@@ -123,9 +143,9 @@ export function TransferCreatePage() {
     <form className="transfer-form-layout" onSubmit={handleSubmit}>
       <div className="receipt-form-main">
         <section className="panel-card intake-form-card">
-          <FormHeading number="01" title="Phiếu yêu cầu" copy={editing ? 'Phiếu tiếp nhận được khóa khi tạo bản nháp.' : 'Tìm trên toàn bộ hồ sơ và chọn phiếu còn mẫu sẵn sàng bàn giao.'} />
+          <FormHeading number="01" title="Hồ sơ tiếp nhận nguồn" copy={editing ? 'Hồ sơ tiếp nhận được khóa khi tạo bản nháp.' : 'Chọn hồ sơ còn mẫu sẵn sàng bàn giao; số Phiếu yêu cầu được lấy từ hồ sơ nguồn.'} />
           <ReceiptPicker editing={editing} open={pickerOpen} query={receiptQuery} page={receiptPage} loading={searchLoading} error={searchError} selected={receipt} onQueryChange={updateReceiptQuery} onSelect={selectReceipt} onChange={changeReceipt} onPageChange={setReceiptSearchPage} />
-          {receipt && <div className="transfer-receipt-summary"><span><small>Người tiếp nhận</small><strong>{receipt.receivedByName}</strong></span><span><small>Ngày nhận</small><strong>{formatDate(receipt.receivedAt)}</strong></span><span><small>Số mẫu sẵn sàng</small><strong>{availableSamples.length}</strong></span></div>}
+          {receipt && <div className="transfer-receipt-summary"><span><small>Số phiếu yêu cầu kiểm nghiệm</small><strong>{receipt.requestNumber || 'Chưa có'}</strong></span><span><small>Mã hồ sơ tiếp nhận</small><strong>{receipt.receiptCode}</strong></span><span><small>Người tiếp nhận</small><strong>{receipt.receivedByName}</strong></span><span><small>Ngày nhận</small><strong>{formatDate(receipt.receivedAt)}</strong></span><span><small>Số mẫu sẵn sàng</small><strong>{availableSamples.length}</strong></span></div>}
         </section>
         <section className="panel-card intake-form-card">
           <FormHeading number="02" title="Danh sách mẫu" copy="Thông tin được chụp lại tại thời điểm tạo hồ sơ chuyển mẫu." />
@@ -134,6 +154,10 @@ export function TransferCreatePage() {
       </div>
       <aside className="receipt-form-aside transfer-form-aside">
         <section className="panel-card intake-form-card"><FormHeading number="03" title="Nơi nhận, thời hạn và lưu mẫu" copy="Theo mục III của Phiếu chuyển mẫu số 4." /><label>Phòng / bộ phận nhận<input value="KCS" readOnly aria-readonly="true" /><small className="field-help">Hiện hệ thống chỉ vận hành một phòng KCS.</small></label><label>Ngày chuyển mẫu<DateInput value={form.transferDate} onChange={updateForm('transferDate')} required /></label><label>Hạn trả kết quả<DateInput min={form.transferDate} value={form.resultsDueDate} onChange={updateForm('resultsDueDate')} required /></label><label className="switch-label"><input type="checkbox" checked={form.returnToCustomer} onChange={updateForm('returnToCustomer')} /><span className="fake-switch" />Lưu và trả mẫu cho khách</label>{form.returnToCustomer && <label>Ngày trả/lưu đến<DateInput min={form.transferDate} value={form.customerReturnDate} onChange={updateForm('customerReturnDate')} required /></label>}<label>Thay đổi / ghi chú<textarea value={form.changesNote} onChange={updateForm('changesNote')} rows="4" /></label></section>
+        <section className="panel-card transfer-evidence-card">
+          <div className="form-card-heading"><div><h2>Bằng chứng bàn giao</h2><p>Chụp tình trạng mẫu khi giao hoặc chọn ảnh, PDF và DOCX từ máy.</p></div></div>
+          <PhotoPicker label="Ảnh / file bàn giao" hint="Có thể chọn nhiều file, tối đa 10 MB mỗi file" files={evidenceFiles} onChange={setEvidenceFiles} camera accept="image/*,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+        </section>
         <div className="form-submit-panel"><p><strong>{editing ? 'Cập nhật bản nháp' : 'Lưu bản nháp'}</strong><span>Kiểm tra lại hồ sơ chuyển mẫu rồi bấm “Gửi bàn giao” ở màn chi tiết để KCS nhận yêu cầu.</span></p><button className="primary-button" type="submit" disabled={saving || !receipt}>{saving ? 'Đang lưu bản nháp…' : editing ? 'Lưu thay đổi' : 'Lưu bản nháp chuyển mẫu'}</button></div>
       </aside>
     </form>
@@ -141,19 +165,19 @@ export function TransferCreatePage() {
 }
 
 function ReceiptPicker({ editing, open, query, page, loading, error, selected, onQueryChange, onSelect, onChange, onPageChange }) {
-  if (selected) return <div className="receipt-picker-selected"><div><span className="receipt-picker-code">{selected.receiptCode}</span><strong>{selected.customerName}</strong><small>{selected.customerPhone || 'Chưa có số điện thoại'} · {selected.samples?.filter((sample) => sample.status === 'RECEIVED').length ?? 0} mẫu sẵn sàng</small></div>{!editing && <button type="button" className="outline-button" onClick={onChange}>Đổi phiếu</button>}</div>;
+  if (selected) return <div className="receipt-picker-selected"><div><span className="receipt-picker-code">YC {selected.requestNumber || 'Chưa có số'}</span><strong>{selected.customerName}</strong><small>Tiếp nhận {selected.receiptCode} · {selected.customerPhone || 'Chưa có số điện thoại'} · {selected.samples?.filter((sample) => sample.status === 'RECEIVED').length ?? 0} mẫu sẵn sàng</small></div>{!editing && <button type="button" className="outline-button" onClick={onChange}>Đổi hồ sơ</button>}</div>;
   if (!open) return null;
   const currentPage = page.number ?? 0;
   const totalPages = page.totalPages ?? 0;
   return <div className="receipt-picker">
-    <label htmlFor="receipt-search">Tìm phiếu tiếp nhận</label>
+    <label htmlFor="receipt-search">Tìm hồ sơ tiếp nhận</label>
     <div className="receipt-search-box"><span aria-hidden="true">⌕</span><input id="receipt-search" type="search" value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Mã phiếu, mã mẫu, tên khách hàng, số điện thoại…" autoComplete="off" role="combobox" aria-expanded="true" aria-controls="receipt-search-results" /></div>
     <div className="receipt-picker-meta"><span>Tìm trực tiếp trên toàn bộ dữ liệu</span><span>{page.totalElements ?? 0} phiếu phù hợp</span></div>
     <div id="receipt-search-results" className="receipt-picker-results" role="listbox" aria-label="Kết quả phiếu tiếp nhận">
       {loading && <p className="receipt-picker-state">Đang tìm phiếu…</p>}
       {!loading && error && <p className="receipt-picker-state error" role="alert">{error}</p>}
       {!loading && !error && page.content.length === 0 && <p className="receipt-picker-state">Không có phiếu còn mẫu sẵn sàng chuyển.</p>}
-      {!loading && !error && page.content.map((entry) => <button type="button" role="option" aria-selected="false" className="receipt-picker-result" key={entry.id} onClick={() => onSelect(entry)}><span><strong>{entry.receiptCode}</strong><small>{entry.customerName} · {entry.customerPhone || 'Chưa có SĐT'}</small></span><span><strong>{entry.samples?.filter((sample) => sample.status === 'RECEIVED').length ?? 0} mẫu</strong><small>{formatDate(entry.receivedAt)}</small></span></button>)}
+      {!loading && !error && page.content.map((entry) => <button type="button" role="option" aria-selected="false" className="receipt-picker-result" key={entry.id} onClick={() => onSelect(entry)}><span><strong>YC {entry.requestNumber || 'Chưa có số'}</strong><small>Tiếp nhận {entry.receiptCode} · {entry.customerName} · {entry.customerPhone || 'Chưa có SĐT'}</small></span><span><strong>{entry.samples?.filter((sample) => sample.status === 'RECEIVED').length ?? 0} mẫu</strong><small>{formatDate(entry.receivedAt)}</small></span></button>)}
     </div>
     {totalPages > 1 && <div className="receipt-picker-pagination"><button type="button" disabled={currentPage === 0 || loading} onClick={() => onPageChange(currentPage - 1)}>← Trước</button><span>Trang {currentPage + 1}/{totalPages} · 20 phiếu/trang</span><button type="button" disabled={currentPage + 1 >= totalPages || loading} onClick={() => onPageChange(currentPage + 1)}>Sau →</button></div>}
   </div>;

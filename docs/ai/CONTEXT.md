@@ -106,3 +106,15 @@
 - Chrome MCP đã kiểm tra phiên TECHNICIAN thật ở 390×844, 1024×768, 1440×900 và 2560×952; role redirect và layout không tràn ngang. Chưa có bằng chứng Chrome với ADMIN/RECEPTIONIST cho dashboard mới.
 - P6: phần gửi Zalo/SMS chưa triển khai vì thiếu OA/provider, template, consent và sandbox. Chỉ được triển khai tiếp sau khi LAB cung cấp các đầu vào này; hiện chưa có credential/webhook/worker gửi thật.
 - Kiểm tra lại sau khi cập nhật P5: backend full suite MySQL/Redis test cô lập `Tests run: 85, Failures: 0, Errors: 0, Skipped: 3`, `BUILD SUCCESS`; frontend `npm run build` `✓ built in 1.03s`. Runtime backend đang mở chưa restart nên Chrome gọi endpoint Admin mới nhận 404; chưa coi E2E Admin hoàn tất.
+
+## UI tiếp nhận mẫu — cập nhật 19/11/2026
+
+- Nhóm “Chỉ tiêu yêu cầu” trên màn tạo hồ sơ tiếp nhận dùng checklist nhiều lựa chọn gồm Cadimi, Auramine O, dư lượng thuốc BVTV và mục Khác; ô Khác mở trường nhập riêng và dữ liệu được chuẩn hóa trước khi gửi API.
+- Đã giới hạn kích thước checkbox và đồng bộ viền, nền, focus, responsive với form tiếp nhận; frontend `npm run build` pass (95 modules), `git diff --check` pass.
+- Chrome hiện đăng nhập vai trò KCS nên route `/admin/intake/new` bị chuyển về `/admin/receiving`; chưa chụp nghiệm thu trực quan màn tạo tiếp nhận trong phiên này.
+
+## Phiếu chuyển mẫu và bằng chứng bàn giao — cập nhật 19/11/2026
+
+- Màn tạo/chi tiết Phiếu chuyển mẫu tách rõ `requestNumber` của Phiếu yêu cầu kiểm nghiệm và `receiptCode` của hồ sơ tiếp nhận; bảng chi tiết dùng đúng tên mẫu, mã mẫu, chỉ tiêu yêu cầu và phương pháp thử theo biểu mẫu số 4.
+- Bổ sung tải nhiều file hoặc chụp ảnh trực tiếp khi lập/sửa bản nháp chuyển mẫu. File ảnh/PDF/DOCX tối đa 10 MB được lưu vào hồ sơ nguồn với loại `TRANSFER_EVIDENCE`; KCS thấy nhóm riêng “Bằng chứng bàn giao” trong màn nhận mẫu.
+- Kiểm tra: frontend production build pass (95 modules), backend Java 21 `mvn -DskipTests compile` trong Docker `BUILD SUCCESS`, `git diff --check` pass. Phiên Chrome đang ở role KCS nên chưa nghiệm thu trực quan màn tạo Phiếu chuyển mẫu.

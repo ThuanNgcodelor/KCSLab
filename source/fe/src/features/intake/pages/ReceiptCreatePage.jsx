@@ -16,7 +16,7 @@ const initialForm = {
 
 const newSample = () => ({
   sampleCode: '', sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
-  packagingOther: '', parameterOther: '', condition: 'Nguyên vẹn', requestedParameters: '',
+  packagingOther: '', parameterOther: '', parameterOtherEnabled: false, condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
 const parameterOptions = ['Cadimi (Cd)', 'Auramine O (Vàng ô)', 'Dư lượng thuốc BVTV'];
@@ -101,14 +101,14 @@ export function ReceiptCreatePage() {
         expectedDate: form.expectedDate || null,
         sampleName: primary.name,
         quantity: primary.quantity,
-        packaging: primary.packaging,
+        packaging: normalizedPackaging(primary),
         sampleCondition: primary.condition,
-        requestedParameters: primary.requestedParameters,
-        samples: samples.map(({ productType, packagingOther, parameterOther, ...sample }) => ({
+        requestedParameters: normalizedParameters(primary),
+        samples: samples.map(({ productType, packagingOther, parameterOther, parameterOtherEnabled, ...sample }) => ({
           ...sample,
           productType: sample.name.trim(),
-          packaging: sample.packaging === 'Khác' && packagingOther.trim() ? `Khác: ${packagingOther.trim()}` : sample.packaging,
-          requestedParameters: `${selectedParameters(sample.requestedParameters).join(', ')}${parameterOther.trim() ? `${selectedParameters(sample.requestedParameters).length ? ', ' : ''}Khác: ${parameterOther.trim()}` : ''}`,
+          packaging: normalizedPackaging({ ...sample, packagingOther }),
+          requestedParameters: normalizedParameters({ ...sample, parameterOther, parameterOtherEnabled }),
         })),
       });
       setCreated(receipt);
@@ -205,7 +205,27 @@ export function ReceiptCreatePage() {
                 <label>Loại bao bì<select value={packagingOptions.includes(sample.packaging) ? sample.packaging : sample.packaging ? 'Khác' : ''} onChange={updateSample(index, 'packaging')}><option value="">Chọn loại bao bì</option>{packagingOptions.map((option) => <option value={option} key={option}>{option}</option>)}<option value="Khác">Khác</option></select></label>
                 {sample.packaging === 'Khác' && <label>Loại bao bì khác<input value={sample.packagingOther} onChange={updateSample(index, 'packagingOther')} placeholder="Nhập loại bao bì" required /></label>}
                 <label>Tình trạng<input value={sample.condition} onChange={updateSample(index, 'condition')} /></label>
-                <fieldset className="full-span choice-fieldset"><legend>Chỉ tiêu yêu cầu</legend><div className="choice-grid">{parameterOptions.map((option) => <label className="choice-option" key={option}><input type="checkbox" checked={selectedParameters(sample.requestedParameters).includes(option)} onChange={() => setSamples((current) => current.map((item, itemIndex) => { if (itemIndex !== index) return item; const currentValues = selectedParameters(item.requestedParameters); const next = currentValues.includes(option) ? currentValues.filter((value) => value !== option) : [...currentValues, option]; return { ...item, requestedParameters: next.join(', ') }; }))} /><span>{option}</span></label>)}<label className="choice-option"><input type="checkbox" checked={Boolean(sample.parameterOther)} onChange={() => updateSample(index, 'parameterOther')({ target: { value: sample.parameterOther ? '' : ' ' } })} /><span>Khác</span></label></div>{sample.parameterOther !== undefined && sample.parameterOther !== '' && <input value={sample.parameterOther.trim()} onChange={updateSample(index, 'parameterOther')} placeholder="Nhập chỉ tiêu khác" required />}</fieldset>
+                <fieldset className="full-span choice-fieldset">
+                  <legend>Chỉ tiêu yêu cầu</legend>
+                  <div className="choice-grid">
+                    {parameterOptions.map((option) => <label className="choice-option" key={option}>
+                      <input type="checkbox" checked={selectedParameters(sample.requestedParameters).includes(option)} onChange={() => setSamples((current) => current.map((item, itemIndex) => {
+                        if (itemIndex !== index) return item;
+                        const currentValues = selectedParameters(item.requestedParameters);
+                        const next = currentValues.includes(option) ? currentValues.filter((value) => value !== option) : [...currentValues, option];
+                        return { ...item, requestedParameters: next.join(', ') };
+                      }))} />
+                      <span>{option}</span>
+                    </label>)}
+                    <label className="choice-option">
+                      <input type="checkbox" checked={sample.parameterOtherEnabled} onChange={(event) => setSamples((current) => current.map((item, itemIndex) => (
+                        itemIndex === index ? { ...item, parameterOtherEnabled: event.target.checked, parameterOther: event.target.checked ? item.parameterOther : '' } : item
+                      )))} />
+                      <span>Khác</span>
+                    </label>
+                  </div>
+                  {sample.parameterOtherEnabled && <label className="choice-other-field">Chỉ tiêu khác<input value={sample.parameterOther} onChange={updateSample(index, 'parameterOther')} placeholder="Nhập tên chỉ tiêu" required /></label>}
+                </fieldset>
               </div>
             </article>)}
           </div>
@@ -248,13 +268,28 @@ function validateForm(form, samples) {
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
   if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim()
-    || !sample.sourceCode.trim() || !sample.requestedParameters.trim() || (sample.packaging === 'Khác' && !sample.packagingOther.trim()))) {
+    || !sample.sourceCode.trim()
+    || (!sample.requestedParameters.trim() && !(sample.parameterOtherEnabled && sample.parameterOther.trim()))
+    || (sample.parameterOtherEnabled && !sample.parameterOther.trim())
+    || (sample.packaging === 'Khác' && !sample.packagingOther.trim()))) {
     return 'Mỗi mẫu cần có mã mẫu, tên mẫu, mã nguồn, chỉ tiêu yêu cầu và loại bao bì.';
   }
   if (form.acceptanceDecision !== 'ACCEPTED' && !form.acceptanceReason.trim()) {
     return 'Vui lòng nhập lý do hoặc điều kiện tiếp nhận.';
   }
   return '';
+}
+
+function normalizedPackaging(sample) {
+  return sample.packaging === 'Khác' && sample.packagingOther.trim()
+    ? `Khác: ${sample.packagingOther.trim()}`
+    : sample.packaging;
+}
+
+function normalizedParameters(sample) {
+  const parameters = selectedParameters(sample.requestedParameters);
+  if (sample.parameterOtherEnabled && sample.parameterOther.trim()) parameters.push(`Khác: ${sample.parameterOther.trim()}`);
+  return parameters.join(', ');
 }
 
 function localDateTime(value) {

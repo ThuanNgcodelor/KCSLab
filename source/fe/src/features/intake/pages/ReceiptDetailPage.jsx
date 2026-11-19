@@ -8,7 +8,7 @@ import { SampleCodingPanel } from '../components/SampleCodingPanel';
 const categoryLabels = {
   FORM_3: 'Phiếu tiếp nhận số 3', LOT_PHOTO: 'Ảnh lô hàng', SAMPLE_PHOTO: 'Ảnh mẫu',
   PACKAGING_PHOTO: 'Ảnh bao bì', SEAL_PHOTO: 'Ảnh niêm phong', DAMAGE_PHOTO: 'Ảnh hư hỏng',
-  LABEL_PHOTO: 'Ảnh nhãn mẫu', OTHER: 'Tài liệu khác',
+  LABEL_PHOTO: 'Ảnh nhãn mẫu', TRANSFER_EVIDENCE: 'Bằng chứng bàn giao', OTHER: 'Tài liệu khác',
 };
 
 export function ReceiptDetailPage() {

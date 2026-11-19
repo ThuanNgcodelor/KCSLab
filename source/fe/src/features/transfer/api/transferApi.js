@@ -9,3 +9,13 @@ export function createTransfer(data) { return request('/transfers', { method: 'P
 export function updateTransfer(id, data) { return request(`/transfers/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
 export function submitTransfer(id) { return request(`/transfers/${id}/submit`, { method: 'POST' }); }
 export function decideTransfer(id, data) { return request(`/transfers/${id}/decision`, { method: 'POST', body: JSON.stringify(data) }); }
+export function uploadTransferEvidence(receiptId, file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const search = new URLSearchParams({
+    category: 'TRANSFER_EVIDENCE',
+    description: 'Bằng chứng bàn giao mẫu',
+  });
+  if (file.lastModified) search.set('capturedAt', new Date(file.lastModified).toISOString());
+  return request(`/receipts/${receiptId}/attachments?${search}`, { method: 'POST', body: formData });
+}

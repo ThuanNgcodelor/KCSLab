@@ -8,5 +8,6 @@ public enum ReceiptAttachmentCategory {
     SEAL_PHOTO,
     DAMAGE_PHOTO,
     LABEL_PHOTO,
+    TRANSFER_EVIDENCE,
     OTHER
 }
