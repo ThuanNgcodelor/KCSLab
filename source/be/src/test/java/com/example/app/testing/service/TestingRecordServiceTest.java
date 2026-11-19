@@ -131,6 +131,15 @@ class TestingRecordServiceTest {
                         ex -> assertThat(ex.getStatusCode().value()).isEqualTo(409));
     }
 
+    @Test
+    void technicianCanCreateTestingRecordFromCompletedResultFileFlow() {
+        TestingRecordResponse created = testingRecordService.createFromResultFile(transferItemId, technician);
+
+        assertThat(created.status()).isEqualTo(TestRecordStatus.REVIEWED);
+        assertThat(created.checkedBy()).isEqualTo("Kỹ thuật viên");
+        assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.TEST_REVIEWED);
+    }
+
     private SaveTestingRecordRequest recordRequest() {
         Instant start = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         return new SaveTestingRecordRequest(

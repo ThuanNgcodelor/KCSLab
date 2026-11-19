@@ -16,7 +16,7 @@
 
 ## Quyết định role Người nhận mẫu KCS — 16/11/2026
 
-- Người dùng xác nhận giữ `TECHNICIAN` cho cả nhận/từ chối Phiếu 4 và lập Phiếu 5; `ADMIN` cũng được lập Phiếu 5. Cả hai cần upload nhiều file PDF và tài liệu khác vào Phiếu 5; đây là yêu cầu chưa triển khai.
+- Người dùng xác nhận giữ `TECHNICIAN` cho cả nhận/từ chối Phiếu 4 và lập Phiếu 5; `ADMIN` cũng được lập Phiếu 5. Phiếu 5 dùng một file kết quả DOCX/PDF hoàn chỉnh; không bắt nhập thiết bị, hóa chất, QC/raw data.
 - `RECEPTIONIST`, `TECHNICIAN` và `ADMIN` có dashboard riêng theo phạm vi công việc; Admin bao quát toàn hệ thống.
 - Người nhận mẫu được xem đầy đủ file gốc của hồ sơ được chuyển giao thông qua quyền theo transfer; file gốc có thể chứa thông tin khách hàng. API projection vẫn hạn chế trả riêng các trường liên hệ khi không cần thiết và không mở toàn bộ `/api/v1/receipts/**`.
 - Quy tắc thiếu ảnh tạm đề xuất cảnh báo, chưa có quy định bắt buộc từ LAB; chưa áp đặt SLA. Plan chi tiết: `plans/intake/TECHNICIAN_KCS.md`.
@@ -35,7 +35,7 @@
 - Backend `/api/v1/users/**`: `ADMIN`.
 - Backend `/api/v1/receipts/**`: `ADMIN` hoặc `RECEPTIONIST`.
 - Backend transfer: `ADMIN|RECEPTIONIST` tạo/sửa/gửi; `ADMIN|TECHNICIAN` quyết định; cả ba role được đọc nhưng service ẩn `DRAFT` khỏi `TECHNICIAN`.
-- Backend testing đọc/lập/cập nhật/submit: `ADMIN` hoặc `TECHNICIAN`; review: `ADMIN`.
+- Backend testing đọc/lập/cập nhật/submit: `ADMIN` hoặc `TECHNICIAN`; tạo Phiếu 5 từ file: `ADMIN|TECHNICIAN`; review legacy: `ADMIN`.
 - Frontend route intake mở cho `ADMIN|RECEPTIONIST`, testing cho `ADMIN|TECHNICIAN`, user management chỉ `ADMIN`.
 - Quyền phát hành kết quả vẫn chưa triển khai và cần LAB xác nhận.
 - Notification chưa có runtime: đề xuất Receptionist nhập/xác nhận consent và xem delivery của phiếu trong phạm vi; chỉ Admin cấu hình provider/template hoặc resend lỗi cuối cùng.

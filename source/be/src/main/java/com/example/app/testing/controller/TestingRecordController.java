@@ -66,7 +66,7 @@ public class TestingRecordController {
 
     @PostMapping("/from-result-file")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','TECHNICIAN')")
     public TestingRecordResponse createFromResultFile(@Valid @RequestBody FileResultRequest request,
                                                        @AuthenticationPrincipal Jwt jwt) {
         return testingRecordService.createFromResultFile(request.transferItemId(),

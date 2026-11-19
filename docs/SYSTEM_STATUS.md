@@ -15,7 +15,7 @@ Ba role hiện có:
 | Role | Phạm vi chính | Lưu ý |
 |---|---|---|
 | RECEPTIONIST | Tiếp nhận, quản lý Phiếu 3, lập/gửi Phiếu 4; dashboard riêng | Không được truy cập workspace nhận mẫu KCS. |
-| TECHNICIAN | Nhận/từ chối Phiếu 4; lập biên bản thử nghiệm; tạo nháp hồ sơ kết quả | Không được gọi API Phiếu 3 đầy đủ. File gốc được chuyển và ghi chú vẫn có thể chứa thông tin khách. |
+| TECHNICIAN | Nhận/từ chối Phiếu 4; tải file để lập Biên bản 5; tạo hồ sơ kết quả nháp | Không được gọi API Phiếu 3 đầy đủ. File gốc được chuyển và ghi chú vẫn có thể chứa thông tin khách. |
 | ADMIN | Quản lý nhân viên, thao tác nội bộ theo quyền và kiểm tra biên bản | Có trang admin, nhưng dashboard tổng hợp toàn hệ thống chưa được coi là hoàn chỉnh/nghiệm thu. |
 
 Không tạo role SAMPLE_RECEIVER. `receivedBy` là nhân viên lập Phiếu 3; `deliveredBy` là người giao được nhập trên form. Public tương lai không trả các thông tin này hoặc thông tin liên hệ đầy đủ.
@@ -36,7 +36,7 @@ Không tạo role SAMPLE_RECEIVER. `receivedBy` là nhân viên lập Phiếu 3;
 | Phiếu 3 | Nhiều mẫu/hồ sơ nguồn, điều kiện nhận, niêm phong, chỉ tiêu, ảnh/file có phân loại và checksum; tìm kiếm/phân trang; dashboard Tiếp nhận. Người dùng đã xác nhận tạo phiếu bằng role thật trên Chrome. | Draft/completion và các quy định liên quan chưa đầy đủ. Export DOCX đã sửa lỗi XML nhưng **chưa nghiệm thu mở bằng Word thật**. |
 | Phiếu 4 | Nháp, sửa, gửi, nhận/từ chối; khóa mẫu khi gửi; tìm hồ sơ có thể chuyển ở server. | Nghiệm thu lại chuỗi thật với file và các lỗi phát sinh. |
 | Workspace KCS | Dashboard `/admin/receiving`, danh sách, chi tiết, gallery, nhận/từ chối; projection riêng; aggregate tại DB, tìm mã, phân trang, sort whitelist; khóa hàng khi quyết định. | Chưa nghiệm thu E2E bản cuối với hai role, file thật, 401/403/409 và realtime; không coi K1+K2 đã hoàn thành. Thiếu ảnh hiện chỉ cảnh báo; LAB cần xác nhận. |
-| Phiếu 5 | Biên bản thử nghiệm: thiết bị, hóa chất, QC/raw data, gửi, trả lại và review nội bộ. | Chưa hoàn tất upload nhiều file cho Phiếu 5; cần kiểm tra tách biệt người phân tích/người kiểm tra. |
+| Phiếu 5 | Chọn mẫu KCS đã nhận và tải một file kết quả DOCX/PDF hoàn chỉnh. | Luồng tạo mới không còn bắt nhập thiết bị, hóa chất, QC/raw data; Admin kiểm tra và phát hành ở hồ sơ kết quả. |
 | Thông báo nội bộ | Lưu DB, notification center, WebSocket và toast; event tiếp nhận/chuyển/nhận/từ chối. | Chưa nghiệm thu đầy đủ hai phiên WebSocket thật, sau commit/rollback và tình huống lỗi. Chính sách hiển thị tên khách trong notification cần LAB xác nhận. |
 | Dashboard Admin | Có route/trang Admin hiện hữu. | Chưa coi dashboard bao quát toàn hệ thống là hoàn thành. |
 
@@ -96,5 +96,5 @@ Cần LAB xác nhận: quy định thiếu ảnh, nội dung/tên khách trong n
 ## Đồng bộ trạng thái và hồ sơ kết quả — 17/11/2026
 
 - **Một kiểu hiển thị trạng thái:** `shared/status.js` (nhãn + màu theo miền: tiếp nhận, chuyển mẫu, biên bản, hồ sơ kết quả, mã hóa, tài khoản) và `StatusBadge` thay cho các lớp rời (`status-pill`, `transfer-status`, `testing-status`, `result-status`, `coding-badge`). Chrome 4 viewport xác nhận mọi badge cùng kích thước/hình dạng trên các trang.
-- **Hồ sơ kết quả nối với Phiếu 5:** trang hồ sơ hiện số liệu của biên bản thử nghiệm (chỉ tiêu Phiếu 4, phương pháp, thời gian, độ thu hồi, dòng số liệu) và tự điền sẵn các dòng chỉ tiêu + phương pháp từ Phiếu 4 (kết quả để trống, kỹ thuật viên nhập). Danh sách “biên bản đã kiểm tra chờ lập hồ sơ” có liên kết tới biên bản.
-- **ADMIN cũng lập được hồ sơ** (cùng TECHNICIAN, giống Phiếu 5); người lập là người duy nhất sửa/gửi duyệt, còn duyệt/trả lại/phát hành/thu hồi phải là Admin khác người lập và khác người phân tích. Backend 76 test pass; Chrome 57/57.
+- **Hồ sơ kết quả nối với Phiếu 5:** TECHNICIAN hoặc ADMIN chọn mẫu KCS đã nhận, tải một file DOCX/PDF kết quả; DOCX được chuyển PDF để kiểm tra. Không nhập lại các bảng thiết bị, hóa chất, QC/raw data.
+- **Phát hành file-first:** ADMIN kiểm tra và phát hành trực tiếp; không có bước duyệt độc lập thứ hai. Backend kiểm tra luồng tạo hồ sơ từ file bằng TECHNICIAN và ADMIN.

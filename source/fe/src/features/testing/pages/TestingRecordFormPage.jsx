@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createTestingRecord, getTestingRecord, listTestingCandidates, updateTestingRecord } from '../api/testingApi';
+import { createTestingRecord, createTestingRecordFromResultFile, getTestingRecord, listTestingCandidates, updateTestingRecord } from '../api/testingApi';
+import { createResultRelease, uploadReportFile } from '../../results/api/resultsApi';
 import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
 
@@ -70,6 +71,8 @@ export function TestingRecordFormPage() {
 
   if (loading) return <section className="staff-page"><p className="muted">Đang chuẩn bị biên bản…</p></section>;
 
+  if (!editing) return <ResultFileTestingForm options={options} error={error} setError={setError} />;
+
   return <section className="staff-page testing-form-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(editing ? `/admin/testing/${id}` : '/admin/testing')}>← {editing ? 'Quay lại biên bản' : 'Danh sách biên bản'}</button><p className="section-kicker">Biên bản số 5</p><h1>{editing ? 'Cập nhật biên bản' : 'Lập biên bản thử nghiệm'}</h1><p className="heading-copy">Ghi lại dữ liệu chuyên môn có thể truy xuất và kiểm tra.</p></div></header>
     {error && <p className="form-error form-page-error" role="alert">{error}</p>}
@@ -83,6 +86,37 @@ export function TestingRecordFormPage() {
         <MeasurementSection type="RAW" title="Số liệu thực nghiệm" number="VII" rows={form.measurements} updateRow={updateRow} removeRow={removeRow} addRow={addRow} />
       </main>
       <aside className="receipt-form-aside testing-form-aside"><section className="panel-card intake-form-card"><FormHeading number="QC" title="Đánh giá chất lượng" copy="Tóm tắt hiệu suất thu hồi và biểu đồ kiểm soát." /><label>Hiệu suất thu hồi (%)<input type="number" min="0" max="999.9999" step="0.0001" value={form.recoveryPercent} onChange={update('recoveryPercent')} /></label><label>Biểu đồ / nhận xét QC<textarea value={form.qcChartNote} onChange={update('qcChartNote')} placeholder="Mô tả vị trí biểu đồ hoặc kết luận kiểm soát" /></label></section><section className="form-submit-panel"><p><strong>{editing ? 'Lưu thay đổi' : 'Tạo bản nháp'}</strong><span>Sau khi lưu, kỹ thuật viên gửi biên bản sang bước kiểm tra.</span></p><button className="primary-button" disabled={saving || !form.transferItemId}>{saving ? 'Đang lưu…' : editing ? 'Lưu biên bản' : 'Tạo biên bản'}</button></section></aside>
+    </form>}
+  </section>;
+}
+
+function ResultFileTestingForm({ options, error, setError }) {
+  const navigate = useNavigate();
+  const [transferItemId, setTransferItemId] = useState(options[0] ? String(options[0].id) : '');
+  const [resultFile, setResultFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const selected = options.find((item) => String(item.id) === String(transferItemId));
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (!transferItemId || !resultFile) { setError('Vui lòng chọn mẫu đã bàn giao và file DOCX/PDF kết quả.'); return; }
+    setSaving(true); setError('');
+    try {
+      const record = await createTestingRecordFromResultFile(Number(transferItemId));
+      const release = await createResultRelease(record.id);
+      await uploadReportFile(release.id, resultFile);
+      navigate(`/admin/results/${release.id}`, { state: { message: 'Đã tải file kết quả và lập hồ sơ Biên bản số 5.' } });
+    } catch (exception) { setError(exception.message); }
+    finally { setSaving(false); }
+  }
+
+  return <section className="staff-page testing-form-page">
+    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/testing')}>← Danh sách biên bản</button><p className="section-kicker">Biên bản số 5</p><h1>Tải file kết quả thử nghiệm</h1><p className="heading-copy">Chọn mẫu KCS đã nhận và tải lên file kết quả DOCX/PDF hoàn chỉnh.</p></div></header>
+    {error && <p className="form-error form-page-error" role="alert">{error}</p>}
+    {options.length === 0 ? <section className="panel-card empty-intake"><span><Icon name="flask" size={22} /></span><h3>Chưa có mẫu sẵn sàng thử nghiệm</h3><p>Mẫu phải được KCS xác nhận nhận ở Phiếu 4 trước khi lập Biên bản số 5.</p><button className="outline-button" onClick={() => navigate('/admin/receiving/transfers')}>Xem phiếu nhận mẫu</button></section> : <form className="testing-file-first-form" onSubmit={handleSubmit}>
+      <section className="panel-card intake-form-card result-file-first-card"><FormHeading number="01" title="Mẫu đã bàn giao" copy="Chỉ mẫu đã được KCS nhận mới xuất hiện trong danh sách." /><label>Mẫu<select value={transferItemId} onChange={(event) => setTransferItemId(event.target.value)} required>{options.map((item) => <option key={item.id} value={item.id}>{item.sampleCode} — {item.sampleName} ({item.transferCode})</option>)}</select></label>{selected && <div className="testing-sample-summary"><span><small>Phiếu yêu cầu</small><strong>{selected.receiptCode}</strong></span><span><small>Chỉ tiêu</small><strong>{selected.requestedParameters || '—'}</strong></span><span><small>Phương pháp</small><strong>{selected.testMethod || '—'}</strong></span><span><small>Hạn trả</small><strong>{formatDate(selected.dueDate)}</strong></span></div>}</section>
+      <section className="panel-card intake-form-card result-file-first-card"><FormHeading number="02" title="File kết quả thử nghiệm" copy="Tải một file DOCX hoặc PDF đã hoàn chỉnh. Không cần nhập lại thiết bị, hóa chất, QC hay số liệu từng dòng." /><label>Phiếu kết quả KQKN-DV<span className="result-file-picker"><span className="result-file-picker-icon">↑</span><span className="result-file-picker-copy"><strong>{resultFile?.name || 'Chọn file kết quả'}</strong><small>{resultFile ? `${Math.ceil(resultFile.size / 1024)} KB · sẵn sàng tải lên` : 'DOCX hoặc PDF · tối đa 10 MB'}</small></span><span className="result-file-picker-action">Chọn file</span><input type="file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => setResultFile(event.target.files?.[0] ?? null)} required /></span></label><p className="form-help">File DOCX sẽ được hệ thống chuyển sang PDF để kiểm tra trước khi Admin phát hành.</p></section>
+      <aside className="form-submit-panel"><p><strong>{saving ? 'Đang xử lý file…' : 'Lập Biên bản số 5'}</strong><span>Sau khi lưu, hồ sơ kết quả sẽ mở để kiểm tra và phát hành.</span></p><button className="primary-button" disabled={saving || !transferItemId || !resultFile}>{saving ? 'Đang lập hồ sơ…' : 'Tải file và lập biên bản'}</button></aside>
     </form>}
   </section>;
 }

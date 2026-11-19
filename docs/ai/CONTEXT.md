@@ -95,7 +95,7 @@
 
 - Đã triển khai feature `sampling` và migration `V11__test_request_sampling_flow.sql` cho Phiếu 1, kế hoạch Phiếu 7, Phiếu 2; các hồ sơ liên kết về Phiếu 3 bằng khóa nội bộ và có UI chọn/tự điền.
 - Phiếu 3 nhận một hoặc nhiều mẫu/lô, có mã mẫu nhập tay, tách seal mẫu/container và kiểm tra trùng. Theo quy trình mới, không chặn bàn giao vì xác minh hai người; KCS nhận/từ chối ở Phiếu 4.
-- Đã nối Phiếu 5 với luồng tải file kết quả DOCX/PDF cho ADMIN, tạo hồ sơ kết quả và phát hành trực tiếp; không bắt nhập các bảng thiết bị, hóa chất, QC và số liệu thô.
+- Đã nối Phiếu 5 với luồng tải file kết quả DOCX/PDF cho TECHNICIAN/ADMIN, tạo hồ sơ kết quả và phát hành trực tiếp bởi ADMIN; màn hình tạo mới không bắt nhập các bảng thiết bị, hóa chất, QC và số liệu thô.
 - Kiểm tra gần nhất: Java 21/Docker compile `BUILD SUCCESS`; `npm run build` `✓ built in 951ms`.
 - Full backend suite trên DB test cô lập: `Tests run: 85, Failures: 2, Errors: 1, Skipped: 3`; `BUILD FAILURE`. Lỗi còn lại là test cũ của quy trình xác minh hai người, chưa được chuyển đổi; chưa được coi là pass.
 - Chưa nghiệm thu Chrome E2E tài khoản thật, Word thật, WebSocket hai phiên, upload file thật toàn luồng và migration trên database làm việc. Không sửa V1–V4, `.env` hoặc secrets trong phiên này.

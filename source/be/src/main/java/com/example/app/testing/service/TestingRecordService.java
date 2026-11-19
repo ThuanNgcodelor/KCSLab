@@ -136,8 +136,8 @@ public class TestingRecordService {
 
     @Transactional
     public TestingRecordResponse createFromResultFile(Long transferItemId, User actor) {
-        if (actor.getRole() != Role.ADMIN) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được lập hồ sơ trực tiếp từ file kết quả");
+        if (actor.getRole() != Role.ADMIN && actor.getRole() != Role.TECHNICIAN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ KCS hoặc Admin được lập hồ sơ từ file kết quả");
         }
         SampleTransferItem transferItem = transferItemRepository.findById(transferItemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu đã bàn giao"));

@@ -8,7 +8,7 @@
 - **P1 — Đã triển khai:** migration `V11__test_request_sampling_flow.sql`, entity/repository/service/controller cho Phiếu 1, Phiếu 7 và Phiếu 2; API và UI tìm/chọn Phiếu 1, tự điền dữ liệu sang Phiếu 3.
 - **P2 — Đã triển khai một phần:** đã có hồ sơ kế hoạch lấy mẫu và lấy mẫu hiện trường liên kết Phiếu 1, nhưng chưa có export DOCX theo mẫu và chưa chốt toàn bộ validation nghiệp vụ với LAB.
 - **P3 — Đã triển khai:** Phiếu 3 nhận liên kết Phiếu 1/2, tách `sampleSealNumber` và `containerSealNumber`, nhập mã thủ công, kiểm tra trùng và ghi lịch sử chỉnh mã; mã thủ công được coi là sẵn sàng cho bàn giao theo quy trình mới.
-- **P4 — Đã triển khai:** Phiếu 4 lấy đúng mẫu đã mã hóa, KCS nhận/từ chối; Phiếu 5 có luồng ADMIN tải file kết quả DOCX/PDF để tạo hồ sơ và phát hành trực tiếp, không bắt nhập các bảng II–VII.
+- **P4 — Đã triển khai:** Phiếu 4 lấy đúng mẫu đã mã hóa, KCS nhận/từ chối; Phiếu 5 có luồng TECHNICIAN/ADMIN tải file kết quả DOCX/PDF để tạo hồ sơ, ADMIN phát hành trực tiếp, không bắt nhập các bảng II–VII.
 - **Chưa nghiệm thu:** Word thật cho export Phiếu 3, Chrome E2E bằng tài khoản thật, file thật qua toàn bộ flow, notification/WebSocket hai phiên, migration trên database làm việc và quy định LAB về format mã/seal/metadata.
 
 ### Bằng chứng kiểm tra gần nhất — 19/11/2026
@@ -51,7 +51,7 @@ Luồng mong muốn khi CFC lấy mẫu hiện trường: **Phiếu 1 yêu cầu
 | 2 — Lấy mẫu hiện trường | Số/No., **Số giấy đề nghị**, thời gian, người lấy mẫu, lô, số xe/moóc/container, mẫu, phương pháp lấy mẫu, khối lượng, chỉ tiêu và số niêm phong | Chưa thấy chức năng lập Phiếu 2 riêng. Cần phân biệt phương pháp **lấy mẫu** và phương pháp **thử nghiệm**. |
 | 3 — Tiếp nhận và bàn giao | Số/No., **Phiếu yêu cầu số**, mã mẫu, người giao/nhận, số niêm phong mẫu, tình trạng, điều kiện, chỉ tiêu và quyết định tiếp nhận | Có Phiếu 3, mẫu, ảnh/file; số yêu cầu đang là chuỗi nhập tay. Hiện có một `sealNumber`; chưa thấy hai trường riêng cho seal container và niêm phong mẫu. Template Phiếu 3 người dùng đang sửa là thay đổi hiện có, cần giữ nguyên khi triển khai. |
 | 4 — Chuyển mẫu | Số/No., **Phiếu yêu cầu số**, từng mẫu, khối lượng, số lượng, tình trạng, chỉ tiêu, phương pháp, hạn trả, bàn giao | Có Phiếu 4; một số màn hình gắn nhãn “Phiếu yêu cầu” nhưng hiển thị `receiptCode` (mã Phiếu 3), cần sửa sau khi có số yêu cầu thật. |
-| 5 — Biên bản thử nghiệm | Số/No., **Phiếu yêu cầu số**, mã mẫu, thời gian, người phân tích/kiểm tra, thiết bị, hóa chất, QC, số liệu | Có Phiếu 5; màn hình cũng có nơi hiển thị `receiptCode` dưới nhãn “Phiếu yêu cầu”. Chưa có upload file trực tiếp cho Phiếu 5; backend hiện yêu cầu thời gian bắt đầu/kết thúc và ít nhất một dòng thực nghiệm khi gửi kiểm tra. |
+| 5 — Biên bản thử nghiệm | Mẫu đã bàn giao, file kết quả DOCX/PDF, người tải, thời điểm và liên kết hồ sơ | Màn hình tạo mới chỉ chọn mẫu và tải file; dữ liệu thiết bị/hóa chất/QC/số liệu nằm trong file do phòng phân tích lập. |
 
 File `2026.11.16.docx` được cung cấp là **Phiếu kết quả thử nghiệm / Test Report**: có thông tin mẫu, các chỉ tiêu, phương pháp và kết quả để trả khách. Nội dung đọc được không có bảng thiết bị, hóa chất, QC, đường chuẩn hay số liệu thô như mẫu Biên bản thử nghiệm số 5. Theo quyết định người dùng, hệ thống dùng chính file kết quả này ở bước 5; không mô tả nó như thể chứa những dữ liệu không có trong file. Cần cập nhật mô tả quy trình và biểu mẫu thực tế theo quyết định này.
 
