@@ -160,3 +160,13 @@
 - `DateTimeInput` mới trong `shared/components/DateInput.jsx` (ngày `dd/mm/yyyy` + giờ 24h `hh:mm`, giá trị vẫn `yyyy-mm-ddTHH:mm`). `Field` của Phiếu 1/07/02 tự dùng `DateInput`/`DateTimeInput` khi `type` là `date`/`datetime-local`.
 - Danh sách Chuyển mẫu tìm và sắp theo Số/No (`sort=requestNumber,...`). KCS tìm thêm theo Số/No. Thông báo KCS nhận/từ chối ghi "mẫu của Số/No. …".
 - Danh sách việc còn mở về giao diện: `plans/UI_AUDIT_2026-11-20.md`, mục 7.
+
+## Cập nhật 20/11/2026 — giao diện làm việc ba vai trò
+
+- `AdminLayout` áp dụng giao diện CFC chung cho các route nội bộ. Điện thoại và tablet dùng một thanh đầu trang cho menu, tên màn hình và thông báo. Ba dashboard dùng chung thành phần chỉ số và giữ dữ liệu theo từng vai trò.
+- Dùng chung thanh công đoạn tại các màn yêu cầu, lấy mẫu, tiếp nhận, bàn giao, thử nghiệm và kết quả. Danh sách nhận mẫu KCS dùng `ListToolbar` và `Pagination`. Form tạo tiếp nhận, chuyển mẫu và thử nghiệm có thứ tự đọc một cột với nút lưu cuối form.
+- Danh mục phương pháp dùng cột có kích thước theo nội dung trên desktop và thẻ trên màn hình tối đa 760 px. Đã sửa tràn ngang trang đăng nhập trên điện thoại và lưới chi tiết tiếp nhận ở 1024 px.
+- Frontend build và `git diff --check` đạt. Chrome với API mô phỏng kiểm tra 55 lượt mở màn hình theo vai trò ở 390, 1024, 1440 và 2560 px, tổng 220 lượt. Test riêng danh mục ở sáu kích thước gồm 760 và 761 px, kiểm tra tìm kiếm rỗng, mở sửa, xác nhận xóa, menu và thông báo trên điện thoại. Chưa chạy lại toàn bộ nghiệp vụ với backend và tài khoản thật.
+- Đầu bảng nội bộ và bảng chỉ tiêu dùng chung nền xanh xám nhạt `#dfeae2` với chữ xanh đậm và đường phân cột nhẹ. Dòng dữ liệu có nền sáng và đổi xanh nhạt khi rê chuột. Giữ bố cục thẻ trên thiết bị nhỏ. Chrome với API mô phỏng kiểm tra màu và responsive ở 24 lượt trên Phương pháp thử, Phiếu yêu cầu và hai màn KCS.
+- Sidebar desktop có nút thu gọn thành thanh biểu tượng 72 px và lưu lựa chọn tại `cfc:sidebar-collapsed:v1` theo trình duyệt. Menu tablet và điện thoại vẫn mở đầy đủ. Chrome với API mô phỏng đã kiểm tra thu gọn, tải lại, mở rộng và menu mobile ở cả ba vai trò tại 390, 1024, 1440 và 2560 px.
+- Ba vai trò dùng sidebar xanh sương `#f7faf7`, mục đang chọn xanh nhạt `#e3eee6`, nút chính xanh lá trầm `#38674f` và nút phụ trắng viền xanh xám. Đầu bảng giữ nền `#dfeae2`. Frontend build đạt. Chrome với API mô phỏng xác nhận màu và thao tác thu gọn, tải lại, mở rộng, menu mobile cho cả ba vai trò.

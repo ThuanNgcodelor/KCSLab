@@ -75,10 +75,10 @@ export function TestMethodsPage() {
         onReset={resetList} />
       {loading ? <PageLoader label="Đang tải danh mục…" rows={3} /> : data.content.length === 0
         ? <div className="empty-intake"><h3>Chưa có phương pháp phù hợp</h3><p>Thử xóa bộ lọc hoặc thêm phương pháp mới.</p></div>
-        : <div className="table-wrap"><table className="staff-table method-table"><thead><tr><th>Mã phương pháp</th><th>Tên / mô tả</th><th>Trạng thái</th><th /></tr></thead><tbody>
+        : <div className="table-wrap"><table className="staff-table method-table" aria-label="Danh mục phương pháp thử"><thead><tr><th scope="col">Mã phương pháp</th><th scope="col">Tên / mô tả</th><th scope="col">Trạng thái</th><th scope="col">Thao tác</th></tr></thead><tbody>
           {data.content.map((method) => <tr key={method.id} className={editingId === method.id ? 'editing-row' : ''}>
-            <td data-label="Mã"><strong>{method.code}</strong></td>
-            <td data-label="Tên">{method.name || <span className="muted">—</span>}</td>
+            <td data-label="Mã phương pháp"><strong>{method.code}</strong></td>
+            <td data-label="Tên / mô tả">{method.name || <span className="muted">—</span>}</td>
             <td data-label="Trạng thái"><span className={`method-status ${method.active ? 'on' : 'off'}`}>{method.active ? 'Đang dùng' : 'Ngưng dùng'}</span></td>
             <td data-label="Thao tác"><div className="method-row-actions">
               <button type="button" className="table-action" onClick={() => startEdit(method)}>Sửa</button>

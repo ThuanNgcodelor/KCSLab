@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { listTestRequests } from '../api/testRequestApi';
@@ -39,6 +40,7 @@ export function TestRequestsPage() {
   return <section className="intake-page request-page">
     <header className="admin-heading"><div><p className="section-kicker">Quy trình hồ sơ / Yêu cầu kiểm nghiệm</p><h1>Yêu cầu kiểm nghiệm</h1><p className="heading-copy">Phiếu 1 là điểm bắt đầu của hồ sơ; từ đây lập Kế hoạch lấy mẫu (07), Lấy mẫu hiện trường (02) và tiếp nhận mẫu.</p></div>
       <button className="primary-button" onClick={() => navigate('/admin/requests/new')}>＋ Tạo yêu cầu kiểm nghiệm</button></header>
+    <WorkflowGuide stage="request" />
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <section className="panel-card intake-list-card">

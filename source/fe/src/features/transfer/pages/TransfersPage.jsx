@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -45,7 +46,7 @@ export function TransfersPage() {
     <header className="admin-heading"><div><p className="section-kicker">Vận hành / Chuyển mẫu</p><h1>Chuyển mẫu KCS/PTN</h1><p className="heading-copy">Bản nháp do tiếp nhận chuẩn bị; chỉ phiếu đã gửi mới khóa mẫu và chờ phòng nhận.</p></div>{canCreate && <button className="primary-button" onClick={() => navigate('/admin/transfers/new')}>＋ Tạo hồ sơ chuyển mẫu</button>}</header>
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
-    <div className="intake-guide"><div className="guide-step done"><span>✓</span><div><strong>Tiếp nhận</strong><small>Hồ sơ tiếp nhận</small></div></div><div className="guide-line done" /><div className="guide-step current"><span>02</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></div><div className="guide-line" /><div className="guide-step"><span>03</span><div><strong>Thử nghiệm</strong><small>Hồ sơ phân tích</small></div></div></div>
+    <WorkflowGuide stage="handover" />
     <section className="panel-card intake-list-card">
       <div className="panel-heading"><div><p className="section-kicker">Chuỗi bàn giao</p><h2>Phiếu chuyển mẫu</h2></div><button className="outline-button small-button" onClick={loadTransfers}>↻ Làm mới</button></div>
       <ListToolbar q={list.q} onQ={(q) => setList({ q })} searchLabel="Tìm phiếu" placeholder="Số/No., mã hóa mẫu, khách hàng…" dateLabel="Ngày chuyển" from={list.from} to={list.to} onFrom={(from) => setList({ from })} onTo={(to) => setList({ to })}

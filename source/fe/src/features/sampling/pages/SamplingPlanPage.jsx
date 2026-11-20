@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTestRequest, saveSamplingPlan } from '../api/testRequestApi';
@@ -32,6 +33,7 @@ export function SamplingPlanPage() {
   if (loading) return <section className="staff-page"><PageLoader label="Đang tải kế hoạch lấy mẫu…" /></section>;
   return <section className="staff-page sampling-page form-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(`/admin/requests/${id}`)}>← Phiếu yêu cầu {request?.requestNumber}</button><p className="section-kicker">Phiếu 07 · Sampling plan</p><h1>Kế hoạch lấy mẫu</h1><p className="heading-copy">Thông tin khách hàng và lô hàng lấy từ Phiếu yêu cầu {request?.requestNumber}; chỉ cần bổ sung phần lấy mẫu.</p></div></header>
+    <WorkflowGuide stage="sampling" />
     {error && <p className="form-error" role="alert">{error}</p>}{message && <p className="form-success" role="status">{message}</p>}
     {plan && request && <PlanForm form={request} data={plan} update={update} onSave={save} onReseed={() => setConfirmReseed(true)} saving={saving} />}
     <div className="page-next-step"><button type="button" className="outline-button" onClick={() => navigate(`/admin/requests/${id}`)}>← Về Phiếu yêu cầu</button>{saved && <button type="button" className="primary-button" onClick={() => navigate(`/admin/requests/${id}/field-sampling`)}>Tiếp theo: Lấy mẫu hiện trường →</button>}</div>

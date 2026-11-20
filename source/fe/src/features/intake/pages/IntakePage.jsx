@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -75,7 +76,7 @@ export function IntakePage() {
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
 
-    <div className="intake-guide"><div className="guide-step current"><span>01</span><div><strong>Tiếp nhận</strong><small>Hồ sơ tiếp nhận</small></div></div><div className="guide-line" /><div className="guide-step"><span>02</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></div><div className="guide-line" /><div className="guide-step"><span>03</span><div><strong>Thử nghiệm</strong><small>Hồ sơ phân tích</small></div></div></div>
+    <WorkflowGuide stage="intake" />
 
     <section className="intake-command-strip" aria-label="Tổng quan tiếp nhận">
       <article><span>Phiếu tiếp nhận</span><strong>{loading ? '…' : dashboard.totalReceipts}</strong><small>{periodLabel}</small></article>

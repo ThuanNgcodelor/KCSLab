@@ -1,9 +1,9 @@
+import { WorkspaceStats } from '../../../shared/components/WorkspaceStats';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { presetRange } from '../../intake/pages/ReceptionistDashboardPage';
 import { getReceivingDashboard } from '../api/receivingApi';
 import { useNotifications } from '../../notifications/hooks/useNotifications';
-import { useAuth } from '../../auth/hooks/useAuth';
 import { PageLoader } from '../../../shared/components/Loading';
 import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
@@ -16,7 +16,6 @@ export function ReceivingDashboardPage() {
   const [error, setError] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { notifications, connectionState } = useNotifications();
   const range = preset === 'custom' ? custom : presetRange(preset);
   useEffect(() => {
@@ -36,10 +35,9 @@ export function ReceivingDashboardPage() {
     { label: 'Từ chối trong kỳ', value: data.rejectedTransfers, detail: 'Phiếu đã trả lại tiếp nhận', tone: 'violet' },
     { label: 'Thời gian xử lý TB', value: data.averageProcessingSeconds == null ? '—' : `${Math.round(data.averageProcessingSeconds / 60)} phút`, detail: 'Từ khi gửi đến khi quyết định', tone: 'blue' },
   ];
-  const firstName = user?.displayName?.split(' ').slice(-1)[0] ?? 'bạn';
   return <section className="admin-page receiving-page receiving-dashboard">
-    <header className="admin-heading"><div><p className="section-kicker">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</p><h1>Chào {firstName}.</h1><p className="heading-copy">Theo dõi bàn giao và đối chiếu mẫu tại phòng KCS.</p></div><button className="primary-button" onClick={() => navigate('/admin/receiving/transfers')}>Xem danh sách nhận mẫu</button></header>
-    <section className="panel-card intake-filter-card receiving-period" aria-label="Khoảng thời gian">
+    <header className="admin-heading"><div><p className="section-kicker">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</p><h1>Hàng đợi nhận mẫu</h1><p className="heading-copy">Theo dõi bàn giao và đối chiếu mẫu tại phòng KCS.</p></div><button className="primary-button" onClick={() => navigate('/admin/receiving/transfers')}>Xem danh sách nhận mẫu</button></header>
+    <section className="panel-card intake-filter-card receiving-period workspace-period" aria-label="Khoảng thời gian">
       <div className="receiving-period-presets" role="group" aria-label="Chọn khoảng thời gian">{[['today','Hôm nay'],['week','Tuần này'],['month','Tháng này'],['custom','Tùy chọn']].map(([id,label]) => <button type="button" key={id} className={preset === id ? 'primary-button small-button' : 'outline-button small-button'} aria-pressed={preset === id} onClick={() => setPreset(id)}>{label}</button>)}</div>
       {preset === 'custom' && <><label><small>Từ ngày</small><DateInput max={custom.to || undefined} value={custom.from} onChange={e => setCustom(c => ({ ...c, from: e.target.value }))} /></label><label><small>Đến ngày</small><DateInput min={custom.from || undefined} value={custom.to} onChange={e => setCustom(c => ({ ...c, to: e.target.value }))} /></label></>}
       <button type="button" className="outline-button small-button" onClick={() => setRefreshKey(key => key + 1)}>↻ Làm mới</button>
@@ -48,8 +46,8 @@ export function ReceivingDashboardPage() {
     {loading && <PageLoader label="Đang tải số liệu…" compact />}
     {!loading && !error && !data && <p>Chọn khoảng ngày để xem số liệu.</p>}
     {data && <>
-      <section className="stats-grid" aria-label="Thống kê nhận mẫu">{stats.map(stat => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{stat.value}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>
-      <div className="dashboard-grid"><section className="panel-card"><div className="receiving-section-heading"><div><p className="section-kicker">Hàng đợi bàn giao</p><h2>Chờ nhận lâu nhất</h2><p>Các phiếu đang chờ đối chiếu, ưu tiên phiếu đến trước.</p></div><span className="receiving-count">{data.pendingNow} đang chờ</span></div>{data.pendingQueue.length ? data.pendingQueue.map(item => <button className="receiving-queue-item" key={item.id} onClick={() => navigate(`/admin/receiving/transfers/${item.id}`)}><span className="receiving-queue-icon" aria-hidden="true"><Icon name="arrowUpRight" size={18} /></span><span className="receiving-queue-main"><strong>Số/No. {item.requestNumber || '—'}</strong><small>{item.items.length} mẫu · Gửi lúc {formatTime(item.submittedAt)}</small></span><span className="receiving-wait">Đã chờ {waitingTime(item.submittedAt)}</span><span aria-hidden="true">›</span></button>) : <div className="receiving-queue-empty"><span aria-hidden="true"><Icon name="checkCircle" size={22} /></span><div><strong>Không có phiếu chờ nhận</strong><p>Các phiếu mới sẽ xuất hiện tại đây khi được bàn giao.</p></div></div>}</section>
+      <WorkspaceStats label="Thống kê nhận mẫu" stats={stats} />
+      <div className="dashboard-grid"><section className="panel-card"><div className="receiving-section-heading"><div><p className="section-kicker">Hàng đợi bàn giao</p><h2>Mẫu chờ đối chiếu</h2><p>Các phiếu đang chờ đối chiếu, ưu tiên phiếu đến trước.</p></div><span className="receiving-count">{data.pendingNow} đang chờ</span></div>{data.pendingQueue.length ? data.pendingQueue.map(item => <button className="receiving-queue-item" key={item.id} onClick={() => navigate(`/admin/receiving/transfers/${item.id}`)}><span className="receiving-queue-icon" aria-hidden="true"><Icon name="arrowUpRight" size={18} /></span><span className="receiving-queue-main"><strong>Số/No. {item.requestNumber || '—'}</strong><small>{item.items.length} mẫu · Gửi lúc {formatTime(item.submittedAt)}</small></span><span className="receiving-wait">Đã chờ {waitingTime(item.submittedAt)}</span><span className="workspace-queue-action">Mở và đối chiếu <span aria-hidden="true">›</span></span></button>) : <div className="receiving-queue-empty"><span aria-hidden="true"><Icon name="checkCircle" size={22} /></span><div><strong>Không có phiếu chờ nhận</strong><p>Các phiếu mới sẽ xuất hiện tại đây khi được bàn giao.</p></div></div>}</section>
       <section className="panel-card"><div className="receiving-section-heading"><div><p className="section-kicker">Trong khoảng đã chọn</p><h2>Nhịp nhận mẫu theo ngày</h2><p>Theo dõi phiếu chuyển lên và quyết định nhận.</p></div></div>{data.trend.length ? <div className="table-wrap"><table><thead><tr><th>Ngày</th><th>Chuyển lên</th><th>Đã nhận</th><th>Từ chối</th></tr></thead><tbody>{data.trend.map(day => <tr key={day.date}><td>{formatDay(day.date)}</td><td>{day.submitted}</td><td>{day.accepted}</td><td>{day.rejected}</td></tr>)}</tbody></table></div> : <p>Chưa có dữ liệu trong khoảng này.</p>}</section></div>
       <section className="panel-card receiving-history"><div className="receiving-section-heading"><div><p className="section-kicker">KCS đã xử lý</p><h2>Quyết định gần đây</h2></div></div>{data.recentDecisions.length ? data.recentDecisions.map(item => <button className="receiving-queue-item" key={item.id} onClick={() => navigate(`/admin/receiving/transfers/${item.id}`)}><span className="receiving-queue-main"><strong>Số/No. {item.requestNumber || '—'}</strong><small>{formatTime(item.receivedAt)}</small></span><span className="receiving-count">{item.status === 'ACCEPTED' ? 'Đã nhận' : 'Từ chối'}</span><span aria-hidden="true">›</span></button>) : <p className="receiving-empty">Chưa có quyết định gần đây.</p>}</section>
     </>}

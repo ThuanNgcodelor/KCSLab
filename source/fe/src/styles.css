@@ -732,8 +732,8 @@ td small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .cfc-confirm__actions button { min-height: 44px; padding: 0 17px; border: 1px solid #cbded0; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 .cfc-confirm__cancel { color: #315b40; background: #fff; }
 .cfc-confirm__cancel:hover { background: #f1f8f2; }
-.cfc-confirm__submit { border-color: #238a4a !important; color: #fff; background: #238a4a; }
-.cfc-confirm__submit:hover { background: #176e38; }
+.cfc-confirm__submit { border-color: var(--workspace-accent, #238a4a) !important; color: #fff; background: var(--workspace-accent, #238a4a); }
+.cfc-confirm__submit:hover { background: var(--workspace-accent-hover, #176e38); }
 .cfc-confirm--danger .cfc-confirm__submit { border-color: #ad4436 !important; background: #ad4436; }
 .cfc-confirm--danger .cfc-confirm__submit:hover { background: #8e352a; }
 @media (max-width: 520px) {
@@ -1245,8 +1245,14 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .request-matrix > * { padding: 10px 12px; border-bottom: 1px solid #e0ece3; border-right: 1px solid #e0ece3; min-width: 0; }
 .request-matrix > :nth-child(3n) { border-right: 0; }
 .request-matrix > :nth-last-child(-n + 3) { border-bottom: 0; }
-.request-matrix-head { color: #fff; background: #2f8a52; font-size: 12px; font-weight: 800; }
-.request-matrix-head i { color: #d9f0e0; }
+.request-matrix-head {
+  color: var(--workspace-ink);
+  background: var(--workspace-table-header);
+  border-color: var(--workspace-table-header-border);
+  font-size: 12px;
+  font-weight: 800;
+}
+.request-matrix-head i { color: var(--workspace-muted); }
 .request-matrix > strong { display: flex; align-items: center; color: #214a36; font-size: 13px; }
 .request-matrix-options { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .request-matrix-options .checkbox-line { min-height: 38px; padding: 6px 12px; }
@@ -1568,7 +1574,7 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
   .auth-flow::before, .auth-flow::after { display: none; }
 }
 @media (max-width: 900px) {
-  .auth-page { grid-template-columns: 1fr; overflow: visible; }
+  .auth-page { grid-template-columns: minmax(0, 1fr); overflow: clip; }
   .auth-hero { gap: 16px; padding: 22px 20px 6px; }
   .auth-hero h2 { margin-bottom: 0; font-size: clamp(27px, 7vw, 36px); }
   .auth-kicker { margin-bottom: 14px; }

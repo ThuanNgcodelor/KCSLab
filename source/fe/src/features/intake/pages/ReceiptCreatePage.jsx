@@ -96,7 +96,7 @@ export function ReceiptCreatePage() {
     const field = data.fieldSampling;
     setForm((current) => ({ ...current,
       testRequestId: data.id, fieldSamplingId: field?.id ?? null, requestNumber: data.requestNumber,
-      customerName: data.customerName, customerPhone: data.customerPhone, customerEmail: data.customerEmail ?? '',
+      customerName: data.customerName ?? '', customerPhone: data.customerPhone ?? '', customerEmail: data.customerEmail ?? '',
       customerAddress: data.customerAddress ?? '', sampledBy: field?.sampleCollector ?? '', sampledAt: localDateTime(field?.samplingEnd),
       growingArea: field?.growingArea ?? data.origin ?? '', packingFacility: field?.packingFacility ?? '',
       vehicleNumber: field?.vehicleNumber ?? '', trailerNumber: field?.trailerNumber ?? '', containerNumber: field?.containerNumber ?? '',

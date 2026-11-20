@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getTestRequest, saveFieldSampling } from '../api/testRequestApi';
@@ -35,6 +36,7 @@ export function FieldSamplingPage() {
   if (loading) return <section className="staff-page"><PageLoader label="Đang tải phiếu lấy mẫu hiện trường…" /></section>;
   return <section className="staff-page sampling-page form-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(`/admin/requests/${id}`)}>← Phiếu yêu cầu {request?.requestNumber}</button><p className="section-kicker">Phiếu 02 · Field sampling form</p><h1>Lấy mẫu hiện trường</h1><p className="heading-copy">{hasPlan.current ? 'Đã điền sẵn từ Kế hoạch lấy mẫu và Phiếu yêu cầu; ghi lại thông tin thực tế.' : 'Chưa có Kế hoạch lấy mẫu — điền sẵn từ Phiếu yêu cầu; có thể lập phiếu này trực tiếp.'}</p></div></header>
+    <WorkflowGuide stage="sampling" />
     {error && <p className="form-error" role="alert">{error}</p>}{message && <p className="form-success" role="status">{message}</p>}
     {field && request && <FieldForm form={request} data={field} update={update} onSave={save} onReseed={() => setConfirmReseed(true)} saving={saving} reseedLabel={hasPlan.current ? 'Lấy lại từ Kế hoạch lấy mẫu' : 'Lấy lại từ Phiếu yêu cầu'} />}
     <div className="page-next-step"><button type="button" className="outline-button" onClick={() => navigate(`/admin/requests/${id}`)}>← Về Phiếu yêu cầu</button>{saved && <button type="button" className="primary-button" onClick={() => navigate(`/admin/intake/new?requestId=${id}`)}>Tiếp theo: Tiếp nhận và bàn giao →</button>}</div>

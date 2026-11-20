@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listTestingRecords } from '../api/testingApi';
@@ -37,7 +38,7 @@ export function TestingRecordsPage() {
 
   return <section className="staff-page testing-page">
     <header className="admin-heading staff-heading"><div><p className="section-kicker">Phòng phân tích</p><h1>Biên bản thử nghiệm</h1><p className="heading-copy">Chọn mẫu đã được KCS nhận và tải file kết quả DOCX/PDF để lập biên bản thử nghiệm.</p></div><button className="primary-button add-staff-button" onClick={() => navigate('/admin/testing/new')}>＋ Tạo biên bản thử nghiệm</button></header>
-    <div className="intake-guide testing-guide" aria-label="Tiến độ xử lý mẫu"><div className="guide-step done"><span>✓</span><div><strong>Tiếp nhận</strong><small>Hồ sơ tiếp nhận</small></div></div><i className="guide-line done" /><div className="guide-step done"><span>✓</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></div><i className="guide-line done" /><div className="guide-step current"><span>03</span><div><strong>Thử nghiệm</strong><small>Biên bản thử nghiệm</small></div></div></div>
+    <WorkflowGuide stage="testing" />
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <section className="panel-card intake-list-card"><div className="panel-heading"><div><p className="section-kicker">Hồ sơ chuyên môn</p><h2>Biên bản gần đây</h2></div><button className="outline-button small-button" onClick={loadRecords}>↻ Làm mới</button></div>
       <ListToolbar q={list.q} onQ={(q) => setList({ q })} searchLabel="Tìm biên bản" placeholder="Mã biên bản, mã mẫu, tên mẫu, phương pháp…" dateLabel="Ngày lập" from={list.from} to={list.to} onFrom={(from) => setList({ from })} onTo={(to) => setList({ to })}

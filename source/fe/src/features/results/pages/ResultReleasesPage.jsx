@@ -1,3 +1,4 @@
+import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -65,7 +66,7 @@ export function ResultReleasesPage() {
 
   return <section className="staff-page results-page">
     <header className="admin-heading staff-heading"><div><p className="section-kicker">Hồ sơ kết quả / KQKN-DV</p><h1>Hồ sơ kết quả</h1><p className="heading-copy">Kiểm tra file kết quả, phát hành PDF và thu hồi khi cần. Chỉ phiếu đã phát hành mới tra cứu và tải được công khai.</p></div></header>
-    <div className="intake-guide testing-guide" aria-label="Tiến độ xử lý mẫu"><div className="guide-step done"><span>✓</span><div><strong>Tiếp nhận</strong><small>Hồ sơ tiếp nhận</small></div></div><i className="guide-line done" /><div className="guide-step done"><span>✓</span><div><strong>Chuyển mẫu</strong><small>Bàn giao sang KCS</small></div></div><i className="guide-line done" /><div className="guide-step done"><span>✓</span><div><strong>Thử nghiệm</strong><small>Biên bản thử nghiệm</small></div></div><i className="guide-line done" /><div className="guide-step current"><span>04</span><div><strong>Kết quả</strong><small>Hồ sơ kết quả</small></div></div></div>
+    <WorkflowGuide stage="results" />
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     {canPrepare && <section className="panel-card intake-list-card result-file-first-card">
       <div className="panel-heading"><div><p className="section-kicker">Hồ sơ kết quả</p><h2>Tạo Hồ sơ kết quả KQKN-DV</h2><p>Chọn mẫu KCS đã nhận và tải DOCX/PDF hoàn chỉnh. Không cần nhập thiết bị, hóa chất, QC hay số liệu từng dòng.</p></div></div>

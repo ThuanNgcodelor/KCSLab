@@ -1,6 +1,6 @@
+import { WorkspaceStats } from '../../../shared/components/WorkspaceStats';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/hooks/useAuth';
 import { getReceptionistDashboard } from '../api/intakeApi';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { labelsOf } from '../../../shared/status';
@@ -12,7 +12,6 @@ const statusLabels = labelsOf('receipt');
 const presets = [['today', 'Hôm nay'], ['week', 'Tuần này'], ['month', 'Tháng này'], ['custom', 'Tùy chọn']];
 
 export function ReceptionistDashboardPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [preset, setPreset] = useState('today');
   const [custom, setCustom] = useState({ from: '', to: '' });
@@ -43,15 +42,14 @@ export function ReceptionistDashboardPage() {
     { label: 'Bị từ chối', value: dashboard?.rejected, detail: 'Có lý do trên hồ sơ', tone: 'violet' },
   ];
   const recent = dashboard?.recentReceipts ?? [];
-  const firstName = user?.displayName?.split(' ').slice(-1)[0] ?? 'bạn';
 
   return <section className="admin-page receptionist-dashboard">
     <header className="admin-heading">
-      <div><p className="section-kicker">{formatLongDate(new Date())}</p><h1>Chào {firstName}.</h1><p className="heading-copy">Công việc tiếp nhận của riêng bạn, tính theo giờ Việt Nam.</p></div>
+      <div><p className="section-kicker">{formatLongDate(new Date())}</p><h1>Công việc tiếp nhận</h1><p className="heading-copy">Công việc tiếp nhận của riêng bạn, tính theo giờ Việt Nam.</p></div>
       <button className="primary-button" onClick={() => navigate('/admin/intake/new')}>＋ Tạo hồ sơ tiếp nhận</button>
     </header>
 
-    <section className="panel-card intake-filter-card" aria-label="Khoảng thời gian">
+    <section className="panel-card intake-filter-card workspace-period" aria-label="Khoảng thời gian">
       <div role="group" aria-label="Chọn khoảng thời gian" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {presets.map(([value, label]) => <button type="button" key={value} className={preset === value ? 'primary-button small-button' : 'outline-button small-button'} aria-pressed={preset === value} onClick={() => setPreset(value)}>{label}</button>)}
       </div>
@@ -65,14 +63,14 @@ export function ReceptionistDashboardPage() {
     {error && <p className="form-error" role="alert">{error}</p>}
     {!rangeReady && <p className="muted" role="status">Chọn cả ngày bắt đầu và ngày kết thúc để xem số liệu.</p>}
 
-    <section className="stats-grid" aria-label="Chỉ số tiếp nhận">{stats.map((stat) => <article className={`stat-card ${stat.tone}`} key={stat.label}><div className="stat-label">{stat.label}<span className="stat-dot" /></div><strong>{loading ? '…' : stat.value ?? '—'}</strong><span className="stat-detail">{stat.detail}</span></article>)}</section>
+    <WorkspaceStats label="Chỉ số tiếp nhận" stats={stats} loading={loading} />
 
     <section className="dashboard-grid intake-dashboard-grid">
       <article className="panel-card activity-panel">
         <div className="panel-heading"><div><p className="section-kicker">Hoạt động của bạn</p><h2>Hồ sơ tiếp nhận gần đây</h2></div><button className="text-button" onClick={() => navigate('/admin/intake/receipts')}>Mở danh sách tiếp nhận <span>→</span></button></div>
         {loading ? <PageLoader label="Đang tải dữ liệu…" compact /> : recent.length
           ? <div className="activity-list">{recent.map((receipt) => <button className="activity-row activity-row-button" key={receipt.id} onClick={() => navigate(`/admin/intake/${receipt.id}`)}><time>{formatShortDate(receipt.receivedAt)}</time><span className="activity-avatar">{receipt.sampleCount}</span><div><p><strong>{receipt.requestNumber || receipt.receiptCode}</strong> · {receipt.customerName}</p><small>{receipt.sampleName} · <StatusBadge domain="receipt" value={receipt.status} />{receipt.expectedDate ? ` · Hạn ${formatShortDate(receipt.expectedDate)}` : ''}</small></div></button>)}</div>
-          : <div className="dashboard-empty"><span>01</span><h3>Chưa có phiếu trong khoảng này</h3><p>Tạo phiếu tiếp nhận mới hoặc chọn khoảng thời gian khác.</p></div>}
+          : <div className="dashboard-empty"><h3>Chưa có phiếu trong khoảng này</h3><p>Tạo phiếu tiếp nhận mới hoặc chọn khoảng thời gian khác.</p></div>}
       </article>
       <article className="panel-card intake-health-panel">
         <div className="panel-heading"><div><p className="section-kicker">Thao tác nhanh</p><h2>Việc tiếp theo</h2></div></div>
