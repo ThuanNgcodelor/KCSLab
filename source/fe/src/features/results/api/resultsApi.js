@@ -63,3 +63,5 @@ export async function downloadReportDocx(id) {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 export function regenerateResultReport(id) { return request(`/result-releases/${id}/regenerate-report`, { method: 'POST' }); }
+export function getLookupSettings() { return request('/result-releases/lookup-settings'); }
+export function regenerateAllReports() { return request('/result-releases/regenerate-reports', { method: 'POST' }); }

@@ -99,3 +99,33 @@ Dùng Task Scheduler > Create Task:
 | Tải DOCX kết quả báo không chuyển được PDF | Chưa cài LibreOffice, hoặc đặt `REPORT_OFFICE_COMMAND` trỏ tới `soffice.com` |
 
 > Đã kiểm tra trên Linux: cú pháp 2 script PowerShell và cấu hình Apache được viết theo cách nginx đang chạy ở máy Linux. **Chưa chạy thử trên Windows thật**: lần cài đầu tiên cần kiểm tra lại các bước 4–6.
+
+---
+
+## 8. Mã QR và khi gắn tên miền
+
+Mã QR trên phiếu kết quả là địa chỉ `PUBLIC_LOOKUP_URL` cộng thêm `?code=<mã tra cứu>`. Ví dụ: `http://192.168.1.50:5173/tracuu/?code=ABCD…`.
+
+- **Đang dùng IP:** đặt `PUBLIC_LOOKUP_URL=http://<IP-server>:5173/tracuu/`. IP dạng `192.168.x.x` là **mạng nội bộ**: chỉ máy trong công ty quét QR mở được, khách ở ngoài thì không. Giai đoạn này chỉ nên dùng để thử.
+- Dưới QR luôn in **mã tra cứu dạng chữ**. Khách có thể gõ tay mã này vào trang tra cứu, kể cả khi QR trỏ tới địa chỉ cũ.
+- Admin xem QR đang trỏ tới đâu ở đầu trang **Hồ sơ kết quả** (`/admin/results`).
+
+### Các bước khi có tên miền (ví dụ `tracuu.cfccobay.com`)
+
+1. **Đưa trang tra cứu ra Internet bằng Cloudflare Tunnel** (không cần IP tĩnh, không phải mở cổng router, có HTTPS miễn phí):
+   - Thêm tên miền vào Cloudflare. Cài `cloudflared` trên Windows server, rồi tạo tunnel trỏ `https://tracuu.cfccobay.com` tới `http://localhost:5173`.
+   - **Chỉ cho ra ngoài** trang `/tracuu/` và 2 API `/api/v1/public/results/lookup`, `/api/v1/public/results/download`. Chặn mọi đường dẫn khác bằng Cloudflare Access/WAF hoặc quy tắc của tunnel. Trang nhân viên vẫn chỉ dùng trong mạng LAN.
+2. **Sửa `.env`:**
+   ```
+   PUBLIC_LOOKUP_URL=https://tracuu.cfccobay.com/tracuu/
+   PUBLIC_CLIENT_IP_HEADER=CF-Connecting-IP
+   ```
+   `PUBLIC_CLIENT_IP_HEADER` giúp giới hạn số lần tra cứu tính theo IP thật của khách. Nếu trang nhân viên cũng chạy qua HTTPS thì đặt thêm `SECURE_COOKIE=true`, và thêm địa chỉ HTTPS đó vào `FRONTEND_ORIGIN`.
+3. **Khởi động lại backend** (đóng cửa sổ backend rồi chạy lại `start-backend.ps1`).
+4. **Cập nhật QR cho phiếu đã phát hành:** vào `/admin/results` bằng tài khoản Admin, kiểm tra địa chỉ QR mới, rồi bấm **"Tạo lại PDF … phiếu đã phát hành"**.
+   - Số phiếu và mã tra cứu giữ nguyên, chỉ QR trong PDF đổi sang tên miền.
+   - Phiếu dùng file tải lên tự giữ bố cục của file đó, nhưng QR cũng không được đóng lại.
+   - Phiếu đã **in giấy** thì không đổi được: khách dùng mã tra cứu dạng chữ.
+5. **SEO trang tra cứu:** trong `source/public/tracuu/index.html`, đổi `<link rel="canonical">` thành `https://tracuu.cfccobay.com/tracuu/`. Thêm `sitemap.xml` và dòng `Sitemap:` vào `source/fe/public/robots.txt`. Build lại frontend.
+
+> Giữ nguyên đường dẫn `/tracuu/?code=…` mãi về sau, chỉ thay phần tên miền. Đổi đường dẫn thì mọi QR đã phát hành sẽ hỏng.

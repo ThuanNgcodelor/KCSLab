@@ -2,7 +2,8 @@ import { WorkflowGuide } from '../../../shared/components/WorkflowGuide';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { createResultRelease, listReadyRecords, listResultReleases, uploadReportFile } from '../api/resultsApi';
+import { createResultRelease, getLookupSettings, listReadyRecords, listResultReleases, regenerateAllReports, uploadReportFile } from '../api/resultsApi';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { createTestingRecordFromResultFile, listTestingCandidates } from '../../testing/api/testingApi';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { PageLoader } from '../../../shared/components/Loading';
@@ -66,6 +67,7 @@ export function ResultReleasesPage() {
 
   return <section className="staff-page results-page">
     <header className="admin-heading staff-heading"><div><p className="section-kicker">Hồ sơ kết quả / KQKN-DV</p><h1>Hồ sơ kết quả</h1><p className="heading-copy">Kiểm tra file kết quả, phát hành PDF và thu hồi khi cần. Chỉ phiếu đã phát hành mới tra cứu và tải được công khai.</p></div></header>
+    {user?.role === 'ADMIN' && <LookupQrPanel />}
     <WorkflowGuide stage="results" />
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     {canPrepare && <section className="panel-card intake-list-card result-file-first-card">
@@ -104,3 +106,30 @@ export function ResultReleasesPage() {
 }
 
 function formatDateTime(value) { return value ? new Date(value).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—'; }
+
+/** Admin: địa chỉ in trong mã QR (PUBLIC_LOOKUP_URL) và tạo lại PDF mọi phiếu đã phát hành sau khi đổi sang tên miền. */
+function LookupQrPanel() {
+  const [settings, setSettings] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [message, setMessage] = useState('');
+  useEffect(() => { getLookupSettings().then(setSettings).catch(() => setSettings(null)); }, []);
+  if (!settings) return null;
+  async function run() {
+    setConfirm(false); setBusy(true); setMessage('');
+    try {
+      const result = await regenerateAllReports();
+      setMessage(`Đã tạo lại ${result.regenerated} phiếu${result.skipped ? `, bỏ qua ${result.skipped} phiếu dùng file tải lên` : ''}${result.failures.length ? `. Lỗi: ${result.failures.join('; ')}` : '.'}`);
+    } catch (exception) { setMessage(exception.message); }
+    finally { setBusy(false); }
+  }
+  const lan = /\/\/(192\.168|10\.|172\.(1[6-9]|2\d|3[01])\.|localhost|127\.)/.test(settings.lookupUrl);
+  return <section className="panel-card lookup-qr-panel">
+    <div><p className="section-kicker">Mã QR trên phiếu kết quả</p>
+      <strong className="mono">{settings.lookupUrl || 'Chưa cấu hình (chỉ in mã tra cứu dạng chữ)'}</strong>
+      <small>{lan ? 'Đây là địa chỉ mạng nội bộ: khách ở ngoài công ty quét QR sẽ không mở được. Khi có tên miền, đổi PUBLIC_LOOKUP_URL trong .env, khởi động lại backend rồi bấm nút bên cạnh.' : 'Phiếu phát hành mới dùng địa chỉ này. Sau khi đổi địa chỉ, tạo lại PDF để phiếu cũ cũng dùng địa chỉ mới.'}</small>
+      {message && <small className="lookup-qr-message" role="status">{message}</small>}</div>
+    <button className="outline-button" disabled={busy || settings.publishedCount === 0} onClick={() => setConfirm(true)}>{busy ? 'Đang tạo lại PDF…' : `Tạo lại PDF ${settings.publishedCount} phiếu đã phát hành`}</button>
+    {confirm && <ConfirmDialog title="Tạo lại PDF tất cả phiếu đã phát hành?" description={`QR trong PDF sẽ trỏ tới ${settings.lookupUrl || '(chưa cấu hình)'}. Số phiếu và mã tra cứu giữ nguyên. Mỗi phiếu mất vài giây.`} confirmLabel="Tạo lại PDF" onCancel={() => setConfirm(false)} onConfirm={run} />}
+  </section>;
+}

@@ -112,7 +112,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/result-releases/*/files/*", "/api/v1/result-releases/*/report-file").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/result-releases/*/report").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/return", "/api/v1/result-releases/*/publish",
-                                "/api/v1/result-releases/*/revoke", "/api/v1/result-releases/*/regenerate-report").hasRole("ADMIN")
+                                "/api/v1/result-releases/*/revoke", "/api/v1/result-releases/*/regenerate-report",
+                                "/api/v1/result-releases/regenerate-reports").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/result-releases", "/api/v1/result-releases/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers("/api/v1/result-releases/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/transfers/**").hasAnyRole("ADMIN", "RECEPTIONIST", "TECHNICIAN")

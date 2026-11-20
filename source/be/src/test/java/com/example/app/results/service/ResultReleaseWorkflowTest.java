@@ -483,6 +483,21 @@ class ResultReleaseWorkflowTest {
     }
 
     @Test
+    void adminRegeneratesEveryPublishedReportWithTheCurrentLookupAddress(@Autowired ResultReportRefreshService refresh) {
+        fillReport();
+        workflow.submit(releaseId, technician);
+        var published = workflow.publish(releaseId, null, admin);
+        expect(403, () -> refresh.regenerateAll(technician));
+        var result = refresh.regenerateAll(admin);
+        assertThat(result.regenerated()).isGreaterThanOrEqualTo(1);
+        assertThat(result.failures()).isEmpty();
+        var again = workflow.detail(releaseId);
+        assertThat(again.resultNumber()).isEqualTo(published.resultNumber());
+        assertThat(again.lookupCode()).isEqualTo(published.lookupCode());
+        assertThat(refresh.settings().publishedCount()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     void adminCanPrepareAndPublishTheirOwnUploadedResult(@org.springframework.beans.factory.annotation.Autowired ReportFileStamper stamper) throws Exception {
         // Hand the dossier created in setUp to the admin, as if the admin had opened it.
         entityManager.flush();

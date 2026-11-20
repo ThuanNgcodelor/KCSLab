@@ -36,11 +36,14 @@ public class ResultReleaseDraftController {
     private final UserService users;
     private final com.example.app.results.service.ResultReportFileService reportFiles;
     private final com.example.app.results.service.ResultEntryService entries;
+    private final com.example.app.results.service.ResultReportRefreshService refresh;
 
     public ResultReleaseDraftController(ResultReleaseDraftService drafts, ResultReleaseService workflow, UserService users,
                                       com.example.app.results.service.ResultReportFileService reportFiles,
-                                      com.example.app.results.service.ResultEntryService entries) {
+                                      com.example.app.results.service.ResultEntryService entries,
+                                      com.example.app.results.service.ResultReportRefreshService refresh) {
         this.drafts = drafts; this.workflow = workflow; this.users = users; this.reportFiles = reportFiles; this.entries = entries;
+        this.refresh = refresh;
     }
 
     public record CreateDraftRequest(@NotNull Long testingRecordId) {}
@@ -185,6 +188,16 @@ public class ResultReleaseDraftController {
     public ResultReleaseDetailResponse publish(@PathVariable Long id, @RequestBody(required = false) PublishRequest request,
                                                @AuthenticationPrincipal Jwt jwt) {
         return workflow.publish(id, request == null ? null : request.publicFileIds(), users.getByEmail(jwt.getSubject()));
+    }
+
+    /** Address printed in the QR of every KQKN (PUBLIC_LOOKUP_URL) and how many reports are published. */
+    @GetMapping("/lookup-settings")
+    public com.example.app.results.service.ResultReportRefreshService.Settings lookupSettings() { return refresh.settings(); }
+
+    /** Rebuilds the PDF of every published report with the current lookup address (after moving to a domain). */
+    @PostMapping("/regenerate-reports")
+    public com.example.app.results.service.ResultReportRefreshService.Result regenerateAll(@AuthenticationPrincipal Jwt jwt) {
+        return refresh.regenerateAll(users.getByEmail(jwt.getSubject()));
     }
 
     @PostMapping("/{id}/regenerate-report")

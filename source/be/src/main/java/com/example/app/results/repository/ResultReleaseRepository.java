@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Long>, JpaSpecificationExecutor<ResultRelease> {
@@ -22,6 +23,9 @@ public interface ResultReleaseRepository extends JpaRepository<ResultRelease, Lo
     boolean existsByLookupCode(String lookupCode);
 
     boolean existsByResultNumber(String resultNumber);
+
+    @org.springframework.data.jpa.repository.Query("select r.id from ResultRelease r where r.status = com.example.app.results.entity.ResultReleaseStatus.PUBLISHED order by r.id")
+    List<Long> findPublishedIds();
 
     @Query("select coalesce(max(r.version), 0) from ResultRelease r where r.testingRecord.id = :recordId")
     int maxVersion(@Param("recordId") Long recordId);
