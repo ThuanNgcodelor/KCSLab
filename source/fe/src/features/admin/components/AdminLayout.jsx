@@ -40,6 +40,7 @@ export function AdminLayout() {
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
           {isAdmin && <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {isAdmin && <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
+          {isAdmin && <NavLink to="/admin/test-methods" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Phương pháp thử</span></NavLink>}
           {user?.role === 'RECEPTIONIST' && <NavLink to="/admin/intake" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {canReceive && <NavLink to="/admin/requests" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Phiếu yêu cầu kiểm nghiệm</span></NavLink>}
           {canReceive && <NavLink to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}

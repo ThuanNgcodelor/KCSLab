@@ -125,9 +125,37 @@ class ReceiptServiceTest {
                 .containsExactly("Beta Available");
     }
 
+    @Test
+    void requestNumberIdentifiesExactlyOneReceipt() {
+        User receptionist = userRepository.save(new User(
+                "dup@test.local", "Nhan vien trung so", "unused", Role.RECEPTIONIST));
+        receiptService.create(receiptRequest("DupA", "0900000101", Instant.now()), receptionist);
+        // Same Số/No. (different customer, different case/spacing) must be rejected.
+        CreateReceiptRequest second = receiptRequest("DupA", "0900000102", Instant.now());
+        assertThatThrownBy(() -> receiptService.create(second, receptionist))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("đã có hồ sơ tiếp nhận");
+        assertThat(receiptService.create(receiptRequest("DupB", "0900000103", Instant.now()), receptionist).requestNumber())
+                .isEqualTo("REQ-DupB");
+    }
+
+    @Test
+    void cfcRequestNumberIsStoredInCanonicalFourDigitForm() {
+        User receptionist = userRepository.save(new User(
+                "canon@test.local", "Nhan vien so chuan", "unused", Role.RECEPTIONIST));
+        ReceiptResponse first = receiptService.create(receiptRequest("Canon", "0900000111", Instant.now(), " cfc92.00005 "), receptionist);
+        assertThat(first.requestNumber()).isEqualTo("CFC92.0005");
+        assertThatThrownBy(() -> receiptService.create(receiptRequest("Canon2", "0900000112", Instant.now(), "CFC92.0005"), receptionist))
+                .isInstanceOf(ResponseStatusException.class).hasMessageContaining("đã có hồ sơ tiếp nhận");
+    }
+
     private CreateReceiptRequest receiptRequest(String customerName, String phone, Instant receivedAt) {
+        return receiptRequest(customerName, phone, receivedAt, "REQ-" + customerName);
+    }
+
+    private CreateReceiptRequest receiptRequest(String customerName, String phone, Instant receivedAt, String requestNumber) {
         return new CreateReceiptRequest(
-                customerName, phone, "REQ-" + customerName, null, "Can Tho",
+                customerName, phone, requestNumber, null, "Can Tho",
                 "Nguoi lay mau", receivedAt.minusSeconds(3600), "Vung trong test",
                 "Co so dong goi test", "65C-TEST", null, null,
                 "Nguoi giao", receivedAt, "Sau rieng test", "1 kg", "Tui PE",

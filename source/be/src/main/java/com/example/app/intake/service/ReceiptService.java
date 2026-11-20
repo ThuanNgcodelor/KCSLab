@@ -178,14 +178,22 @@ public class ReceiptService {
                 request.conditionDetail(), request.transportInfo(), request.receivedTemperature(),
                 request.storageCondition(), request.requestedParameters(), request.expectedDate(),
                 request.specialRequest(), decision, request.acceptanceReason());
-        receipt.setRequestNumber(request.requestNumber().trim());
+        // Số/No. dạng CFC luôn lưu dạng chuẩn CFC26.0001 (gõ CFC26.00001 hay cfc26.1 đều được chuyển).
+        String typedNumber = request.requestNumber().trim();
+        String canonicalNumber = com.example.app.sampling.service.TestRequestNumberSequence.normalize(typedNumber);
+        String requestNumber = canonicalNumber != null ? canonicalNumber : typedNumber;
+        receiptRepository.findByRequestNumberUnique(requestNumber).ifPresent(existing -> {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Số/No. " + existing.getRequestNumber()
+                    + " đã có hồ sơ tiếp nhận; mỗi Số/No. chỉ được dùng cho một hồ sơ");
+        });
+        receipt.setRequestNumber(requestNumber);
         receipt.setSealStatus(request.sealStatus());
         receipt.setStorageAfterReceipt(blankToNull(request.storageAfterReceipt()));
         receipt.setContainerSealNumber(blankToNull(request.containerSealNumber()));
         if (request.testRequestId() != null) {
             TestRequest testRequest = testRequestRepository.findById(request.testRequestId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Phiếu yêu cầu"));
-            if (!testRequest.getRequestNumber().equalsIgnoreCase(request.requestNumber().trim())) {
+            if (!testRequest.getRequestNumber().equalsIgnoreCase(requestNumber)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Số Phiếu yêu cầu không khớp hồ sơ đã chọn");
             }
@@ -220,7 +228,13 @@ public class ReceiptService {
             }
             receipt.addSample(sample);
         }
-        Receipt saved = receiptRepository.save(receipt);
+        Receipt saved;
+        try {
+            saved = receiptRepository.saveAndFlush(receipt);
+        } catch (org.springframework.dao.DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Số/No. " + requestNumber + " đã có hồ sơ tiếp nhận; mỗi Số/No. chỉ được dùng cho một hồ sơ");
+        }
         notificationService.notifyRoles(Set.of(Role.ADMIN, Role.TECHNICIAN), receivedBy,
                 StaffNotificationType.INTAKE_RECORDED,
                 "Phiếu tiếp nhận mới",

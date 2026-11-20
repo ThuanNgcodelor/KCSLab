@@ -97,8 +97,15 @@ class TestRequestNumberingTest {
                 });
         assertThatThrownBy(() -> service.create(request("PHIEU-1"), actor))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(400));
-        assertThatThrownBy(() -> service.create(request("CFC26.12"), actor))
-                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(400));
+        // Typed numbers are converted to the canonical four-digit form.
+        assertThat(service.create(request("cfc93.12"), actor).requestNumber()).isEqualTo("CFC93.0012");
+        assertThat(service.create(request("CFC93.00013"), actor).requestNumber()).isEqualTo("CFC93.0013");
+        assertThatThrownBy(() -> service.create(request("CFC93.0013"), actor))
+                .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(409));
+        assertThat(TestRequestNumberSequence.normalize(" cfc26.00001 ")).isEqualTo("CFC26.0001");
+        assertThat(TestRequestNumberSequence.normalize("CFC26.12345")).isEqualTo("CFC26.12345");
+        assertThat(TestRequestNumberSequence.normalize("CFC26.0")).isNull();
+        assertThat(TestRequestNumberSequence.normalize("REQ-1")).isNull();
 
         Response next = service.create(request(""), actor);
         assertThat(next.requestNumber()).isNotEqualTo(auto.requestNumber());

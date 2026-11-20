@@ -1,12 +1,13 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
-import { createReceipt, downloadReceiptForm3, uploadReceiptFile } from '../api/intakeApi';
+import { createReceipt, downloadReceiptForm3, listReceipts, uploadReceiptFile } from '../api/intakeApi';
 import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
 import { getTestRequest, getTestRequestByNumber, listTestRequests } from '../../sampling/api/testRequestApi';
 import { Chevron } from '../../sampling/components/SamplingParts';
 import { splitParameters } from '../../../shared/parameters';
+import { normalizeRequestNumber } from '../../../shared/requestNumber';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -21,7 +22,7 @@ const newSample = () => ({
   packagingOther: '', parameterOther: '', parameterOtherEnabled: false, condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
-const parameterOptions = ['Cadimi (Cd)', 'Auramine O (Vàng ô)', 'Dư lượng thuốc BVTV'];
+const parameterOptions = ['Cadimi (Cd)', 'Auramine O (Vỏ)', 'Auramine O (Ruột)', 'Dư lượng thuốc BVTV'];
 const conditionOptions = ['Nguyên vẹn', 'Rò rỉ', 'Dập nát', 'Thiếu lượng'];
 const ABNORMAL = 'Dấu hiệu bất thường';
 // Tình trạng mẫu là checklist theo mẫu Word, lưu thành chuỗi "Rò rỉ; Dập nát; Dấu hiệu bất thường: mốc".
@@ -55,7 +56,7 @@ function samplesFromRequest(data) {
   (data.items ?? []).forEach((item) => {
     const name = item.sampleNameOrId || data.sampleName;
     if (!byName.has(name)) byName.set(name, []);
-    splitParameters(item.parameters).forEach((parameter) => { if (!byName.get(name).includes(parameter)) byName.get(name).push(parameter); });
+    splitParameters(item.parameters, item.matrix).forEach((parameter) => { if (!byName.get(name).includes(parameter)) byName.get(name).push(parameter); });
   });
   const rows = [...byName].map(([name, parameters]) => {
     const known = parameters.filter((parameter) => parameterOptions.includes(parameter));
@@ -76,6 +77,19 @@ export function ReceiptCreatePage() {
   const [uploadWarning, setUploadWarning] = useState('');
   const [created, setCreated] = useState(null);
   const [sourceRequest, setSourceRequest] = useState(null);
+  // Số/No. là định danh duy nhất: mỗi Số/No. chỉ có một hồ sơ tiếp nhận.
+  const [usedBy, setUsedBy] = useState(null);
+  useEffect(() => {
+    const number = form.requestNumber.trim();
+    if (!number) { setUsedBy(null); return undefined; }
+    let active = true;
+    const timer = window.setTimeout(() => {
+      listReceipts({ q: number, size: 5 })
+        .then((page) => { if (active) setUsedBy(page.content.find((item) => (item.requestNumber || '').toLowerCase() === number.toLowerCase()) ?? null); })
+        .catch(() => { if (active) setUsedBy(null); });
+    }, 300);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [form.requestNumber]);
 
   function applyRequest(data) {
     setSourceRequest(data);
@@ -131,7 +145,7 @@ export function ReceiptCreatePage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const validationMessage = validateForm(form, samples);
+    const validationMessage = usedBy ? `Số/No. ${usedBy.requestNumber} đã có hồ sơ tiếp nhận. Mỗi Số/No. chỉ được dùng cho một hồ sơ.` : validateForm(form, samples);
     if (validationMessage) {
       setError(validationMessage);
       return;
@@ -188,7 +202,7 @@ export function ReceiptCreatePage() {
       <h1>Đã tạo hồ sơ tiếp nhận</h1>
       <p>Người tiếp nhận, hồ sơ nguồn, danh sách mẫu và ảnh hiện trường đã được gắn vào cùng một hồ sơ.</p>
       {uploadWarning && <div className="toast toast-warning" role="alert">{uploadWarning}</div>}
-      <div className="code-display"><small>MÃ PHIẾU</small><strong>{created.receiptCode}</strong>
+      <div className="code-display"><small>SỐ/NO</small><strong>{created.requestNumber || created.receiptCode}</strong>
         <small>MÃ MẪU HIỆN TẠI</small>
         {created.samples?.map((sample) => <strong key={sample.id}>{sample.sampleCode}</strong>)}
       </div>
@@ -206,6 +220,7 @@ export function ReceiptCreatePage() {
       <button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Quay lại danh sách</button>
       <p className="section-kicker">Vận hành / Tiếp nhận mẫu</p><h1>Tạo hồ sơ tiếp nhận</h1>
     </div></header>
+    {usedBy && <div className="toast toast-error" role="alert">Số/No. <strong>{usedBy.requestNumber}</strong> đã có hồ sơ tiếp nhận (nhận ngày {new Date(usedBy.receivedAt).toLocaleDateString('vi-VN')}). Mỗi Số/No. chỉ được dùng cho một hồ sơ. <button type="button" className="link-button" onClick={() => navigate(`/admin/intake/${usedBy.id}`)}>Xem hồ sơ đó</button></div>}
     {sourceRequest && <div className="source-banner"><strong>Đang tạo từ yêu cầu: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
     {error && <div className="toast toast-error" role="alert">{error}</div>}
     {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
@@ -409,12 +424,19 @@ function RequestPicker({ value, linked, onChange, onPick, onUnlink }) {
   }, [value, linked]);
   function handle(event) {
     onChange(event);
-    const typed = event.target.value.trim().toUpperCase();
+    const typed = normalizeRequestNumber(event.target.value).toUpperCase();
     if (options.some((item) => item.requestNumber === typed)) onPick(typed);
+  }
+  // Rời ô nhập: đưa về dạng chuẩn CFC26.0001 rồi tự liên kết nếu đúng một Phiếu yêu cầu có sẵn.
+  function handleBlur(event) {
+    const canonical = normalizeRequestNumber(event.target.value);
+    if (canonical === event.target.value) return;
+    onChange({ target: { value: canonical } });
+    if (options.some((item) => item.requestNumber === canonical.toUpperCase())) onPick(canonical.toUpperCase());
   }
   return <label className="request-picker full-span">Số/No. Phiếu yêu cầu
     <span className="request-picker-row">
-      <input value={value} onChange={handle} list={listId} required readOnly={linked} placeholder="Chọn hoặc gõ số, ví dụ CFC26.0001" autoComplete="off" spellCheck="false" />
+      <input value={value} onChange={handle} onBlur={handleBlur} list={listId} required readOnly={linked} placeholder="Chọn hoặc gõ số, ví dụ CFC26.0001" autoComplete="off" spellCheck="false" />
       {linked && <button type="button" className="outline-button" onClick={onUnlink}>Đổi phiếu</button>}
     </span>
     <datalist id={listId}>{options.map((item) => <option key={item.id} value={item.requestNumber}>{item.customerName} · {item.sampleName}</option>)}</datalist>

@@ -16,7 +16,7 @@ const sortOptions = [
   ['transferDate,desc', 'Ngày chuyển: mới → cũ'], ['transferDate,asc', 'Ngày chuyển: cũ → mới'],
   ['resultsDueDate,asc', 'Hạn trả: gần nhất'], ['resultsDueDate,desc', 'Hạn trả: xa nhất'],
   ['transferCode,asc', 'Mã phiếu: A → Z'], ['transferCode,desc', 'Mã phiếu: Z → A'],
-  ['receiptCode,asc', 'Mã tiếp nhận: A → Z'], ['customerName,asc', 'Khách hàng: A → Z'],
+  ['customerName,asc', 'Khách hàng: A → Z'],
   ['customerName,desc', 'Khách hàng: Z → A'], ['status,asc', 'Trạng thái: A → Z'],
 ];
 const defaults = { q: '', from: '', to: '', status: '', sort: 'createdAt,desc' };
@@ -53,7 +53,7 @@ export function TransfersPage() {
         sort={list.sort} sortOptions={sortOptions} onSort={(sort) => setList({ sort })} onReset={() => setList({ ...defaults })} />
       {loading ? <PageLoader label="Đang tải hồ sơ chuyển mẫu…" rows={3} /> : transfers.length === 0 ? <div className="empty-intake"><span><Icon name="transfer" size={22} /></span><h3>Chưa có hồ sơ chuyển mẫu</h3><p>Tạo hồ sơ chuyển mẫu từ hồ sơ tiếp nhận để bàn giao mẫu.</p>{canCreate && <button className="outline-button" onClick={() => navigate('/admin/transfers/new')}>Tạo hồ sơ chuyển mẫu đầu tiên</button>}</div> : <div className="table-wrap"><table className="staff-table transfer-table"><thead><tr><th>Mã phiếu</th><th>Phiếu tiếp nhận</th><th>Nơi nhận</th><th>Mẫu</th><th>Hạn trả</th><th>Trạng thái</th><th /></tr></thead><tbody>{transfers.map((transfer) => <tr key={transfer.id}>
         <td data-label="Mã phiếu"><span className="transfer-cell-copy"><strong className="receipt-code">{transfer.transferCode}</strong><small>{transfer.customerName}</small></span></td>
-        <td data-label="Tiếp nhận"><span className="transfer-cell-copy"><strong>{transfer.receiptCode}</strong><small>{transfer.deliveredBy}</small></span></td>
+        <td data-label="Tiếp nhận"><span className="transfer-cell-copy"><strong>{transfer.requestNumber || '—'}</strong><small>{transfer.deliveredBy}</small></span></td>
         <td data-label="Nơi nhận">{transfer.receivingDepartment}</td>
         <td data-label="Số mẫu">{transfer.items.length} mẫu</td>
         <td data-label="Hạn trả">{formatDate(transfer.resultsDueDate)}</td>

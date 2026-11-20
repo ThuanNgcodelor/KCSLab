@@ -48,7 +48,7 @@ export function ReceiptDetailPage() {
   const photoCategory = category !== 'FORM_3' && category !== 'OTHER';
 
   return <section className="staff-page receipt-detail-page">
-    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Hồ sơ tiếp nhận / {receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div></header>
+    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Hồ sơ tiếp nhận / {receipt.requestNumber || receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div></header>
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <div className="receipt-detail-grid">
       <main className="receipt-form-main">

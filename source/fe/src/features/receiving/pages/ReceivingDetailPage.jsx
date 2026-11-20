@@ -1,42 +1,42 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { decideReceivingTransfer, getReceivingEvidence, getReceivingTransfer } from '../api/receivingApi';
+import { decideReceivingTransfer, getReceivingTransfer } from '../api/receivingApi';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { PageLoader } from '../../../shared/components/Loading';
-import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
 import { ParameterRows } from '../../../shared/components/ParameterRows';
 
-const groupNames = { FORM_3: 'Biên bản tiếp nhận', SAMPLE_PHOTO: 'Ảnh mẫu', LOT_PHOTO: 'Ảnh lô hàng', TRANSFER_EVIDENCE: 'Bằng chứng bàn giao' };
-
 export function ReceivingDetailPage() {
-  const { id } = useParams(); const navigate = useNavigate(); const dialog = useRef(null);
-  const [transfer, setTransfer] = useState(null); const [evidence, setEvidence] = useState([]);
+  const { id } = useParams(); const navigate = useNavigate();
+  const [transfer, setTransfer] = useState(null);
   const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
   const [note, setNote] = useState(''); const [labOpinion, setLabOpinion] = useState('');
   const [labRetain, setLabRetain] = useState(false); const [labRetentionUntil, setLabRetentionUntil] = useState('');
-  const [selected, setSelected] = useState(null); const [pendingDecision, setPendingDecision] = useState(null);
-  async function load() { setLoading(true); setError(''); try { const [record, files] = await Promise.all([getReceivingTransfer(id), getReceivingEvidence(id)]); setTransfer(record); setEvidence(files); return true; } catch (e) { setTransfer(null); setEvidence([]); setError(e.message); return false; } finally { setLoading(false); } }
+  const [pendingDecision, setPendingDecision] = useState(null);
+  async function load() { setLoading(true); setError(''); try { setTransfer(await getReceivingTransfer(id)); return true; } catch (e) { setTransfer(null); setError(e.message); return false; } finally { setLoading(false); } }
   useEffect(() => { load(); }, [id]);
-  useEffect(() => { if (selected) dialog.current?.showModal(); }, [selected]);
   function requestDecision(decision) { if (decision === 'REJECTED' && !note.trim()) { setError('Vui lòng ghi lý do từ chối.'); return; } if (labRetain && !labRetentionUntil) { setError('Vui lòng chọn ngày lưu mẫu đến.'); return; } setError(''); setPendingDecision(decision); }
   async function decide() { const decision = pendingDecision; if (!decision || saving) return; setPendingDecision(null); setSaving(true); setError(''); try { setTransfer(await decideReceivingTransfer(id, { decision, receivingNote: note, labOpinion, labRetain, labRetentionUntil: labRetain ? labRetentionUntil : null })); } catch (e) { if (e.status === 409) { if (await load()) setError('Phiếu đã thay đổi. Đã tải lại trạng thái mới.'); } else setError(e.message); } finally { setSaving(false); } }
-  const groups = ['Biên bản tiếp nhận', 'Ảnh mẫu', 'Ảnh lô hàng', 'Bằng chứng bàn giao', 'Khác'];
   return <section className="admin-page receiving-page receiving-detail">
-    <header className="admin-heading"><div><button className="back-link" onClick={() => navigate('/admin/receiving/transfers')}>← Danh sách nhận mẫu</button><p>Chi tiết phiếu bàn giao</p><h1>{transfer?.transferCode || 'Chi tiết phiếu chuyển'}</h1></div></header>
+    <header className="admin-heading"><div><button className="back-link" onClick={() => navigate('/admin/receiving/transfers')}>← Danh sách nhận mẫu</button><p>Chi tiết phiếu bàn giao</p><h1>{transfer ? `Số/No ${transfer.requestNumber || '—'}` : 'Chi tiết phiếu chuyển'}</h1></div></header>
     {error && <p className="form-error" role="alert">{error}</p>}{loading && <PageLoader label="Đang tải phiếu…" rows={4} />}
     {!loading && transfer && <>
-      <section className="panel-card"><div className="receiving-section-heading"><div><h2>Thông tin bàn giao</h2><p>Thông tin phiếu và các mẫu cần đối chiếu</p></div><StatusBadge domain="transfer" value={transfer.status} /></div>
-        <dl className="receiving-details-grid">{[['Phiếu yêu cầu', transfer.requestNumber], ['Phiếu tiếp nhận', transfer.receiptCode], ['Người giao nội bộ', transfer.deliveredBy], ['Ngày chuyển', transfer.transferDate], ['Hạn trả kết quả', transfer.resultsDueDate], ['Phòng nhận', transfer.receivingDepartment], ['Người nhận', transfer.receivedBy || 'Chưa xác nhận'], ['Trả mẫu cho khách', transfer.returnToCustomer ? `Có${transfer.customerReturnDate ? ` (${transfer.customerReturnDate})` : ''}` : 'Không']].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || '—'}</dd></div>)}</dl>
-        <h3 className="receiving-subheading">Danh sách mẫu <span>{transfer.items.length}</span></h3><div className="table-wrap receiving-sample-table"><table><thead><tr><th>Mã mẫu</th><th>Tên mẫu</th><th>Số lượng</th><th>Khối lượng</th><th>Tình trạng</th><th>Chỉ tiêu</th><th>Phương pháp</th></tr></thead><tbody>{transfer.items.map((item) => <ParameterRows key={item.id} item={item} columns={(rowSpan) => <><td data-label="Mã mẫu" rowSpan={rowSpan}>{item.sampleCode}</td><td data-label="Tên mẫu" rowSpan={rowSpan}>{item.sampleName}</td><td data-label="Số lượng" rowSpan={rowSpan}>{item.quantity || '—'}</td><td data-label="Khối lượng" rowSpan={rowSpan}>{item.weight || '—'}</td><td data-label="Tình trạng" rowSpan={rowSpan}>{item.sampleCondition || '—'}</td></>} />)}</tbody></table></div><p className="receiving-note"><strong>Ghi chú:</strong> {transfer.changesNote || 'Không có'}</p>
+      <section className="panel-card handover-card"><div className="receiving-section-heading"><div><h2>Thông tin bàn giao</h2><p>Thông tin phiếu và các mẫu được chuyển đến KCS</p></div><StatusBadge domain="transfer" value={transfer.status} /></div>
+        <div className="handover-summary">
+          <div className="handover-primary"><span>Số/No</span><strong>{transfer.requestNumber || '—'}</strong><small>{transfer.items.length} mẫu · {transfer.receivingDepartment || 'KCS'}</small></div>
+          <dl className="handover-grid">{[['Người giao nội bộ', transfer.deliveredBy], ['Ngày chuyển', formatDate(transfer.transferDate)], ['Hạn trả kết quả', formatDate(transfer.resultsDueDate), 'due'], ['Người nhận', transfer.receivedBy || 'Chưa xác nhận'], ['Trả mẫu cho khách', transfer.returnToCustomer ? `Có${transfer.customerReturnDate ? ` · ${formatDate(transfer.customerReturnDate)}` : ''}` : 'Không']].map(([label, value, tone]) => <div key={label} className={tone ? `handover-item ${tone}` : 'handover-item'}><dt>{label}</dt><dd>{value || '—'}</dd></div>)}</dl>
+        </div>
+        <h3 className="receiving-subheading handover-subheading">Danh sách mẫu <span>{transfer.items.length}</span></h3><div className="table-wrap receiving-sample-table"><table><thead><tr><th>Mã hóa mẫu</th><th>Số/No</th><th>Số lượng</th><th>Khối lượng</th><th>Tình trạng</th><th>Chỉ tiêu</th><th>Phương pháp</th></tr></thead><tbody>{transfer.items.map((item) => <ParameterRows key={item.id} item={item} columns={(rowSpan) => <><td data-label="Mã hóa mẫu" rowSpan={rowSpan}><strong>{item.sampleCode}</strong></td><td data-label="Số/No" rowSpan={rowSpan}>{transfer.requestNumber || '—'}</td><td data-label="Số lượng" rowSpan={rowSpan}>{item.quantity || '—'}</td><td data-label="Khối lượng" rowSpan={rowSpan}>{item.weight || '—'}</td><td data-label="Tình trạng" rowSpan={rowSpan}>{item.sampleCondition || '—'}</td></>} />)}</tbody></table></div><div className="handover-note"><strong>Ghi chú bàn giao</strong><p>{transfer.changesNote || 'Không có ghi chú.'}</p></div>
       </section>
-      <section className="panel-card receiving-evidence"><div className="receiving-section-heading"><div><h2>Ảnh và hồ sơ đối chiếu</h2><p>Bằng chứng từ tiếp nhận và lúc bàn giao mẫu</p></div><span className="receiving-count">{evidence.length} file</span></div>{!evidence.some((file) => file.contentType.startsWith('image/')) && <p className="receiving-warning">Chưa có ảnh đối chiếu. KCS vẫn có thể nhận sau khi kiểm tra thực tế.</p>}{groups.map((group) => { const files = evidence.filter((file) => (groupNames[file.category] || 'Khác') === group); return files.length ? <div key={group}><h3>{group} <span>({files.length})</span></h3><div className="receiving-gallery">{files.map((file) => <article key={file.id}>{file.contentType.startsWith('image/') ? <button className="receiving-preview" onClick={() => setSelected(file)} aria-label={`Xem ảnh ${file.originalName}`}><img src={file.contentUrl} alt={file.originalName} /></button> : <span className="receiving-file-icon"><Icon name="file" size={26} /></span>}<strong>{file.originalName}</strong><small>{Math.ceil(file.size / 1024)} KB · {file.uploadedByName || 'Không rõ người tải'}</small><a href={file.contentUrl} target="_blank" rel="noreferrer">Mở / tải file</a></article>)}</div></div> : null; })}{!evidence.length && <p className="receiving-empty">Chưa có file đính kèm cho hồ sơ này.</p>}</section>
       {transfer.status === 'PENDING' && <section className="panel-card"><h2>Xác nhận bàn giao</h2><label>Ghi chú hoặc lý do từ chối<textarea rows="3" value={note} onChange={(e) => setNote(e.target.value)} /></label><label>Ý kiến phòng phân tích<textarea rows="3" value={labOpinion} onChange={(e) => setLabOpinion(e.target.value)} /></label><label className="switch-label"><input type="checkbox" checked={labRetain} onChange={(e) => setLabRetain(e.target.checked)} /><span className="fake-switch" />Phòng phân tích lưu mẫu</label>{labRetain && <label>Lưu đến ngày<DateInput value={labRetentionUntil} onChange={(e) => setLabRetentionUntil(e.target.value)} /></label>}<div className="receiving-filter"><button className="outline-button" disabled={saving} onClick={() => requestDecision('REJECTED')}>Từ chối</button><button className="primary-button" disabled={saving} onClick={() => requestDecision('ACCEPTED')}>{saving ? 'Đang lưu…' : 'Xác nhận đã nhận'}</button></div></section>}
-      {transfer.status !== 'PENDING' && <section className="panel-card"><h2>Kết quả bàn giao</h2><p>{transfer.receivingNote || 'Không có ghi chú.'}</p><p>Ý kiến phòng phân tích: {transfer.labOpinion || 'Không có'}</p></section>}
-      {transfer.status === 'ACCEPTED' && <section className="panel-card"><h2>Mã hóa mẫu đã bàn giao</h2><p>Mã hóa mẫu do bộ phận tiếp nhận nhập và dán nhãn. KCS nhận mẫu là hoàn tất, không có bước đối chiếu mã riêng.</p>{transfer.items.map((item) => <div key={item.id} className="receiving-note"><strong>{item.sampleCode}</strong> · Sẵn sàng chuyển sang bước kết quả</div>)}</section>}
-      <dialog ref={dialog} onClose={() => setSelected(null)} className="receiving-dialog"><button className="outline-button" onClick={() => dialog.current?.close()}>Đóng</button>{selected && <img src={selected.contentUrl} alt={selected.originalName} />}</dialog>
-      {pendingDecision && <ConfirmDialog title={pendingDecision === 'ACCEPTED' ? 'Xác nhận nhận mẫu?' : 'Từ chối nhận mẫu?'} description={pendingDecision === 'ACCEPTED' ? `Bạn xác nhận đã đối chiếu và nhận mẫu trong phiếu ${transfer.transferCode}.` : `Phiếu ${transfer.transferCode} sẽ được trả lại cùng lý do đã nhập.`} confirmLabel={pendingDecision === 'ACCEPTED' ? 'Xác nhận đã nhận' : 'Xác nhận từ chối'} tone={pendingDecision === 'REJECTED' ? 'danger' : 'default'} onCancel={() => setPendingDecision(null)} onConfirm={decide} />}
+      {pendingDecision && <ConfirmDialog title={pendingDecision === 'ACCEPTED' ? 'Xác nhận nhận mẫu?' : 'Từ chối nhận mẫu?'} description={pendingDecision === 'ACCEPTED' ? `Bạn xác nhận đã nhận mẫu của Số/No ${transfer.requestNumber || '—'}.` : `Phiếu của Số/No ${transfer.requestNumber || '—'} sẽ được trả lại cùng lý do đã nhập.`} confirmLabel={pendingDecision === 'ACCEPTED' ? 'Xác nhận đã nhận' : 'Xác nhận từ chối'} tone={pendingDecision === 'REJECTED' ? 'danger' : 'default'} onCancel={() => setPendingDecision(null)} onConfirm={decide} />}
     </>}
   </section>;
+}
+
+function formatDate(value) {
+  if (!value) return '';
+  const [year, month, day] = String(value).slice(0, 10).split('-');
+  return day && month && year ? `${day}/${month}/${year}` : value;
 }

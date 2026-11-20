@@ -5,6 +5,7 @@ import { SplashScreen } from '../shared/components/Loading';
 
 const AdminLayout = lazy(() => import('../features/admin/components/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const TestMethodsPage = lazy(() => import('../features/methods/pages/TestMethodsPage').then(m => ({ default: m.TestMethodsPage })));
 const UsersPage = lazy(() => import('../features/users/pages/UsersPage').then(m => ({ default: m.UsersPage })));
 const UserFormPage = lazy(() => import('../features/users/pages/UserFormPage').then(m => ({ default: m.UserFormPage })));
 const ReceptionistDashboardPage = lazy(() => import('../features/intake/pages/ReceptionistDashboardPage').then(m => ({ default: m.ReceptionistDashboardPage })));
@@ -65,6 +66,7 @@ export function App() {
         <Route path="/admin/profile" element={<ProfilePage />} />
         <Route element={<RoleRoute roles={['ADMIN']} />}>
           <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/test-methods" element={<TestMethodsPage />} />
           <Route path="/admin/users/new" element={<UserFormPage />} />
           <Route path="/admin/users/:id/edit" element={<UserFormPage />} />
         </Route>

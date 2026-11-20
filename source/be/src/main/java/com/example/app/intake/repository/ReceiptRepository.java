@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long>, JpaSpecificationExecutor<Receipt> {
     Optional<Receipt> findByReceiptCode(String receiptCode);
+    Optional<Receipt> findByRequestNumberUnique(String requestNumber);
 }

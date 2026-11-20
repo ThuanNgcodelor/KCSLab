@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public record IntakeDashboardReceiptResponse(
         Long id,
         String receiptCode,
+        String requestNumber,
         String customerName,
         String sampleName,
         int sampleCount,

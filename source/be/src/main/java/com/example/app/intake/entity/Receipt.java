@@ -35,6 +35,8 @@ public class Receipt {
     private User receivedBy;
     @Column(nullable = false, length = 160) private String deliveredBy;
     @Column(length = 80) private String requestNumber;
+    /** Unique key of the Số/No.; legacy duplicates keep NULL here (see V16). */
+    @Column(name = "request_number_unique", length = 80) private String requestNumberUnique;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "test_request_id") private TestRequest testRequest;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "field_sampling_id") private FieldSampling fieldSampling;
     @Column(nullable = false) private Instant receivedAt;
@@ -115,7 +117,7 @@ public class Receipt {
     public User getReceivedBy() { return receivedBy; }
     public String getDeliveredBy() { return deliveredBy; }
     public String getRequestNumber() { return requestNumber; }
-    public void setRequestNumber(String requestNumber) { this.requestNumber = requestNumber; }
+    public void setRequestNumber(String requestNumber) { this.requestNumber = requestNumber; this.requestNumberUnique = requestNumber; }
     public void linkRequest(TestRequest request, FieldSampling field) { this.testRequest = request; this.fieldSampling = field; }
     public TestRequest getTestRequest() { return testRequest; }
     public FieldSampling getFieldSampling() { return fieldSampling; }

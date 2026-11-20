@@ -35,6 +35,20 @@ public class TestRequestNumberSequence {
 
     public static String format(String yearCode, long sequence) { return String.format("CFC%s.%04d", yearCode, sequence); }
 
+    private static final Pattern TYPED = Pattern.compile("^CFC(\\d{2})\\.(\\d{1,9})$");
+
+    /**
+     * Canonical form of a typed number: {@code cfc26.00001} or {@code CFC26.1} become {@code CFC26.0001}
+     * (four digits, more only after 9999). Returns {@code null} when the text is not a CFC number at all.
+     */
+    public static String normalize(String typed) {
+        if (typed == null) return null;
+        Matcher m = TYPED.matcher(typed.trim().replaceAll("\\s+", "").toUpperCase(java.util.Locale.ROOT));
+        if (!m.matches()) return null;
+        long sequence = Long.parseLong(m.group(2));
+        return sequence < 1 ? null : format(m.group(1), sequence);
+    }
+
     /** Suggestion only: does not consume a number. */
     @Transactional(readOnly = true)
     public String peek() {

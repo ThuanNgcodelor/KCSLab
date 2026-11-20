@@ -82,7 +82,7 @@ public class IntakeDashboardService {
     }
 
     private IntakeDashboardReceiptResponse toDashboardReceipt(ReceiptResponse receipt) {
-        return new IntakeDashboardReceiptResponse(receipt.id(), receipt.receiptCode(), receipt.customerName(),
+        return new IntakeDashboardReceiptResponse(receipt.id(), receipt.receiptCode(), receipt.requestNumber(), receipt.customerName(),
                 receipt.sampleName(), receipt.samples().size(), receipt.receivedByName(), receipt.receivedAt(),
                 receipt.expectedDate(), receipt.status());
     }
