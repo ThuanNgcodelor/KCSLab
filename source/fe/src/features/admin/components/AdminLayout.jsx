@@ -70,6 +70,7 @@ export function AdminLayout() {
   return (
     <NotificationProvider><NotificationToasts /><div className="admin-shell" data-role={user?.role}
       onKeyDown={(event) => { if (event.key === 'Escape' && mobileOpen) setMobileOpen(false); }}>
+      <a className="workspace-skip" href="#workspace-content">Chuyển đến nội dung</a>
       <aside id="workspace-sidebar" className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`} data-collapsed={sidebarCollapsed}>
         <div className="sidebar-brand">
           <img className="sidebar-logo" src={cfcLogo} alt="Logo CFC Cò Bay" width="58" height="40" />
@@ -117,7 +118,7 @@ export function AdminLayout() {
           </div>
           <NotificationCenter />
         </header>
-        <div className="admin-content"><Outlet /></div>
+        <div className="admin-content" id="workspace-content" tabIndex={-1}><Outlet /></div>
         <AdminFooter />
       </main>
     </div></NotificationProvider>

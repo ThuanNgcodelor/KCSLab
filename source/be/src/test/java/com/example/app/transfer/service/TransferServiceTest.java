@@ -81,7 +81,7 @@ class TransferServiceTest {
         assertThat(created.items()).hasSize(1);
         assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.RECEIVED);
 
-        TransferResponse submitted = transferService.submit(created.id());
+        TransferResponse submitted = transferService.submit(created.id(), receptionist);
         assertThat(submitted.status()).isEqualTo(TransferStatus.PENDING);
         assertThat(sample.getStatus()).isEqualTo(ReceiptStatus.TRANSFER_PENDING);
 
@@ -98,7 +98,7 @@ class TransferServiceTest {
     @Test
     void requiresReasonWhenRejectingTransfer() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
 
         assertThatThrownBy(() -> transferService.decide(created.id(),
                 new TransferDecisionRequest(TransferStatus.REJECTED, " ", null,
@@ -110,7 +110,7 @@ class TransferServiceTest {
     @Test
     void rejectsASecondDecisionAfterTheTransferHasAlreadyBeenAccepted() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
         TransferDecisionRequest decision = new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, "Đủ mẫu", null, false, null);
         transferService.decide(created.id(), decision, technician);
@@ -123,7 +123,7 @@ class TransferServiceTest {
     @Test
     void receivingDashboardAndSearchUseSubmittedTransfers() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
         entityManager.flush();
         LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
         var dashboard = receivingService.dashboard(technician, today, today);
@@ -142,7 +142,7 @@ class TransferServiceTest {
     @Test
     void receivingDashboardUsesVietnamMidnightBoundaries() {
         TransferResponse created = transferService.create(createRequest(), receptionist);
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
         var transfer = transferRepository.findById(created.id()).orElseThrow();
         ReflectionTestUtils.setField(transfer, "submittedAt", Instant.parse("2026-11-15T17:00:00Z"));
         entityManager.flush();
@@ -167,7 +167,7 @@ class TransferServiceTest {
             var request = new CreateTransferRequest(receipt.getId(), "KCS", LocalDate.now(),
                     LocalDate.now().plusDays(4), false, null, null,
                     List.of(new CreateTransferItemRequest(item.getId(), "500 g", "1 túi", "Tốt", "Cd", "TCVN")));
-            transferService.submit(transferService.create(request, receptionist).id());
+            transferService.submit(transferService.create(request, receptionist).id(), receptionist);
         }
         entityManager.flush();
         LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh"));
@@ -183,7 +183,7 @@ class TransferServiceTest {
     @Test
     void receivingDashboardUsesVietnamMidnightForDecisions() {
         var created = transferService.create(createRequest(), receptionist);
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
         transferService.decide(created.id(), new TransferDecisionRequest(TransferStatus.ACCEPTED, "Đủ mẫu", null, false, null), technician);
         var transfer = transferRepository.findById(created.id()).orElseThrow();
         ReflectionTestUtils.setField(transfer, "receivedAt", Instant.parse("2026-11-15T17:00:00Z"));
@@ -195,7 +195,7 @@ class TransferServiceTest {
     @Test
     void allowsCreatingANewTransferAfterRejection() {
         TransferResponse first = transferService.create(createRequest(), receptionist);
-        transferService.submit(first.id());
+        transferService.submit(first.id(), receptionist);
         transferService.decide(first.id(),
                 new TransferDecisionRequest(TransferStatus.REJECTED, "Bao bì cần đóng lại", null,
                         false, null), technician);
@@ -221,7 +221,7 @@ class TransferServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Không tìm thấy phiếu chuyển mẫu");
 
-        transferService.submit(created.id());
+        transferService.submit(created.id(), receptionist);
 
         assertThat(transferService.findAll(technician))
                 .extracting(TransferResponse::id)

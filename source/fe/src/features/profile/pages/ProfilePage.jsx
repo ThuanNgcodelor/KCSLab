@@ -5,6 +5,8 @@ import { changePassword, deleteAvatar, getProfile, updateProfile, uploadAvatar }
 import { UserAvatar } from '../components/UserAvatar';
 import { formatBytes, prepareAvatar } from '../utils/prepareAvatar';
 import { PageLoader } from '../../../shared/components/Loading';
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
+import { InstallGuide } from '../../../shared/components/InstallGuide';
 
 const roleLabels = { ADMIN: 'Quản trị viên', RECEPTIONIST: 'Nhân viên tiếp nhận', TECHNICIAN: 'Kỹ thuật viên KCS' };
 
@@ -19,6 +21,7 @@ export function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
+  const [confirmAvatarDelete, setConfirmAvatarDelete] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -68,6 +71,7 @@ export function ProfilePage() {
   }
 
   async function handleAvatarDelete() {
+    setConfirmAvatarDelete(false);
     setAvatarSaving(true); setError(''); setMessage('');
     try {
       applyProfile(await deleteAvatar());
@@ -102,17 +106,18 @@ export function ProfilePage() {
         <div className="profile-avatar-frame"><UserAvatar user={profile} className="profile-avatar" alt={`Avatar của ${profile?.displayName}`} /><span className="profile-presence" title="Tài khoản đang hoạt động" /></div>
         <div><h2>{profile?.displayName}</h2><p>{roleLabels[profile?.role] ?? profile?.role}</p></div>
         <dl><div><dt>Email đăng nhập</dt><dd>{profile?.email}</dd></div><div><dt>Trạng thái</dt><dd>{profile?.enabled ? 'Đang hoạt động' : 'Đã khóa'}</dd></div><div><dt>Cập nhật gần nhất</dt><dd>{formatDateTime(profile?.updatedAt)}</dd></div></dl>
-        <input ref={fileInput} className="visually-hidden" type="file" accept="image/jpeg,image/png" onChange={handleAvatarChange} />
+        <input ref={fileInput} hidden type="file" accept="image/jpeg,image/png" onChange={handleAvatarChange} />
         <button type="button" className="primary-button" disabled={avatarSaving} onClick={() => fileInput.current?.click()}>{avatarSaving ? 'Đang tối ưu ảnh…' : profile?.avatarUrl ? 'Đổi avatar' : 'Tải avatar lên'}</button>
-        {profile?.avatarUrl && <button type="button" className="profile-remove-avatar" disabled={avatarSaving} onClick={handleAvatarDelete}>Xóa avatar</button>}
+        {profile?.avatarUrl && <button type="button" className="profile-remove-avatar" disabled={avatarSaving} onClick={() => setConfirmAvatarDelete(true)}>Xóa avatar</button>}
         <small>JPG/PNG tối đa 10 MB ở thiết bị. Trước khi gửi, ảnh được thu nhỏ; máy chủ chỉ lưu JPEG 320×320 và không giữ ảnh gốc.</small>
+        <InstallGuide />
       </aside>
 
       <div className="profile-forms">
         <form className="panel-card profile-form" onSubmit={handleProfileSubmit}>
           <div className="profile-section-heading"><span className="form-number">I</span><div><h2>Thông tin hiển thị</h2><p>Tên này xuất hiện trên phiếu, lịch sử thao tác và thông báo nội bộ.</p></div></div>
           <label>Tên hiển thị<input value={displayName} minLength="2" maxLength="120" onChange={(event) => setDisplayName(event.target.value)} required /></label>
-          <label>Email<input value={profile?.email ?? ''} readOnly aria-readonly="true" /><small>Email là định danh đăng nhập, chỉ Admin mới thay đổi được.</small></label>
+          <label>Email<input value={profile?.email ?? ''} readOnly aria-readonly="true" /><small>Email này dùng để đăng nhập.</small></label>
           <div className="profile-form-actions"><button className="primary-button" disabled={profileSaving || displayName.trim() === profile?.displayName} type="submit">{profileSaving ? 'Đang lưu…' : 'Lưu thông tin'}</button></div>
         </form>
 
@@ -124,6 +129,9 @@ export function ProfilePage() {
         </form>
       </div>
     </div>
+    {confirmAvatarDelete && <ConfirmDialog title="Xóa avatar?" tone="danger"
+      description="Ảnh đại diện sẽ được thay bằng chữ cái từ tên hiển thị của bạn."
+      confirmLabel="Xóa avatar" onConfirm={handleAvatarDelete} onCancel={() => setConfirmAvatarDelete(false)} />}
   </section>;
 }
 

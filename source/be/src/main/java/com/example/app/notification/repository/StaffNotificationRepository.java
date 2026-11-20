@@ -4,6 +4,8 @@ import com.example.app.notification.entity.StaffNotification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +17,10 @@ public interface StaffNotificationRepository extends JpaRepository<StaffNotifica
         org.springframework.data.jpa.repository.JpaSpecificationExecutor<StaffNotification> {
     Page<StaffNotification> findByRecipient_Id(Long recipientId, Pageable pageable);
     Page<StaffNotification> findByRecipient_IdAndReadAtIsNull(Long recipientId, Pageable pageable);
+    @Override
+    @EntityGraph(attributePaths = "actor")
+    Page<StaffNotification> findAll(Specification<StaffNotification> spec, Pageable pageable);
+
     long countByRecipient_IdAndReadAtIsNull(Long recipientId);
     Optional<StaffNotification> findByIdAndRecipient_Id(Long id, Long recipientId);
     boolean existsByDedupeKey(String dedupeKey);

@@ -126,7 +126,7 @@ class SampleCodingServiceTest {
 
         assertThat(searchTransferable()).extracting(ReceiptResponse::id).contains(receipt.id());
         var transfer = transfers.create(transferRequest(receipt.id(), sampleId), coder);
-        assertThat(transfers.submit(transfer.id()).status()).isEqualTo(TransferStatus.PENDING);
+        assertThat(transfers.submit(transfer.id(), coder).status()).isEqualTo(TransferStatus.PENDING);
         assertThat(transfers.decide(transfer.id(), new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, null, null, false, null), technician).status())
                 .isEqualTo(TransferStatus.ACCEPTED);
@@ -140,7 +140,7 @@ class SampleCodingServiceTest {
         assertThat(coding.find(sampleId).codingStatus()).isEqualTo(SampleCodingStatus.VERIFIED);
         assertThat(searchTransferable()).extracting(ReceiptResponse::id).contains(receipt.id());
         var transfer = transfers.create(transferRequest(receipt.id(), sampleId), coder);
-        transfers.submit(transfer.id());
+        transfers.submit(transfer.id(), coder);
         transfers.decide(transfer.id(), new TransferDecisionRequest(TransferStatus.ACCEPTED, null, null, false, null), technician);
         assertThat(testing.candidates()).anyMatch(candidate -> candidate.sampleId().equals(sampleId));
     }

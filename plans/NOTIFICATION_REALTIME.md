@@ -79,7 +79,7 @@
 - [ ] Mỗi màn hình có loading/error/empty, chữ và icon rõ, trạng thái không chỉ dựa vào màu, thao tác bằng bàn phím, không tràn ngang toàn trang.
 - [ ] Chạy `npm run build` và `git diff --check`; chạy test backend nếu có sửa backend, không báo kết quả test chưa chạy.
 - [ ] Chụp/kiểm tra Chrome tại 390×844, 1024×768, 1440×900, 2560×952; báo role, dữ liệu thật hay giả lập và từng trường hợp chưa kiểm tra.
-- [ ] Sau mỗi nhóm thay đổi, cập nhật `docs/ai/CONTEXT.md` hoặc `docs/ai/STATE.md` theo bằng chứng; báo file thay đổi, rủi ro và phần còn lại.
+- [ ] Cập nhật `docs/ai/CONTEXT.md` sau các thay đổi về hành vi hoặc trạng thái kiểm thử.
 
 ### Thứ tự ưu tiên
 

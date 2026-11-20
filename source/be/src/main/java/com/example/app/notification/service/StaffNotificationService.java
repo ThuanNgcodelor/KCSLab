@@ -9,6 +9,7 @@ import com.example.app.notification.repository.StaffNotificationRepository;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import com.example.app.user.repository.UserRepository;
+import com.example.app.user.service.UserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +30,16 @@ public class StaffNotificationService {
     private final StaffNotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserService userService;
 
     public StaffNotificationService(StaffNotificationRepository notificationRepository,
                                     UserRepository userRepository,
-                                    ApplicationEventPublisher eventPublisher) {
+                                    ApplicationEventPublisher eventPublisher,
+                                    UserService userService) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
+        this.userService = userService;
     }
 
     private static final java.util.Map<String, String> LIST_SORT = java.util.Map.of(
@@ -94,33 +98,35 @@ public class StaffNotificationService {
     }
 
     @Transactional
-    public void notifyRoles(Collection<Role> roles, User excludedUser,
+    public void notifyRoles(Collection<Role> roles, User actor,
                             StaffNotificationType type, String title, String message,
                             String targetUrl, String entityType, Long entityId) {
-        notifyUsers(userRepository.findByRoleInAndEnabledTrue(roles), excludedUser,
+        notifyUsers(userRepository.findByRoleInAndEnabledTrue(roles), actor,
                 type, title, message, targetUrl, entityType, entityId);
     }
 
     @Transactional
-    public void notifyUsers(Collection<User> recipients, User excludedUser,
+    public void notifyUsers(Collection<User> recipients, User actor,
                             StaffNotificationType type, String title, String message,
                             String targetUrl, String entityType, Long entityId) {
         for (User recipient : recipients) {
-            if (excludedUser != null && excludedUser.getId().equals(recipient.getId())) continue;
+            if (actor != null && actor.getId().equals(recipient.getId())) continue;
             String dedupeKey = "%s:%s:%s:%d".formatted(type, entityType, entityId, recipient.getId());
             if (notificationRepository.existsByDedupeKey(dedupeKey)) continue;
             StaffNotification saved = notificationRepository.save(new StaffNotification(
-                    recipient, type, title, message, targetUrl, entityType, entityId, dedupeKey));
+                    recipient, actor, type, title, message, targetUrl, entityType, entityId, dedupeKey));
             eventPublisher.publishEvent(new StaffNotificationCreatedEvent(
                     recipient.getEmail(), toResponse(saved)));
         }
     }
 
     public StaffNotificationResponse toResponse(StaffNotification notification) {
+        User actor = notification.getActor();
         return new StaffNotificationResponse(notification.getId(), notification.getType(),
                 notification.getTitle(), notification.getMessage(), notification.getTargetUrl(),
                 notification.getEntityType(), notification.getEntityId(), notification.getReadAt(),
-                notification.getCreatedAt());
+                notification.getCreatedAt(), actor == null ? null
+                : new StaffNotificationResponse.Actor(actor.getDisplayName(), userService.avatarUrl(actor)));
     }
 
 }

@@ -267,7 +267,12 @@
   .admin-content .method-table .table-action { min-height: var(--workspace-action-height); }
 }
 @media (max-width: 520px) {
-  .admin-shell .notification-popover { position: fixed; top: 62px; right: 14px; }
+  .admin-shell .notification-popover {
+    position: fixed;
+    top: calc(62px + var(--safe-top));
+    right: calc(14px + var(--safe-right));
+    width: min(390px, calc(100vw - 28px - var(--safe-left) - var(--safe-right)));
+  }
   .admin-content .admin-heading > .primary-button { margin-top: 12px; }
   .admin-content .workspace-period > button:last-child { margin-inline-start: 0; }
   .admin-content :is(.dashboard-page, .receptionist-dashboard, .receiving-dashboard) .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

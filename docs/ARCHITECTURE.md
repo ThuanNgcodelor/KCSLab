@@ -1,6 +1,6 @@
 # Architecture
 
-**Phiên bản:** 0.3 · **Cập nhật:** 13/11/2026 · **Trạng thái:** Đang triển khai
+**Cập nhật 20/11/2026**
 
 ## Runtime hiện tại
 
@@ -11,12 +11,13 @@
 
 ## Biên module
 
-- Backend package-by-feature: `auth`, `user`, `intake`, `transfer`, `testing`; `config` và `common` chỉ chứa cross-cutting concerns.
-- Frontend feature-based: `auth`, `users`, `intake`, `transfers`, `testing`, `admin`; HTTP client dùng chung ở `shared/api`.
+- Xem [bản đồ module](ai/MODULE_MAP.md) để định vị backend và frontend. HTTP client dùng chung nằm ở `shared/api`.
 - Auth stateless bằng access JWT trong cookie; refresh token được hash và lưu server-side để rotation/revoke.
 - CSRF dùng cookie token; login và refresh được bỏ qua CSRF, các mutation đã đăng nhập gửi CSRF header.
 - Attachment dev lưu local, metadata/checksum lưu DB. Production chưa chốt object storage và backup.
-- Vite dev lắng nghe `0.0.0.0:5173`; frontend gọi `/api/v1` cùng origin và proxy `/api` đến backend để truy cập qua IP LAN không phụ thuộc hostname.
+- Frontend dùng cùng origin cho API và WebSocket. Vite proxy `/api` và `/ws` đến backend trong môi trường dev. Proxy production cần hỗ trợ WebSocket Upgrade. Đặt `FRONTEND_ORIGIN` bằng origin người dùng truy cập, ví dụ `https://lab.example.com`; có thể phân cách nhiều origin bằng dấu phẩy.
+- WebSocket gửi thông báo đến các phiên của người nhận sau commit. MySQL và API là nguồn dữ liệu dùng khi trình duyệt đồng bộ lại.
+- Bản frontend production đăng ký service worker trên origin bảo mật. Chỉ trang hướng dẫn mất mạng được lưu trong CacheStorage.
 
 ## Luồng hiện có
 

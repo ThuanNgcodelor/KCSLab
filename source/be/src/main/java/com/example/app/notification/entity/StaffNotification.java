@@ -33,6 +33,10 @@ public class StaffNotification {
     @JoinColumn(name = "recipient_user_id", nullable = false)
     private User recipient;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_user_id")
+    private User actor;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
     private StaffNotificationType type;
@@ -63,9 +67,10 @@ public class StaffNotification {
 
     protected StaffNotification() {}
 
-    public StaffNotification(User recipient, StaffNotificationType type, String title, String message,
+    public StaffNotification(User recipient, User actor, StaffNotificationType type, String title, String message,
                              String targetUrl, String entityType, Long entityId, String dedupeKey) {
         this.recipient = recipient;
+        this.actor = actor;
         this.type = type;
         this.title = title;
         this.message = message;
@@ -82,6 +87,7 @@ public class StaffNotification {
 
     public Long getId() { return id; }
     public User getRecipient() { return recipient; }
+    public User getActor() { return actor; }
     public StaffNotificationType getType() { return type; }
     public String getTitle() { return title; }
     public String getMessage() { return message; }

@@ -50,7 +50,7 @@ class ReceivingEvidenceIntegrationTest {
         var transfer = transfers.create(new CreateTransferRequest(first.getId(), "KCS", LocalDate.now(),
                 LocalDate.now().plusDays(1), false, null, null, List.of(new CreateTransferItemRequest(
                 first.getSamples().getFirst().getId(), "500 g", "1", "Tốt", "Cd", "TCVN"))), sender);
-        transfers.submit(transfer.id());
+        transfers.submit(transfer.id(), sender);
         var own = receiptService.attach(first.getId(), new MockMultipartFile("file", "a.png", "image/png", new byte[]{1,2,3}),
                 ReceiptAttachmentCategory.SAMPLE_PHOTO, null, null, sender);
         var other = receiptService.attach(second.getId(), new MockMultipartFile("file", "b.png", "image/png", new byte[]{4,5,6}),

@@ -1,4 +1,6 @@
-# Current Plan — Tiếp nhận, thông báo, mã hóa và phát hành kết quả
+# Kế hoạch tiếp nhận và phát hành kết quả
+
+Trạng thái hiện tại nằm ở [SYSTEM_STATUS.md](../docs/SYSTEM_STATUS.md). Nội dung bên dưới ghi lại các mốc lập kế hoạch trước đây.
 
 > **Đề xuất mới 18/11/2026:** luồng Phiếu 1 → 7 → 2 → 3 → 4 → 5, nhập mã thủ công và kế thừa dữ liệu đang chờ chốt nghiệp vụ tại `plans/QUY_TRINH_YEU_CAU_LAY_MAU_TIEP_NHAN.md`. Chưa triển khai; các quyết định cũ về gate mã hóa vẫn là hiện trạng cho đến khi LAB xác nhận thay đổi.
 

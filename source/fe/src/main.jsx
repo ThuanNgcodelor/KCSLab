@@ -5,6 +5,7 @@ import { App } from './app/App';
 import { AuthProvider } from './features/auth/hooks/useAuth';
 import { GlobalProgress } from './shared/components/Loading';
 import './styles.css';
+import './shared/pwa';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

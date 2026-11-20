@@ -122,16 +122,6 @@ export function ReceiptCreatePage() {
     setForm((current) => ({ ...current, testRequestId: undefined, fieldSamplingId: undefined }));
   }
 
-  useEffect(() => {
-    const phoneInput = document.querySelector('.receipt-form-page input[type="tel"]');
-    if (!phoneInput) return;
-    phoneInput.placeholder = '090 123 4567';
-    phoneInput.inputMode = 'numeric';
-    phoneInput.maxLength = 11;
-    phoneInput.pattern = '0[0-9]{9,10}';
-    phoneInput.setAttribute('aria-describedby', 'customer-phone-help');
-  });
-
   const update = (field) => (event) => setForm((current) => ({
     ...current,
     [field]: event.target.type === 'checkbox'
@@ -223,13 +213,14 @@ export function ReceiptCreatePage() {
     {usedBy && <div className="toast toast-error" role="alert">Số/No. <strong>{usedBy.requestNumber}</strong> đã có hồ sơ tiếp nhận (nhận ngày {new Date(usedBy.receivedAt).toLocaleDateString('vi-VN')}). Mỗi Số/No. chỉ được dùng cho một hồ sơ. <button type="button" className="link-button" onClick={() => navigate(`/admin/intake/${usedBy.id}`)}>Xem hồ sơ đó</button></div>}
     {sourceRequest && <div className="source-banner"><strong>Đang tạo từ yêu cầu: {sourceRequest.requestNumber}</strong><span>Dữ liệu đã được điền sẵn từ hồ sơ nguồn. Hãy đối chiếu thực tế trước khi lưu.</span></div>}
     {error && <div className="toast toast-error" role="alert">{error}</div>}
-    {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
       <div className="receipt-form-main">
         <FormCard number="I" en="Delivery & receipt" title="Người giao và người nhận mẫu" copy="Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận.">
           <div className="form-two-columns">
             <label>Họ tên người giao<input value={form.deliveredBy} onChange={update('deliveredBy')} required /></label>
-            <label>Số điện thoại<input type="tel" value={form.customerPhone} onChange={update('customerPhone')} required /></label>
+            <label>Số điện thoại<input type="tel" inputMode="numeric" autoComplete="tel" placeholder="0901234567" maxLength={11} pattern="0[0-9]{9,10}"
+              aria-describedby="customer-phone-help" value={form.customerPhone} onChange={update('customerPhone')} required />
+              <small id="customer-phone-help">Nhập 10 hoặc 11 chữ số, bắt đầu bằng 0.</small></label>
             <RequestPicker value={form.requestNumber} linked={Boolean(sourceRequest)} onChange={update('requestNumber')} onPick={pickRequest} onUnlink={unlinkRequest} />
             <label>Tên khách hàng / đơn vị<input value={form.customerName} onChange={update('customerName')} required /></label>
             <label>Email<input type="email" value={form.customerEmail} onChange={update('customerEmail')} /></label>

@@ -84,7 +84,7 @@ class ResultReleaseWorkflowTest {
                 LocalDate.now().plusDays(5), false, null, null,
                 List.of(new CreateTransferItemRequest(sampleId, null, null, null, null, "PP")))
                 , receptionist);
-        transfers.submit(transfer.id());
+        transfers.submit(transfer.id(), receptionist);
         var accepted = transfers.decide(transfer.id(), new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, null, null, false, null), technician);
         Instant start = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -383,11 +383,17 @@ class ResultReleaseWorkflowTest {
 
     @Test
     void notificationListSearchesAndFiltersByDateAndType() {
+        admin.markAvatarUpdated();
         notifications.notifyUsers(List.of(technician), admin,
                 com.example.app.notification.entity.StaffNotificationType.TRANSFER_SUBMITTED,
                 "Phiếu chuyển mẫu mới", "Có mẫu sầu riêng", "/x", "TRANSFER", 987654L);
         assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, null, null, null, null).content()).isNotEmpty();
-        assertThat(notifications.findFor(technician, 0, 10, "title,asc", false, "sầu riêng", null, null, null).content()).hasSize(1);
+        var matching = notifications.findFor(technician, 0, 10, "title,asc", false, "sầu riêng", null, null, null).content();
+        assertThat(matching).hasSize(1);
+        var actor = matching.getFirst().actor();
+        assertThat(actor.displayName()).isEqualTo(admin.getDisplayName());
+        assertThat(actor.avatarUrl()).startsWith("/api/v1/users/" + admin.getId() + "/avatar?v=");
+        assertThat(notifications.markRead(matching.getFirst().id(), technician).actor()).isEqualTo(actor);
         assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, "không-khớp", null, null, null).content()).isEmpty();
         assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, null,
                 com.example.app.notification.entity.StaffNotificationType.TRANSFER_REJECTED, null, null).content()).isEmpty();

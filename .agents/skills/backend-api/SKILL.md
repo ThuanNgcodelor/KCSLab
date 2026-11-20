@@ -9,7 +9,7 @@ description: Thiết kế hoặc chỉnh sửa REST API Spring Boot theo package
 
 ## Quy trình
 
-1. Đọc `AGENTS.md`, `source/be/AGENTS.md`, `docs/ai/STATE.md` và `plans/CURRENT.md`.
+1. Đọc `AGENTS.md`, `source/be/AGENTS.md`, `docs/ai/CONTEXT.md` và `plans/CURRENT.md`.
 2. Xác minh `pom.xml`/`build.gradle`, Java/Spring Boot version, package root, security, persistence và test trước khi sửa.
 3. Xác định feature sở hữu endpoint. Giữ controller, service, repository, entity và DTO trong feature đó; chỉ đặt code dùng chung thật sự vào `common/`.
 4. Tách request/response DTO khỏi entity. Áp dụng validation ở boundary, constructor injection và transaction tại service khi cần.

@@ -3,7 +3,7 @@
 ## Vai trò
 
 - **Claude phân tích và lập plan; Codex viết code.** Claude không sửa source, schema, migration, database hay secrets. Chỉ ghi file plan/tài liệu khi được giao rõ (thường trong `plans/`).
-- Hai agent không chia sẻ lịch sử hội thoại; plan, source và Project Memory (`docs/ai/`) là đầu vào chung. Chi tiết: `docs/ai/CLAUDE_PLANNING_BRIEF.md`.
+- Hai agent dùng chung plan, source và Project Memory. Bắt đầu từ [START_HERE.md](docs/ai/START_HERE.md).
 - Một plan tốt phải giao thẳng được cho Codex: mục tiêu, hiện trạng có bằng chứng, quyết định đã chốt, câu hỏi mở, các bước + file dự kiến, contract API/schema, phụ thuộc, rủi ro, tiêu chí nghiệm thu, danh sách test.
 - Luôn phân biệt **đã chạy / đang dở / đề xuất / chưa kiểm thử**. Không đánh dấu hoàn thành chỉ vì đã viết plan hoặc code.
 
@@ -34,7 +34,7 @@ ADMIN: giám sát toàn hệ thống
 
 | Cần gì | Đọc |
 |---|---|
-| Tổng quan nhanh (đọc đầu) | `AGENTS.md`, `docs/SYSTEM_STATUS.md`, `docs/ai/CONTEXT.md`, `docs/ai/STATE.md` |
+| Tổng quan nhanh | `AGENTS.md`, `docs/ai/CONTEXT.md` |
 | Định vị module | `docs/ai/MODULE_MAP.md` |
 | Quyết định kiến trúc / kế hoạch | `docs/ai/DECISIONS.md`, `plans/CURRENT.md`, `plans/ROADMAP.md` |
 | Workspace theo role | `plans/intake/OVERVIEW.md`, `RECEPTIONIST.md`, `TECHNICIAN_KCS.md`, `ADMIN.md` |
@@ -42,7 +42,7 @@ ADMIN: giám sát toàn hệ thống
 | Thông báo khách | `docs/INTAKE_NOTIFICATIONS.md` |
 | Quy tắc code | `source/be/AGENTS.md`, `source/fe/AGENTS.md` |
 
-Chỉ đọc phần liên quan trực tiếp. `docs/ai/CHANGELOG.md` là lịch sử, không đọc đầu phiên. Tài liệu có thể lạc hậu so với source: khi lệch, tin source và `git log`.
+Chỉ đọc phần liên quan trực tiếp. Đối chiếu với source và dùng `git log` để tra lịch sử.
 
 ## Quy tắc làm việc
 

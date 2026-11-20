@@ -16,7 +16,7 @@ export function ReceivingDashboardPage() {
   const [error, setError] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
-  const { notifications, connectionState } = useNotifications();
+  const { dataVersion } = useNotifications();
   const range = preset === 'custom' ? custom : presetRange(preset);
   useEffect(() => {
     if (!range.from || !range.to) { setData(null); return undefined; }
@@ -26,7 +26,7 @@ export function ReceivingDashboardPage() {
       .catch(e => { if (active) { setData(null); setError(e.message); } })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [range.from, range.to, notifications, connectionState, refreshKey]);
+  }, [range.from, range.to, dataVersion, refreshKey]);
   const stats = data && [
     { label: 'Phiếu chuyển lên', value: data.submittedTransfers, detail: 'Phiếu gửi đến KCS trong kỳ', tone: 'mint' },
     { label: 'Số mẫu chuyển lên', value: data.submittedSamples, detail: 'Mẫu trong các phiếu đã gửi', tone: 'blue' },

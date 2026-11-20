@@ -100,7 +100,7 @@ class PublicResultFlowTest {
         var transfer = transfers.create(new CreateTransferRequest(receipt.getId(), "KCS", LocalDate.now(),
                 LocalDate.now().plusDays(5), false, null, null, List.of(new CreateTransferItemRequest(
                 receipt.getSamples().getFirst().getId(), null, null, null, null, "PP"))), receptionist);
-        transfers.submit(transfer.id());
+        transfers.submit(transfer.id(), receptionist);
         var accepted = transfers.decide(transfer.id(), new TransferDecisionRequest(
                 TransferStatus.ACCEPTED, null, null, false, null), technician);
         Instant start = Instant.now().truncatedTo(ChronoUnit.SECONDS);

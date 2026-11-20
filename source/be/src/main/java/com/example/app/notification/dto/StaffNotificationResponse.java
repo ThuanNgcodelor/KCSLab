@@ -13,5 +13,8 @@ public record StaffNotificationResponse(
         String entityType,
         Long entityId,
         Instant readAt,
-        Instant createdAt
-) {}
+        Instant createdAt,
+        Actor actor
+) {
+    public record Actor(String displayName, String avatarUrl) {}
+}

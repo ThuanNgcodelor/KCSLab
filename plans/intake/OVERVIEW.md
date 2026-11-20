@@ -2,7 +2,7 @@
 
 **Cập nhật:** 16/11/2026 · **Trạng thái:** Luồng tạo Phiếu 3 của `RECEPTIONIST` đã được người dùng nghiệm thu; dashboard riêng của Receptionist và workspace người nhận mẫu KCS là ưu tiên kế tiếp
 
-> Các dòng “chưa có” trong phần khảo sát bên dưới là baseline lịch sử. Khi đối chiếu trạng thái hiện tại, ưu tiên `docs/ai/START_HERE.md`, `docs/ai/STATE.md` và `plans/CURRENT.md`.
+> Phần khảo sát bên dưới ghi lại hiện trạng lúc lập kế hoạch. Xem [SYSTEM_STATUS.md](../../docs/SYSTEM_STATUS.md) để biết trạng thái hiện tại.
 
 ## Trạng thái triển khai hiện tại
 

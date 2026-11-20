@@ -16,7 +16,7 @@ export function ReceivingListPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { notifications, connectionState } = useNotifications();
+  const { dataVersion } = useNotifications();
   const status = params.get('status') || 'PENDING';
   const page = Math.max(0, Number(params.get('page')) || 0);
   const size = params.get('size') === '50' ? 50 : 20;
@@ -30,7 +30,7 @@ export function ReceivingListPage() {
     listReceivingTransfers({ status, page, size, q, from, to, sort }).then(value => { if (active) setData(value); })
       .catch(e => { if (active) { setData(null); setError(e.message); } }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [status, page, size, q, from, to, sort, notifications, connectionState]);
+  }, [status, page, size, q, from, to, sort, dataVersion]);
   return <section className="admin-page receiving-page receiving-list"><header className="admin-heading"><div><p className="section-kicker">Nhận mẫu KCS / Danh sách</p><h1>Nhận mẫu KCS</h1><p className="heading-copy">Theo dõi phiếu bàn giao từ bộ phận tiếp nhận và xác nhận nhận mẫu.</p></div></header>
     <WorkflowGuide stage="handover" />
     <nav className="receiving-filter receiving-status-tabs" aria-label="Trạng thái phiếu">{receivingStatuses.map((key) => <button key={key} className={status === key ? 'primary-button' : 'outline-button'} aria-pressed={status === key} onClick={() => update('status',key)}>{labels[key]}</button>)}</nav>

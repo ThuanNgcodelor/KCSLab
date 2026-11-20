@@ -67,8 +67,8 @@ public class TransferController {
     }
 
     @PostMapping("/{id}/submit")
-    public TransferResponse submit(@PathVariable Long id) {
-        return transferService.submit(id);
+    public TransferResponse submit(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return transferService.submit(id, userService.getByEmail(jwt.getSubject()));
     }
 
     @PostMapping("/{id}/decision")

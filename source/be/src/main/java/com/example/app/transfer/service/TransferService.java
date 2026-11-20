@@ -180,7 +180,7 @@ public class TransferService {
     }
 
     @Transactional
-    public TransferResponse submit(Long id) {
+    public TransferResponse submit(Long id, User submittedBy) {
         SampleTransfer transfer = getTransfer(id);
         requireDraft(transfer);
         if (transfer.getItems().isEmpty()) {
@@ -204,11 +204,11 @@ public class TransferService {
         transfer.getItems().forEach(item -> item.getSample().markTransferPending());
         transfer.submit();
         SampleTransfer saved = transferRepository.save(transfer);
-        notificationService.notifyRoles(Set.of(Role.TECHNICIAN), transfer.getDeliveredBy(),
+        notificationService.notifyRoles(Set.of(Role.TECHNICIAN), submittedBy,
                 StaffNotificationType.TRANSFER_SUBMITTED,
                 "Phiếu chuyển mẫu mới",
                 "%s đã chuyển %d mẫu đến phòng KCS".formatted(
-                        transfer.getDeliveredBy().getDisplayName(), transfer.getItems().size()),
+                        submittedBy.getDisplayName(), transfer.getItems().size()),
                 "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());
         return toResponse(saved);
     }

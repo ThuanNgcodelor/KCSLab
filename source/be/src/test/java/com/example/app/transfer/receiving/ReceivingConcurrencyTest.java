@@ -61,7 +61,7 @@ class ReceivingConcurrencyTest {
                     LocalDate.now().plusDays(1), false, null, null,
                     List.of(new CreateTransferItemRequest(receipt.getSamples().getFirst().getId(), "1", "1", "Tốt", "Cd", "Test")));
             var transfer = transfers.create(request, sender);
-            transfers.submit(transfer.id());
+            transfers.submit(transfer.id(), sender);
             return new Fixture(sender.getId(), receiver.getId(), customer.getId(), receipt.getId(), transfer.id(), receiver);
         });
         assertThat(fixture).isNotNull();

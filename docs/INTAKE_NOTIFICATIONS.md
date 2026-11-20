@@ -19,7 +19,7 @@ Phạm vi này chưa gồm marketing/broadcast, OTP, gửi kết quả thử ngh
 
 MVP dùng sự kiện `INTAKE_RECORDED`: phát sinh sau khi Phiếu 3 và các mẫu được lưu thành công. Nội dung phải dùng từ “đã ghi nhận tiếp nhận”, không khẳng định mẫu đã đạt kiểm tra hoặc đã được mã hóa.
 
-Khi Phase 2 tách rõ các bước tạo hồ sơ → chấp nhận mẫu → gán mã → xác minh mã, bổ sung hai sự kiện riêng:
+Nếu LAB cần gửi thêm xác nhận hoặc từ chối cho khách, có thể bổ sung hai sự kiện riêng:
 
 - `INTAKE_ACCEPTED`: mẫu được chấp nhận và có thể đi tiếp trong quy trình.
 - `INTAKE_REJECTED`: mẫu/hồ sơ bị từ chối, chỉ gửi lý do đã được phép công khai.
@@ -172,10 +172,10 @@ Không gửi tên chỉ tiêu nhạy cảm, kết quả thử nghiệm, ảnh l�
 - [ ] Cấu hình fallback theo lỗi xác định; đối soát để không gửi kép.
 - [ ] Test tiếng Việt/Unicode, độ dài nội dung, template đã đăng ký và quota.
 
-### N5 — WebSocket nội bộ và production rollout
+### N5 — Thông báo nội bộ và triển khai
 
-- [ ] Phát WebSocket cho nhân viên khi receipt được ghi nhận, delivery lỗi, Phiếu 4 được gửi/nhận/từ chối.
-- [ ] Authorize topic theo role; client reconnect và tải lại REST để lấy nguồn sự thật.
+- [x] Thông báo nội bộ đã hỗ trợ ghi nhận tiếp nhận và gửi/nhận/từ chối bàn giao. WebSocket dùng kết nối xác thực theo người nhận và đồng bộ lại qua REST.
+- [ ] Bổ sung sự kiện lỗi gửi khách khi đã tích hợp provider.
 - [ ] Bật theo feature flag: nội bộ → nhóm khách thử nghiệm → toàn bộ khách đủ consent.
 - [ ] Dashboard SLA/chi phí, runbook sự cố, retention và cảnh báo provider.
 

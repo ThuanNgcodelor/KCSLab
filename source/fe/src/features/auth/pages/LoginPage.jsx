@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import cfcLogo from '../../../assets/brand/cfc-logo.png';
+import { InstallGuide } from '../../../shared/components/InstallGuide';
 
 // "/admin" đưa mỗi role về trang tổng quan của mình (Admin, Tiếp nhận, KCS).
 const HOME = '/admin';
@@ -164,6 +165,7 @@ export function LoginPage() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3.5 5 6v5.5c0 4.2 2.8 7.4 7 9 4.2-1.6 7-4.8 7-9V6Z" /><path d="m9 12 2.2 2.2L15.5 10" /></svg>
               Chỉ tài khoản do quản trị viên tạo mới truy cập được. Quên mật khẩu, hãy liên hệ quản trị viên.
             </p>
+            <InstallGuide />
           </div>
         </div>
         <a className="auth-public-link" href="/tracuu/">Khách hàng tra cứu kết quả kiểm nghiệm <span aria-hidden="true">→</span></a>

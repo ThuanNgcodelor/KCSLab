@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listNotifications, markAllNotificationsRead, markNotificationRead } from '../api/notificationApi';
-import { formatTime, typeIcon } from '../components/NotificationCenter';
+import { listNotifications } from '../api/notificationApi';
+import { formatTime } from '../components/NotificationCenter';
+import { NotificationAvatar } from '../components/NotificationAvatar';
 import { useNotifications } from '../hooks/useNotifications';
 import { PageLoader } from '../../../shared/components/Loading';
 import { ListToolbar } from '../../../shared/components/ListToolbar';
@@ -23,43 +24,60 @@ export function NotificationsPage() {
   const [unread, setUnread] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reload, setReload] = useState(0);
+  const [marking, setMarking] = useState(false);
 
-  const load = useCallback(() => {
-    setLoading(true); setError('');
-    return listNotifications({ page, size: 20, unread, q: list.q, from: list.from, to: list.to, type: list.type, sort: list.sort })
-      .then(setNotificationPage)
-      .catch((exception) => setError(exception.message))
-      .finally(() => setLoading(false));
-  }, [page, unread, list]);
-
-  useEffect(() => { load(); }, [load, live.unreadCount]);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError('');
+    listNotifications({ page, size: 20, unread, q: list.q, from: list.from, to: list.to, type: list.type, sort: list.sort, silent: true })
+      .then((result) => {
+        if (!active) return;
+        if (page > 0 && result.content.length === 0 && result.totalPages <= page) {
+          setList({ page: Math.max(0, result.totalPages - 1) });
+          return;
+        }
+        setNotificationPage(result);
+      })
+      .catch((exception) => { if (active) setError(exception.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [page, unread, list.q, list.from, list.to, list.type, list.sort, live.dataVersion, reload, setList]);
 
   async function openNotification(notification) {
-    if (!notification.readAt) await markNotificationRead(notification.id);
-    await Promise.all([load(), live.refresh()]);
-    if (notification.targetUrl) navigate(notification.targetUrl);
+    setError('');
+    try {
+      await live.markRead(notification);
+      if (notification.targetUrl) navigate(notification.targetUrl);
+    } catch (exception) {
+      setError(exception.message);
+    }
   }
 
   async function markAll() {
-    await markAllNotificationsRead();
-    await Promise.all([load(), live.refresh()]);
+    setError('');
+    setMarking(true);
+    try { await live.markAllRead(); }
+    catch (exception) { setError(exception.message); }
+    finally { setMarking(false); }
   }
 
   return <section className="admin-page notifications-page">
-    <header className="admin-heading"><div><p className="section-kicker">Hệ thống / Nhật ký công việc</p><h1>Thông báo</h1><p className="heading-copy">Theo dõi tiếp nhận, bàn giao mẫu và phản hồi từ KCS theo thời gian thực.</p></div>{notificationPage.unreadCount > 0 && <button className="outline-button" type="button" onClick={markAll}>Đánh dấu đã đọc</button>}</header>
-    <div className="notification-tabs" role="tablist" aria-label="Lọc thông báo">
-      <button className={!unread ? 'active' : ''} type="button" onClick={() => { setUnread(false); setPage(0); }}>Tất cả</button>
-      <button className={unread ? 'active' : ''} type="button" onClick={() => { setUnread(true); setPage(0); }}>Chưa đọc <span>{notificationPage.unreadCount ?? live.unreadCount}</span></button>
+    <header className="admin-heading"><div><p className="section-kicker">Hệ thống / Nhật ký công việc</p><h1>Thông báo</h1><p className="heading-copy">Theo dõi tiếp nhận, bàn giao mẫu và phản hồi từ KCS theo thời gian thực.</p></div>{live.unreadCount > 0 && <button className="outline-button" type="button" disabled={marking} onClick={markAll}>{marking ? 'Đang đánh dấu…' : 'Đánh dấu tất cả đã đọc'}</button>}</header>
+    <div className="notification-tabs" role="group" aria-label="Lọc thông báo">
+      <button className={!unread ? 'active' : ''} aria-pressed={!unread} type="button" onClick={() => { setUnread(false); setPage(0); }}>Tất cả</button>
+      <button className={unread ? 'active' : ''} aria-pressed={unread} type="button" onClick={() => { setUnread(true); setPage(0); }}>Chưa đọc <span>{notificationPage.unreadCount ?? live.unreadCount}</span></button>
     </div>
     <ListToolbar q={list.q} onQ={(q) => setList({ q })} searchLabel="Tìm thông báo" placeholder="Tiêu đề hoặc nội dung…" from={list.from} to={list.to} onFrom={(from) => setList({ from })} onTo={(to) => setList({ to })}
       filters={[{ label: 'Loại', value: list.type, onChange: (type) => setList({ type }), options: typeOptions }]}
       sort={list.sort} sortOptions={sortOptions} onSort={(sort) => setList({ sort })} onReset={() => setList({ ...defaults })} />
-    {error && <p className="form-error" role="alert">{error}</p>}
+    {error && <div className="notification-feedback"><p className="form-error" role="alert">{error}</p><button type="button" className="outline-button" onClick={() => setReload((current) => current + 1)}>Tải lại thông báo</button></div>}
     <section className="panel-card notification-page-card">
       {loading ? <PageLoader label="Đang tải thông báo…" rows={3} /> : notificationPage.content.length === 0
-        ? <div className="notification-page-empty"><span><Icon name="checkCircle" size={24} /></span><h2>{unread ? 'Không còn thông báo chưa đọc' : 'Chưa có thông báo'}</h2><p>Các hoạt động tiếp nhận và bàn giao sẽ xuất hiện tại đây.</p></div>
+        ? !error && <div className="notification-page-empty"><span><Icon name="checkCircle" size={24} /></span><h2>{unread ? 'Không còn thông báo chưa đọc' : 'Chưa có thông báo'}</h2><p>Các hoạt động tiếp nhận và bàn giao sẽ xuất hiện tại đây.</p></div>
         : <div className="notification-page-list">{notificationPage.content.map((notification) => <button className={`notification-page-row ${notification.readAt ? '' : 'unread'}`} type="button" key={notification.id} onClick={() => openNotification(notification)}>
-          <span className="notification-type-icon">{typeIcon(notification.type)}</span>
+          <NotificationAvatar notification={notification} />
           <span className="notification-page-copy"><strong>{notification.title}</strong><small>{notification.message}</small></span>
           <time>{formatTime(notification.createdAt)}</time>
           {!notification.readAt && <i aria-label="Chưa đọc" />}

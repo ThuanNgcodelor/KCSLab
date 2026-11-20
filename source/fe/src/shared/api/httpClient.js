@@ -11,7 +11,18 @@ function readCookie(name) {
 }
 
 export async function initializeCsrf() {
-  await fetch(`${API_BASE_URL}/auth/csrf`, { credentials: 'include' });
+  await fetchFromApi('/auth/csrf', { credentials: 'include' });
+}
+
+async function fetchFromApi(path, options) {
+  try {
+    return await fetch(`${API_BASE_URL}${path}`, options);
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
+    throw new Error(navigator.onLine
+      ? 'Không kết nối được máy chủ. Vui lòng thử lại.'
+      : 'Thiết bị đang mất kết nối mạng. Vui lòng thử lại khi có mạng.', { cause: error });
+  }
 }
 
 function requestOptions(options = {}) {
@@ -42,14 +53,14 @@ async function parseResponse(response) {
 
 async function refreshAccessToken() {
   if (!refreshPromise) {
-    refreshPromise = fetch(`${API_BASE_URL}/auth/refresh`, requestOptions({ method: 'POST' }))
+    refreshPromise = fetchFromApi('/auth/refresh', requestOptions({ method: 'POST' }))
       .then(parseResponse)
       .then((user) => {
         window.dispatchEvent(new CustomEvent('auth:refreshed', { detail: user }));
         return user;
       })
       .catch((error) => {
-        window.dispatchEvent(new Event('auth:expired'));
+        if (error.status === 401 || error.status === 403) window.dispatchEvent(new Event('auth:expired'));
         throw error;
       })
       .finally(() => {
@@ -67,12 +78,12 @@ export async function request(path, options = {}) {
 async function send(path, options) {
   const { silent, ...fetchOptions } = options; // eslint-disable-line no-unused-vars
   options = fetchOptions;
-  let response = await fetch(`${API_BASE_URL}${path}`, requestOptions(options));
+  let response = await fetchFromApi(path, requestOptions(options));
   const canRefresh = response.status === 401 && !['/auth/login', '/auth/refresh'].includes(path);
 
   if (canRefresh) {
     await refreshAccessToken();
-    response = await fetch(`${API_BASE_URL}${path}`, requestOptions(options));
+    response = await fetchFromApi(path, requestOptions(options));
   }
 
   return parseResponse(response);
