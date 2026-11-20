@@ -16,7 +16,7 @@ const DOMAINS = {
     DRAFT: ['Bản nháp', 'neutral'], SUBMITTED: ['Chờ Admin phát hành', 'warning'], RETURNED: ['Đã trả lại', 'danger'], PUBLISHED: ['Đã phát hành', 'success'], REVOKED: ['Đã thu hồi', 'danger'],
   },
   coding: {
-    PENDING_CODING: ['Chờ mã hóa', 'neutral'], PENDING_VERIFICATION: ['Chờ đối chiếu', 'warning'], VERIFIED: ['Đã xác minh', 'success'], CORRECTION_REQUIRED: ['Cần hiệu chỉnh', 'danger'],
+    PENDING_CODING: ['Chờ mã hóa', 'neutral'], PENDING_VERIFICATION: ['Chờ đối chiếu', 'warning'], VERIFIED: ['Đã mã hóa', 'success'], CORRECTION_REQUIRED: ['Cần hiệu chỉnh', 'danger'],
   },
   testRequest: { DRAFT: ['Bản nháp', 'neutral'], COMPLETED: ['Đã hoàn tất', 'success'] },
   account: { ACTIVE: ['Đang hoạt động', 'success'], DISABLED: ['Đã khóa', 'danger'] },

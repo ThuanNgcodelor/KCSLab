@@ -228,9 +228,8 @@ public class TransferService {
                     "Cần nhập ngày lưu mẫu tại phòng phân tích");
         }
 
-        // Acceptance closes the physical handover checkpoint. The independent
-        // CFC-TN-14 coding verification is performed by KCS after acceptance;
-        // testing candidates remain gated by SampleCodingStatus.VERIFIED.
+        // Acceptance closes the handover: KCS has no separate code-verification step.
+        // Samples are coded (VERIFIED) at intake; only legacy rows may still be pending.
         transfer.decide(request.decision(), receiver, blankToNull(request.receivingNote()),
                 blankToNull(request.labOpinion()), request.labRetain(), request.labRetentionUntil());
         if (request.decision() == TransferStatus.ACCEPTED) {

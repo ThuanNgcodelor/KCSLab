@@ -241,7 +241,7 @@ export function ReceiptCreatePage() {
           <div className="intake-sample-editor">
             {samples.map((sample, index) => <SampleCard key={index} index={index} sample={sample} canRemove={samples.length > 1} onRemove={() => setSamples((current) => current.filter((_, itemIndex) => itemIndex !== index))}>
               <div className="form-two-columns">
-                <label>Mã mẫu do người tiếp nhận nhập<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
+                <label>Mã hóa mẫu<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
                 <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
                 <label>Số lượng / khối lượng<input value={sample.quantity} onChange={updateSample(index, 'quantity')} /></label>

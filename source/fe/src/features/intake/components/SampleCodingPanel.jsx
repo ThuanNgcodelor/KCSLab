@@ -52,7 +52,7 @@ export function SampleCodingPanel({ sample, onChanged }) {
       <StatusBadge domain="coding" value={status} />
       {coding.legacy && <small className="muted">Mã cũ trước khi có bước xác minh (cần LAB xác nhận)</small>}
       {coding.codedBy && <small>Mã hóa: {coding.codedBy}</small>}
-      {manualFlow && <small>Mã được nhập tại khâu tiếp nhận · không yêu cầu xác minh hai người</small>}
+      {manualFlow && <small>Mã hóa mẫu do bộ phận tiếp nhận nhập · không cần đối chiếu lại</small>}
       {!manualFlow && coding.verifiedBy && <small>Xác minh: {coding.verifiedBy}</small>}
       <button type="button" className="link-button" onClick={toggleHistory}>{events ? 'Ẩn lịch sử' : 'Lịch sử mã'}</button>
     </div>
