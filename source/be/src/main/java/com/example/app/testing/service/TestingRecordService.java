@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -136,6 +137,16 @@ public class TestingRecordService {
 
     @Transactional
     public TestingRecordResponse createFromResultFile(Long transferItemId, User actor) {
+        return toResponse(openCompleted(transferItemId, actor, null, false));
+    }
+
+    /** Result-entry flow: the record is opened already complete; the KQKN dossier built from it goes to Admin for approval. */
+    @Transactional
+    public TestingRecord createFromResultEntry(Long transferItemId, Instant testingStart, User actor) {
+        return openCompleted(transferItemId, actor, testingStart, true);
+    }
+
+    private TestingRecord openCompleted(Long transferItemId, User actor, Instant testingStart, boolean entry) {
         if (actor.getRole() != Role.ADMIN && actor.getRole() != Role.TECHNICIAN) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ KCS hoặc Admin được lập hồ sơ từ file kết quả");
         }
@@ -152,9 +163,10 @@ public class TestingRecordService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Mẫu đã có hồ sơ kết quả");
         }
         TestingRecord record = new TestingRecord(nextCode(), transferItem, actor);
-        record.completeFromResultFile(actor);
+        if (entry) record.completeFromResultEntry(actor, testingStart);
+        else record.completeFromResultFile(actor);
         transferItem.getSample().markTestReviewed();
-        return toResponse(recordRepository.save(record));
+        return recordRepository.saveAndFlush(record);
     }
 
     @Transactional

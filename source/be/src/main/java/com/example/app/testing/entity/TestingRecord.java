@@ -114,6 +114,13 @@ public class TestingRecord {
         this.updatedAt = now;
     }
 
+    /** Entry flow: the KQKN results typed into the system are the testing evidence; Admin approves the report itself. */
+    public void completeFromResultEntry(User actor, Instant testingStart) {
+        completeFromResultFile(actor);
+        this.reviewNote = "Hồ sơ được lập từ kết quả nhập trên hệ thống";
+        if (testingStart != null) this.analysisStart = testingStart;
+    }
+
     private void addEquipment(TestingEquipment item) { equipment.add(item); item.attachTo(this); }
     private void addReagent(TestingReagent item) { reagents.add(item); item.attachTo(this); }
     private void addMeasurement(TestingMeasurement item) { measurements.add(item); item.attachTo(this); }

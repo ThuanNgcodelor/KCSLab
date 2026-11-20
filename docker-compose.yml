@@ -1,0 +1,32 @@
+# Chạy CFC Lab trên máy Linux bằng Docker (bản đã build, không phải chế độ dev):
+#   - backend : .jar + LibreOffice, cổng 8080
+#   - frontend: nginx phục vụ bản build, cổng 5173 (trang tra cứu ở /tracuu/)
+# MySQL và Redis dùng container thật đang có trên máy (cổng 3306 và 6379); cấu hình đọc từ .env.
+# Dùng: ./scripts/run-all.sh   (hoặc docker compose up -d --build)
+services:
+  backend:
+    build:
+      context: ./source/be
+      dockerfile: Dockerfile.prod
+    image: cfc-lab-backend:prod
+    container_name: cfc-lab-prod-backend
+    restart: unless-stopped
+    network_mode: host          # 127.0.0.1 trong .env trỏ đúng MySQL/Redis của máy
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      REPORT_OFFICE_COMMAND: soffice
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - ./source/be/storage:/app/storage   # ảnh mẫu, file kết quả, avatar (dùng chung với dữ liệu hiện có)
+
+  frontend:
+    build:
+      context: ./source
+      dockerfile: fe/Dockerfile
+    image: cfc-lab-frontend:prod
+    container_name: cfc-lab-prod-frontend
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - backend

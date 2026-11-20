@@ -46,3 +46,19 @@ export async function openReportPreview(id) {
   window.open(url, '_blank', 'noopener');
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
+export function getReportHeader(transferItemId) { return request(`/result-releases/report-header?transferItemId=${encodeURIComponent(transferItemId)}`); }
+export function createResultFromEntry(data) { return request('/result-releases/from-entry', { method: 'POST', body: JSON.stringify(data) }); }
+export async function downloadReportDocx(id) {
+  const response = await fetch(`/api/v1/result-releases/${id}/report-docx`, { credentials: 'include' });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    throw new Error(detail.detail ?? 'Không thể tạo file Word.');
+  }
+  const disposition = response.headers.get('Content-Disposition') || '';
+  const match = /filename\*=UTF-8''([^;]+)/i.exec(disposition) || /filename="?([^";]+)"?/i.exec(disposition);
+  const url = URL.createObjectURL(await response.blob());
+  const anchor = document.createElement('a');
+  anchor.href = url; anchor.download = match ? decodeURIComponent(match[1]) : `KQKN-${id}.docx`;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}

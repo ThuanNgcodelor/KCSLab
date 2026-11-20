@@ -1,0 +1,32 @@
+# Image chạy backend (Linux/Docker): build .jar rồi chạy bằng JRE, có sẵn LibreOffice để chuyển DOCX -> PDF.
+# Dùng qua docker-compose.yml ở thư mục gốc.
+
+# ---- 1. Build .jar ----
+FROM maven:3.9.11-eclipse-temurin-21 AS build
+WORKDIR /src
+COPY pom.xml .
+RUN mvn -B -q dependency:go-offline
+COPY src ./src
+RUN mvn -B -q -DskipTests package && cp "$(ls build/*.jar | grep -v original | head -1)" /src/app.jar
+
+# ---- 2. Runtime: Java 21 + LibreOffice ----
+FROM eclipse-temurin:21-jre
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libreoffice-writer-nogui \
+        fonts-liberation \
+        fonts-dejavu-core \
+        fonts-crosextra-carlito \
+        fonts-crosextra-caladea \
+        tzdata \
+    && rm -rf /var/lib/apt/lists/*
+ENV TZ=Asia/Ho_Chi_Minh \
+    REPORT_OFFICE_COMMAND=soffice \
+    SPRING_PROFILES_ACTIVE=mysql \
+    HOME=/tmp
+WORKDIR /app
+COPY --from=build /src/app.jar /app/app.jar
+# File tải lên (ảnh mẫu, file kết quả, avatar) nằm trong /app/storage -> gắn volume để không mất khi cập nhật.
+VOLUME ["/app/storage"]
+EXPOSE 8080
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]

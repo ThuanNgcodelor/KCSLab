@@ -35,10 +35,12 @@ public class ResultReleaseDraftController {
     private final ResultReleaseService workflow;
     private final UserService users;
     private final com.example.app.results.service.ResultReportFileService reportFiles;
+    private final com.example.app.results.service.ResultEntryService entries;
 
     public ResultReleaseDraftController(ResultReleaseDraftService drafts, ResultReleaseService workflow, UserService users,
-                                      com.example.app.results.service.ResultReportFileService reportFiles) {
-        this.drafts = drafts; this.workflow = workflow; this.users = users; this.reportFiles = reportFiles;
+                                      com.example.app.results.service.ResultReportFileService reportFiles,
+                                      com.example.app.results.service.ResultEntryService entries) {
+        this.drafts = drafts; this.workflow = workflow; this.users = users; this.reportFiles = reportFiles; this.entries = entries;
     }
 
     public record CreateDraftRequest(@NotNull Long testingRecordId) {}
@@ -48,6 +50,35 @@ public class ResultReleaseDraftController {
                             @Size(max = 120) String result, @Size(max = 255) String note) {}
     public record ReportRequest(@jakarta.validation.constraints.NotEmpty @Size(max = 40) List<@Valid ReportRow> rows,
                                 @Size(max = 120) String qualityHeadName, @Size(max = 120) String directorName) {}
+
+    public record EntryRequest(@NotNull Long transferItemId, java.time.LocalDate testingDate,
+                               @jakarta.validation.constraints.NotEmpty @Size(max = 40) List<@Valid ReportRow> rows,
+                               boolean submit) {}
+
+    /** Sample block of the KQKN report for a received sample (auto-filled from Phiếu 3/4). */
+    @GetMapping("/report-header")
+    public ResultReleaseService.ReportHeader reportHeader(@RequestParam Long transferItemId) {
+        return workflow.header(transferItemId);
+    }
+
+    /** Result-entry flow: opens the testing record and its KQKN dossier with the typed rows in one step. */
+    @PostMapping("/from-entry")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResultReleaseDetailResponse createFromEntry(@Valid @RequestBody EntryRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return entries.create(request.transferItemId(), request.testingDate(), request.rows().stream()
+                .map(row -> new ResultReleaseService.ReportRowInput(row.parameter(), row.unit(), row.method(), row.result(), row.note()))
+                .toList(), request.submit(), users.getByEmail(jwt.getSubject()));
+    }
+
+    @GetMapping("/{id}/report-docx")
+    public ResponseEntity<byte[]> reportDocx(@PathVariable Long id) {
+        var file = workflow.reportDocx(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(file.fileName(), StandardCharsets.UTF_8).build().toString())
+                .header("X-Content-Type-Options", "nosniff").header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .body(file.content());
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Chạy `mvn test` của backend trong Docker với MySQL 8.4 + Redis TẠM, tách hẳn khỏi database làm việc.
-# Không đụng cổng 3306 của máy. Tự tạo và tự xóa container/network. Cần Docker và image maven:3.9.11-eclipse-temurin-21.
+# Không đụng cổng 3306 của máy. Tự tạo và tự xóa container/network.
+# Chạy trong image có LibreOffice (source/be/Dockerfile) vì phiếu KQKN PDF được tạo từ DOCX bằng LibreOffice.
 # Dùng: scripts/run-be-tests-docker.sh [tham số Maven, ví dụ -Dtest=SampleCodingServiceTest]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,6 +9,8 @@ NET=cfc-test-net; DB=cfc-test-mysql; RD=cfc-test-redis
 cleanup() { docker rm -f "$DB" "$RD" >/dev/null 2>&1 || true; docker network rm "$NET" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 cleanup
+IMAGE=cfc-lab-management-backend:office
+docker image inspect "$IMAGE" >/dev/null 2>&1 || docker build -q -f "$ROOT/source/be/Dockerfile" -t "$IMAGE" "$ROOT/source/be" >/dev/null
 docker network create "$NET" >/dev/null
 docker run -d --name "$DB" --network "$NET" -e MYSQL_ROOT_PASSWORD=testroot -e MYSQL_DATABASE=cfc_lab_test \
   -e MYSQL_USER=cfc_test -e MYSQL_PASSWORD=testpw mysql:8.4 >/dev/null
@@ -17,4 +20,5 @@ docker run --rm --network "$NET" -v "$ROOT/source/be":/app -v "$HOME/.m2":/root/
   -e KCS_ISOLATED_DB=true \
   -e DB_URL='jdbc:mysql://'"$DB"':3306/cfc_lab_test?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true' \
   -e DB_USERNAME=cfc_test -e DB_PASSWORD=testpw -e REDIS_HOST="$RD" \
-  maven:3.9.11-eclipse-temurin-21 mvn -B test "$@"
+  -e REPORT_OFFICE_COMMAND=soffice \
+  "$IMAGE" mvn -B test "$@"

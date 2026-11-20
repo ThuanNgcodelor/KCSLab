@@ -106,7 +106,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/samples/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receiving/**").hasAnyRole("ADMIN", "TECHNICIAN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/result-releases", "/api/v1/result-releases/from-entry").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/result-releases/*/files", "/api/v1/result-releases/*/report-file", "/api/v1/result-releases/*/submit",
                                 "/api/v1/result-releases/*/revisions").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/result-releases/*/files/*", "/api/v1/result-releases/*/report-file").hasAnyRole("ADMIN", "TECHNICIAN")
@@ -126,7 +126,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/testing-records/**").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/testing-records/*/review").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/testing-records/*/submit").hasAnyRole("ADMIN", "TECHNICIAN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/testing-records").hasAnyRole("ADMIN", "TECHNICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/testing-records", "/api/v1/testing-records/from-result-file").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/testing-records/*").hasAnyRole("ADMIN", "TECHNICIAN")
                         .requestMatchers("/api/v1/testing-records/**").denyAll()
                         .anyRequest().authenticated())

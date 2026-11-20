@@ -9,7 +9,7 @@ import { PageLoader } from '../../../shared/components/Loading';
 import { Icon } from '../../../shared/components/Icon';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import {
-  downloadResultFile, getResultRelease, openReportPreview, saveResultReport, getResultReleaseEvents, publishResultRelease, removeResultFile, removeReportFile, uploadReportFile,
+  downloadReportDocx, downloadResultFile, getResultRelease, openReportPreview, saveResultReport, getResultReleaseEvents, publishResultRelease, removeResultFile, removeReportFile, uploadReportFile,
   returnResultRelease, reviseResultRelease, revokeResultRelease, submitResultRelease, uploadResultFiles,
 } from '../api/resultsApi';
 
@@ -40,6 +40,7 @@ export function ResultReleaseDetailPage() {
       const [detail, history] = await Promise.all([getResultRelease(id), getResultReleaseEvents(id)]);
       setRelease(detail); setEvents(history); setPublicIds([]);
       if (detail.files.some((file) => file.kind === 'REPORT_PDF')) setReportInputMode('file');
+      else if (detail.items.length) setReportInputMode('table');
       const source = detail.items.length ? detail.items : detail.suggestedItems;
       setRows(source.length ? source.map((item) => ({ parameter: item.parameter, unit: item.unit ?? '', method: item.method ?? '', result: item.result ?? '', note: item.note ?? '' })) : [emptyRow()]);
       setSigners({ qualityHeadName: detail.qualityHeadName ?? '', directorName: detail.directorName ?? '' });
@@ -122,6 +123,7 @@ export function ResultReleaseDetailPage() {
         {canEdit && <span className="field-help">Tên người ký lấy mặc định từ biểu mẫu LAB, có thể sửa (cần LAB xác nhận). Lưu nội dung trước khi xem trước hoặc gửi duyệt.</span>}
         <div className="form-actions">
           {(release.items.length > 0 || reportPdf) && release.status !== 'PUBLISHED' && release.status !== 'REVOKED' && <button type="button" className="outline-button" disabled={busy} onClick={() => run(() => openReportPreview(release.id), { reload: false })}>Xem trước PDF</button>}
+          {release.items.length > 0 && <button type="button" className="outline-button" disabled={busy} onClick={() => run(() => downloadReportDocx(release.id), { reload: false })}>Tải file Word (DOCX)</button>}
           {report && <button type="button" className="outline-button" disabled={busy} onClick={() => run(() => downloadResultFile(release.id, report), { reload: false })}>Tải phiếu PDF đã phát hành</button>}
           {canEdit && <button type="button" className="primary-button" disabled={busy} onClick={saveTableReport}>{busy ? 'Đang lưu…' : 'Lưu bảng kết quả'}</button>}
         </div>
@@ -152,11 +154,11 @@ export function ResultReleaseDetailPage() {
         {release.status === 'REVOKED' && <Timeline complete title="Đã thu hồi" detail={`${release.revokedByName ?? ''} · ${formatDateTime(release.revokedAt)}`} />}
       </section>
         {release.status === 'PUBLISHED' && <section className="panel-card custody-card"><p className="section-kicker">Tra cứu công khai</p><Info label="Mã tra cứu" value={release.lookupCode} mono /><Info label="Số phiếu" value={release.resultNumber} /><small className="muted">Mã QR trên phiếu PDF trỏ tới trang tra cứu (<code>PUBLIC_LOOKUP_URL</code> + <code>?code=…</code>). Khách quét QR rồi nhập 4 số cuối điện thoại để xem và tải PDF.</small></section>}
-        {isTech && editable && !reportPdf && <section className="form-submit-panel"><p><strong>Hoàn tất hồ sơ</strong><span>Tải file KQKN lên, hoặc nhập bảng và lưu ít nhất một dòng kết quả. Admin sẽ kiểm tra trước khi phát hành.</span></p><button className="primary-button" disabled={busy || release.items.length === 0} onClick={() => setConfirm({ title: 'Gửi hồ sơ?', description: 'Sau khi gửi, hồ sơ sẽ chuyển sang trạng thái chờ Admin kiểm tra.', confirmLabel: 'Gửi hồ sơ', run: () => run(() => submitResultRelease(release.id)) })}>Gửi hồ sơ</button></section>}
+        {isTech && editable && !reportPdf && <section className="form-submit-panel"><p><strong>Gửi Admin duyệt</strong><span>Lưu bảng kết quả (hoặc tải file KQKN) rồi gửi. Admin kiểm tra và phát hành; nếu sai, hồ sơ được trả lại kèm lý do.</span></p><button className="primary-button" disabled={busy || release.items.length === 0} onClick={() => setConfirm({ title: 'Gửi hồ sơ?', description: 'Sau khi gửi, hồ sơ sẽ chuyển sang trạng thái chờ Admin kiểm tra.', confirmLabel: 'Gửi duyệt', run: () => run(() => submitResultRelease(release.id)) })}>Gửi Admin duyệt</button></section>}
         {isTech && editable && reportPdf && !isAdmin && <section className="form-submit-panel"><p><strong>Đã tải file kết quả</strong><span>Không cần gửi duyệt. Admin sẽ kiểm tra file và phát hành khi hồ sơ đủ điều kiện.</span></p></section>}
         {isAdmin && directFileReady && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number"><Icon name="check" size={14} /></span><div><h2>Kiểm tra và phát hành</h2><p>File KQKN đã có sẵn. Kiểm tra bản PDF, sau đó Admin phát hành trực tiếp; không cần người duyệt thứ hai.</p></div></div>
           <button className="primary-button" disabled={busy} onClick={() => setConfirm({ title: 'Phát hành kết quả?', description: 'Hệ thống sẽ cấp số phiếu, đóng dấu QR và mở tra cứu công khai sau khi phát hành.', confirmLabel: 'Phát hành', run: () => run(() => publishResultRelease(release.id, selected)) })}>Phát hành kết quả</button></section>}
-        {isAdmin && release.status === 'SUBMITTED' && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number"><Icon name="check" size={14} /></span><div><h2>Duyệt hồ sơ cũ</h2><p>Luồng gửi duyệt cũ vẫn được giữ cho hồ sơ đã ở trạng thái chờ duyệt.</p></div></div>
+        {isAdmin && release.status === 'SUBMITTED' && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number"><Icon name="check" size={14} /></span><div><h2>Duyệt và phát hành</h2><p>Kiểm tra bảng kết quả, bản xem trước PDF hoặc file Word. Phát hành nếu đúng, hoặc trả lại kèm lý do để kỹ thuật viên sửa.</p></div></div>
           <label>Lý do (bắt buộc khi trả lại)<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} /></label>
           <div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={busy || !reason.trim()} onClick={() => setConfirm({ title: 'Trả lại hồ sơ?', description: 'Hồ sơ quay về kỹ thuật viên để bổ sung.', confirmLabel: 'Trả lại', tone: 'danger', run: () => run(() => returnResultRelease(release.id, reason.trim())) })}>Trả lại</button>
             <button className="primary-button" disabled={busy} onClick={() => setConfirm({ title: 'Phát hành kết quả?', description: 'Hệ thống sẽ cấp số phiếu, tạo PDF phiếu KQKN và mã tra cứu; khách tra cứu bằng mã (hoặc QR) + 4 số cuối điện thoại. Chỉ mẫu đã xác minh mã mới được phát hành.', confirmLabel: 'Phát hành', run: () => run(() => publishResultRelease(release.id, selected)) })}>Phát hành</button></div></section>}

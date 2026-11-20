@@ -9,3 +9,6 @@ source/be/target/
 /source/be/build/
 docs/ai
 docs/template
+
+/logs/
+

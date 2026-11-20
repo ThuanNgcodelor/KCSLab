@@ -63,23 +63,28 @@ public class ResultReleaseService {
     private final ResultReleaseFileRepository files;
     private final ResultReleaseEventRepository events;
     private final com.example.app.results.repository.ResultReleaseItemRepository items;
-    private final ReportPdfService pdf;
     private final ReportFileStamper stamper;
     private final ResultNumberSequence numbers;
     private final String defaultQualityHead;
     private final String defaultDirector;
     private final Path storageRoot;
+    private final com.example.app.transfer.repository.SampleTransferItemRepository transferItems;
+    private final KqknDocxExporter docx;
+    private final OfficeConverter converter;
     private final SecureRandom random = new SecureRandom();
 
     public ResultReleaseService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
                                 ResultReleaseEventRepository events,
                                 com.example.app.results.repository.ResultReleaseItemRepository items,
-                                ReportPdfService pdf, ReportFileStamper stamper, ResultNumberSequence numbers,
+                                ReportFileStamper stamper, ResultNumberSequence numbers,
                                 @Value("${app.report.quality-head-name:}") String defaultQualityHead,
                                 @Value("${app.report.director-name:}") String defaultDirector,
-                                @Value("${app.storage.results-root:storage/results}") String storageRoot) {
+                                @Value("${app.storage.results-root:storage/results}") String storageRoot,
+                                com.example.app.transfer.repository.SampleTransferItemRepository transferItems,
+                                KqknDocxExporter docx, OfficeConverter converter) {
+        this.transferItems = transferItems; this.docx = docx; this.converter = converter;
         this.releases = releases; this.files = files; this.events = events;
-        this.items = items; this.pdf = pdf; this.stamper = stamper; this.numbers = numbers;
+        this.items = items; this.stamper = stamper; this.numbers = numbers;
         this.defaultQualityHead = defaultQualityHead; this.defaultDirector = defaultDirector;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
     }
@@ -314,28 +319,84 @@ public class ResultReleaseService {
         if (items.countByRelease_Id(id) == 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Chưa có file phiếu hoặc chỉ tiêu cho phiếu kết quả");
         }
-        return pdf.render(buildReport(release, release.getLookupCode(), release.getResultNumber(),
+        return generatedPdf(buildReport(release, release.getLookupCode(), release.getResultNumber(),
                 LocalDate.now(BUSINESS_ZONE), true));
     }
 
     ReportData buildReport(ResultRelease release, String lookupCode, String resultNumber, LocalDate reportDate, boolean preview) {
         var record = release.getTestingRecord();
-        var item = record.getTransferItem();
+        List<ReportData.Row> rows = items.findByRelease_IdOrderByRowOrderAsc(release.getId()).stream()
+                .map(row -> new ReportData.Row(row.getParameterName(), row.getUnit(), row.getMethod(),
+                        row.getResultValue(), row.getNote())).toList();
+        return reportData(record.getTransferItem(), toDate(record.getAnalysisStart()), rows, lookupCode, resultNumber,
+                reportDate, effective(release.getQualityHeadName(), defaultQualityHead),
+                effective(release.getDirectorName(), defaultDirector), preview);
+    }
+
+    /** Sample information of the KQKN report comes from Phiếu 3/4 data already entered, never retyped. */
+    private ReportData reportData(com.example.app.transfer.entity.SampleTransferItem item, LocalDate testingDate,
+                                  List<ReportData.Row> rows, String lookupCode, String resultNumber, LocalDate reportDate,
+                                  String qualityHead, String director, boolean preview) {
         var receipt = item.getTransfer().getReceipt();
         var customer = receipt.getCustomer();
         String condition = java.util.stream.Stream.of(receipt.getSampleCondition(), receipt.getConditionDetail())
                 .filter(value -> value != null && !value.isBlank()).collect(java.util.stream.Collectors.joining(". "));
-        List<ReportData.Row> rows = items.findByRelease_IdOrderByRowOrderAsc(release.getId()).stream()
-                .map(row -> new ReportData.Row(row.getParameterName(), row.getUnit(), row.getMethod(),
-                        row.getResultValue(), row.getNote())).toList();
         return new ReportData(resultNumber, lookupCode, reportDate, customer.getName(), customer.getAddress(),
                 receipt.getSampleName(), receipt.getGrowingArea(), receipt.getPackingFacility(),
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getSealNumber(), item.getSampleCode(), receipt.getSampledBy(), toDate(receipt.getSampledAt()),
                 condition, item.getQuantity() != null ? item.getQuantity() : receipt.getQuantity(),
-                toDate(receipt.getReceivedAt()), toDate(record.getAnalysisStart()), rows,
-                effective(release.getQualityHeadName(), defaultQualityHead),
-                effective(release.getDirectorName(), defaultDirector), preview);
+                toDate(receipt.getReceivedAt()), testingDate, rows, qualityHead, director, preview);
+    }
+
+    public record ReportHeader(Long transferItemId, String requestNumber, String customerName, String customerAddress,
+                               String sampleName, String orchardCode, String packingFacility, String truckNumber,
+                               String moocNumber, String containerNumber, String sealNumber, String sampleCode,
+                               String sampleCollector, LocalDate samplingDate, String sampleCondition, String sampleQuantity,
+                               LocalDate dateReceived, LocalDate resultsDueDate, String requestedParameters, String testMethod,
+                               String qualityHeadName, String directorName) {}
+
+    /** Sample block of the KQKN report for a received sample, shown before any record exists so nothing is retyped. */
+    @Transactional(readOnly = true)
+    public ReportHeader header(Long transferItemId) {
+        var item = transferItems.findById(transferItemId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu đã bàn giao"));
+        ReportData data = reportData(item, null, List.of(), null, null, null, defaultQualityHead, defaultDirector, true);
+        return new ReportHeader(item.getId(), item.getTransfer().getReceipt().getRequestNumber(), data.customerName(),
+                data.customerAddress(), data.sampleName(), data.orchardCode(), data.packingFacility(), data.truckNumber(),
+                data.moocNumber(), data.containerNumber(), data.sealNumber(), data.sampleCode(), data.sampleCollector(),
+                data.samplingDate(), data.sampleCondition(), data.sampleQuantity(), data.dateReceived(),
+                item.getTransfer().getResultsDueDate(), item.getRequestedParameters(), item.getTestMethod(),
+                defaultQualityHead, defaultDirector);
+    }
+
+    /**
+     * The KQKN PDF is the LAB's Word template filled in and converted by LibreOffice, so the PDF always looks exactly
+     * like the DOCX. The QR (or, for a preview, the placeholder and watermark) goes into the "Dán/in mã QR" box.
+     */
+    private byte[] generatedPdf(ReportData data) {
+        byte[] converted = converter.docxToPdf(docx.render(data));
+        return stamper.stamp(converted, data.preview() ? null : data.lookupCode(), data.preview());
+    }
+
+    public record DocxFile(String fileName, byte[] content) {}
+
+    /** KQKN as an editable Word file, filled from the same data as the PDF. Uploaded DOCX reports are returned as uploaded. */
+    @Transactional(readOnly = true)
+    public DocxFile reportDocx(Long id) {
+        ResultRelease release = get(id);
+        String number = release.getResultNumber() != null ? release.getResultNumber() : release.getTestingRecord().getTransferItem().getSampleCode();
+        String fileName = "KQKN-" + number.replaceAll("[^A-Za-z0-9._-]", "_") + ".docx";
+        ResultReleaseFile source = activeFiles(id).stream()
+                .filter(file -> ResultReleaseFile.REPORT_SOURCE.equals(file.getKind())).findFirst().orElse(null);
+        if (source != null) return new DocxFile(source.getOriginalName(), read(source));
+        if (items.countByRelease_Id(id) == 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phiếu kết quả chưa có chỉ tiêu để xuất file Word");
+        }
+        boolean published = release.getStatus() == ResultReleaseStatus.PUBLISHED || release.getStatus() == ResultReleaseStatus.REVOKED;
+        LocalDate date = published && release.getPublishedAt() != null ? toDate(release.getPublishedAt()) : LocalDate.now(BUSINESS_ZONE);
+        return new DocxFile(fileName, docx.render(buildReport(release, release.getLookupCode(), release.getResultNumber(),
+                date, !published)));
     }
 
     /** Phiếu 5 data shown beside the KQKN editor so results are copied from the testing record, not retyped from memory. */
@@ -499,7 +560,7 @@ public class ResultReleaseService {
             registerCleanupOnRollback(written);
             byte[] report = uploadedReport != null
                     ? stamper.stamp(read(uploadedReport), lookupCode, false)
-                    : pdf.render(buildReport(release, lookupCode, resultNumber, today, false));
+                    : generatedPdf(buildReport(release, lookupCode, resultNumber, today, false));
             String fileName = "KQKN-" + release.getDisplayNumber().replaceAll("[^A-Za-z0-9._-]", "_") + ".pdf";
             ResultReleaseFile generated = store(release, fileName, "application/pdf", "pdf",
                     report, actor, written).asGeneratedReport();

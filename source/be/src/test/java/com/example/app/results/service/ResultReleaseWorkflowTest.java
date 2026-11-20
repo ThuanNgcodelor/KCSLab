@@ -305,7 +305,7 @@ class ResultReleaseWorkflowTest {
         assertThat(new String(preview, 0, 5)).isEqualTo("%PDF-");
         assertThat(previewText).contains("PHIẾU KẾT QUẢ THỬ NGHIỆM", "TEST REPORT", "THÔNG TIN MẪU", "KẾT QUẢ THỬ NGHIỆM",
                 "Auramine O (Phần vỏ)", "Cadimium (Cd)", "KPH", "LOQ = 30 µg/kg", "Phan Trường Tiền", "Nguyễn Công Huân",
-                "Khách kết quả", "CT777-SR-01012030-001", "BM.QT.14.02", "GHI CHÚ/ NOTES");
+                "Khách kết quả", "CT777-SR-01012030-001", "GHI CHÚ/ NOTES", "Dán/in mã QR");
 
         workflow.submit(releaseId, technician);
         var published = workflow.publish(releaseId, null, admin);
@@ -313,6 +313,8 @@ class ResultReleaseWorkflowTest {
         assertThat(generated.checksum()).hasSize(64);
         try (var in = workflow.loadFile(releaseId, generated.id()).resource().getInputStream()) {
             byte[] stored = in.readAllBytes();
+            String out = System.getProperty("kqkn.pdf.out");
+            if (out != null) java.nio.file.Files.write(java.nio.file.Path.of(out), stored);
             String text = pdfText(stored);
             assertThat(text).contains(published.resultNumber(), published.lookupCode().substring(0, 4), "Auramine O (Phần vỏ)");
             assertThat(text).doesNotContain("BẢN XEM TRƯỚC");
@@ -413,6 +415,47 @@ class ResultReleaseWorkflowTest {
     }
 
     // ---- File-first flow: Admin may check and publish their own uploaded result ----
+
+    @Test
+    void resultEntryCreatesRecordAndDossierInOneStepThenAdminPublishes(@Autowired ResultEntryService entries) throws Exception {
+        User receptionist = users.save(new User("wf-rec2@test.local", "Tiếp nhận 2", "unused", Role.RECEPTIONIST));
+        Customer customer = customers.save(new Customer("Khách nhập kết quả", "0900000888", "Cần Thơ", null));
+        Receipt receipt = new Receipt("TN-WF-002", customer, receptionist, "Người giao", Instant.now(),
+                "Sầu riêng tươi", "1", "Túi", null, true, "Nguyên vẹn", null, null, null, "Thường", "Cadimi",
+                LocalDate.now().plusDays(5), null, AcceptanceDecision.ACCEPTED, null);
+        receipt.addSample(new Sample("CT778-SR-01012030-001", "CT778", "Sầu riêng", LocalDate.now(), 1,
+                "Mẫu", "1", "Túi", "Tốt", "Cadimi").markLegacyVerified());
+        receipt = receipts.save(receipt);
+        var transfer = transfers.create(new CreateTransferRequest(receipt.getId(), "KCS", LocalDate.now(),
+                LocalDate.now().plusDays(5), false, null, null,
+                List.of(new CreateTransferItemRequest(receipt.getSamples().getFirst().getId(), null, null, null, null, "CFC-01:2026"))),
+                receptionist);
+        transfers.submit(transfer.id(), receptionist);
+        Long itemId = transfers.decide(transfer.id(), new TransferDecisionRequest(
+                TransferStatus.ACCEPTED, null, null, false, null), technician).items().getFirst().id();
+
+        var header = workflow.header(itemId);
+        assertThat(header.customerName()).isEqualTo("Khách nhập kết quả");
+        assertThat(header.sampleCode()).isEqualTo("CT778-SR-01012030-001");
+        assertThat(header.testMethod()).isEqualTo("CFC-01:2026");
+
+        var rows = List.of(new ResultReleaseService.ReportRowInput("Cadimi (Cd)", "µg/kg", "CFC-02:2026", "< LOQ", "LOQ = 30 µg/kg"),
+                new ResultReleaseService.ReportRowInput("Auramine O (Vỏ)", "µg/kg", "CFC-01:2026", "KPH", null));
+        LocalDate testingDate = LocalDate.of(2026, 11, 20);
+        var created = entries.create(itemId, testingDate, rows, true, technician);
+        assertThat(created.status()).isEqualTo("SUBMITTED");
+        assertThat(created.items()).hasSize(2);
+        assertThat(created.reference().analysisStart()).isEqualTo(testingDate.atStartOfDay(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).toInstant());
+        expect(409, () -> entries.create(itemId, testingDate, rows, false, technician)); // one record per sample
+
+        var docx = workflow.reportDocx(created.id());
+        assertThat(docx.fileName()).endsWith(".docx");
+        assertThat(new String(docx.content(), java.nio.charset.StandardCharsets.ISO_8859_1)).startsWith("PK");
+
+        expect(403, () -> workflow.publish(created.id(), null, technician));
+        assertThat(workflow.publish(created.id(), null, admin).status()).isEqualTo("PUBLISHED");
+        assertThat(workflow.reportDocx(created.id()).fileName()).doesNotContain("CT778");
+    }
 
     @Test
     void adminCanPrepareAndPublishTheirOwnUploadedResult(@org.springframework.beans.factory.annotation.Autowired ReportFileStamper stamper) throws Exception {

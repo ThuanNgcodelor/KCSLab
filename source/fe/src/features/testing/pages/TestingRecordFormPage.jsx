@@ -4,6 +4,7 @@ import { createTestingRecord, createTestingRecordFromResultFile, getTestingRecor
 import { createResultRelease, uploadReportFile } from '../../results/api/resultsApi';
 import { Icon } from '../../../shared/components/Icon';
 import { DateInput, DateTimeInput } from '../../../shared/components/DateInput';
+import { ResultEntryForm } from '../components/ResultEntryForm';
 
 const emptyEquipment = () => ({ name: '', serialNumber: '', manufacturer: '', identificationCode: '', calibrationDate: '' });
 const emptyReagent = () => ({ name: '', code: '', origin: '', preparationDate: '', expiryDate: '', storageCondition: '', concentration: '' });
@@ -71,7 +72,7 @@ export function TestingRecordFormPage() {
 
   if (loading) return <section className="staff-page"><p className="muted">Đang chuẩn bị biên bản…</p></section>;
 
-  if (!editing) return <ResultFileTestingForm options={options} error={error} setError={setError} />;
+  if (!editing) return <NewTestingRecord options={options} error={error} setError={setError} />;
 
   return <section className="staff-page testing-form-page">
     <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate(editing ? `/admin/testing/${id}` : '/admin/testing')}>← {editing ? 'Quay lại biên bản' : 'Danh sách biên bản'}</button><p className="section-kicker">Phòng phân tích</p><h1>{editing ? 'Cập nhật biên bản' : 'Tạo biên bản thử nghiệm'}</h1><p className="heading-copy">Ghi lại dữ liệu chuyên môn có thể truy xuất và kiểm tra.</p></div></header>
@@ -90,9 +91,29 @@ export function TestingRecordFormPage() {
   </section>;
 }
 
-function ResultFileTestingForm({ options, error, setError }) {
+function NewTestingRecord({ options, error, setError }) {
   const navigate = useNavigate();
+  const [mode, setMode] = useState('entry');
   const [transferItemId, setTransferItemId] = useState(options[0] ? String(options[0].id) : '');
+  const switchMode = (value) => { setMode(value); setError(''); };
+
+  return <section className="staff-page testing-form-page">
+    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/testing')}>← Danh sách biên bản</button><p className="section-kicker">Phòng phân tích / Phiếu kết quả KQKN</p><h1>Tạo biên bản thử nghiệm</h1><p className="heading-copy">Nhập kết quả ngay trên hệ thống (thông tin mẫu tự điền), hoặc tải lên file KQKN đã soạn sẵn.</p></div></header>
+    {error && <p className="form-error form-page-error" role="alert">{error}</p>}
+    {options.length === 0 ? <section className="panel-card empty-intake"><span><Icon name="flask" size={22} /></span><h3>Chưa có mẫu sẵn sàng thử nghiệm</h3><p>Mẫu phải được KCS xác nhận nhận trước khi lập biên bản thử nghiệm.</p><button className="outline-button" onClick={() => navigate('/admin/receiving/transfers')}>Xem mẫu đã nhận</button></section> : <>
+      <div className="entry-mode-switch" role="tablist" aria-label="Cách lập phiếu kết quả">
+        <button type="button" role="tab" aria-selected={mode === 'entry'} className={mode === 'entry' ? 'active' : ''} onClick={() => switchMode('entry')}><strong>Nhập kết quả trên hệ thống</strong><small>Chỉ nhập Đơn vị, Kết quả, Ghi chú · tự tạo PDF và Word</small></button>
+        <button type="button" role="tab" aria-selected={mode === 'file'} className={mode === 'file' ? 'active' : ''} onClick={() => switchMode('file')}><strong>Tải file KQKN có sẵn</strong><small>DOCX hoặc PDF đã soạn hoàn chỉnh</small></button>
+      </div>
+      {mode === 'entry'
+        ? <ResultEntryForm options={options} transferItemId={transferItemId} setTransferItemId={setTransferItemId} error={error} setError={setError} />
+        : <ResultFileTestingForm options={options} transferItemId={transferItemId} setTransferItemId={setTransferItemId} setError={setError} />}
+    </>}
+  </section>;
+}
+
+function ResultFileTestingForm({ options, transferItemId, setTransferItemId, setError }) {
+  const navigate = useNavigate();
   const [resultFile, setResultFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const selected = options.find((item) => String(item.id) === String(transferItemId));
@@ -110,15 +131,11 @@ function ResultFileTestingForm({ options, error, setError }) {
     finally { setSaving(false); }
   }
 
-  return <section className="staff-page testing-form-page">
-    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/testing')}>← Danh sách biên bản</button><p className="section-kicker">Phòng phân tích</p><h1>Tạo biên bản thử nghiệm</h1><p className="heading-copy">Chọn mẫu KCS đã nhận và tải lên file kết quả DOCX/PDF hoàn chỉnh.</p></div></header>
-    {error && <p className="form-error form-page-error" role="alert">{error}</p>}
-    {options.length === 0 ? <section className="panel-card empty-intake"><span><Icon name="flask" size={22} /></span><h3>Chưa có mẫu sẵn sàng thử nghiệm</h3><p>Mẫu phải được KCS xác nhận nhận trước khi lập biên bản thử nghiệm.</p><button className="outline-button" onClick={() => navigate('/admin/receiving/transfers')}>Xem mẫu đã nhận</button></section> : <form className="testing-file-first-form" onSubmit={handleSubmit}>
+  return <form className="testing-file-first-form" onSubmit={handleSubmit}>
       <section className="panel-card intake-form-card result-file-first-card"><FormHeading number="I" title="Mẫu đã bàn giao" copy="Chỉ mẫu đã được KCS nhận mới xuất hiện trong danh sách." /><label>Mẫu<select value={transferItemId} onChange={(event) => setTransferItemId(event.target.value)} required>{options.map((item) => <option key={item.id} value={item.id}>{item.sampleCode} · Số/No. {item.requestNumber || '—'} — {item.sampleName}</option>)}</select></label>{selected && <div className="testing-sample-summary"><span><small>Số/No.</small><strong>{selected.requestNumber || selected.receiptCode}</strong></span><span><small>Chỉ tiêu</small><strong>{selected.requestedParameters || '—'}</strong></span><span><small>Phương pháp</small><strong>{selected.testMethod || '—'}</strong></span><span><small>Hạn trả</small><strong>{formatDate(selected.dueDate)}</strong></span></div>}</section>
       <section className="panel-card intake-form-card result-file-first-card"><FormHeading number="II" title="File kết quả thử nghiệm" copy="Tải một file DOCX hoặc PDF đã hoàn chỉnh. Không cần nhập lại thiết bị, hóa chất, QC hay số liệu từng dòng." /><label>Phiếu kết quả KQKN-DV<span className="result-file-picker"><span className="result-file-picker-icon">↑</span><span className="result-file-picker-copy"><strong>{resultFile?.name || 'Chọn file kết quả'}</strong><small>{resultFile ? `${Math.ceil(resultFile.size / 1024)} KB · sẵn sàng tải lên` : 'DOCX hoặc PDF · tối đa 10 MB'}</small></span><span className="result-file-picker-action">Chọn file</span><input type="file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => setResultFile(event.target.files?.[0] ?? null)} required /></span></label><p className="form-help">File DOCX sẽ được hệ thống chuyển sang PDF để kiểm tra trước khi Admin phát hành.</p></section>
-      <aside className="form-submit-panel"><p><strong>{saving ? 'Đang xử lý file…' : 'Tạo biên bản thử nghiệm'}</strong><span>Sau khi lưu, hồ sơ kết quả sẽ mở để kiểm tra và phát hành.</span></p><button className="primary-button" disabled={saving || !transferItemId || !resultFile}>{saving ? 'Đang tạo biên bản…' : 'Tải file và tạo biên bản'}</button></aside>
-    </form>}
-  </section>;
+      <aside className="form-submit-panel"><p><strong>{saving ? 'Đang xử lý file…' : 'Tạo biên bản thử nghiệm'}</strong><span>Sau khi lưu, hồ sơ kết quả sẽ mở để Admin kiểm tra và phát hành.</span></p><button className="primary-button" disabled={saving || !transferItemId || !resultFile}>{saving ? 'Đang tạo biên bản…' : 'Tải file và tạo biên bản'}</button></aside>
+    </form>;
 }
 
 function FormHeading({ number, title, copy }) { return <div className="form-card-heading"><span className="form-number">{number}</span><div><h2>{title}</h2><p>{copy}</p></div></div>; }
