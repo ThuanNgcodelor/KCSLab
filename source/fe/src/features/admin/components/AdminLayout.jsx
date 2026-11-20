@@ -73,7 +73,7 @@ export function AdminLayout() {
       <aside id="workspace-sidebar" className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`} data-collapsed={sidebarCollapsed}>
         <div className="sidebar-brand">
           <img className="sidebar-logo" src={cfcLogo} alt="Logo CFC Cò Bay" width="58" height="40" />
-          <div className="sidebar-brand-copy"><strong>CFC Lab</strong><small>Management system</small></div>
+          <div className="sidebar-brand-copy"><strong>CFC Lab</strong></div>
           <button type="button" className="sidebar-toggle" onClick={toggleSidebar} aria-controls="workspace-sidebar"
             aria-expanded={!sidebarCollapsed} aria-label={sidebarToggleLabel} title={sidebarToggleLabel}>
             <Icon name={sidebarCollapsed ? 'expand' : 'collapse'} />
@@ -85,7 +85,7 @@ export function AdminLayout() {
           {isAdmin && <NavLink title="Nhân viên" to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
           {isAdmin && <NavLink title="Phương pháp thử" to="/admin/test-methods" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="method" /><span>Phương pháp thử</span></NavLink>}
           {user?.role === 'RECEPTIONIST' && <NavLink title="Tổng quan" to="/admin/intake" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
-          {canReceive && <NavLink title="Phiếu yêu cầu kiểm nghiệm" to="/admin/requests" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Phiếu yêu cầu kiểm nghiệm</span></NavLink>}
+          {canReceive && <NavLink title="Yêu cầu kiểm nghiệm" to="/admin/requests" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Yêu cầu kiểm nghiệm</span></NavLink>}
           {canReceive && <NavLink title="Tiếp nhận mẫu" to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="inbox" /><span>Tiếp nhận mẫu</span></NavLink>}
           {user?.role === 'TECHNICIAN' && <NavLink title="Tổng quan" to="/admin/receiving" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           <NavLink title={user?.role === 'TECHNICIAN' ? 'Nhận mẫu' : 'Chuyển mẫu'} to={user?.role === 'TECHNICIAN' ? '/admin/receiving/transfers' : '/admin/transfers'} onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>{user?.role === 'TECHNICIAN' ? 'Nhận mẫu' : 'Chuyển mẫu'}</span></NavLink>

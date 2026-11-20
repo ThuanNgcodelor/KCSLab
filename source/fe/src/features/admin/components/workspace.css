@@ -10,6 +10,8 @@
   --workspace-sidebar: #f7faf7;
   --workspace-selection: #e3eee6;
   --workspace-control-border: #b9cdbf;
+  --workspace-action-height: 44px;
+  --workspace-action-radius: 9px;
   --workspace-table-header: #dfeae2;
   --workspace-table-header-border: #c6d8cb;
   --workspace-table-hover: #edf7ef;
@@ -21,11 +23,13 @@
   color: var(--workspace-ink);
   border-inline-end: 1px solid var(--workspace-border);
 }
-.admin-shell .sidebar-brand img { background: #fff; padding: 5px; border-radius: 8px; object-fit: contain; }
+.admin-shell .sidebar-brand { gap: 10px; padding: 0 4px 18px; }
+.admin-shell .sidebar-brand img { width: 44px; height: 36px; flex: 0 0 44px; background: #fff; padding: 5px; border-radius: 8px; object-fit: contain; }
+.admin-shell .sidebar-brand-copy { flex: 1; min-width: 0; }
+.admin-shell .sidebar-brand-copy strong { white-space: nowrap; }
 .admin-shell .sidebar-brand strong,
 .admin-shell .sidebar-profile strong { color: var(--workspace-ink); }
 .admin-shell .sidebar-section-label,
-.admin-shell .sidebar-brand small,
 .admin-shell .sidebar-profile small,
 .admin-shell .sidebar-status,
 .admin-shell .sidebar-logout { color: var(--workspace-muted); font-size: 12px; }
@@ -41,13 +45,12 @@
 .sidebar-toggle, .sidebar-logout .nav-icon { display: none; }
 
 @media (min-width: 1081px) {
-  .admin-shell .sidebar-brand { gap: 9px; padding-inline: 4px; }
   .sidebar-toggle {
     display: grid;
     place-items: center;
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
     margin-inline-start: auto;
     padding: 0;
     border: 1px solid var(--workspace-control-border);
@@ -68,7 +71,7 @@
     padding-bottom: 20px;
   }
   .admin-sidebar[data-collapsed="true"] .sidebar-logo { width: 44px; height: 34px; flex: none; }
-  .admin-sidebar[data-collapsed="true"] .sidebar-toggle { margin-inline-start: 0; }
+  .admin-sidebar[data-collapsed="true"] .sidebar-toggle { flex-basis: auto; margin-inline-start: 0; }
   .admin-sidebar[data-collapsed="true"] :is(.sidebar-brand-copy, .sidebar-section-label, .sidebar-profile-copy, .profile-more) { display: none; }
   .admin-sidebar[data-collapsed="true"] .admin-nav { margin-bottom: 16px; }
   .admin-sidebar[data-collapsed="true"] :is(.nav-item, .sidebar-profile, .sidebar-status, .sidebar-logout) {
@@ -110,6 +113,15 @@
 .admin-content .panel-card { border-color: var(--workspace-border); border-radius: 12px; box-shadow: none; }
 .admin-content .primary-button:not(:disabled) { background: var(--workspace-accent); color: #fff; }
 .admin-content .primary-button:not(:disabled):hover { background: var(--workspace-accent-hover); }
+.admin-content :is(.primary-button, .outline-button):not(.small-button) {
+  min-height: var(--workspace-action-height);
+  border-radius: var(--workspace-action-radius);
+}
+.admin-content :is(.workspace-period, .receiving-filter, .transfer-draft-actions, .transfer-decision-actions, .method-form-actions, .profile-form-actions, .optional-form-actions, .receipt-success-actions) :is(.primary-button, .outline-button, .small-button) {
+  min-height: var(--workspace-action-height);
+  border-radius: var(--workspace-action-radius);
+}
+.admin-shell .cfc-confirm__actions button { border-radius: var(--workspace-action-radius); }
 .admin-main :is(.outline-button, .table-action, .pagination-button, .filter-reset, .workspace-menu, .notification-trigger):not(:disabled, .danger, .danger-action, .reject-button, .current) {
   background: var(--workspace-paper);
   border-color: var(--workspace-control-border);
@@ -160,7 +172,7 @@
 .admin-content .method-table th:last-child { width: 224px; text-align: right; }
 .admin-content .method-table td { overflow-wrap: anywhere; white-space: normal; vertical-align: middle; }
 .admin-content .method-table td, .admin-content .method-table th { padding-inline: 12px; }
-.admin-content .method-table .table-action { min-height: 34px; }
+.admin-content .method-table .table-action { min-height: 40px; border-radius: var(--workspace-action-radius); }
 .admin-content .method-form .switch-label { display: flex; align-items: center; min-height: 42px; }
 .admin-content :is(.list-toolbar, .intake-filter-card, .receiving-list .receiving-filter:not(.receiving-status-tabs)) label {
   color: var(--workspace-muted);
@@ -180,7 +192,7 @@
 .workspace-period label { flex: 1 1 140px; }
 .workspace-queue-action { color: var(--workspace-accent); font-size: 12px; font-weight: 700; }
 .admin-content :is(.status-chips, .receiving-status-tabs) { display: flex; flex-wrap: wrap; gap: 8px; }
-.admin-content :is(.status-chips, .receiving-status-tabs) button { min-height: 40px; font-size: 12px; }
+.admin-content :is(.status-chips, .receiving-status-tabs) button { min-height: var(--workspace-action-height); border-radius: var(--workspace-action-radius); font-size: 12px; }
 .admin-content :is(.status-chips, .receiving-status-tabs) button[aria-pressed="true"] {
   background: var(--workspace-accent);
   color: #fff;
@@ -252,7 +264,7 @@
   .admin-content .method-table td:last-child { grid-template-columns: minmax(0, 1fr); }
   .admin-content .method-table td:last-child::before { content: none; }
   .admin-content .method-row-actions { justify-content: flex-start; }
-  .admin-content .method-table .table-action { min-height: 40px; }
+  .admin-content .method-table .table-action { min-height: var(--workspace-action-height); }
 }
 @media (max-width: 520px) {
   .admin-shell .notification-popover { position: fixed; top: 62px; right: 14px; }
