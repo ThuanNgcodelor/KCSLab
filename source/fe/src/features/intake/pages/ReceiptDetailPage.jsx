@@ -1,3 +1,4 @@
+import { ParameterList } from '../../../shared/components/ParameterRows';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getReceipt, uploadReceiptFile } from '../api/intakeApi';
@@ -65,7 +66,7 @@ export function ReceiptDetailPage() {
           </div>
         </section>
         <section className="panel-card intake-form-card"><DetailHeading title={`Danh sách mẫu (${receipt.samples.length})`} />
-          <div className="receipt-sample-list">{receipt.samples.map((sample) => <article className="receipt-sample-item" key={sample.id}><div><strong>{sample.sampleCode}</strong><small>{sample.sourceCode} · {sample.productType}</small></div><div><strong>{sample.name}</strong><small>{sample.quantity || 'Chưa ghi lượng'} · {sample.packaging || 'Chưa ghi bao bì'}</small></div><div><strong>{sample.sampleCondition || 'Chưa ghi tình trạng'}</strong><small>{sample.requestedParameters || 'Chưa ghi chỉ tiêu'}</small></div><SampleCodingPanel sample={sample} onChanged={() => getReceipt(id).then(setReceipt).catch(() => {})} /></article>)}</div>
+          <div className="receipt-sample-list">{receipt.samples.map((sample) => <article className="receipt-sample-item" key={sample.id}><div><strong>{sample.sampleCode}</strong><small>{sample.sourceCode} · {sample.productType}</small></div><div><strong>{sample.name}</strong><small>{sample.quantity || 'Chưa ghi lượng'} · {sample.packaging || 'Chưa ghi bao bì'}</small></div><div><strong>{sample.sampleCondition || 'Chưa ghi tình trạng'}</strong><ParameterList value={sample.requestedParameters} /></div><SampleCodingPanel sample={sample} onChanged={() => getReceipt(id).then(setReceipt).catch(() => {})} /></article>)}</div>
         </section>
         <section className="panel-card intake-form-card"><DetailHeading title={`Ảnh và hồ sơ (${receipt.attachments.length})`} />
           {receipt.attachments.length === 0 ? <p className="muted">Chưa có ảnh hoặc file đính kèm.</p> : <div className="attachment-list">{receipt.attachments.map((attachment) => <a className="attachment-item" href={attachment.contentUrl} target="_blank" rel="noreferrer" key={attachment.id}>{attachment.contentType.startsWith('image/') ? <img className="attachment-thumb" src={attachment.contentUrl} alt="" loading="lazy" /> : <span>▤</span>}<div><strong>{categoryLabels[attachment.category] ?? attachment.category}</strong><small>{attachment.originalName} · {formatSize(attachment.size)}</small><small>{attachment.uploadedByName || 'Không rõ người tải'} · {formatDateTime(attachment.capturedAt || attachment.uploadedAt)}</small></div></a>)}</div>}

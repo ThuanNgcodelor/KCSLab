@@ -1,3 +1,4 @@
+import { splitParameters } from '../../../shared/parameters';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -126,7 +127,7 @@ export function ResultReleaseDetailPage() {
         </div>
       </section>}
       {release.reference && <section className="panel-card intake-form-card reference-card"><FormHeading number="02" title="Số liệu từ biên bản thử nghiệm" copy={<>Tham chiếu từ biên bản <Link className="inline-link" to={`/admin/testing/${release.reference.testingRecordId}`}>{release.reference.recordCode}</Link>. Đây là hồ sơ làm việc nội bộ; kết quả cuối cùng nhập vào bảng 01 phía trên.</>} />
-        <div className="test-general-grid"><Data label="Chỉ tiêu yêu cầu" value={release.reference.requestedParameters} /><Data label="Phương pháp" value={release.reference.testMethod} /><Data label="Bắt đầu thử nghiệm" value={formatDateTime(release.reference.analysisStart)} /><Data label="Hiệu suất thu hồi" value={release.reference.recoveryPercent == null ? null : `${release.reference.recoveryPercent}%`} /></div>
+        <div className="test-general-grid"><Data label="Chỉ tiêu yêu cầu" value={splitParameters(release.reference.requestedParameters).join('\n')} /><Data label="Phương pháp" value={release.reference.testMethod} /><Data label="Bắt đầu thử nghiệm" value={formatDateTime(release.reference.analysisStart)} /><Data label="Hiệu suất thu hồi" value={release.reference.recoveryPercent == null ? null : `${release.reference.recoveryPercent}%`} /></div>
         {release.reference.measurements.length === 0 ? <p className="muted">Biên bản chưa có dòng số liệu.</p> : <div className="table-wrap"><table className="staff-table record-data-table"><thead><tr><th>Loại</th><th>Lần lặp</th><th>KQ / lần</th><th>Kết quả</th><th>Độ lệch</th></tr></thead><tbody>{release.reference.measurements.map((measurement, index) => <tr key={index}><td data-label="Loại">{measurement.type === 'QC' ? 'QC' : 'Thực nghiệm'}</td><td data-label="Lần lặp">{measurement.replicate || '—'}</td><td data-label="KQ / lần">{measurement.resultPerReplicate || '—'}</td><td data-label="Kết quả">{measurement.result || '—'}</td><td data-label="Độ lệch">{measurement.deviation || '—'}</td></tr>)}</tbody></table></div>}
       </section>}
       <section className="panel-card intake-form-card"><FormHeading number={release.reference ? '03' : '02'} title={`File đính kèm nội bộ (${attachments.length}/10)`} copy="Không bắt buộc: dữ liệu thô, bảng tính… PDF, DOCX hoặc XLSX, tối đa 10 MB mỗi file. Mặc định chỉ dùng nội bộ; Admin duyệt có thể chọn công khai kèm phiếu." />
@@ -172,7 +173,7 @@ export function ResultReleaseDetailPage() {
 }
 
 function FormHeading({ number, title, copy }) { return <div className="form-card-heading"><span className="form-number">{number}</span><div><h2>{title}</h2><p>{copy}</p></div></div>; }
-function Data({ label, value }) { return <span><small>{label}</small><strong>{value || '—'}</strong></span>; }
+function Data({ label, value }) { return <span><small>{label}</small><strong style={{ whiteSpace: 'pre-line' }}>{value || '—'}</strong></span>; }
 function Timeline({ complete, title, detail }) { return <div className={`custody-event ${complete ? 'complete' : ''}`}><i /><span><strong>{title}</strong><small>{detail}</small></span></div>; }
 function formatDateTime(value) { return value ? new Date(value).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—'; }
 

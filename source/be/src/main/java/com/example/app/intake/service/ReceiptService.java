@@ -67,6 +67,7 @@ public class ReceiptService {
             "receivedAt", "receivedAt",
             "createdAt", "createdAt",
             "receiptCode", "receiptCode",
+            "requestNumber", "requestNumber",
             "customerName", "customer.name",
             "sampleName", "sampleName",
             "status", "status",

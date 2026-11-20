@@ -59,6 +59,7 @@ public final class ReceiptSpecifications {
                 var samples = root.join("samples", JoinType.LEFT);
                 return builder.or(
                         builder.like(builder.lower(root.get("receiptCode")), pattern, '\\'),
+                        builder.like(builder.lower(root.get("requestNumber")), pattern, '\\'),
                         builder.like(builder.lower(root.get("sampleName")), pattern, '\\'),
                         builder.like(builder.lower(customer.get("name")), pattern, '\\'),
                         builder.like(builder.lower(customer.get("phone")), pattern, '\\'),

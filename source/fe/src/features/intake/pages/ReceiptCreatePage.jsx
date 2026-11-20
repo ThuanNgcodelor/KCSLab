@@ -6,6 +6,7 @@ import { Icon } from '../../../shared/components/Icon';
 import { DateInput } from '../../../shared/components/DateInput';
 import { getTestRequest, getTestRequestByNumber, listTestRequests } from '../../sampling/api/testRequestApi';
 import { Chevron } from '../../sampling/components/SamplingParts';
+import { splitParameters } from '../../../shared/parameters';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -48,18 +49,18 @@ function cloneSample(previous) {
   if (!previous) return newSample();
   return { ...previous, sampleCode: nextSampleCode(previous.sampleCode), requestedParameters: '', parameterOther: '', parameterOtherEnabled: false };
 }
-// Phiếu yêu cầu lưu mỗi (mẫu, chỉ tiêu, nền mẫu) một dòng; Phiếu 3 chỉ chọn 1 chỉ tiêu cho mỗi mẫu nên tách theo (mẫu, chỉ tiêu).
+// Phiếu yêu cầu lưu mỗi (mẫu, chỉ tiêu, nền mẫu) một dòng; Phiếu 3 gộp lại: một mẫu thật = một mã, nhiều chỉ tiêu.
 function samplesFromRequest(data) {
-  const rows = [];
-  const seen = new Set();
+  const byName = new Map();
   (data.items ?? []).forEach((item) => {
     const name = item.sampleNameOrId || data.sampleName;
-    const parameter = item.parameters === 'Vàng O (Auramin O)' ? 'Auramine O (Vàng ô)' : item.parameters;
-    const key = `${name}|${parameter}`;
-    if (!parameter || seen.has(key)) return;
-    seen.add(key);
-    const known = parameterOptions.includes(parameter);
-    rows.push({ ...newSample(), name, requestedParameters: known ? parameter : '', parameterOtherEnabled: !known, parameterOther: known ? '' : parameter.replace(/^Khác:\s*/, '') });
+    if (!byName.has(name)) byName.set(name, []);
+    splitParameters(item.parameters).forEach((parameter) => { if (!byName.get(name).includes(parameter)) byName.get(name).push(parameter); });
+  });
+  const rows = [...byName].map(([name, parameters]) => {
+    const known = parameters.filter((parameter) => parameterOptions.includes(parameter));
+    const other = parameters.filter((parameter) => !parameterOptions.includes(parameter));
+    return { ...newSample(), name, requestedParameters: known.join(', '), parameterOtherEnabled: other.length > 0, parameterOther: other.join(', ') };
   });
   return rows.length ? rows : [{ ...newSample(), name: data.sampleName }];
 }
@@ -249,17 +250,19 @@ export function ReceiptCreatePage() {
                 {sample.packaging === 'Khác' && <label>Loại bao bì khác<input value={sample.packagingOther} onChange={updateSample(index, 'packagingOther')} placeholder="Nhập loại bao bì" required /></label>}
                 <ConditionChecklist value={sample.condition} onChange={(condition) => setSamples((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, condition } : item)))} name={`condition-${index}`} />
                 <fieldset className="full-span choice-fieldset">
-                  <legend>Chỉ tiêu yêu cầu (chọn một)</legend>
+                  <legend>Chỉ tiêu yêu cầu (chọn nhiều nếu một mẫu cần nhiều chỉ tiêu)</legend>
                   <div className="choice-grid">
                     {parameterOptions.map((option) => <label className="choice-option" key={option}>
-                      <input type="radio" name={`parameter-${index}`} checked={!sample.parameterOtherEnabled && sample.requestedParameters === option} onChange={() => setSamples((current) => current.map((item, itemIndex) => (
-                        itemIndex === index ? { ...item, requestedParameters: option, parameterOtherEnabled: false, parameterOther: '' } : item
-                      )))} />
+                      <input type="checkbox" checked={selectedParameters(sample.requestedParameters).includes(option)} onChange={(event) => setSamples((current) => current.map((item, itemIndex) => {
+                        if (itemIndex !== index) return item;
+                        const picked = selectedParameters(item.requestedParameters).filter((name) => name !== option);
+                        return { ...item, requestedParameters: (event.target.checked ? [...picked, option] : picked).join(', ') };
+                      }))} />
                       <span>{option}</span>
                     </label>)}
                     <label className="choice-option">
-                      <input type="radio" name={`parameter-${index}`} checked={sample.parameterOtherEnabled} onChange={() => setSamples((current) => current.map((item, itemIndex) => (
-                        itemIndex === index ? { ...item, requestedParameters: '', parameterOtherEnabled: true } : item
+                      <input type="checkbox" checked={sample.parameterOtherEnabled} onChange={(event) => setSamples((current) => current.map((item, itemIndex) => (
+                        itemIndex === index ? { ...item, parameterOtherEnabled: event.target.checked, parameterOther: event.target.checked ? item.parameterOther : '' } : item
                       )))} />
                       <span>Khác</span>
                     </label>
@@ -379,7 +382,7 @@ function FormCard({ number, title, copy, className = 'intake-form-card', default
 
 function SampleCard({ index, sample, canRemove, onRemove, children }) {
   const [open, setOpen] = useState(true); const bodyId = useId();
-  const summary = [sample.name, sample.parameterOtherEnabled ? sample.parameterOther : sample.requestedParameters].filter(Boolean).join(' · ');
+  const summary = [sample.name, [sample.requestedParameters, sample.parameterOtherEnabled ? sample.parameterOther : ''].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
   return <article className="sample-editor-card">
     <div className="sample-editor-heading">
       <button type="button" className="group-toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen(!open)}>
