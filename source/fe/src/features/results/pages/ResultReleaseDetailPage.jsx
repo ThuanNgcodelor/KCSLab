@@ -87,7 +87,7 @@ export function ResultReleaseDetailPage() {
     {release.decisionNote && release.status === 'RETURNED' && <p className="handoff-result rejected"><strong>Lý do trả lại ({release.decidedByName})</strong><span>{release.decisionNote}</span></p>}
     {release.revokeReason && release.status === 'REVOKED' && <p className="handoff-result rejected"><strong>Lý do thu hồi ({release.revokedByName})</strong><span>{release.revokeReason}</span></p>}
     <div className="testing-detail-grid"><main className="receipt-form-main">
-      <section className="panel-card intake-form-card report-editor"><FormHeading number="01" title="Phiếu kết quả (KQKN-DV)" copy="Tải lên file DOCX hoặc PDF đã soạn, hoặc nhập bảng kết quả. DOCX được chuyển sang PDF; hãy xem trước và đối chiếu kỹ bố cục, nội dung trước khi gửi duyệt. Nếu không tìm thấy ô QR, mã sẽ được đặt ở trang riêng." />
+      <section className="panel-card intake-form-card report-editor"><FormHeading number="I" title="Phiếu kết quả (KQKN-DV)" copy="Tải lên file DOCX hoặc PDF đã soạn, hoặc nhập bảng kết quả. DOCX được chuyển sang PDF; hãy xem trước và đối chiếu kỹ bố cục, nội dung trước khi gửi duyệt. Nếu không tìm thấy ô QR, mã sẽ được đặt ở trang riêng." />
         {canEdit && !reportPdf && <div className="report-mode-switch" role="group" aria-label="Cách tạo phiếu kết quả">
           <button type="button" className={reportInputMode === 'file' ? 'primary-button' : 'outline-button'} aria-pressed={reportInputMode === 'file'} onClick={() => { setReportInputMode('file'); setError(''); }}>Tải file phiếu</button>
           <button type="button" className={reportInputMode === 'table' ? 'primary-button' : 'outline-button'} aria-pressed={reportInputMode === 'table'} onClick={() => { setReportInputMode('table'); setError(''); }}>Nhập bảng thủ công</button>
@@ -103,7 +103,7 @@ export function ResultReleaseDetailPage() {
           : reportInputMode === 'file' ? <p className="field-help report-mode-help">Chọn file DOCX/PDF và bấm “Tải phiếu lên”. Khi file đã tải thành công, bạn có thể gửi duyệt mà không nhập bảng.</p>
             : <p className="field-help report-mode-help">Nhập bảng chỉ khi không có file KQKN. Mỗi dòng cần có chỉ tiêu và kết quả.</p>}
       </section>
-      {showTable && <section className="panel-card intake-form-card report-editor"><FormHeading number="01b" title="Nhập bảng kết quả" copy="Dùng khi không có file phiếu. Số phiếu, ngày và mã QR được cấp khi phát hành." />
+      {showTable && <section className="panel-card intake-form-card report-editor"><FormHeading number="II" title="Nhập bảng kết quả" copy="Dùng khi không có file phiếu. Số phiếu, ngày và mã QR được cấp khi phát hành." />
         <div className="table-wrap"><table className="staff-table report-table"><thead><tr><th>STT</th><th>Chỉ tiêu</th><th>Đơn vị</th><th>Phương pháp</th><th>Kết quả</th><th>Ghi chú</th>{canEdit && <th />}</tr></thead><tbody>
           {rows.map((row, index) => <tr key={index}>
             <td className="report-no" data-label="STT">{index + 1}</td>
@@ -126,7 +126,7 @@ export function ResultReleaseDetailPage() {
           {canEdit && <button type="button" className="primary-button" disabled={busy} onClick={saveTableReport}>{busy ? 'Đang lưu…' : 'Lưu bảng kết quả'}</button>}
         </div>
       </section>}
-      {release.reference && <section className="panel-card intake-form-card reference-card"><FormHeading number="02" title="Số liệu từ biên bản thử nghiệm" copy={<>Tham chiếu từ biên bản <Link className="inline-link" to={`/admin/testing/${release.reference.testingRecordId}`}>{release.reference.recordCode}</Link>. Đây là hồ sơ làm việc nội bộ; kết quả cuối cùng nhập vào bảng 01 phía trên.</>} />
+      {release.reference && <section className="panel-card intake-form-card reference-card"><FormHeading number="III" title="Số liệu từ biên bản thử nghiệm" copy={<>Tham chiếu từ biên bản <Link className="inline-link" to={`/admin/testing/${release.reference.testingRecordId}`}>{release.reference.recordCode}</Link>. Đây là hồ sơ làm việc nội bộ; kết quả cuối cùng nhập vào bảng 01 phía trên.</>} />
         <div className="test-general-grid"><Data label="Chỉ tiêu yêu cầu" value={splitParameters(release.reference.requestedParameters).join('\n')} /><Data label="Phương pháp" value={release.reference.testMethod} /><Data label="Bắt đầu thử nghiệm" value={formatDateTime(release.reference.analysisStart)} /><Data label="Hiệu suất thu hồi" value={release.reference.recoveryPercent == null ? null : `${release.reference.recoveryPercent}%`} /></div>
         {release.reference.measurements.length === 0 ? <p className="muted">Biên bản chưa có dòng số liệu.</p> : <div className="table-wrap"><table className="staff-table record-data-table"><thead><tr><th>Loại</th><th>Lần lặp</th><th>KQ / lần</th><th>Kết quả</th><th>Độ lệch</th></tr></thead><tbody>{release.reference.measurements.map((measurement, index) => <tr key={index}><td data-label="Loại">{measurement.type === 'QC' ? 'QC' : 'Thực nghiệm'}</td><td data-label="Lần lặp">{measurement.replicate || '—'}</td><td data-label="KQ / lần">{measurement.resultPerReplicate || '—'}</td><td data-label="Kết quả">{measurement.result || '—'}</td><td data-label="Độ lệch">{measurement.deviation || '—'}</td></tr>)}</tbody></table></div>}
       </section>}

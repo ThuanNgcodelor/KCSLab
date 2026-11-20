@@ -110,14 +110,14 @@ export function ProfilePage() {
 
       <div className="profile-forms">
         <form className="panel-card profile-form" onSubmit={handleProfileSubmit}>
-          <div className="profile-section-heading"><span>Hồ sơ</span><div><h2>Thông tin hiển thị</h2><p>Tên này xuất hiện trên phiếu, lịch sử thao tác và thông báo nội bộ.</p></div></div>
+          <div className="profile-section-heading"><span className="form-number">I</span><div><h2>Thông tin hiển thị</h2><p>Tên này xuất hiện trên phiếu, lịch sử thao tác và thông báo nội bộ.</p></div></div>
           <label>Tên hiển thị<input value={displayName} minLength="2" maxLength="120" onChange={(event) => setDisplayName(event.target.value)} required /></label>
           <label>Email<input value={profile?.email ?? ''} readOnly aria-readonly="true" /><small>Email là định danh đăng nhập, chỉ Admin mới thay đổi được.</small></label>
           <div className="profile-form-actions"><button className="primary-button" disabled={profileSaving || displayName.trim() === profile?.displayName} type="submit">{profileSaving ? 'Đang lưu…' : 'Lưu thông tin'}</button></div>
         </form>
 
         <form className="panel-card profile-form" onSubmit={handlePasswordSubmit}>
-          <div className="profile-section-heading"><span>Bảo mật</span><div><h2>Đổi mật khẩu</h2><p>Sau khi đổi, mọi phiên đăng nhập sẽ bị thu hồi và bạn cần đăng nhập lại.</p></div></div>
+          <div className="profile-section-heading"><span className="form-number">II</span><div><h2>Đổi mật khẩu</h2><p>Sau khi đổi, mọi phiên đăng nhập sẽ bị thu hồi và bạn cần đăng nhập lại.</p></div></div>
           <div className="profile-password-grid"><label>Mật khẩu hiện tại<input type={showPasswords ? 'text' : 'password'} autoComplete="current-password" value={passwords.currentPassword} onChange={(event) => setPasswords((current) => ({ ...current, currentPassword: event.target.value }))} required /></label><label>Mật khẩu mới<input type={showPasswords ? 'text' : 'password'} autoComplete="new-password" minLength="10" maxLength="128" value={passwords.newPassword} onChange={(event) => setPasswords((current) => ({ ...current, newPassword: event.target.value }))} required /><small>Tối thiểu 10 ký tự.</small></label><label>Xác nhận mật khẩu mới<input type={showPasswords ? 'text' : 'password'} autoComplete="new-password" minLength="10" maxLength="128" value={passwords.confirmPassword} onChange={(event) => setPasswords((current) => ({ ...current, confirmPassword: event.target.value }))} required /></label></div>
           <label className="show-password"><input type="checkbox" checked={showPasswords} onChange={(event) => setShowPasswords(event.target.checked)} /> Hiện mật khẩu</label>
           <div className="profile-form-actions"><button className="outline-button" disabled={passwordSaving} type="submit">{passwordSaving ? 'Đang đổi mật khẩu…' : 'Đổi mật khẩu'}</button></div>

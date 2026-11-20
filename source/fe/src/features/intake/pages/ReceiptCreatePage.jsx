@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import { createReceipt, downloadReceiptForm3, listReceipts, uploadReceiptFile } from '../api/intakeApi';
 import { Icon } from '../../../shared/components/Icon';
-import { DateInput } from '../../../shared/components/DateInput';
+import { DateInput, DateTimeInput } from '../../../shared/components/DateInput';
 import { getTestRequest, getTestRequestByNumber, listTestRequests } from '../../sampling/api/testRequestApi';
 import { Chevron } from '../../sampling/components/SamplingParts';
 import { splitParameters } from '../../../shared/parameters';
@@ -226,7 +226,7 @@ export function ReceiptCreatePage() {
     {!form.customerPhone && <p id="customer-phone-help" className="form-example-guide" role="note">Ghi nhận đầy đủ người nhận, nguồn mẫu, từng mẫu và bằng chứng ảnh.</p>}
     <form className="receipt-form-layout" noValidate onSubmit={handleSubmit}>
       <div className="receipt-form-main">
-        <FormCard number="01" title="Người giao và người nhận mẫu" copy="Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận.">
+        <FormCard number="I" en="Delivery & receipt" title="Người giao và người nhận mẫu" copy="Tài khoản đang đăng nhập được lưu tự động là người tiếp nhận.">
           <div className="form-two-columns">
             <label>Họ tên người giao<input value={form.deliveredBy} onChange={update('deliveredBy')} required /></label>
             <label>Số điện thoại<input type="tel" value={form.customerPhone} onChange={update('customerPhone')} required /></label>
@@ -235,11 +235,11 @@ export function ReceiptCreatePage() {
             <label>Email<input type="email" value={form.customerEmail} onChange={update('customerEmail')} /></label>
             <label className="full-span">Địa chỉ<input value={form.customerAddress} onChange={update('customerAddress')} /></label>
             <label>Người nhận mẫu<input value={form.sampledBy} onChange={update('sampledBy')} placeholder="Nếu khác người giao" /></label>
-            <label>Thời điểm nhận mẫu<input type="datetime-local" value={form.sampledAt} onChange={update('sampledAt')} /></label>
+            <label>Thời điểm nhận mẫu<DateTimeInput value={form.sampledAt} onChange={update('sampledAt')} /></label>
           </div>
         </FormCard>
 
-        <FormCard number="02" title="Hồ sơ nguồn và lô hàng" copy="Dữ liệu có cấu trúc để truy xuất và đưa vào hồ sơ kết quả sau này.">
+        <FormCard number="II" en="Source & consignment" title="Hồ sơ nguồn và lô hàng" copy="Dữ liệu có cấu trúc để truy xuất và đưa vào hồ sơ kết quả sau này.">
           <div className="form-two-columns">
             <label>Vùng trồng / nguồn mẫu<input value={form.growingArea} onChange={update('growingArea')} /></label>
             <label>Cơ sở đóng gói<input value={form.packingFacility} onChange={update('packingFacility')} /></label>
@@ -253,7 +253,7 @@ export function ReceiptCreatePage() {
           </div>
         </FormCard>
 
-        <FormCard number="03" title="Danh sách mẫu" copy="Một phiếu tiếp nhận có thể chứa nhiều mẫu độc lập.">
+        <FormCard number="III" en="Samples" title="Danh sách mẫu" copy="Một phiếu tiếp nhận có thể chứa nhiều mẫu độc lập.">
           <div className="intake-sample-editor">
             {samples.map((sample, index) => <SampleCard key={index} index={index} sample={sample} canRemove={samples.length > 1} onRemove={() => setSamples((current) => current.filter((_, itemIndex) => itemIndex !== index))}>
               <div className="form-two-columns">
@@ -290,7 +290,7 @@ export function ReceiptCreatePage() {
           <button type="button" className="outline-button add-sample-button" onClick={() => setSamples((current) => [...current, cloneSample(current[current.length - 1])])}>＋ Thêm mẫu vào phiếu (sao chép mẫu trước)</button>
         </FormCard>
 
-        <FormCard number="04" title="Điều kiện và kết luận tiếp nhận" copy="Ghi nhận tình trạng chung của lô tại thời điểm nhận.">
+        <FormCard number="IV" en="Conditions & decision" title="Điều kiện và kết luận tiếp nhận" copy="Ghi nhận tình trạng chung của lô tại thời điểm nhận.">
           <div className="form-two-columns">
             <label>Nhiệt độ / điều kiện khi nhận<select value={temperatureOptions.includes(form.storageCondition) ? form.storageCondition : 'Khác'} onChange={update('storageCondition')}><option value="">Chọn điều kiện</option>{temperatureOptions.map((option) => <option value={option} key={option}>{option}</option>)}</select></label>
             {form.storageCondition === 'Khác' && <label>Điều kiện khác<input value={form.temperatureOther} onChange={update('temperatureOther')} placeholder="Nhập điều kiện" required /></label>}
@@ -306,7 +306,7 @@ export function ReceiptCreatePage() {
       </div>
 
       <aside className="receipt-form-aside">
-        <FormCard number="05" title="Ảnh và hồ sơ" copy="Ảnh được phân loại và ghi nhận người tải lên." className="upload-card">
+        <FormCard number="V" en="Photos & documents" title="Ảnh và hồ sơ" copy="Ảnh được phân loại và ghi nhận người tải lên." className="upload-card">
           <PhotoPicker label="Biên bản tiếp nhận" hint="PDF, DOCX hoặc ảnh chụp phiếu" camera accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
           <PhotoPicker label="Ảnh mẫu" hint="Chụp trực tiếp hoặc chọn nhiều ảnh" files={files.samples} onChange={updateFiles('samples')} />
           <PhotoPicker label="Ảnh lô hàng" hint="Toàn cảnh lô/xe/container khi nhận" files={files.lot} onChange={updateFiles('lot')} />
@@ -385,11 +385,11 @@ function ConditionChecklist({ value, onChange, name }) {
   </fieldset>;
 }
 
-function FormCard({ number, title, copy, className = 'intake-form-card', defaultOpen = true, children }) {
+function FormCard({ number, title, en, copy, className = 'intake-form-card', defaultOpen = true, children }) {
   const [open, setOpen] = useState(defaultOpen); const bodyId = useId();
   return <section className={`panel-card ${className} collapsible-card`}>
     <button type="button" className="section-toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen(!open)}>
-      <span className="form-number">{number}</span><span className="section-toggle-text"><strong>{title}</strong>{copy && <small>{copy}</small>}</span><Chevron open={open} />
+      <span className="form-number">{number}</span><span className="section-toggle-text"><strong>{title}{en && <i>{en}</i>}</strong>{copy && <small>{copy}</small>}</span><Chevron open={open} />
     </button>
     <div id={bodyId} className="section-body" hidden={!open}>{children}</div>
   </section>;

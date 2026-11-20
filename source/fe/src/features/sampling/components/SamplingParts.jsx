@@ -1,3 +1,4 @@
+import { DateInput, DateTimeInput } from '../../../shared/components/DateInput';
 import { useId, useState } from 'react';
 import { CONDITIONS, FIELD_PARAMETERS, LOT_BANDS, SAMPLE_FORMS, TRANSPORT_MODES, csvList, emptyFieldItem, parseCondition, toggleCsv } from '../samplingModel';
 
@@ -108,6 +109,10 @@ export function FormSection({ number, title, en, copy, children, defaultOpen = t
   const [open, setOpen] = useState(defaultOpen); const bodyId = useId();
   return <section className="panel-card intake-form-card sampling-form-section"><button type="button" className="section-toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen(!open)}><span className="form-number">{number}</span><span className="section-toggle-text"><strong>{title}{en && <i>{en}</i>}</strong>{copy && <small>{copy}</small>}</span><Chevron open={open} /></button><div id={bodyId} className="section-body" hidden={!open}>{children}</div></section>;
 }
-export function Field({ label, wide, ...props }) { return <label className={wide ? 'full-span' : ''}>{label}<input {...props} /></label>; }
+export function Field({ label, wide, type, ...props }) {
+  // Ngày luôn dd/mm/yyyy, giờ 24h, không phụ thuộc ngôn ngữ trình duyệt.
+  const control = type === 'date' ? <DateInput {...props} /> : type === 'datetime-local' ? <DateTimeInput {...props} /> : <input type={type} {...props} />;
+  return <label className={wide ? 'full-span' : ''}>{label}{control}</label>;
+}
 export function Check({ label, checked, onChange }) { return <label className="checkbox-line"><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} /><span>{label}</span></label>; }
 

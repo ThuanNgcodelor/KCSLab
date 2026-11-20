@@ -101,5 +101,10 @@ export function presetRange(preset) {
   }
   return { from: today, to: today };
 }
-function formatShortDate(value) { return value ? new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', timeZone: TIME_ZONE }) : '—'; }
+// Ngày hiển thị thống nhất dd/mm/yyyy (giờ Việt Nam).
+function formatShortDate(value) {
+  if (!value) return '—';
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: TIME_ZONE }).formatToParts(new Date(value)).map((part) => [part.type, part.value]));
+  return `${parts.day}/${parts.month}/${parts.year}`;
+}
 function formatLongDate(value) { return value.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: TIME_ZONE }); }

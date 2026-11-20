@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { getLoadingSnapshot, subscribeLoading } from '../loading/loadingStore';
 
-const LOGO = '/favicon.png';
+import LOGO from '../../assets/brand/cfc-logo.png';
 
 /** CFC brand spinner: the stork emblem inside a rotating ring. */
 export function CfcLoader({ size = 64, label }) {

@@ -68,6 +68,7 @@ public class TransferService {
     private static final Map<String, String> SORT_FIELDS = Map.of(
             "createdAt", "createdAt", "transferDate", "transferDate", "resultsDueDate", "resultsDueDate",
             "transferCode", "transferCode", "status", "status", "receiptCode", "receipt.receiptCode",
+            "requestNumber", "receipt.requestNumber",
             "customerName", "receipt.customer.name");
 
     /**
@@ -104,6 +105,12 @@ public class TransferService {
                 predicates.add(builder.like(builder.lower(root.get("transferCode")), pattern, '\\'));
                 predicates.add(builder.like(builder.lower(receipt.get("receiptCode")), pattern, '\\'));
                 predicates.add(builder.like(builder.lower(root.get("receivingDepartment")), pattern, '\\'));
+                predicates.add(builder.like(builder.lower(receipt.get("requestNumber")), pattern, '\\'));
+                var itemQuery = query.subquery(Long.class);
+                var item = itemQuery.from(SampleTransferItem.class);
+                itemQuery.select(item.get("id")).where(builder.equal(item.get("transfer"), root),
+                        builder.like(builder.lower(item.get("sampleCode")), pattern, '\\'));
+                predicates.add(builder.exists(itemQuery));
                 if (!technician) {
                     predicates.add(builder.like(builder.lower(receipt.join("customer", JoinType.INNER).get("name")), pattern, '\\'));
                 }
@@ -248,10 +255,14 @@ public class TransferService {
         String title = request.decision() == TransferStatus.ACCEPTED
                 ? "KCS đã nhận mẫu"
                 : "KCS từ chối nhận mẫu";
+        // Người dùng nhận diện hồ sơ bằng Số/No.; mã phiếu chuyển chỉ dùng khi hồ sơ cũ chưa có Số/No.
+        String requestNumber = saved.getReceipt().getRequestNumber();
+        String reference = requestNumber == null || requestNumber.isBlank()
+                ? "phiếu " + saved.getTransferCode() : "mẫu của Số/No. " + requestNumber;
         String message = request.decision() == TransferStatus.ACCEPTED
-                ? "%s đã xác nhận nhận phiếu %s".formatted(receiver.getDisplayName(), saved.getTransferCode())
-                : "%s đã từ chối phiếu %s: %s".formatted(
-                        receiver.getDisplayName(), saved.getTransferCode(), request.receivingNote().trim());
+                ? "%s đã xác nhận nhận %s".formatted(receiver.getDisplayName(), reference)
+                : "%s đã từ chối %s: %s".formatted(
+                        receiver.getDisplayName(), reference, request.receivingNote().trim());
         notificationService.notifyUsers(List.of(saved.getDeliveredBy()), receiver,
                 notificationType, title, message,
                 "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());

@@ -86,6 +86,7 @@ public class ReceivingService {
                 predicate = builder.and(predicate, builder.or(
                         builder.like(builder.lower(root.get("transferCode")), pattern, '\\'),
                         builder.like(builder.lower(root.get("receipt").get("receiptCode")), pattern, '\\'),
+                        builder.like(builder.lower(root.get("receipt").get("requestNumber")), pattern, '\\'),
                         builder.exists(subquery)));
             }
             return predicate;

@@ -4,7 +4,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { NotificationCenter } from '../../notifications/components/NotificationCenter';
 import { NotificationProvider } from '../../notifications/hooks/useNotifications';
 import { NotificationToasts } from '../../notifications/components/NotificationToasts';
-import cfcLogo from '../../../../../../guideline-assets/cfc-008.png';
+import cfcLogo from '../../../assets/brand/cfc-logo.png';
 import { UserAvatar } from '../../profile/components/UserAvatar';
 
 function Icon({ name }) {
@@ -17,6 +17,9 @@ function Icon({ name }) {
     bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',
     settings: 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.68v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.8 15a1.7 1.7 0 0 0-1.56-1.03H6v-2.68h.24A1.7 1.7 0 0 0 7.8 10.3a1.7 1.7 0 0 0-.34-1.88L7.4 8.36l1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56V5h2.68v.3a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03H21v2.68h-.04A1.7 1.7 0 0 0 19.4 15Z',
     profile: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
+    inbox: 'M4 13.5 6.5 5.5A1.5 1.5 0 0 1 8 4.5h8a1.5 1.5 0 0 1 1.5 1l2.5 8M4 13.5V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-4.5h-4.5a3.5 3.5 0 0 1-7 0Z',
+    method: 'M5 4.5h14M5 9.5h14M5 14.5h9M5 19.5h6M17.5 15.5l1.5 1.5 3-3',
+    result: 'M8 3.5h8M9 3.5v2h6v-2M6.5 5.5h11A1.5 1.5 0 0 1 19 7v12.5A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5V7a1.5 1.5 0 0 1 1.5-1.5ZM8.5 13l2.2 2.2L15.5 10.5',
   };
   return <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
 }
@@ -35,29 +38,28 @@ export function AdminLayout() {
   return (
     <NotificationProvider><NotificationToasts /><div className="admin-shell">
       <aside className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-brand"><img className="sidebar-logo" src={cfcLogo} alt="" width="38" height="38" /><div><strong>CFC Lab</strong><small>Management system</small></div></div>
+        <div className="sidebar-brand"><img className="sidebar-logo" src={cfcLogo} alt="Logo CFC Cò Bay" width="58" height="40" /><div><strong>CFC Lab</strong><small>Management system</small></div></div>
         <div className="sidebar-section-label">Không gian quản trị</div>
         <nav className="admin-nav" aria-label="Điều hướng quản trị">
           {isAdmin && <NavLink to="/admin" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {isAdmin && <NavLink to="/admin/users" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="users" /><span>Nhân viên</span></NavLink>}
-          {isAdmin && <NavLink to="/admin/test-methods" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Phương pháp thử</span></NavLink>}
+          {isAdmin && <NavLink to="/admin/test-methods" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="method" /><span>Phương pháp thử</span></NavLink>}
           {user?.role === 'RECEPTIONIST' && <NavLink to="/admin/intake" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           {canReceive && <NavLink to="/admin/requests" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Phiếu yêu cầu kiểm nghiệm</span></NavLink>}
-          {canReceive && <NavLink to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Tiếp nhận mẫu</span></NavLink>}
+          {canReceive && <NavLink to="/admin/intake/receipts" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="inbox" /><span>Tiếp nhận mẫu</span></NavLink>}
           {user?.role === 'TECHNICIAN' && <NavLink to="/admin/receiving" end onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="grid" /><span>Tổng quan</span></NavLink>}
           <NavLink to={user?.role === 'TECHNICIAN' ? '/admin/receiving/transfers' : '/admin/transfers'} onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="transfer" /><span>{user?.role === 'TECHNICIAN' ? 'Nhận mẫu' : 'Chuyển mẫu'}</span></NavLink>
           {canTest && <NavLink to="/admin/testing" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="flask" /><span>Thử nghiệm</span></NavLink>}
-          {canTest && <NavLink to="/admin/results" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Hồ sơ kết quả</span></NavLink>}
+          {canTest && <NavLink to="/admin/results" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="result" /><span>Hồ sơ kết quả</span></NavLink>}
           <NavLink to="/admin/notifications" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="bell" /><span>Thông báo</span></NavLink>
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
         <nav className="admin-nav">
           <NavLink to="/admin/profile" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="profile" /><span>Thông tin cá nhân</span></NavLink>
-          {user?.role !== 'TECHNICIAN' && <a className="nav-item disabled" href="#settings" onClick={(event) => event.preventDefault()}><Icon name="settings" /><span>Cài đặt chung</span></a>}
         </nav>
         <div className="sidebar-bottom"><div className="sidebar-status"><span className="pulse-dot" />Hệ thống hoạt động</div><button className="sidebar-profile" onClick={() => navigate('/admin/profile')}><UserAvatar user={user} className="sidebar-user-avatar" /><span><strong>{user?.displayName ?? roleLabel}</strong><small>{roleLabel}</small></span><span className="profile-more">•••</span></button><button className="sidebar-logout" onClick={signOut}>Đăng xuất</button></div>
       </aside>
-      <main className="admin-main"><div className="mobile-nav-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><img className="mobile-logo" src={cfcLogo} alt="" width="30" height="30" />CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}>{mobileOpen ? '×' : '☰'}</button></div>{mobileOpen && <button className="mobile-nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}<header className="admin-topbar"><div><small>Không gian làm việc</small><strong>{pageTitle}</strong></div><NotificationCenter /></header><div className="admin-content"><Outlet /></div><AdminFooter /></main>
+      <main className="admin-main"><div className="mobile-nav-bar"><button className="mobile-brand" onClick={() => navigate('/admin')}><img className="mobile-logo" src={cfcLogo} alt="" width="44" height="30" />CFC Lab</button><button className="mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}>{mobileOpen ? '×' : '☰'}</button></div>{mobileOpen && <button className="mobile-nav-backdrop" onClick={() => setMobileOpen(false)} aria-label="Đóng menu" />}<header className="admin-topbar"><div><small>Không gian làm việc</small><strong>{pageTitle}</strong></div><NotificationCenter /></header><div className="admin-content"><Outlet /></div><AdminFooter /></main>
     </div></NotificationProvider>
   );
 }
@@ -75,6 +77,7 @@ function getPageTitle(pathname) {
   if (pathname.includes('/results')) return 'Hồ sơ kết quả';
   if (pathname.includes('/testing')) return 'Thử nghiệm';
   if (pathname.includes('/users')) return 'Nhân viên';
+  if (pathname.includes('/test-methods')) return 'Phương pháp thử';
   return 'Tổng quan';
 }
 
@@ -87,7 +90,7 @@ function AdminFooter() {
             <i /><i /><i /><i /><i /><i /><i />
           </div>
           <a className="footer-brand" href="https://www.cfccobay.com/" target="_blank" rel="noreferrer">
-            <img className="footer-logo" src={cfcLogo} alt="" width="42" height="42" loading="lazy" />
+            <img className="footer-logo" src={cfcLogo} alt="" width="58" height="40" loading="lazy" />
             <span><strong>CFC CÒ BAY</strong><small>Agriculture &amp; Technology</small></span>
           </a>
           <p>Từ một mẫu thử đến một quyết định đáng tin cậy.</p>

@@ -84,7 +84,9 @@ export const blanks = (data) => Object.fromEntries(Object.entries(data).map(([ke
 export function fieldFrom(data) { const items = (data.items ?? []).map((item) => blanks(item)); return { ...emptyField(), ...blanks(formFrom(data)), sealPresent: data.sealPresent, items: items.length ? items : [emptyFieldItem()] }; }
 export function localDateTime(value) { if (!value) return ''; const d = new Date(value); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
 export function formFrom(data) { return { ...emptyPlan(), ...blanks(data), samplingStart: localDateTime(data.samplingStart), samplingEnd: localDateTime(data.samplingEnd) }; }
-export function requestFrom(data) { const { items, samplingPlan, fieldSampling, ...rest } = data; return { ...emptyRequest(), ...rest, harvestDate: data.harvestDate ?? '', packingDate: data.packingDate ?? '', expectedDate: data.expectedDate ?? '', completed: data.status === 'COMPLETED', samples: samplesFrom(items) }; }
+// API trả null cho trường trống; ô nhập có kiểm soát cần chuỗi rỗng để React không cảnh báo.
+function blankNulls(values, base) { return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value == null && typeof base[key] === 'string' ? '' : value])); }
+export function requestFrom(data) { const { items, samplingPlan, fieldSampling, ...rest } = data; const base = emptyRequest(); return { ...base, ...blankNulls(rest, base), harvestDate: data.harvestDate ?? '', packingDate: data.packingDate ?? '', expectedDate: data.expectedDate ?? '', completed: data.status === 'COMPLETED', samples: samplesFrom(items) }; }
 
 // Danh sách tick của Phiếu 1 (mục đích, thông báo khi chậm) lưu thành chuỗi "A; B; Khác: …" nên không cần đổi schema.
 export const PURPOSES = ['Kiểm soát nội bộ', 'Đánh giá lô hàng', 'Yêu cầu của khách hàng'];

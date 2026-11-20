@@ -66,3 +66,49 @@ export function DateInput({ value = '', onChange, min, max, required, disabled, 
       onChange={(event) => { setText(toDisplay(event.target.value)); emit(event.target.value); }} />
   </span>;
 }
+
+function maskTime(raw) {
+  const digits = raw.replace(/\D/g, '').slice(0, 4);
+  return digits.length <= 2 ? digits : `${digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+function validTime(text) {
+  const match = /^(\d{2}):(\d{2})$/.exec(text);
+  return Boolean(match) && Number(match[1]) < 24 && Number(match[2]) < 60;
+}
+
+/**
+ * Ngày + giờ 24h luôn hiển thị dd/mm/yyyy hh:mm (ô datetime-local gốc đổi theo ngôn ngữ trình duyệt, vd. AM/PM).
+ * `value` và giá trị phát ra giữ dạng yyyy-mm-ddTHH:mm (hoặc '') như ô datetime-local nên API không đổi.
+ */
+export function DateTimeInput({ value = '', onChange, required, disabled, name, id }) {
+  const [datePart, timePart] = (value || '').split('T');
+  const [date, setDate] = useState(datePart || '');
+  const [time, setTime] = useState((timePart || '').slice(0, 5));
+  const timeField = useRef(null);
+
+  useEffect(() => {
+    const [nextDate, nextTime] = (value || '').split('T');
+    if ((nextDate || '') !== date) setDate(nextDate || '');
+    if (nextTime && nextTime.slice(0, 5) !== time) setTime(nextTime.slice(0, 5));
+    if (!value && date && !time) setTime('');
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    let message = '';
+    if (time && !validTime(time)) message = 'Nhập giờ theo dạng hh:mm (24 giờ).';
+    else if (date && !time) message = 'Nhập giờ theo dạng hh:mm.';
+    timeField.current?.setCustomValidity(message);
+  }, [date, time]);
+
+  function emit(nextDate, nextTime) {
+    const next = nextDate && validTime(nextTime) ? `${nextDate}T${nextTime}` : '';
+    onChange?.({ target: { value: next, name } });
+  }
+
+  return <span className="datetime-input">
+    <DateInput id={id} value={date} required={required} disabled={disabled} onChange={(event) => { setDate(event.target.value); emit(event.target.value, time); }} />
+    <input ref={timeField} className="time-input" type="text" inputMode="numeric" placeholder="hh:mm" maxLength={5} pattern="\d{2}:\d{2}" aria-label="Giờ (24 giờ)"
+      value={time} disabled={disabled} required={required}
+      onChange={(event) => { const next = maskTime(event.target.value); setTime(next); emit(date, next); }} />
+  </span>;
+}

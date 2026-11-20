@@ -152,3 +152,11 @@
 - Niêm phong vẫn 3 trạng thái (Còn nguyên/Không có/Đã mở); Word gộp "Không có/đã mở".
 - Ghi chú cuối file Word mẫu (số niêm phong/seal/chỉ tiêu "cần check"; bỏ bước kiểm tra mã hóa, chị Thúy mã hóa nhập tay; thiếu 1 biên bản nhận mẫu; bỏ loại thiết bị khi xuất kết quả) **chưa xử lý — cần LAB xác nhận**, đặc biệt mâu thuẫn với bước xác minh mã mẫu V7.
 - Kiểm thử: backend 98 test, 0 lỗi, 1 skipped; đã tạo phiếu thật trên `cfc_lab` qua API, xuất DOCX và render PDF bằng LibreOffice để đối chiếu mẫu. Dữ liệu thử còn lại trong `cfc_lab`: 2 phiếu tiếp nhận (4 mẫu `CT999-SR-19112026-0xx`, khách "TEST TỰ ĐỘNG - xóa được") và Phiếu yêu cầu `CFC26.0002`. Chưa mở bằng Word thật.
+
+## Cập nhật 20/11/2026 — logo 3 màu, trang đăng nhập mới, đồng bộ giao diện
+- Logo web dùng con cò 3 màu (`guideline-assets/cfc-006.png`, đã tách nền đen thành trong suốt) tại `source/fe/src/assets/brand/cfc-logo.png`. Favicon `fe/public/favicon.png`, `favicon-48.png`, `apple-touch-icon.png`; trang `/tracuu/` có `cfc-logo.png` và `favicon.png` riêng. Logo tròn cũ `cfc-008.png` không còn được dùng. PDF KQKN và mẫu Word Phiếu 3 đã có logo 3 màu từ trước.
+- `LoginPage`: thiết kế tối "aurora" (CSS tiền tố `.auth-*`). Đăng nhập xong vào `/admin`, mỗi role tự chuyển về tổng quan của mình. CSS đăng nhập cũ (`.login-*`) đã gỡ.
+- Khung quản trị có mặc định sáng cho ô nhập, ô tick và ô bảng qua `.admin-shell :where(...)`, độ ưu tiên thấp nên style riêng của trang vẫn thắng.
+- `DateTimeInput` mới trong `shared/components/DateInput.jsx` (ngày `dd/mm/yyyy` + giờ 24h `hh:mm`, giá trị vẫn `yyyy-mm-ddTHH:mm`). `Field` của Phiếu 1/07/02 tự dùng `DateInput`/`DateTimeInput` khi `type` là `date`/`datetime-local`.
+- Danh sách Chuyển mẫu tìm và sắp theo Số/No (`sort=requestNumber,...`). KCS tìm thêm theo Số/No. Thông báo KCS nhận/từ chối ghi "mẫu của Số/No. …".
+- Danh sách việc còn mở về giao diện: `plans/UI_AUDIT_2026-11-20.md`, mục 7.
