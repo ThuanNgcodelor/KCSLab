@@ -70,6 +70,17 @@ public class ResultReleaseDraftController {
                 .toList(), request.submit(), users.getByEmail(jwt.getSubject()));
     }
 
+    @GetMapping("/{id}/sample-photos/{attachmentId}")
+    public ResponseEntity<Resource> samplePhoto(@PathVariable Long id, @PathVariable Long attachmentId) {
+        var stored = workflow.samplePhoto(id, attachmentId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(stored.contentType()))
+                .contentLength(stored.size())
+                .header("X-Content-Type-Options", "nosniff")
+                .header(HttpHeaders.CACHE_CONTROL, "private, max-age=600")
+                .body(stored.resource());
+    }
+
     @GetMapping("/{id}/report-docx")
     public ResponseEntity<byte[]> reportDocx(@PathVariable Long id) {
         var file = workflow.reportDocx(id);
@@ -174,6 +185,11 @@ public class ResultReleaseDraftController {
     public ResultReleaseDetailResponse publish(@PathVariable Long id, @RequestBody(required = false) PublishRequest request,
                                                @AuthenticationPrincipal Jwt jwt) {
         return workflow.publish(id, request == null ? null : request.publicFileIds(), users.getByEmail(jwt.getSubject()));
+    }
+
+    @PostMapping("/{id}/regenerate-report")
+    public ResultReleaseDetailResponse regenerateReport(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return workflow.regenerateReport(id, users.getByEmail(jwt.getSubject()));
     }
 
     @PostMapping("/{id}/revoke")

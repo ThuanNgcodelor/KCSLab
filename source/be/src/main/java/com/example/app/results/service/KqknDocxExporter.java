@@ -35,14 +35,30 @@ public class KqknDocxExporter {
              ZipInputStream zip = new ZipInputStream(input);
              ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              ZipOutputStream out = new ZipOutputStream(bytes)) {
+            Map<String, byte[]> entries = new LinkedHashMap<>();
             ZipEntry entry;
-            while ((entry = zip.getNextEntry()) != null) {
-                byte[] content = zip.readAllBytes();
-                if ("word/document.xml".equals(entry.getName())) {
-                    content = fill(new String(content, StandardCharsets.UTF_8), data).getBytes(StandardCharsets.UTF_8);
+            while ((entry = zip.getNextEntry()) != null) entries.put(entry.getName(), zip.readAllBytes());
+            String document = fill(text(entries, "word/document.xml"), data);
+            if (!data.photos().isEmpty()) {
+                document = appendPhotos(document, data.photos());
+                StringBuilder rels = new StringBuilder(text(entries, "word/_rels/document.xml.rels"));
+                int close = rels.lastIndexOf("</Relationships>");
+                for (int index = 0; index < data.photos().size(); index++) {
+                    entries.put("word/media/cfc-photo-" + (index + 1) + ".jpeg", data.photos().get(index).jpeg());
+                    rels.insert(close, "<Relationship Id=\"rIdCfcPhoto" + (index + 1) + "\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/image\" Target=\"media/cfc-photo-" + (index + 1) + ".jpeg\"/>");
+                    close = rels.lastIndexOf("</Relationships>");
                 }
-                out.putNextEntry(new ZipEntry(entry.getName()));
-                out.write(content);
+                entries.put("word/_rels/document.xml.rels", rels.toString().getBytes(StandardCharsets.UTF_8));
+                String types = text(entries, "[Content_Types].xml");
+                if (!types.contains("Extension=\"jpeg\"")) {
+                    types = types.replace("<Default Extension=\"xml\"", "<Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"xml\"");
+                    entries.put("[Content_Types].xml", types.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+            entries.put("word/document.xml", document.getBytes(StandardCharsets.UTF_8));
+            for (var item : entries.entrySet()) {
+                out.putNextEntry(new ZipEntry(item.getKey()));
+                out.write(item.getValue());
                 out.closeEntry();
             }
             out.finish();
@@ -81,6 +97,55 @@ public class KqknDocxExporter {
             xml = xml.replace(optional, escape(value.getValue())).replace("{{" + value.getKey() + "}}", escape(value.getValue()));
         }
         return xml;
+    }
+
+    private static String text(Map<String, byte[]> entries, String name) {
+        byte[] content = entries.get(name);
+        if (content == null) throw new IllegalStateException("Mẫu KQKN thiếu " + name);
+        return new String(content, StandardCharsets.UTF_8);
+    }
+
+    private static final long MAX_WIDTH_EMU = 5_760_000L;  // 16 cm
+    private static final long MAX_HEIGHT_EMU = 3_600_000L; // 10 cm: two photos fit on one page
+
+    /** Adds a "Hình ảnh mẫu" page after the report (new page, same header/footer), one photo per paragraph. */
+    private String appendPhotos(String xml, java.util.List<ReportData.Photo> photos) {
+        int body = xml.lastIndexOf("</w:body>");
+        int sect = xml.lastIndexOf("<w:sectPr", body);
+        int at = sect >= 0 ? sect : body;
+        StringBuilder page = new StringBuilder();
+        page.append("<w:p><w:pPr><w:pageBreakBefore/><w:spacing w:after=\"60\"/></w:pPr>")
+                .append(run("HÌNH ẢNH MẪU", true, false, 26, "00A859"))
+                .append(run("  / Sample photos", false, true, 22, "00A859")).append("</w:p>");
+        page.append("<w:p><w:pPr><w:spacing w:after=\"160\"/></w:pPr>")
+                .append(run("Ảnh chụp khi tiếp nhận mẫu/ Photos taken when the sample was received", false, true, 18, "555555"))
+                .append("</w:p>");
+        for (int index = 0; index < photos.size(); index++) {
+            ReportData.Photo photo = photos.get(index);
+            double scale = Math.min((double) MAX_WIDTH_EMU / photo.width(), (double) MAX_HEIGHT_EMU / photo.height());
+            long cx = Math.round(photo.width() * scale), cy = Math.round(photo.height() * scale);
+            int id = 9000 + index;
+            page.append("<w:p><w:pPr><w:keepNext/><w:spacing w:before=\"120\" w:after=\"40\"/><w:jc w:val=\"center\"/></w:pPr><w:r><w:drawing>")
+                    .append("<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"><wp:extent cx=\"").append(cx).append("\" cy=\"").append(cy).append("\"/>")
+                    .append("<wp:docPr id=\"").append(id).append("\" name=\"Ảnh mẫu ").append(index + 1).append("\"/>")
+                    .append("<wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" noChangeAspect=\"1\"/></wp:cNvGraphicFramePr>")
+                    .append("<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"><a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">")
+                    .append("<pic:pic xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\"><pic:nvPicPr><pic:cNvPr id=\"").append(id)
+                    .append("\" name=\"cfc-photo-").append(index + 1).append(".jpeg\"/><pic:cNvPicPr/></pic:nvPicPr>")
+                    .append("<pic:blipFill><a:blip r:embed=\"rIdCfcPhoto").append(index + 1).append("\"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>")
+                    .append("<pic:spPr><a:xfrm><a:off x=\"0\" y=\"0\"/><a:ext cx=\"").append(cx).append("\" cy=\"").append(cy)
+                    .append("\"/></a:xfrm><a:prstGeom prst=\"rect\"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>")
+                    .append("</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>");
+            page.append("<w:p><w:pPr><w:spacing w:after=\"160\"/><w:jc w:val=\"center\"/></w:pPr>")
+                    .append(run("Hình " + (index + 1) + ". " + photo.caption(), false, true, 18, "333333")).append("</w:p>");
+        }
+        return xml.substring(0, at) + page + xml.substring(at);
+    }
+
+    private static String run(String text, boolean bold, boolean italic, int halfPoints, String color) {
+        return "<w:r><w:rPr><w:rFonts w:ascii=\"Times New Roman\" w:hAnsi=\"Times New Roman\" w:cs=\"Times New Roman\"/>"
+                + (bold ? "<w:b/>" : "") + (italic ? "<w:i/>" : "") + "<w:color w:val=\"" + color + "\"/><w:sz w:val=\"" + halfPoints
+                + "\"/></w:rPr><w:t xml:space=\"preserve\">" + escape(text) + "</w:t></w:r>";
     }
 
     private String repeatRows(String xml, ReportData data) {

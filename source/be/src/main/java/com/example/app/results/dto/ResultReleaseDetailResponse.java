@@ -15,7 +15,10 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
         Instant submittedAt, String submittedByName, Instant decidedAt, String decidedByName, String decisionNote,
         Instant publishedAt, Instant revokedAt, String revokedByName, String revokeReason, List<FileResponse> files,
         List<ItemResponse> items, String qualityHeadName, String directorName,
-        Reference reference, List<ItemResponse> suggestedItems, String documentNumber) {
+        Reference reference, List<ItemResponse> suggestedItems, String documentNumber, List<PhotoResponse> samplePhotos) {
+
+    /** Sample photo taken at intake (Phiếu 3); printed on the "Hình ảnh mẫu" page of the KQKN. */
+    public record PhotoResponse(Long id, String originalName, String category, String caption, Instant capturedAt) {}
 
     public record Measurement(String type, String replicate, String resultPerReplicate, String result, String deviation) {}
     public record Reference(Long testingRecordId, String recordCode, Instant analysisStart, Instant analysisEnd,
@@ -43,7 +46,7 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
 
     public static ResultReleaseDetailResponse from(ResultRelease release, List<ResultReleaseFile> files,
             List<com.example.app.results.entity.ResultReleaseItem> rows, String defaultQualityHead, String defaultDirector,
-            Reference reference, List<ItemResponse> suggestedItems) {
+            Reference reference, List<ItemResponse> suggestedItems, List<PhotoResponse> samplePhotos) {
         var record = release.getTestingRecord();
         boolean issued = release.getStatus() == ResultReleaseStatus.PUBLISHED
                 || release.getStatus() == ResultReleaseStatus.REVOKED;
@@ -59,7 +62,7 @@ public record ResultReleaseDetailResponse(Long id, Long testingRecordId, String 
                         row.getMethod(), row.getResultValue(), row.getNote())).toList(),
                 blank(release.getQualityHeadName()) ? defaultQualityHead : release.getQualityHeadName(),
                 blank(release.getDirectorName()) ? defaultDirector : release.getDirectorName(), reference, suggestedItems,
-                release.getDocumentNumber());
+                release.getDocumentNumber(), samplePhotos);
     }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }

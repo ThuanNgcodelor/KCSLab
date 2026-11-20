@@ -1791,3 +1791,10 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
   .result-entry-actions { width: 100%; flex-wrap: wrap; }
   .form-submit-panel.result-entry-submit .result-entry-actions button { width: 100%; }
 }
+
+/* Hồ sơ kết quả — ảnh mẫu từ phiếu tiếp nhận */
+.sample-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 12px; }
+.sample-photo-grid figure { display: grid; gap: 8px; margin: 0; padding: 8px; border: 1px solid #e1ece4; border-radius: 12px; background: #fbfdfb; }
+.sample-photo-grid img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: #eef4f0; }
+.sample-photo-grid figcaption { display: grid; gap: 2px; color: #4c6b59; font-size: 12px; line-height: 1.4; }
+.sample-photo-grid figcaption strong { color: #1d4a35; font-size: 13px; }

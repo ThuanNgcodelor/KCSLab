@@ -9,6 +9,12 @@ public record ReportData(String resultNumber, String lookupCode, LocalDate repor
         String truckNumber, String moocNumber, String containerNumber, String sealNumber, String sampleCode,
         String sampleCollector, LocalDate samplingDate, String sampleCondition, String sampleQuantity,
         LocalDate dateReceived, LocalDate testingDate, List<Row> rows, String qualityHeadName, String directorName,
-        boolean preview) {
+        boolean preview, List<Photo> photos) {
     public record Row(String parameter, String unit, String method, String result, String note) {}
+    /** A sample photo taken at intake (Phiếu 3), already re-encoded as JPEG; printed on the "Hình ảnh mẫu" page. */
+    public record Photo(String caption, byte[] jpeg, int width, int height) {}
+
+    public ReportData {
+        photos = photos == null ? List.of() : List.copyOf(photos);
+    }
 }

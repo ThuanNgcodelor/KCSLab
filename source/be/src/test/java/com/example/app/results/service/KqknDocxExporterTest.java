@@ -24,7 +24,7 @@ class KqknDocxExporterTest {
                 List.of(new ReportData.Row("Auramine O (Vỏ)", "µg/kg", "CFC-01:2026 (1)(2)(3)", "KPH", "LOQ = 1,5 µg/kg"),
                         new ReportData.Row("Auramine O (Ruột)", "µg/kg", "CFC-01:2026 (1)(2)(3)", "KPH", "LOQ = 1,5 µg/kg"),
                         new ReportData.Row("Cadimi (Cd)", "µg/kg", "CFC-02:2026 (1)(2)(3)", "< LOQ", "LOQ = 30 µg/kg")),
-                "Người ký 1", "Người ký 2", true);
+                "Người ký 1", "Người ký 2", true, List.of(photo()));
 
         byte[] docx = exporter.render(data);
         String xml = documentXml(docx);
@@ -34,8 +34,27 @@ class KqknDocxExporterTest {
                 "Auramine O (Ruột)", "&lt; LOQ", "LOQ = 30 µg/kg", "(cấp khi phát hành)", "Người ký 2");
         assertThat(xml).doesNotContain("Mooc number", "An Thịnh Phát", "Phan Trường Tiền");
         assertThat(xml.split("Auramine O \\(Vỏ\\)", -1)).hasSize(2);
+        assertThat(xml).contains("HÌNH ẢNH MẪU", "Hình 1. Ảnh mẫu", "rIdCfcPhoto1");
+        assertThat(entry(docx, "word/media/cfc-photo-1.jpeg")).isNotEmpty();
+        assertThat(new String(entry(docx, "word/_rels/document.xml.rels"), StandardCharsets.UTF_8)).contains("media/cfc-photo-1.jpeg");
         String out = System.getProperty("kqkn.out");
         if (out != null) Files.write(Path.of(out), docx);
+    }
+
+    private static ReportData.Photo photo() throws Exception {
+        var image = new java.awt.image.BufferedImage(40, 30, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        var out = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(image, "jpeg", out);
+        return new ReportData.Photo("Ảnh mẫu (chụp lúc 08:00 19/11/2026)", out.toByteArray(), 40, 30);
+    }
+
+    private static byte[] entry(byte[] docx, String name) throws Exception {
+        try (var zip = new ZipInputStream(new ByteArrayInputStream(docx))) {
+            for (var item = zip.getNextEntry(); item != null; item = zip.getNextEntry()) {
+                if (item.getName().equals(name)) return zip.readAllBytes();
+            }
+        }
+        return new byte[0];
     }
 
     private static String documentXml(byte[] docx) throws Exception {

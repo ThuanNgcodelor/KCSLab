@@ -11,8 +11,12 @@ RUN mvn -B -q -DskipTests package && cp "$(ls build/*.jar | grep -v original | h
 
 # ---- 2. Runtime: Java 21 + LibreOffice ----
 FROM eclipse-temurin:21-jre
-RUN apt-get update \
+# ttf-mscorefonts-installer tải font chuẩn Microsoft (Times New Roman, Arial…) mà mẫu KQKN dùng,
+# để PDF chuyển từ Word giống bản gốc. Chấp nhận điều khoản (EULA) của Microsoft core fonts.
+RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections \
+    && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ttf-mscorefonts-installer fontconfig \
         libreoffice-writer-nogui \
         fonts-liberation \
         fonts-dejavu-core \

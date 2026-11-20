@@ -9,12 +9,12 @@ import { PageLoader } from '../../../shared/components/Loading';
 import { Icon } from '../../../shared/components/Icon';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import {
-  downloadReportDocx, downloadResultFile, getResultRelease, openReportPreview, saveResultReport, getResultReleaseEvents, publishResultRelease, removeResultFile, removeReportFile, uploadReportFile,
+  downloadReportDocx, downloadResultFile, regenerateResultReport, getResultRelease, openReportPreview, saveResultReport, getResultReleaseEvents, publishResultRelease, removeResultFile, removeReportFile, uploadReportFile,
   returnResultRelease, reviseResultRelease, revokeResultRelease, submitResultRelease, uploadResultFiles,
 } from '../api/resultsApi';
 
 export const resultStatusLabels = labelsOf('release');
-const eventLabels = { CREATED: 'Lập hồ sơ', REPORT_UPDATED: 'Cập nhật nội dung phiếu', REPORT_FILE_UPLOADED: 'Tải file phiếu kết quả', REPORT_FILE_REMOVED: 'Gỡ file phiếu kết quả', FILE_ADDED: 'Thêm file', FILE_REMOVED: 'Gỡ file', SUBMITTED: 'Gửi duyệt', RETURNED: 'Trả lại', PUBLISHED: 'Phát hành', REVOKED: 'Thu hồi', REVISION_CREATED: 'Lập phiên bản mới' };
+const eventLabels = { CREATED: 'Lập hồ sơ', REPORT_UPDATED: 'Cập nhật nội dung phiếu', REPORT_FILE_UPLOADED: 'Tải file phiếu kết quả', REPORT_FILE_REMOVED: 'Gỡ file phiếu kết quả', FILE_ADDED: 'Thêm file', FILE_REMOVED: 'Gỡ file', SUBMITTED: 'Gửi duyệt', RETURNED: 'Trả lại', PUBLISHED: 'Phát hành', REVOKED: 'Thu hồi', REVISION_CREATED: 'Lập phiên bản mới', REPORT_REGENERATED: 'Tạo lại PDF từ mẫu Word' };
 const ACCEPT = '.pdf,.docx,.xlsx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 export function ResultReleaseDetailPage() {
@@ -128,6 +128,12 @@ export function ResultReleaseDetailPage() {
           {canEdit && <button type="button" className="primary-button" disabled={busy} onClick={saveTableReport}>{busy ? 'Đang lưu…' : 'Lưu bảng kết quả'}</button>}
         </div>
       </section>}
+      <section className="panel-card intake-form-card sample-photo-card"><FormHeading number="II" title={`Ảnh mẫu từ phiếu tiếp nhận (${release.samplePhotos?.length ?? 0})`} copy="Ảnh chụp khi tiếp nhận mẫu (Số/No. này). Các ảnh này được in ở trang “Hình ảnh mẫu” của phiếu KQKN (Word, PDF và bản khách tra cứu)." />
+        {release.samplePhotos?.length ? <div className="sample-photo-grid">{release.samplePhotos.map((photo, index) => <figure key={photo.id}>
+          <a href={`/api/v1/result-releases/${release.id}/sample-photos/${photo.id}`} target="_blank" rel="noreferrer"><img src={`/api/v1/result-releases/${release.id}/sample-photos/${photo.id}`} alt={photo.caption} loading="lazy" /></a>
+          <figcaption><strong>Hình {index + 1}</strong>{photo.caption}</figcaption></figure>)}</div>
+          : <p className="muted">Phiếu tiếp nhận của mẫu này chưa có ảnh. Thêm ảnh ở phiếu tiếp nhận (Phiếu 3) để in kèm phiếu kết quả.</p>}
+      </section>
       {release.reference && <section className="panel-card intake-form-card reference-card"><FormHeading number="III" title="Số liệu từ biên bản thử nghiệm" copy={<>Tham chiếu từ biên bản <Link className="inline-link" to={`/admin/testing/${release.reference.testingRecordId}`}>{release.reference.recordCode}</Link>. Đây là hồ sơ làm việc nội bộ; kết quả cuối cùng nhập vào bảng 01 phía trên.</>} />
         <div className="test-general-grid"><Data label="Chỉ tiêu yêu cầu" value={splitParameters(release.reference.requestedParameters).join('\n')} /><Data label="Phương pháp" value={release.reference.testMethod} /><Data label="Bắt đầu thử nghiệm" value={formatDateTime(release.reference.analysisStart)} /><Data label="Hiệu suất thu hồi" value={release.reference.recoveryPercent == null ? null : `${release.reference.recoveryPercent}%`} /></div>
         {release.reference.measurements.length === 0 ? <p className="muted">Biên bản chưa có dòng số liệu.</p> : <div className="table-wrap"><table className="staff-table record-data-table"><thead><tr><th>Loại</th><th>Lần lặp</th><th>KQ / lần</th><th>Kết quả</th><th>Độ lệch</th></tr></thead><tbody>{release.reference.measurements.map((measurement, index) => <tr key={index}><td data-label="Loại">{measurement.type === 'QC' ? 'QC' : 'Thực nghiệm'}</td><td data-label="Lần lặp">{measurement.replicate || '—'}</td><td data-label="KQ / lần">{measurement.resultPerReplicate || '—'}</td><td data-label="Kết quả">{measurement.result || '—'}</td><td data-label="Độ lệch">{measurement.deviation || '—'}</td></tr>)}</tbody></table></div>}
@@ -162,6 +168,8 @@ export function ResultReleaseDetailPage() {
           <label>Lý do (bắt buộc khi trả lại)<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} /></label>
           <div className="transfer-decision-actions"><button className="outline-button reject-button" disabled={busy || !reason.trim()} onClick={() => setConfirm({ title: 'Trả lại hồ sơ?', description: 'Hồ sơ quay về kỹ thuật viên để bổ sung.', confirmLabel: 'Trả lại', tone: 'danger', run: () => run(() => returnResultRelease(release.id, reason.trim())) })}>Trả lại</button>
             <button className="primary-button" disabled={busy} onClick={() => setConfirm({ title: 'Phát hành kết quả?', description: 'Hệ thống sẽ cấp số phiếu, tạo PDF phiếu KQKN và mã tra cứu; khách tra cứu bằng mã (hoặc QR) + 4 số cuối điện thoại. Chỉ mẫu đã xác minh mã mới được phát hành.', confirmLabel: 'Phát hành', run: () => run(() => publishResultRelease(release.id, selected)) })}>Phát hành</button></div></section>}
+        {isAdmin && release.status === 'PUBLISHED' && !reportPdf && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number"><Icon name="file" size={14} /></span><div><h2>Tạo lại phiếu PDF</h2><p>Tạo lại PDF từ mẫu Word hiện tại, giữ nguyên số phiếu, ngày phát hành, mã tra cứu và QR. Khách tải về sẽ nhận bản mới.</p></div></div>
+          <button className="outline-button" disabled={busy} onClick={() => setConfirm({ title: 'Tạo lại phiếu PDF?', description: 'PDF đã phát hành được thay bằng bản tạo lại từ mẫu Word. Bản cũ vẫn được lưu trong nhật ký hồ sơ.', confirmLabel: 'Tạo lại PDF', run: () => run(() => regenerateResultReport(release.id)) })}>Tạo lại PDF từ mẫu Word</button></section>}
         {isAdmin && release.status === 'PUBLISHED' && <section className="panel-card intake-form-card"><div className="form-card-heading"><span className="form-number">!</span><div><h2>Thu hồi</h2><p>Kết quả sẽ biến mất khỏi tra cứu công khai ngay lập tức.</p></div></div>
           <label>Lý do thu hồi<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} /></label>
           <button className="outline-button reject-button" disabled={busy || !reason.trim()} onClick={() => setConfirm({ title: 'Thu hồi kết quả đã phát hành?', description: 'Khách sẽ không còn tra cứu hoặc tải được kết quả này.', confirmLabel: 'Thu hồi', tone: 'danger', run: () => run(() => revokeResultRelease(release.id, reason.trim())) })}>Thu hồi</button></section>}

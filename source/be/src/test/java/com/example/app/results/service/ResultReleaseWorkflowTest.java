@@ -321,6 +321,14 @@ class ResultReleaseWorkflowTest {
             assertThat(java.security.MessageDigest.getInstance("SHA-256").digest(stored))
                     .isEqualTo(java.util.HexFormat.of().parseHex(generated.checksum()));
         }
+
+        expect(403, () -> workflow.regenerateReport(releaseId, technician));
+        var regenerated = workflow.regenerateReport(releaseId, admin);
+        var reports = regenerated.files().stream().filter(f -> f.kind().equals("GENERATED_REPORT")).toList();
+        assertThat(reports).hasSize(1);
+        assertThat(reports.getFirst().id()).isNotEqualTo(generated.id());
+        assertThat(regenerated.resultNumber()).isEqualTo(published.resultNumber());
+        assertThat(regenerated.lookupCode()).isEqualTo(published.lookupCode());
     }
 
     @Test
@@ -455,6 +463,23 @@ class ResultReleaseWorkflowTest {
         expect(403, () -> workflow.publish(created.id(), null, technician));
         assertThat(workflow.publish(created.id(), null, admin).status()).isEqualTo("PUBLISHED");
         assertThat(workflow.reportDocx(created.id()).fileName()).doesNotContain("CT778");
+    }
+
+    @Test
+    void resultNumberIsTheReceiptRequestNumberAndPhotosComeFromTheReceipt() throws Exception {
+        entityManager.flush();
+        jdbc.update("update receipts set request_number = 'CFC26.0099' where id = (select st.receipt_id from result_releases rr "
+                + "join testing_records t on t.id = rr.testing_record_id join sample_transfer_items ti on ti.id = t.transfer_item_id "
+                + "join sample_transfers st on st.id = ti.transfer_id where rr.id = ?)", releaseId);
+        entityManager.clear();
+        fillReport();
+        assertThat(workflow.detail(releaseId).samplePhotos()).isEmpty(); // receipt in setUp has no photos
+        workflow.submit(releaseId, technician);
+        var published = workflow.publish(releaseId, null, admin);
+        assertThat(published.resultNumber()).isEqualTo("CFC26.0099");
+        assertThat(pdfText(workflow.loadFile(releaseId, published.files().stream()
+                .filter(f -> f.kind().equals("GENERATED_REPORT")).findFirst().orElseThrow().id()).resource()
+                .getInputStream().readAllBytes())).contains("CFC26.0099");
     }
 
     @Test

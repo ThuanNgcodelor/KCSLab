@@ -71,6 +71,8 @@ public class ResultReleaseService {
     private final com.example.app.transfer.repository.SampleTransferItemRepository transferItems;
     private final KqknDocxExporter docx;
     private final OfficeConverter converter;
+    private final com.example.app.intake.repository.ReceiptAttachmentRepository attachments;
+    private final Path receiptStorage;
     private final SecureRandom random = new SecureRandom();
 
     public ResultReleaseService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
@@ -81,8 +83,11 @@ public class ResultReleaseService {
                                 @Value("${app.report.director-name:}") String defaultDirector,
                                 @Value("${app.storage.results-root:storage/results}") String storageRoot,
                                 com.example.app.transfer.repository.SampleTransferItemRepository transferItems,
-                                KqknDocxExporter docx, OfficeConverter converter) {
-        this.transferItems = transferItems; this.docx = docx; this.converter = converter;
+                                KqknDocxExporter docx, OfficeConverter converter,
+                                com.example.app.intake.repository.ReceiptAttachmentRepository attachments,
+                                @Value("${app.storage.root:storage/receipts}") String receiptStorage) {
+        this.transferItems = transferItems; this.docx = docx; this.converter = converter; this.attachments = attachments;
+        this.receiptStorage = Paths.get(receiptStorage).toAbsolutePath().normalize();
         this.releases = releases; this.files = files; this.events = events;
         this.items = items; this.stamper = stamper; this.numbers = numbers;
         this.defaultQualityHead = defaultQualityHead; this.defaultDirector = defaultDirector;
@@ -330,13 +335,92 @@ public class ResultReleaseService {
                         row.getResultValue(), row.getNote())).toList();
         return reportData(record.getTransferItem(), toDate(record.getAnalysisStart()), rows, lookupCode, resultNumber,
                 reportDate, effective(release.getQualityHeadName(), defaultQualityHead),
-                effective(release.getDirectorName(), defaultDirector), preview);
+                effective(release.getDirectorName(), defaultDirector), preview,
+                loadPhotos(samplePhotos(record.getTransferItem().getTransfer().getReceipt().getId())));
+    }
+
+    private static final java.util.Map<com.example.app.intake.entity.ReceiptAttachmentCategory, String> PHOTO_LABELS = java.util.Map.of(
+            com.example.app.intake.entity.ReceiptAttachmentCategory.SAMPLE_PHOTO, "Ảnh mẫu",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.LOT_PHOTO, "Ảnh lô hàng",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.PACKAGING_PHOTO, "Ảnh bao bì",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.SEAL_PHOTO, "Ảnh niêm phong",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.LABEL_PHOTO, "Ảnh nhãn",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.DAMAGE_PHOTO, "Ảnh hư hỏng",
+            com.example.app.intake.entity.ReceiptAttachmentCategory.OTHER, "Ảnh khác");
+    private static final int MAX_PHOTOS = 12;
+
+    /** Image attachments of the receipt that describe the sample (not Phiếu 3 scans or handover evidence). */
+    private List<com.example.app.intake.entity.ReceiptAttachment> samplePhotos(Long receiptId) {
+        return attachments.findByReceipt_IdOrderByIdAsc(receiptId).stream()
+                .filter(file -> PHOTO_LABELS.containsKey(file.getCategory()))
+                .filter(file -> file.getContentType() != null && file.getContentType().toLowerCase().startsWith("image/"))
+                .limit(MAX_PHOTOS).toList();
+    }
+
+    private static String caption(com.example.app.intake.entity.ReceiptAttachment file) {
+        String label = PHOTO_LABELS.getOrDefault(file.getCategory(), "Ảnh");
+        String description = file.getDescription();
+        String when = file.getCapturedAt() == null ? null
+                : file.getCapturedAt().atZone(BUSINESS_ZONE).format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
+        StringBuilder text = new StringBuilder(label);
+        if (description != null && !description.isBlank()) text.append(": ").append(description.trim());
+        if (when != null) text.append(" (chụp lúc ").append(when).append(")");
+        return text.toString();
+    }
+
+    private List<ResultReleaseDetailResponse.PhotoResponse> photoResponses(ResultRelease release) {
+        return samplePhotos(release.getTestingRecord().getTransferItem().getTransfer().getReceipt().getId()).stream()
+                .map(file -> new ResultReleaseDetailResponse.PhotoResponse(file.getId(), file.getOriginalName(),
+                        file.getCategory().name(), caption(file), file.getCapturedAt())).toList();
+    }
+
+    /** Reads, downsizes (max 1600 px) and re-encodes each photo as JPEG; unreadable images are skipped. */
+    private List<ReportData.Photo> loadPhotos(List<com.example.app.intake.entity.ReceiptAttachment> files) {
+        List<ReportData.Photo> photos = new ArrayList<>();
+        for (var file : files) {
+            Path path = receiptStorage.resolve(file.getStorageName()).normalize();
+            if (!path.startsWith(receiptStorage) || !Files.isRegularFile(path)) continue;
+            try {
+                java.awt.image.BufferedImage source = javax.imageio.ImageIO.read(path.toFile());
+                if (source == null) continue;
+                double scale = Math.min(1.0, 1600.0 / Math.max(source.getWidth(), source.getHeight()));
+                int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
+                int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
+                var image = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                var graphics = image.createGraphics();
+                graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                graphics.setColor(java.awt.Color.WHITE);
+                graphics.fillRect(0, 0, width, height);
+                graphics.drawImage(source, 0, 0, width, height, null);
+                graphics.dispose();
+                var out = new java.io.ByteArrayOutputStream();
+                javax.imageio.ImageIO.write(image, "jpeg", out);
+                photos.add(new ReportData.Photo(caption(file), out.toByteArray(), width, height));
+            } catch (IOException | RuntimeException exception) {
+                // A broken image must not block the report; the photo stays visible in the intake record.
+            }
+        }
+        return photos;
+    }
+
+    /** Sample photo of the release's receipt, for the dossier page. Only photos that the report prints are served. */
+    @Transactional(readOnly = true)
+    public StoredFile samplePhoto(Long id, Long attachmentId) {
+        ResultRelease release = get(id);
+        var file = samplePhotos(release.getTestingRecord().getTransferItem().getTransfer().getReceipt().getId()).stream()
+                .filter(candidate -> candidate.getId().equals(attachmentId)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy ảnh mẫu"));
+        Path path = receiptStorage.resolve(file.getStorageName()).normalize();
+        if (!path.startsWith(receiptStorage) || !Files.isRegularFile(path)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File ảnh không còn trên máy chủ");
+        }
+        return new StoredFile(new FileSystemResource(path), file.getContentType(), file.getOriginalName(), file.getSize());
     }
 
     /** Sample information of the KQKN report comes from Phiếu 3/4 data already entered, never retyped. */
     private ReportData reportData(com.example.app.transfer.entity.SampleTransferItem item, LocalDate testingDate,
                                   List<ReportData.Row> rows, String lookupCode, String resultNumber, LocalDate reportDate,
-                                  String qualityHead, String director, boolean preview) {
+                                  String qualityHead, String director, boolean preview, List<ReportData.Photo> photos) {
         var receipt = item.getTransfer().getReceipt();
         var customer = receipt.getCustomer();
         String condition = java.util.stream.Stream.of(receipt.getSampleCondition(), receipt.getConditionDetail())
@@ -346,7 +430,7 @@ public class ResultReleaseService {
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getSealNumber(), item.getSampleCode(), receipt.getSampledBy(), toDate(receipt.getSampledAt()),
                 condition, item.getQuantity() != null ? item.getQuantity() : receipt.getQuantity(),
-                toDate(receipt.getReceivedAt()), testingDate, rows, qualityHead, director, preview);
+                toDate(receipt.getReceivedAt()), testingDate, rows, qualityHead, director, preview, photos);
     }
 
     public record ReportHeader(Long transferItemId, String requestNumber, String customerName, String customerAddress,
@@ -361,7 +445,7 @@ public class ResultReleaseService {
     public ReportHeader header(Long transferItemId) {
         var item = transferItems.findById(transferItemId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mẫu đã bàn giao"));
-        ReportData data = reportData(item, null, List.of(), null, null, null, defaultQualityHead, defaultDirector, true);
+        ReportData data = reportData(item, null, List.of(), null, null, null, defaultQualityHead, defaultDirector, true, List.of());
         return new ReportHeader(item.getId(), item.getTransfer().getReceipt().getRequestNumber(), data.customerName(),
                 data.customerAddress(), data.sampleName(), data.orchardCode(), data.packingFacility(), data.truckNumber(),
                 data.moocNumber(), data.containerNumber(), data.sealNumber(), data.sampleCode(), data.sampleCollector(),
@@ -549,9 +633,7 @@ public class ResultReleaseService {
         }
 
         LocalDate today = LocalDate.now(BUSINESS_ZONE);
-        String prefix = SampleCodes.productCode(sample.getProductType())
-                + today.format(DateTimeFormatter.ofPattern("MMyyyy"));
-        String resultNumber = numbers.next(prefix);
+        String resultNumber = resultNumber(release, sample, today);
         String lookupCode = newLookupCode();
         release.publish(actor, lookupCode, resultNumber);
         try {
@@ -573,6 +655,56 @@ public class ResultReleaseService {
         events.save(new ResultReleaseEvent(release, "PUBLISHED", previousStatus,
                 release.getStatus(), release.getResultNumber(), actor));
         return toDetail(release);
+    }
+
+    /**
+     * Rebuilds the published KQKN PDF from the current Word template (same result number, lookup code and publication
+     * date) — e.g. after the template or the PDF conversion changed. Only for reports generated by the system; an
+     * uploaded report file keeps its own layout. The old PDF stays on disk as a removed file for the audit trail.
+     */
+    @Transactional
+    public ResultReleaseDetailResponse regenerateReport(Long id, User actor) {
+        ResultRelease release = lock(id);
+        if (actor.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ Admin được tạo lại phiếu PDF");
+        }
+        if (release.getStatus() != ResultReleaseStatus.PUBLISHED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Chỉ tạo lại PDF cho phiếu đang phát hành");
+        }
+        if (reportPdf(id) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phiếu này dùng file tải lên nên không tạo lại từ mẫu Word");
+        }
+        LocalDate date = release.getPublishedAt() != null ? toDate(release.getPublishedAt()) : LocalDate.now(BUSINESS_ZONE);
+        byte[] report = generatedPdf(buildReport(release, release.getLookupCode(), release.getResultNumber(), date, false));
+        List<Path> written = new ArrayList<>();
+        registerCleanupOnRollback(written);
+        try {
+            for (ResultReleaseFile file : activeFiles(id)) {
+                if (ResultReleaseFile.GENERATED_REPORT.equals(file.getKind())) file.remove(actor);
+            }
+            String fileName = "KQKN-" + release.getDisplayNumber().replaceAll("[^A-Za-z0-9._-]", "_") + ".pdf";
+            files.saveAndFlush(store(release, fileName, "application/pdf", "pdf", report, actor, written).asGeneratedReport());
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể lưu PDF phiếu kết quả", exception);
+        }
+        events.save(new ResultReleaseEvent(release, "REPORT_REGENERATED", release.getStatus(), release.getStatus(),
+                "Tạo lại PDF từ mẫu Word", actor));
+        return toDetail(release);
+    }
+
+    /**
+     * Số/No. of the KQKN = Số/No. of the receipt (CFC26.0001). A revision gets "/R1", "/R2"…; a second sample of the
+     * same receipt gets "-2", "-3"… so the number stays unique. Receipts without a Số/No. keep the old sequence.
+     */
+    private String resultNumber(ResultRelease release, com.example.app.intake.entity.Sample sample, LocalDate today) {
+        String request = release.getTestingRecord().getTransferItem().getTransfer().getReceipt().getRequestNumber();
+        if (request == null || request.isBlank()) {
+            return numbers.next(SampleCodes.productCode(sample.getProductType()) + today.format(DateTimeFormatter.ofPattern("MMyyyy")));
+        }
+        String base = request.trim() + (release.getVersion() > 1 ? "/R" + (release.getVersion() - 1) : "");
+        String candidate = base;
+        for (int index = 2; releases.existsByResultNumber(candidate); index++) candidate = base + "-" + index;
+        return candidate;
     }
 
     @Transactional
@@ -654,7 +786,8 @@ public class ResultReleaseService {
         var rows = items.findByRelease_IdOrderByRowOrderAsc(release.getId());
         return ResultReleaseDetailResponse.from(release,
                 files.findByRelease_IdAndRemovedAtIsNullOrderByIdAsc(release.getId()),
-                rows, defaultQualityHead, defaultDirector, reference(release), rows.isEmpty() ? suggestions(release) : List.of());
+                rows, defaultQualityHead, defaultDirector, reference(release), rows.isEmpty() ? suggestions(release) : List.of(),
+                photoResponses(release));
     }
 
     private String newLookupCode() {
