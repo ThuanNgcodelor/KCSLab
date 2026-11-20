@@ -7,4 +7,5 @@ source/be/target/
 /artifacts/
 /source/be/storage/
 /source/be/build/
-/docs/
+docs/ai
+docs/template

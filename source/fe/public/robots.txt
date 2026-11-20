@@ -1,0 +1,5 @@
+# Chỉ trang tra cứu công khai được index. Workspace nhân viên và API không được index.
+# Thêm dòng "Sitemap: https://<hostname>/sitemap.xml" khi có hostname công khai (cần xác nhận).
+User-agent: *
+Allow: /tracuu/
+Disallow: /
