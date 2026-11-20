@@ -7,8 +7,11 @@
 3. Ở **Tiếp nhận mẫu**, tìm số yêu cầu để lấy dữ liệu có sẵn. Đối chiếu thông tin thực tế, nhập mã từng mẫu, chọn chỉ tiêu, ghi tình trạng, niêm phong mẫu và seal container vào hai trường riêng. Tải hồ sơ hoặc dùng **Chụp ảnh** rồi lưu.
 4. Mở **Chuyển mẫu**, chọn hồ sơ tiếp nhận và các mẫu cần bàn giao. Kiểm tra khối lượng, số lượng, tình trạng, chỉ tiêu, phương pháp và hạn trả kết quả. Lưu nháp, kiểm tra chi tiết rồi bấm **Gửi bàn giao**.
 5. **KCS** mở **Nhận mẫu**, chọn phiếu đang chờ, đối chiếu mẫu thực tế với hồ sơ và ảnh, rồi xác nhận nhận. Nếu có sai lệch, chọn **Từ chối** và ghi lý do.
-6. **KCS hoặc Admin** mở **Thử nghiệm** hoặc **Hồ sơ kết quả**, chọn mẫu đã được KCS nhận rồi tải DOCX/PDF KQKN hoàn chỉnh. Bước này dùng file để lập biên bản thử nghiệm và hồ sơ kết quả.
-7. **Admin** mở hồ sơ, xem trước PDF, đối chiếu thông tin rồi chọn **Phát hành**. Khách dùng mã tra cứu/QR và bốn số cuối điện thoại để tải phiếu đã phát hành.
+6. **KCS hoặc Admin** mở **Thử nghiệm → Tạo biên bản**, chọn mẫu đã được KCS nhận.
+   - **Nhập kết quả trên hệ thống** (mặc định): thông tin mẫu tự điền từ phiếu tiếp nhận và phiếu chuyển. Chỉ cần nhập **Đơn vị, Kết quả, Ghi chú** cho từng chỉ tiêu, rồi bấm **Tạo biên bản & gửi Admin duyệt** hoặc **Lưu nháp**.
+   - **Tải file KQKN có sẵn:** chọn file DOCX/PDF đã soạn.
+7. Ở hồ sơ kết quả có **Xem trước PDF** và **Tải file Word (DOCX)**. Hai file có cùng bố cục mẫu KQKN, kèm trang **Hình ảnh mẫu** lấy từ ảnh của phiếu tiếp nhận.
+8. **Admin** mở hồ sơ, kiểm tra rồi chọn **Phát hành** (hoặc **Trả lại** kèm lý do). Số phiếu là Số/No. của phiếu tiếp nhận, PDF có QR. Khách dùng mã tra cứu/QR và bốn số cuối điện thoại để tải phiếu đã phát hành.
 
 ## Tài khoản và thông báo
 

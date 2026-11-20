@@ -27,7 +27,8 @@ ADMIN: giám sát toàn hệ thống
 
 - Chỉ ba role `ADMIN`, `RECEPTIONIST`, `TECHNICIAN`; không tự thêm role mới.
 - Mã mẫu chuẩn CFC-TN-14: `SOURCE-PRODUCT-DDMMYYYY-SEQUENCE`. Hiện mới có mã gốc.
-- **Chưa có**: `-V/-R`, QC/mã mù, xác minh độc lập, phát hành result release/PDF, QR/public lookup thật, gửi ZBS/SMS khách. V6 và API tạo/đọc nháp kết quả đã có trong thay đổi chưa commit; landing tra cứu chỉ là preview khóa form. Không mô tả các phần chưa có như đã hoạt động.
+- **Đã có**: phiếu KQKN (nhập kết quả trên hệ thống hoặc tải file; PDF = mẫu Word chuyển bằng LibreOffice; số phiếu = Số/No.; QR), Admin duyệt/phát hành/thu hồi/tạo lại PDF, trang tra cứu `/tracuu/` (chưa có tên miền, QR đang trỏ IP nội bộ).
+- **Chưa có**: `-V/-R`, QC/mã mù, xác minh độc lập, gửi ZBS/SMS khách. Không mô tả các phần chưa có như đã hoạt động.
 - Phân biệt KPI theo **phiếu** và **mẫu**; thời gian theo `Asia/Ho_Chi_Minh`; aggregate phải lấy từ DB, không tính từ trang đang hiển thị.
 
 ## Tài liệu — đọc theo tác vụ
@@ -64,5 +65,8 @@ Chỉ đọc phần liên quan trực tiếp. Đối chiếu với source và d�
 
 ## Lưu ý hiện tại
 
-- Dashboard Receptionist đã có ở commit `556bfa5` nhưng chưa nghiệm thu bằng Chrome; API `/api/v1/intake/dashboard/receptionist` chưa trả hàng đợi hành động.
-- Export Phiếu 3 DOCX chưa được xác nhận mở bằng Word thật.
+- Tổng quan mới nhất ở `docs/ai/CONTEXT.md` (20/11/2026).
+- Chạy trên Linux: `./scripts/run-all.sh` ([run.md](run.md)). Windows server: [RUN_WINDOWS_SERVER.md](RUN_WINDOWS_SERVER.md), chưa thử trên máy thật.
+- Test backend chạy trong image có LibreOffice (`scripts/run-be-tests-docker.sh`), vì PDF KQKN tạo từ DOCX.
+- Cần LAB xác nhận: quy ước số phiếu `/R1` và `-2`; có công khai ảnh mẫu trong PDF; có bỏ form biên bản chi tiết cũ.
+- Export Phiếu 3 DOCX và phiếu KQKN DOCX chưa được xác nhận mở bằng Microsoft Word thật.

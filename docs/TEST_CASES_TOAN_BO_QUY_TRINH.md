@@ -11,8 +11,8 @@ Dùng môi trường thử và tài khoản Admin, Tiếp nhận, KCS riêng. L�
 | Tiếp nhận | Tại **Tiếp nhận mẫu**, chọn yêu cầu, đối chiếu dữ liệu được điền sẵn. Nhập mã mẫu `QA-SR-001` hoặc mã mới, seal container `CS-QA-01`, bao bì và tình trạng. Thêm ảnh/file rồi lưu | Thông tin nguồn và hai số niêm phong ở đúng vị trí, mã mẫu có thể chọn khi chuyển |
 | Tiếp nhận | Lập **Chuyển mẫu**, kiểm tra số lượng, khối lượng, chỉ tiêu, phương pháp thử và ngày hạn trả. Lưu nháp, kiểm tra chi tiết, gửi bàn giao | Nháp ẩn với KCS. Sau khi gửi, KCS thấy phiếu đang chờ |
 | KCS | Mở phiếu từ thông báo. So khớp mã mẫu, tình trạng, yêu cầu và ảnh, xác nhận nhận | Phiếu hiện ở danh sách đã nhận. Tiếp nhận có thông báo, avatar hiển thị nếu KCS đã tải ảnh |
-| KCS | Trong **Thử nghiệm**, chọn mẫu và tải PDF kết quả hợp lệ | Mở hồ sơ kết quả có file xem trước được. Biên bản dùng file đã chọn |
-| Admin | Mở hồ sơ, xem trước và bấm **Phát hành** | Có số phiếu và mã tra cứu. Admin có thể phát hành hồ sơ do mình lập |
+| KCS | **Thử nghiệm → Tạo biên bản**, chế độ **Nhập kết quả**: kiểm tra 10 mục thông tin mẫu tự điền, nhập Đơn vị/Kết quả/Ghi chú, bấm **Tạo biên bản & gửi Admin duyệt** | Mở hồ sơ kết quả trạng thái chờ duyệt. Xem trước PDF và tải Word cùng bố cục mẫu KQKN, có trang ảnh mẫu nếu phiếu tiếp nhận có ảnh |
+| Admin (khác người lập) | Mở hồ sơ, xem trước và bấm **Phát hành** | Số phiếu = Số/No. (ví dụ `CFC26.0001`), có mã tra cứu và QR trong ô "Dán/in mã QR" |
 | Khách | Tra bằng mã/QR và bốn số cuối điện thoại đúng | Mở và tải được PDF phát hành. Thử sai bốn số và kiểm tra hệ thống chặn |
 
 ## TC02 · Giao mẫu trực tiếp, từ chối bàn giao
@@ -26,6 +26,11 @@ Dùng môi trường thử và tài khoản Admin, Tiếp nhận, KCS riêng. L�
 1. Với mẫu KCS đã nhận, thử tải sai định dạng, quá 10 MB rồi tải DOCX hợp lệ.
 2. Hệ thống báo lỗi với file sai và cho thử lại. DOCX hợp lệ được chuyển PDF khi backend có LibreOffice.
 3. Đối chiếu tên mẫu, chỉ tiêu, số phiếu và bố cục PDF trước khi phát hành. Thu hồi phiếu vừa phát hành rồi thử tra cứu lại.
+
+## TC03b · Tạo lại PDF và địa chỉ QR
+
+1. Admin mở `/admin/results`, xem khung **Mã QR trên phiếu kết quả** (địa chỉ hiện tại, cảnh báo nếu là IP nội bộ).
+2. Bấm **Tạo lại PDF** ở một phiếu đã phát hành, rồi bấm tạo lại hàng loạt. Số phiếu và mã tra cứu không đổi; khách tải về bản mới. Tài khoản KCS không gọi được hai thao tác này.
 
 ## TC04 · Quyền, giao diện, thông báo và PWA
 

@@ -6,7 +6,7 @@
 
 | Nhiệm vụ | Tài liệu |
 |---|---|
-| Chạy app, kiểm thử | [run.md](../../run.md), [ca kiểm thử](../TEST_CASES_TOAN_BO_QUY_TRINH.md) |
+| Chạy app, kiểm thử | [run.md](../../run.md) (Linux), [RUN_WINDOWS_SERVER.md](../../RUN_WINDOWS_SERVER.md) (Windows server, tên miền, QR), [ca kiểm thử](../TEST_CASES_TOAN_BO_QUY_TRINH.md) |
 | Quy trình và giao diện | [Hướng dẫn sử dụng](../DOC_HIEU_HE_THONG.md), [frontend AGENTS.md](../../source/fe/AGENTS.md) |
 | API, phân quyền và dữ liệu | [Backend AGENTS.md](../../source/be/AGENTS.md), [API](../API_CONVENTIONS.md), [RBAC](../RBAC.md), [Database](../DATABASE.md) |
 | Trạng thái và kế hoạch | [SYSTEM_STATUS.md](../SYSTEM_STATUS.md), [CURRENT.md](../../plans/CURRENT.md) |

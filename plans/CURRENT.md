@@ -2,6 +2,17 @@
 
 Trạng thái hiện tại nằm ở [SYSTEM_STATUS.md](../docs/SYSTEM_STATUS.md). Nội dung bên dưới ghi lại các mốc lập kế hoạch trước đây.
 
+> **Cập nhật 20/11/2026 (chiều) — đã làm.**
+> - Luồng nhập kết quả KQKN ở `/admin/testing/new`; phiếu Word/PDF từ mẫu LAB (LibreOffice, font Times New Roman); trang ảnh mẫu; số phiếu = Số/No.
+> - Admin tạo lại PDF (từng phiếu hoặc hàng loạt); trang tra cứu mới + SEO; Docker Compose cho Linux; hướng dẫn Windows server (Laragon).
+>
+> **Tiếp theo:**
+> 1. Nghiệm thu luồng nhập kết quả bằng tài khoản KCS/Admin thật.
+> 2. Mở DOCX trên Microsoft Word.
+> 3. Cài thử Windows server.
+> 4. Có tên miền → Cloudflare Tunnel → đổi `PUBLIC_LOOKUP_URL` → tạo lại PDF.
+> 5. LAB chốt các mục "cần xác nhận" trong `docs/ai/CONTEXT.md`.
+
 > **Đề xuất mới 18/11/2026:** luồng Phiếu 1 → 7 → 2 → 3 → 4 → 5, nhập mã thủ công và kế thừa dữ liệu đang chờ chốt nghiệp vụ tại `plans/QUY_TRINH_YEU_CAU_LAY_MAU_TIEP_NHAN.md`. Chưa triển khai; các quyết định cũ về gate mã hóa vẫn là hiện trạng cho đến khi LAB xác nhận thay đổi.
 
 > Plan điều phối mới cho toàn bộ phần chưa triển khai và chưa nghiệm thu: `plans/SYSTEM_COMPLETION_ROADMAP.md`. File này và các plan chuyên biệt vẫn được giữ làm tài liệu tham khảo/lịch sử.

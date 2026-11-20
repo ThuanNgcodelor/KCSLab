@@ -8,6 +8,8 @@
 - Frontend: React 19, Vite 6, JavaScript/JSX, React Router 7.
 - Database: MySQL 8.4 là profile mặc định; Flyway chạy migration có version khi startup và Hibernate dùng `validate` để kiểm tra schema.
 - Dev runtime: backend có thể chạy bằng Docker Maven/JDK vì host không bắt buộc cài Java/Maven.
+- Chạy trên Linux: `docker-compose.yml` gồm backend `.jar` + LibreOffice (`Dockerfile.prod`) và frontend nginx (`source/fe/Dockerfile`), cả hai dùng `network_mode: host`. MySQL/Redis ở ngoài compose. Windows server chạy `java -jar`, LibreOffice và Laragon (Apache proxy `/api`, `/ws`), không Docker.
+- Phiếu KQKN: `KqknDocxExporter` điền mẫu Word, `OfficeConverter` (LibreOffice) chuyển PDF, `ReportFileStamper` đóng QR/mã tra cứu. Bản xem trước có watermark.
 
 ## Biên module
 

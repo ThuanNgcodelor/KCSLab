@@ -15,12 +15,14 @@ Cookie access JWT và refresh session phía server dùng cùng origin. Khởi t�
 | Chuyển mẫu | `/transfers`, `POST /transfers/{id}/submit`. File bằng chứng lưu qua endpoint đính kèm của hồ sơ tiếp nhận |
 | KCS | `/receiving/dashboard`, `/receiving/transfers`, `/receiving/transfers/{id}/evidence`, `POST /receiving/transfers/{id}/decision` |
 | Thử nghiệm | `/testing-records`, `/testing-records/candidates`, `POST /testing-records/from-result-file`, `/test-methods` |
-| Kết quả | `/result-releases`, `POST /result-releases/{id}/report-file`, `GET /result-releases/{id}/report-preview`, `POST /result-releases/{id}/publish`, `POST /result-releases/{id}/revoke` |
+| Kết quả | `/result-releases`, `GET /result-releases/report-header?transferItemId=`, `POST /result-releases/from-entry`, `PUT /result-releases/{id}/report`, `POST /result-releases/{id}/report-file`, `GET /result-releases/{id}/report-preview`, `GET /result-releases/{id}/report-docx`, `GET /result-releases/{id}/sample-photos/{attachmentId}`, `POST /result-releases/{id}/submit`, `POST /result-releases/{id}/return`, `POST /result-releases/{id}/publish`, `POST /result-releases/{id}/revoke`, `POST /result-releases/{id}/regenerate-report`, `GET /result-releases/lookup-settings`, `POST /result-releases/regenerate-reports` |
 | Tra cứu | `POST /public/results/lookup`, `POST /public/results/download` |
 
 - `GET /test-requests/next-number` gợi ý số dạng `CFC26.0001`. Để trống khi tạo sẽ cấp số nguyên tử. Số yêu cầu đã tạo là bất biến, trùng trả 409. Hai biểu mẫu lấy mẫu dùng chung số yêu cầu.
 - KCS đọc projection của phiếu đã gửi. File bằng chứng phải thuộc hồ sơ đã bàn giao. Quyết định được khóa theo phiếu, trả 409 nếu phiếu hết trạng thái đang chờ.
 - Biên bản từ file dùng `transferItemId` của mẫu đã được nhận. Tải KQKN bằng multipart `file` chứa DOCX hoặc PDF. DOCX cần LibreOffice. Admin xem trước PDF rồi phát hành. Mã mẫu nhập tay hợp lệ được ghi nhận ở trạng thái sẵn sàng khi tiếp nhận.
+- Nhập kết quả: `GET /result-releases/report-header` trả 10 mục thông tin mẫu và chuỗi chỉ tiêu/phương pháp của mẫu. `POST /result-releases/from-entry` nhận `{transferItemId, testingDate, rows[{parameter, unit, method, result, note}], submit}` (1–40 dòng, mỗi dòng cần chỉ tiêu và kết quả). API tạo biên bản, hồ sơ và các dòng trong một giao dịch; mỗi mẫu chỉ một biên bản (trùng thì 409).
+- Xem trước PDF và `report-docx` đều tạo từ cùng mẫu Word; PDF cần LibreOffice. Khi phát hành, số phiếu = Số/No. của phiếu tiếp nhận. `regenerate-report` và `regenerate-reports` chỉ dành cho Admin, chỉ áp dụng cho phiếu do hệ thống tạo, giữ nguyên số và mã tra cứu.
 - Tra cứu và tải dùng `code`, `phoneLast4`; thêm `fileId` khi tải. Chỉ trả hồ sơ đã phát hành. Có giới hạn truy cập và `Cache-Control: no-store`. Xem [triển khai trang tra cứu](PUBLIC_LOOKUP_SEO.md).
 
 ## Thông báo nội bộ
