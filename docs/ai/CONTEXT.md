@@ -50,4 +50,4 @@ Cập nhật 23/11/2026. Đọc file này để bắt đầu. Khi cần chi ti�
   - có bỏ hẳn form biên bản chi tiết cũ (thiết bị, hóa chất, QC) không;
   - quy tắc mật khẩu 10 hay 12 ký tự.
 - Cần nghiệm thu: iPhone/Android, mở file Word trên Microsoft Word, sao lưu database và thư mục `storage`, HTTPS.
-- Zalo/SMS khách vẫn là [đề xuất riêng](../INTAKE_NOTIFICATIONS.md).
+- Zalo/SMS khách vẫn là [đề xuất riêng](../INTAKE_NOTIFICATIONS.md). Ngày 23/11/2026 đã lập [plan test Zalo tiếp nhận](../../plans/ZALO_INTAKE_TEST_PLAN.md): người dùng đang test template của mình theo SĐT, chỉ nhận trên tài khoản của chính mình. Fake provider trước, sau đó development mode + allowlist; mỗi phiếu một sự kiện riêng kể cả cùng khách/SĐT. Chưa triển khai hoặc gửi tin trong lần lập plan; gửi khách thật là giai đoạn sau.
