@@ -45,7 +45,7 @@ class ZaloLiveTemplateProviderTest {
         properties.setLiveEnabled(false); assertThat(provider.send(message).status()).isEqualTo("BLOCKED");
         properties.setLiveEnabled(true); properties.setMode(CustomerNotificationProperties.Mode.ZALO_DEVELOPMENT);
         assertThat(provider.send(message).status()).isEqualTo("BLOCKED"); properties.setMode(CustomerNotificationProperties.Mode.ZALO_LIVE);
-        when(operations.paused()).thenReturn(true); assertThat(provider.send(message).status()).isEqualTo("BLOCKED"); when(operations.paused()).thenReturn(false);
+        when(operations.paused()).thenReturn(true); assertThat(provider.send(message).status()).isEqualTo("RETRY_WAIT"); when(operations.paused()).thenReturn(false);
         properties.setAllowedPhones(""); assertThat(provider.send(message).status()).isEqualTo("BLOCKED"); properties.setAllowedPhones("0900000099");
         when(tokens.currentAccessToken()).thenReturn(""); assertThat(provider.send(message).status()).isEqualTo("RETRY_WAIT"); http.verify();
     }

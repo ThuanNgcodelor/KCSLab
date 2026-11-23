@@ -1,21 +1,23 @@
 # Kế hoạch thử gửi Zalo khi tiếp nhận mẫu
 
-**Ngày:** 23/11/2026 · **Trạng thái:** P1 đã có runtime/test; P0 còn thiếu dữ liệu tài khoản, P2 có adapter và mock HTTP nhưng chưa gửi Zalo thật.
+**Ngày:** 23/11/2026 · **Trạng thái:** P1–P4 có mã nguồn và test fake/mock; P0 thiếu dữ liệu tài khoản. Chưa gửi Zalo thật, chưa bật LIVE hoặc triển khai môi trường vận hành.
 
-## Kết quả triển khai P0–P2 ngày 23/11/2026
+## Kết quả triển khai P0–P4 ngày 23/11/2026
 
 - P0: đã rà điều kiện test và source; DB/Redis kiểm thử cô lập. Các ảnh sau đó chỉ xác nhận App DEV, chưa có bằng chứng OA/template/token/đích nhận hoặc request gửi thành công. Chưa hoàn tất mapping template thật.
 - P1: migration V20, consent/outbox/attempt, worker claim có lease, fake provider, backoff cho lỗi fake, trạng thái theo phiếu, API/RBAC và UI đã triển khai. Nhiều phiếu cùng khách có sự kiện độc lập; xử lý lặp cùng phiếu không thêm tin.
 - P2: adapter ép `development`, kiểm tra allowlist hai lớp, mapping khai báo server, timeout→UNKNOWN, session/cap bền vững và audit retry đã triển khai/test bằng HTTP giả. Không dùng token thật và không gửi tin Zalo.
+- P3: webhook xác minh raw body + inbox chống trùng, đối soát bằng API trạng thái có giới hạn; lưu bằng chứng giao và chống callback sớm/muộn làm sai trạng thái.
+- P4: token mã hóa/refresh có lease App/OA, cảnh báo, Admin filter/pause/audit, adapter LIVE với gate riêng. Test token rotation giữ hàng đợi; tạm dừng không làm mất tin chưa gọi provider. [Runbook Linux/Windows](../docs/ZALO_OPERATIONS_RUNBOOK.md).
 - Mode mặc định OFF; chưa triển khai/restart app vận hành hoặc migrate database thật. Không tạo/mua dịch vụ Zalo.
-- Kiểm tra: toàn suite backend 125 đạt, 1 bỏ qua; sau sửa cuối 20 test notification/provider đạt với JVM giờ Việt Nam. Frontend build đạt; Playwright API giả kiểm tra form/lịch sử/retry và bốn breakpoint, không tràn ngang. Chưa E2E Zalo thật.
+- Kiểm tra: toàn suite backend 142 đạt, 1 bỏ qua; sau sửa cuối 37 test notification/provider đạt với JVM giờ Việt Nam. Frontend build đạt; Playwright API giả kiểm tra form/lịch sử/retry và Admin filter/pause/resume/error tại bốn breakpoint, không tràn ngang. Chưa E2E Zalo thật.
 - Hướng dẫn cấu hình và thử từng bước: [ZALO_INTAKE_TESTING.md](../docs/ZALO_INTAKE_TESTING.md).
 
 Các phần sau giữ yêu cầu nghiệm thu của plan; dấu hoàn thành chỉ phản ánh phần đã được kiểm tra.
 
 Mục tiêu trước mắt là tạo phiếu tiếp nhận bằng dữ liệu thử trên CFC Lab và nhận tin Zalo trên **tài khoản của chính người dùng**. Người dùng xác nhận đã thử gửi theo số điện thoại, bằng template của mình. Kết quả thử đó chưa được xem là đã nghiệm thu gửi cho khách thật.
 
-Kế hoạch này cụ thể hóa phần thử nghiệm Zalo trong [thiết kế thông báo khách hàng](../docs/INTAKE_NOTIFICATIONS.md). SMS và gửi kết quả kiểm nghiệm là giai đoạn sau. Code P1/P2 đã được thêm; không gửi tin, gọi API bằng credential của người dùng, đổi cấu hình Zalo hoặc đọc/ghi `.env`.
+Kế hoạch này cụ thể hóa phần thử nghiệm Zalo trong [thiết kế thông báo khách hàng](../docs/INTAKE_NOTIFICATIONS.md). SMS và gửi kết quả kiểm nghiệm là giai đoạn sau. Code P1–P4 đã được thêm; không gửi tin, gọi API bằng credential của người dùng, đổi cấu hình Zalo hoặc đọc/ghi `.env`.
 
 ## 1. Phạm vi thử nghiệm đã chốt
 
@@ -295,6 +297,6 @@ Kiểm tra triển khai dự kiến: `bash scripts/run-be-tests-docker.sh` với
 1. Template ID và tên biến thực tế; template có trường phân biệt Số/No. hay chưa.
 2. Request đã thành công dùng `mode: development` hay template test theo cách khác.
 3. Nguồn cấp token an toàn cho backend test; App/OA tương ứng và quyền của tài khoản nhận.
-4. Muốn dừng ở nhận tin thủ công P2 hay thêm theo dõi tự động P3 ngay đợt đầu.
+4. HTTPS callback, khóa xác minh đúng loại webhook và buổi nghiệm thu polling/refresh trên OA thật; code P3/P4 đã có.
 
 Có thể bắt đầu P1 bằng fake provider khi chưa có các thông tin này. Chúng chỉ chặn mapping và buổi gửi Zalo thật; không cần người dùng gửi secret vào chat.

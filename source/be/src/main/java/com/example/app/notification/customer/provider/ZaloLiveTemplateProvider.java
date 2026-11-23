@@ -28,9 +28,12 @@ public class ZaloLiveTemplateProvider implements CustomerMessageProvider {
     }
     @Override
     public Outcome send(Message message) {
+        if (properties.getMode() == CustomerNotificationProperties.Mode.ZALO_LIVE && operations.paused()) {
+            return new Outcome("RETRY_WAIT", "SENDING_PAUSED", null);
+        }
         if (properties.getMode() != CustomerNotificationProperties.Mode.ZALO_LIVE || !properties.isLiveEnabled()
                 || !properties.isTokenRefreshEnabled() || !properties.isPollingEnabled() || properties.getAppSecret().isBlank()
-                || properties.getSessionKey().isBlank() || operations.paused() || !allowed(message.phone())) {
+                || properties.getSessionKey().isBlank() || !allowed(message.phone())) {
             return new Outcome("BLOCKED", "LIVE_CONFIGURATION_INCOMPLETE", null);
         }
         String token = tokens.currentAccessToken();
