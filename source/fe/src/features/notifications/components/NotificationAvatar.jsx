@@ -2,6 +2,7 @@ import { Icon } from '../../../shared/components/Icon';
 import { UserAvatar } from '../../profile/components/UserAvatar';
 
 const typeIcons = {
+  TEST_REQUEST_CREATED: 'inbox',
   INTAKE_RECORDED: 'inbox',
   TRANSFER_SUBMITTED: 'send',
   TRANSFER_ACCEPTED: 'checkCircle',

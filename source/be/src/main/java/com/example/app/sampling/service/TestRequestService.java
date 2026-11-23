@@ -7,6 +7,8 @@ import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
 import com.example.app.common.dto.PagedResponse;
 import com.example.app.common.query.ListQuery;
+import com.example.app.notification.service.StaffNotificationService;
+import com.example.app.notification.entity.StaffNotificationType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
@@ -19,8 +21,8 @@ import java.util.List;
 
 @Service
 public class TestRequestService {
- private final TestRequestRepository requests; private final SamplingPlanRepository plans; private final FieldSamplingRepository fields; private final TestRequestNumberSequence numbers;
- public TestRequestService(TestRequestRepository r,SamplingPlanRepository p,FieldSamplingRepository f,TestRequestNumberSequence n){requests=r;plans=p;fields=f;numbers=n;}
+ private final TestRequestRepository requests; private final SamplingPlanRepository plans; private final FieldSamplingRepository fields; private final TestRequestNumberSequence numbers; private final StaffNotificationService notifications;
+ public TestRequestService(TestRequestRepository r,SamplingPlanRepository p,FieldSamplingRepository f,TestRequestNumberSequence n,StaffNotificationService notifications){requests=r;plans=p;fields=f;numbers=n;this.notifications=notifications;}
  @Transactional(readOnly=true) public String nextNumber(){return numbers.peek();}
  private static final Map<String,String> SORT_FIELDS=Map.of("createdAt","createdAt","requestDate","requestDate","requestNumber","requestNumber","customerName","customerName","sampleName","sampleName","expectedDate","expectedDate","status","status");
  /** Paged list: search, status/sampling-mode filter, request-date range and whitelisted sort all run in the database. */
@@ -39,7 +41,13 @@ public class TestRequestService {
   return PagedResponse.from(requests.findAll(spec,ListQuery.page(page,size,parsed)).map(this::response),parsed.canonical());}
  @Transactional(readOnly=true) public Response get(Long id){return response(require(id));}
  @Transactional(readOnly=true) public Response byNumber(String number){return response(requests.findByRequestNumberIgnoreCase(normalize(number)).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy Phiếu yêu cầu")));}
- @Transactional public Response create(SaveRequest q,User actor){String number=resolveNumber(q.requestNumber());TestRequest r=new TestRequest(number,actor);apply(r,q);return response(requests.save(r));}
+ @Transactional public Response create(SaveRequest q,User actor){
+  String number=resolveNumber(q.requestNumber());TestRequest r=new TestRequest(number,actor);apply(r,q);TestRequest saved=requests.save(r);
+  notifications.notifyRoles(java.util.Set.of(Role.ADMIN,Role.RECEPTIONIST),actor,StaffNotificationType.TEST_REQUEST_CREATED,
+   "Yêu cầu kiểm nghiệm mới","%s đã tạo Phiếu yêu cầu %s. Chuẩn bị tiếp nhận mẫu.".formatted(actor.getDisplayName(),saved.getRequestNumber()),
+   "/admin/requests/"+saved.getId(),"TEST_REQUEST",saved.getId());
+  return response(saved);
+ }
  private String resolveNumber(String typed){
   if(typed==null||typed.isBlank())return numbers.allocate(numbers.currentYearCode());
   String number=TestRequestNumberSequence.normalize(typed);

@@ -239,12 +239,17 @@ public class ReceiptService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Số/No. " + requestNumber + " đã có hồ sơ tiếp nhận; mỗi Số/No. chỉ được dùng cho một hồ sơ");
         }
-        notificationService.notifyRoles(Set.of(Role.ADMIN, Role.TECHNICIAN), receivedBy,
+        notificationService.notifyRoles(Set.of(Role.ADMIN), receivedBy,
                 StaffNotificationType.INTAKE_RECORDED,
                 "Phiếu tiếp nhận mới",
                 "%s đã ghi nhận %d mẫu từ %s".formatted(
                         receivedBy.getDisplayName(), saved.getSamples().size(), saved.getCustomer().getName()),
                 "/admin/intake/" + saved.getId(), "RECEIPT", saved.getId());
+        notificationService.notifyRoles(Set.of(Role.TECHNICIAN), receivedBy,
+                StaffNotificationType.INTAKE_RECORDED, "Phiếu tiếp nhận mới",
+                "%s đã ghi nhận %d mẫu cho Số/No. %s".formatted(
+                        receivedBy.getDisplayName(), saved.getSamples().size(), saved.getRequestNumber()),
+                "/admin/receiving", "RECEIPT", saved.getId());
         customerNotifications.record(saved, request, receivedBy);
         return toResponse(saved);
     }

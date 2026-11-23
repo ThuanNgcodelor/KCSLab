@@ -67,9 +67,18 @@ public class StaffNotificationService {
         }
         if (com.example.app.common.query.ListQuery.hasText(q)) {
             String pattern = com.example.app.common.query.ListQuery.contains(q);
-            spec = spec.and((root, query, builder) -> builder.or(
-                    builder.like(builder.lower(root.get("title")), pattern, '\\'),
-                    builder.like(builder.lower(root.get("message")), pattern, '\\')));
+            spec = spec.and((root, query, builder) -> {
+                jakarta.persistence.criteria.Expression<String> message = root.get("message");
+                if (viewer.getRole() == Role.TECHNICIAN) {
+                    var marker = builder.locate(message, " mẫu từ ");
+                    // Match what KCS can read, including historical intake notices containing a customer name.
+                    message = builder.<String>selectCase().when(builder.and(
+                            builder.equal(root.get("type"), StaffNotificationType.INTAKE_RECORDED), builder.gt(marker, 0)),
+                            builder.substring(message, builder.literal(1), builder.sum(marker, 3))).otherwise(message);
+                }
+                return builder.or(builder.like(builder.lower(root.get("title")), pattern, '\\'),
+                        builder.like(builder.lower(message), pattern, '\\'));
+            });
         }
         Page<StaffNotification> result = notificationRepository.findAll(spec,
                 com.example.app.common.query.ListQuery.page(page, size, parsed));
@@ -118,8 +127,16 @@ public class StaffNotificationService {
 
     public StaffNotificationResponse toResponse(StaffNotification notification) {
         User actor = notification.getActor();
+        String message = notification.getMessage();
+        String target = notification.getTargetUrl();
+        if (notification.getRecipient().getRole() == Role.TECHNICIAN && notification.getType() == StaffNotificationType.INTAKE_RECORDED) {
+            int marker = message.indexOf(" mẫu từ ");
+            if (marker >= 0) message = message.substring(0, marker + " mẫu".length());
+            // KCS cannot open the reception-only detail route used by historical notices.
+            target = "/admin/receiving";
+        }
         return new StaffNotificationResponse(notification.getId(), notification.getType(),
-                notification.getTitle(), notification.getMessage(), notification.getTargetUrl(),
+                notification.getTitle(), message, target,
                 notification.getEntityType(), notification.getEntityId(), notification.getReadAt(),
                 notification.getCreatedAt(), actor == null ? null
                 : new StaffNotificationResponse.Actor(actor.getDisplayName(), userService.avatarUrl(actor)));
