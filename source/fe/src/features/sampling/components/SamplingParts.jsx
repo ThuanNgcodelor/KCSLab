@@ -34,7 +34,7 @@ export function ConsignmentInfo({ form, data, update }) {
   return <Group title="II. Thông tin lô hàng" en="Consignment information"><div className="form-two-columns">
     <Linked label="Tên mẫu / Name of sample" value={form.sampleName} />
     <Linked label="Giống / Variety" value={form.variety} />
-    <Field label="Mã vùng trồng / Growing area code" value={data.growingArea} onChange={(e) => update({ growingArea: e.target.value })} />
+    <Field label="Mã vùng trồng / Growing area code" value={data.growingArea} onChange={(e) => update({ growingArea: e.target.value })} maxLength={255} />
     <Field label="Mã cơ sở đóng gói / Packing code" value={data.packingFacility} onChange={(e) => update({ packingFacility: e.target.value })} />
     <Field label="Số xe đầu kéo" value={data.vehicleNumber} onChange={(e) => update({ vehicleNumber: e.target.value })} />
     <Field label="Số rơ moóc" value={data.trailerNumber} onChange={(e) => update({ trailerNumber: e.target.value })} />

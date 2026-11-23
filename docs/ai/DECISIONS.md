@@ -3,6 +3,7 @@
 - Modular monolith Spring Boot, React/Vite, MySQL/Flyway. Java `String` ánh xạ sang `VARCHAR/TEXT` và dùng `utf8mb4`.
 - Cookie JWT cho request đã xác thực, refresh session phía server, CSRF cho thao tác ghi phù hợp. Admin cấp tài khoản.
 - Số yêu cầu, số của mỗi biểu mẫu, mã mẫu và mã tra cứu có vai trò riêng. **Số/No.** là định danh duy nhất của phiếu tiếp nhận (V16, V18) và cũng là **số phiếu KQKN** (`/R1` cho bản phát hành lại, `-2` cho mẫu thứ hai — cần LAB xác nhận).
+- Từ 23/11/2026, theo xác nhận người dùng, trường từng ghi “Nguồn gốc” ở Phiếu yêu cầu được hiểu thống nhất là **Mã vùng trồng**. Giao diện/model dùng `growingArea`; `origin` trong API/DB Phiếu yêu cầu và `orchardCode` ở KQKN là các khóa tương thích của cùng thông tin. `sourceCode` của mã mẫu là khái niệm riêng. Giữ snapshot từng phiếu; không tự ghi đè hồ sơ đã lưu khi sửa phiếu trước.
 - Phiếu KQKN có một nguồn duy nhất là mẫu Word `templates/kqkn-dv.docx`. **PDF luôn là DOCX đã điền rồi chuyển bằng LibreOffice**, nên PDF và Word giống nhau. Không vẽ PDF bằng code. Image backend cài font Microsoft để giữ Times New Roman.
 - Có 2 cách lập phiếu kết quả: nhập kết quả trên hệ thống (mặc định) hoặc tải file DOCX/PDF có sẵn. Admin duyệt và phát hành; người duyệt độc lập với người lập và người phân tích.
 - QR trỏ tới `PUBLIC_LOOKUP_URL` + `?code=…`. Đường dẫn `/tracuu/?code=` phải giữ cố định; đổi tên miền chỉ thay phần host, rồi tạo lại PDF hàng loạt.

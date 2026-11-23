@@ -101,7 +101,8 @@ export function ReceiptCreatePage() {
       testRequestId: data.id, fieldSamplingId: field?.id ?? null, requestNumber: data.requestNumber,
       customerName: data.customerName ?? '', customerPhone: data.customerPhone ?? '', customerEmail: data.customerEmail ?? '',
       customerAddress: data.customerAddress ?? '', sampledBy: field?.sampleCollector ?? '', sampledAt: localDateTime(field?.samplingEnd),
-      growingArea: field?.growingArea ?? data.origin ?? '', packingFacility: field?.packingFacility ?? '',
+      // origin là khóa API cũ của Mã vùng trồng trên Phiếu yêu cầu.
+      growingArea: field?.growingArea ?? data.samplingPlan?.growingArea ?? data.origin ?? '', packingFacility: field?.packingFacility ?? '',
       vehicleNumber: field?.vehicleNumber ?? '', trailerNumber: field?.trailerNumber ?? '', containerNumber: field?.containerNumber ?? '',
       sealNumber: field?.sampleSealNumber ?? '', sealStatus: field?.sealPresent === false ? 'NOT_PRESENT' : 'INTACT',
       conditionDetail: field?.sampleCondition ?? '', transportInfo: field?.fieldNotes ?? '', storageCondition: field?.storageCondition ?? 'Thường',
@@ -242,7 +243,7 @@ export function ReceiptCreatePage() {
 
         <FormCard number="II" en="Source & consignment" title="Hồ sơ nguồn và lô hàng" copy="Dữ liệu có cấu trúc để truy xuất và đưa vào hồ sơ kết quả sau này.">
           <div className="form-two-columns">
-            <label>Vùng trồng / nguồn mẫu<input value={form.growingArea} onChange={update('growingArea')} /></label>
+            <label>Mã vùng trồng<input value={form.growingArea} onChange={update('growingArea')} maxLength={255} /></label>
             <label>Cơ sở đóng gói<input value={form.packingFacility} onChange={update('packingFacility')} /></label>
             <label>Biển số xe<input value={form.vehicleNumber} onChange={update('vehicleNumber')} /></label>
             <label>Số moóc<input value={form.trailerNumber} onChange={update('trailerNumber')} /></label>

@@ -5,7 +5,7 @@ export const FLESH = 'Ruột';
 
 export const today = () => new Date().toISOString().slice(0, 10);
 export const emptySample = () => ({ label: '', cadmium: { flesh: false, method: '' }, auramine: { skin: false, flesh: false, method: '' }, legacy: [] });
-export const emptyRequest = () => ({ requestNumber: '', requestDate: today(), customerName: '', taxCode: '', contactPerson: '', customerAddress: '', customerPhone: '', customerEmail: '', sampleName: '', lotCode: '', variety: '', origin: '', harvestDate: '', packingDate: '', samplingMode: 'COMPANY', purpose: '', expectedDate: '', resultDeliveryMethod: '', serviceConditions: '', delayNotice: '', completed: false, samples: [emptySample()] });
+export const emptyRequest = () => ({ requestNumber: '', requestDate: today(), customerName: '', taxCode: '', contactPerson: '', customerAddress: '', customerPhone: '', customerEmail: '', sampleName: '', lotCode: '', variety: '', growingArea: '', harvestDate: '', packingDate: '', samplingMode: 'COMPANY', purpose: '', expectedDate: '', resultDeliveryMethod: '', serviceConditions: '', delayNotice: '', completed: false, samples: [emptySample()] });
 export const emptyPlan = () => ({ formNumber: '', formDate: today(), representative: '', representativePhone: '', sampleCollector: '', collectorPhone: '', samplingStart: '', samplingEnd: '', samplingLocation: '', growingArea: '', packingFacility: '', vehicleNumber: '', trailerNumber: '', containerNumber: '', schemeNotes: '', transportConditions: '', sampleForms: '', lotSizeBand: '', transportModes: '' });
 export const emptyFieldItem = () => ({ sampleName: '', samplingMethod: '', quantity: '', parameters: '', parametersOther: '' });
 export const emptyField = () => ({ ...emptyPlan(), sampleCondition: '', storageCondition: '', storageTemperature: '', sampleSealNumber: '', sealPresent: true, samplingMethod: '', sampleQuantity: '', fieldNotes: '', items: [emptyFieldItem()] });
@@ -37,7 +37,7 @@ export const parseCondition = (value) => { if (!value) return { choice: '', othe
 export const requestParameterCodes = (sample) => [sample.auramine.skin || sample.auramine.flesh ? 'VANG_O' : '', sample.cadmium.flesh ? 'CD' : ''].filter(Boolean).join(',');
 
 // Phiếu 07 lấy sẵn từ Phiếu 1; trường nào Phiếu 1 không có thì để trống cho nhân viên nhập.
-export const planSeed = (form) => ({ ...emptyPlan(), representative: form.contactPerson || '', representativePhone: form.customerPhone || '', growingArea: form.origin || '', sampleForms: 'WHOLE' });
+export const planSeed = (form) => ({ ...emptyPlan(), representative: form.contactPerson || '', representativePhone: form.customerPhone || '', growingArea: form.growingArea || '', sampleForms: 'WHOLE' });
 // Phiếu 02 lấy sẵn từ Phiếu 07 và Phiếu 1; thông tin thực tế (niêm phong, số lượng, tình trạng) để trống.
 export const fieldSeed = (plan, form) => {
   const seed = emptyField(); SHARED_KEYS.forEach((key) => { seed[key] = plan[key] ?? ''; });
@@ -72,7 +72,8 @@ export function samplesFrom(items) {
   const samples = [...groups.values()];
   return samples.length ? samples : [emptySample()];
 }
-export function requestPayload(form) { const { samples, ...rest } = form; return { ...rest, harvestDate: form.harvestDate || null, packingDate: form.packingDate || null, expectedDate: form.expectedDate || null, items: buildItems(samples) }; }
+// API Phiếu yêu cầu giữ khóa origin để tương thích dữ liệu cũ; nghiệp vụ và model dùng Mã vùng trồng.
+export function requestPayload(form) { const { samples, growingArea, ...rest } = form; return { ...rest, origin: growingArea, harvestDate: form.harvestDate || null, packingDate: form.packingDate || null, expectedDate: form.expectedDate || null, items: buildItems(samples) }; }
 export function timePayload(data, requestNumber) { return { ...data, formNumber: requestNumber, samplingStart: data.samplingStart ? new Date(data.samplingStart).toISOString() : null, samplingEnd: data.samplingEnd ? new Date(data.samplingEnd).toISOString() : null }; }
 export function fieldPayload(field, requestNumber) {
   const items = field.items.filter((item) => item.sampleName.trim() || item.samplingMethod.trim() || item.quantity.trim() || item.parameters || item.parametersOther.trim()).map((item, index) => ({ ...item, sampleName: item.sampleName.trim() || `Mẫu ${index + 1}` }));
@@ -86,7 +87,7 @@ export function localDateTime(value) { if (!value) return ''; const d = new Date
 export function formFrom(data) { return { ...emptyPlan(), ...blanks(data), samplingStart: localDateTime(data.samplingStart), samplingEnd: localDateTime(data.samplingEnd) }; }
 // API trả null cho trường trống; ô nhập có kiểm soát cần chuỗi rỗng để React không cảnh báo.
 function blankNulls(values, base) { return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value == null && typeof base[key] === 'string' ? '' : value])); }
-export function requestFrom(data) { const { items, samplingPlan, fieldSampling, ...rest } = data; const base = emptyRequest(); return { ...base, ...blankNulls(rest, base), harvestDate: data.harvestDate ?? '', packingDate: data.packingDate ?? '', expectedDate: data.expectedDate ?? '', completed: data.status === 'COMPLETED', samples: samplesFrom(items) }; }
+export function requestFrom(data) { const { items, samplingPlan, fieldSampling, origin, ...rest } = data; const base = emptyRequest(); return { ...base, ...blankNulls(rest, base), growingArea: origin ?? '', harvestDate: data.harvestDate ?? '', packingDate: data.packingDate ?? '', expectedDate: data.expectedDate ?? '', completed: data.status === 'COMPLETED', samples: samplesFrom(items) }; }
 
 // Danh sách tick của Phiếu 1 (mục đích, thông báo khi chậm) lưu thành chuỗi "A; B; Khác: …" nên không cần đổi schema.
 export const PURPOSES = ['Kiểm soát nội bộ', 'Đánh giá lô hàng', 'Yêu cầu của khách hàng'];

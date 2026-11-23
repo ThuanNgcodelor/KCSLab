@@ -6,10 +6,21 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NET=cfc-test-net; DB=cfc-test-mysql; RD=cfc-test-redis
-cleanup() { docker rm -f "$DB" "$RD" >/dev/null 2>&1 || true; docker network rm "$NET" >/dev/null 2>&1 || true; }
+IMAGE=cfc-lab-management-backend:office
+TEST_UID="$(id -u)"; TEST_GID="$(id -g)"
+cleanup() {
+  docker rm -f "$DB" "$RD" >/dev/null 2>&1 || true
+  docker network rm "$NET" >/dev/null 2>&1 || true
+  # Maven runs as root in the image. Restore only generated output so the host Java IDE can rebuild it.
+  # -h avoids following symlinks outside the build directory. Also run on Maven failure via the EXIT trap.
+  if [[ -d "$ROOT/source/be/build" ]] && docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    docker run --rm --network none --user 0 --entrypoint chown \
+      -v "$ROOT/source/be/build:/build" "$IMAGE" -Rh "$TEST_UID:$TEST_GID" /build \
+      || printf '%s\n' 'Không khôi phục được quyền thư mục build; kiểm tra Docker trước khi build trong IDE.' >&2
+  fi
+}
 trap cleanup EXIT
 cleanup
-IMAGE=cfc-lab-management-backend:office
 docker image inspect "$IMAGE" >/dev/null 2>&1 || docker build -q -f "$ROOT/source/be/Dockerfile" -t "$IMAGE" "$ROOT/source/be" >/dev/null
 docker network create "$NET" >/dev/null
 docker run -d --name "$DB" --network "$NET" -e MYSQL_ROOT_PASSWORD=testroot -e MYSQL_DATABASE=cfc_lab_test \

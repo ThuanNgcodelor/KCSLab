@@ -59,7 +59,7 @@ export function TestRequestFormPage() {
       <FormSection number="II" title="Thông tin mẫu" en="Sample information">
         <div className="form-two-columns">
           <Field label="Tên mẫu/ Name of sample" value={form.sampleName} onChange={change(setForm, 'sampleName')} required /><Field label="Mã lô/ Lot code" value={form.lotCode} onChange={change(setForm, 'lotCode')} />
-          <Field label="Giống sầu riêng/ Variety" value={form.variety} onChange={change(setForm, 'variety')} /><Field label="Nguồn gốc/ Origin" value={form.origin} onChange={change(setForm, 'origin')} />
+          <Field label="Giống sầu riêng/ Variety" value={form.variety} onChange={change(setForm, 'variety')} /><Field label="Mã vùng trồng / Growing area code" value={form.growingArea} onChange={change(setForm, 'growingArea')} maxLength={255} />
           <Field type="date" label="Ngày thu hoạch/ Harvest date" value={form.harvestDate} onChange={change(setForm, 'harvestDate')} /><Field type="date" label="Ngày đóng gói/ Packing date" value={form.packingDate} onChange={change(setForm, 'packingDate')} />
           <div className="full-span"><span className="group-label">Nguồn lấy mẫu/ Sampled by</span><div className="choice-row">
             <Radio name="samplingMode" label="Công ty lấy mẫu (kèm Phiếu lấy mẫu hiện trường)" checked={form.samplingMode === 'COMPANY'} onChange={() => setForm((c) => ({ ...c, samplingMode: 'COMPANY' }))} />

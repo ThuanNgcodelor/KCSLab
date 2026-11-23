@@ -4,6 +4,12 @@ Base path `/api/v1`. Danh sách dùng `page` bắt đầu từ 0, `size` mặc �
 
 Cookie access JWT và refresh session phía server dùng cùng origin. Khởi tạo CSRF từ `GET /auth/csrf`. Mutation nội bộ gửi `X-XSRF-TOKEN`; login, refresh và API khách thuộc nhóm cấu hình riêng. Các lỗi nghiệp vụ có status HTTP phù hợp. Xem [RBAC](RBAC.md) để đối chiếu quyền.
 
+## Mã vùng trồng
+
+Tên nghiệp vụ thống nhất là **Mã vùng trồng** từ Phiếu yêu cầu đến KQKN. Để tương thích dữ liệu và caller hiện có, API Phiếu yêu cầu tiếp tục đọc/ghi khóa `origin`; frontend ánh xạ khóa này sang `growingArea` trong model. API Kế hoạch/lấy mẫu/tiếp nhận dùng `growingArea`; header/placeholder KQKN dùng `orchardCode`. Các khóa này cùng biểu diễn mã vùng trồng, không phải tên địa phương/xuất xứ. `sourceCode` của từng mẫu là trường riêng dùng tạo mã mẫu. Giá trị tối đa 255 ký tự; không áp đặt quy cách mã mới khi LAB chưa xác nhận.
+
+Khi tạo tiếp nhận từ Phiếu yêu cầu, UI lấy mã từ Phiếu hiện trường, nếu null/không có thì lấy Kế hoạch, cuối cùng Phiếu yêu cầu. Chuỗi rỗng đã lưu được giữ nguyên. Đây là điền sẵn/snapshot; sửa phiếu trước không tự ghi đè phiếu hoặc PDF đã lưu.
+
 ## Điểm vào theo module
 
 | Module | Endpoint chính |

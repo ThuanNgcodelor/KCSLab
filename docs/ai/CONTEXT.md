@@ -8,6 +8,7 @@ Cập nhật 23/11/2026. Đọc file này để bắt đầu. Khi cần chi ti�
 - Ba quyền `ADMIN`, `RECEPTIONIST` và `TECHNICIAN`. Xem [RBAC](../RBAC.md) và [bản đồ module](MODULE_MAP.md).
 - Luồng chính: yêu cầu kiểm nghiệm → (tùy chọn) kế hoạch lấy mẫu và lấy mẫu hiện trường → tiếp nhận (Phiếu 3) → chuyển mẫu (Phiếu 4) → KCS nhận mẫu → thử nghiệm và phiếu KQKN → Admin duyệt và phát hành → khách tra cứu.
 - **Số/No.** (dạng `CFC26.0001`) là định danh duy nhất của yêu cầu và phiếu tiếp nhận. Mã hóa mẫu do người tiếp nhận nhập tay.
+- **Mã vùng trồng**: người dùng chốt ngày 23/11/2026 dùng tên này xuyên suốt Phiếu yêu cầu → Kế hoạch lấy mẫu → Lấy mẫu hiện trường → Tiếp nhận → KQKN, thay các nhãn “Nguồn gốc”, “Vùng trồng / nguồn mẫu”. Model frontend dùng `growingArea`; API/DB Phiếu yêu cầu giữ khóa `origin` cũ và KQKN giữ `orchardCode` để tương thích. Tiếp nhận điền sẵn ưu tiên hiện trường → kế hoạch → yêu cầu; giá trị rỗng đã lưu ở bước trước được giữ nguyên. `sourceCode` (Mã nguồn tạo mã mẫu) vẫn là thông tin riêng. Không tự cập nhật dây chuyền hồ sơ/PDF đã lưu. Kiểm tra: frontend build đạt; ánh xạ API cũ/giá trị rỗng và kế thừa đạt; Playwright API giả trên 5 màn ở 390/1024/1440/2560 px không tràn ngang. Chưa deploy lại bản vận hành hoặc sửa dữ liệu thật.
 
 ## Thử nghiệm và phiếu kết quả (KQKN)
 
@@ -38,6 +39,7 @@ Cập nhật 23/11/2026. Đọc file này để bắt đầu. Khi cần chi ti�
   Lệnh `stop` chỉ tắt 2 container này. Xem [run.md](../../run.md).
 - **Windows server:** không dùng Docker. Laragon (MySQL, Redis, Apache phục vụ `dist`), Java 21 chạy `.jar`, LibreOffice cài trên Windows. Script ở `scripts/windows/`. Xem [RUN_WINDOWS_SERVER.md](../../RUN_WINDOWS_SERVER.md).
 - Test backend: `./scripts/run-be-tests-docker.sh` chạy trong image có LibreOffice. Lần chạy 20/11/2026: 107 đạt, 1 bỏ qua.
+  - Sửa quyền build ngày 23/11/2026: output `build/` và `target/` cũ do Docker tạo với owner root khiến Java IDE không ghi được `.class`. Đã trả quyền về user máy dev; script test có EXIT cleanup trả quyền `build/` về UID/GID người chạy (không theo symlink). Compile main/test bằng Maven Wrapper với user `kali` đạt; chạy script với 2 test resolver đạt và output sau Docker đều ghi được. Nếu IDE còn giữ lỗi cũ, chạy `Java: Clean Java Language Server Workspace` để nạp lại.
   - Kiểm tra phạm vi sửa QR ngày 23/11/2026: `ReportFileStamperTest`, `KqknDocxExporterTest`, `ResultReleaseWorkflowTest`, `PublicResultFlowTest`: 34 đạt, 1 bỏ qua (test tùy chọn PDF thật). Đã giải mã ảnh QR từ PDF thử nghiệm để xác nhận đúng URL và kiểm tra không in mã dưới QR. Không chạy lại toàn bộ suite hoặc nghiệm thu tài khoản thật trong lần này.
 
 ## Điểm còn mở

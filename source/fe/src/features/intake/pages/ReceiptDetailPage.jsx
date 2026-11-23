@@ -60,7 +60,7 @@ export function ReceiptDetailPage() {
             <Detail label="Người giao" value={receipt.deliveredBy} />
             <Detail label="Người nhận mẫu" value={receipt.sampledBy} />
             <Detail label="Thời điểm lấy" value={formatDateTime(receipt.sampledAt)} />
-            <Detail label="Vùng trồng / nguồn" value={receipt.growingArea} />
+            <Detail label="Mã vùng trồng" value={receipt.growingArea} />
             <Detail label="Cơ sở đóng gói" value={receipt.packingFacility} />
             <Detail label="Xe / moóc" value={[receipt.vehicleNumber, receipt.trailerNumber].filter(Boolean).join(' / ')} />
             <Detail label="Container / seal container" value={[receipt.containerNumber, receipt.containerSealNumber].filter(Boolean).join(' / ')} />
