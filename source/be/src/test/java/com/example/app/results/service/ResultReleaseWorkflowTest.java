@@ -195,7 +195,8 @@ class ResultReleaseWorkflowTest {
         assertThat(publicFiles.getFirst().originalName()).isEqualTo("KQKN-SR092026-777.pdf");
         var stamped = workflow.loadFile(releaseId, publicFiles.getFirst().id());
         String text = pdfText(stamped.resource().getContentAsByteArray());
-        assertThat(text).contains("SR092026-777").contains(published.lookupCode().substring(0, 4));
+        assertThat(text).contains("SR092026-777")
+                .doesNotContain("Mã tra cứu", published.lookupCode(), ReportFileStamper.groups(published.lookupCode()));
         // The uploaded DOCX and unstamped PDF never become public.
         assertThat(published.files().stream().filter(f -> !f.kind().equals("GENERATED_REPORT")))
                 .allSatisfy(f -> assertThat(f.publicDownload()).isFalse());
@@ -316,8 +317,9 @@ class ResultReleaseWorkflowTest {
             String out = System.getProperty("kqkn.pdf.out");
             if (out != null) java.nio.file.Files.write(java.nio.file.Path.of(out), stored);
             String text = pdfText(stored);
-            assertThat(text).contains(published.resultNumber(), published.lookupCode().substring(0, 4), "Auramine O (Phần vỏ)");
-            assertThat(text).doesNotContain("BẢN XEM TRƯỚC");
+            assertThat(text).contains(published.resultNumber(), "Auramine O (Phần vỏ)");
+            assertThat(text).doesNotContain("BẢN XEM TRƯỚC", "Mã tra cứu", published.lookupCode(),
+                    ReportFileStamper.groups(published.lookupCode()));
             assertThat(java.security.MessageDigest.getInstance("SHA-256").digest(stored))
                     .isEqualTo(java.util.HexFormat.of().parseHex(generated.checksum()));
         }

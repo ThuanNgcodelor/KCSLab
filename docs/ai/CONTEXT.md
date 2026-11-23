@@ -1,6 +1,6 @@
 # Ngữ cảnh CFC Lab
 
-Cập nhật 20/11/2026 (chiều). Đọc file này để bắt đầu. Khi cần chi tiết, chọn tài liệu theo tác vụ ở [START_HERE.md](START_HERE.md).
+Cập nhật 23/11/2026. Đọc file này để bắt đầu. Khi cần chi tiết, chọn tài liệu theo tác vụ ở [START_HERE.md](START_HERE.md).
 
 ## Hệ thống đang chạy
 
@@ -16,9 +16,11 @@ Cập nhật 20/11/2026 (chiều). Đọc file này để bắt đầu. Khi cầ
   2. **Tải file KQKN có sẵn** (DOCX/PDF): luồng cũ, vẫn giữ.
 - **Phiếu KQKN tạo từ mẫu Word** `templates/kqkn-dv.docx`, làm từ mẫu của LAB `docs/template/KQKN-SR-CT001-092026.docx`.
   - **PDF = DOCX chuyển bằng LibreOffice.** Bộ vẽ PDF bằng code (OpenPDF `ReportPdfService`) đã bỏ.
-  - QR và mã tra cứu được đóng vào ô "Dán/in mã QR". Image backend có font Microsoft (Times New Roman).
+  - QR được đóng vào ô "Dán/in mã QR". Từ 23/11/2026 không in dòng "Mã tra cứu: …" dưới QR; mã vẫn nằm trong URL của QR và dùng cho tra cứu như trước. Nếu không tạo được QR, vẫn giữ phương án mã chữ dự phòng. Image backend có font Microsoft (Times New Roman).
+  - PDF đã lưu không tự đổi: cần chạy backend bản mới rồi Admin tạo lại PDF của phiếu do hệ thống tạo. Chưa triển khai lại backend hoặc tạo lại PDF trên dữ liệu thật trong lần sửa này.
 - **Số phiếu KQKN = Số/No. của phiếu tiếp nhận.** Bản phát hành lại thêm `/R1`, `/R2`…; mẫu thứ hai cùng Số/No. thêm `-2`. Phiếu không có Số/No. dùng sequence cũ.
 - **Ảnh mẫu** của phiếu tiếp nhận (các loại `*_PHOTO`/`OTHER`, tối đa 12 ảnh) được in ở trang "HÌNH ẢNH MẪU" của DOCX/PDF và hiện trong hồ sơ kết quả. Không lấy scan Phiếu 3 và ảnh bàn giao.
+  - Ảnh được chọn theo toàn bộ phiếu tiếp nhận, chưa lọc riêng từng mẫu. Trang tra cứu không có gallery/timeline toàn quy trình; API public chỉ trả thông tin phiếu, dòng kết quả và file được công khai. Luồng tải KQKN có sẵn giữ nội dung file, không tự bổ sung ảnh tiếp nhận.
 - Admin duyệt: phát hành (cấp số, mã tra cứu, QR) hoặc trả lại kèm lý do. Người duyệt phải khác người lập và người phân tích.
 - Admin có nút **Tạo lại PDF** cho từng phiếu và **tạo lại hàng loạt** ở `/admin/results`: giữ nguyên số và mã tra cứu, dùng khi đổi mẫu hoặc đổi địa chỉ QR.
 
@@ -36,6 +38,7 @@ Cập nhật 20/11/2026 (chiều). Đọc file này để bắt đầu. Khi cầ
   Lệnh `stop` chỉ tắt 2 container này. Xem [run.md](../../run.md).
 - **Windows server:** không dùng Docker. Laragon (MySQL, Redis, Apache phục vụ `dist`), Java 21 chạy `.jar`, LibreOffice cài trên Windows. Script ở `scripts/windows/`. Xem [RUN_WINDOWS_SERVER.md](../../RUN_WINDOWS_SERVER.md).
 - Test backend: `./scripts/run-be-tests-docker.sh` chạy trong image có LibreOffice. Lần chạy 20/11/2026: 107 đạt, 1 bỏ qua.
+  - Kiểm tra phạm vi sửa QR ngày 23/11/2026: `ReportFileStamperTest`, `KqknDocxExporterTest`, `ResultReleaseWorkflowTest`, `PublicResultFlowTest`: 34 đạt, 1 bỏ qua (test tùy chọn PDF thật). Đã giải mã ảnh QR từ PDF thử nghiệm để xác nhận đúng URL và kiểm tra không in mã dưới QR. Không chạy lại toàn bộ suite hoặc nghiệm thu tài khoản thật trong lần này.
 
 ## Điểm còn mở
 

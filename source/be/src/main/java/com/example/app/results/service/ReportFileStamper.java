@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
  * <ul>
  *   <li>{@link #inspect} reads the "Số/ No." printed on page 1 and finds the template's QR placeholder
  *       ("Dấu/ảnh mã QR khi phát hành phiếu").</li>
- *   <li>{@link #stamp} covers that placeholder with the lookup QR (PUBLIC_LOOKUP_URL + ?code=...) and the lookup code.
+ *   <li>{@link #stamp} covers that placeholder with the lookup QR (PUBLIC_LOOKUP_URL + ?code=...), without a code label.
  *       Without a placeholder a separate page is added, so report content is not covered.
  *       Previews get a "BẢN XEM TRƯỚC" watermark.</li>
  * </ul>
@@ -86,7 +86,7 @@ public class ReportFileStamper {
         }
     }
 
-    /** Stamps the QR + lookup code (or, for a preview, a placeholder and a watermark) on a copy of the PDF. */
+    /** Stamps the QR (or, for a preview, a placeholder and a watermark) on a copy of the PDF. */
     public byte[] stamp(byte[] pdf, String lookupCode, boolean preview) {
         Slot slot = inspect(pdf).slot();
         try (PDDocument document = Loader.loadPDF(pdf)) {
@@ -112,15 +112,14 @@ public class ReportFileStamper {
                     content.setLineDashPattern(new float[]{3, 2}, 0);
                     content.addRect(left + 2, bottom + 2, HALF_WIDTH * 2 - 4, HALF_HEIGHT * 2 - 4);
                     content.stroke();
-                    centered(content, regular, 6.5f, "QR + mã tra cứu", slot.centerX(), slot.centerY() + 3);
+                    centered(content, regular, 6.5f, "QR", slot.centerX(), slot.centerY() + 3);
                     centered(content, regular, 6.5f, "in khi phát hành", slot.centerX(), slot.centerY() - 6);
                 } else {
                     float qrSize = HALF_HEIGHT * 2 - 14;
                     BufferedImage qr = qr(lookupCode);
                     if (qr != null) {
                         var image = LosslessFactory.createFromImage(document, qr);
-                        content.drawImage(image, slot.centerX() - qrSize / 2, bottom + 11, qrSize, qrSize);
-                        centered(content, regular, 5.2f, "Mã tra cứu: " + groups(lookupCode), slot.centerX(), bottom + 4);
+                        content.drawImage(image, slot.centerX() - qrSize / 2, slot.centerY() - qrSize / 2, qrSize, qrSize);
                     } else {
                         centered(content, regular, 6.5f, "Mã tra cứu", slot.centerX(), slot.centerY() + 4);
                         centered(content, regular, 6.5f, groups(lookupCode), slot.centerX(), slot.centerY() - 6);

@@ -1,12 +1,19 @@
 package com.example.app.results.service;
 
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.junit.jupiter.api.Test;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +46,7 @@ class ReportFileStamperTest {
     }
 
     @Test
-    void readsTheNumberAndStampsTheLookupCodeOnACopy() throws Exception {
+    void readsTheNumberAndStampsScannableQrWithoutPrintingLookupCode() throws Exception {
         byte[] original = template(false);
         var inspection = stamper.inspect(original);
         assertThat(inspection.documentNumber()).isEqualTo("SR092026-001");
@@ -50,11 +57,25 @@ class ReportFileStamperTest {
         assertThat(stamped).isNotEqualTo(original);
         var reader = new com.lowagie.text.pdf.PdfReader(stamped);
         assertThat(reader.getNumberOfPages()).isEqualTo(2);
-        // The first page is left intact; the lookup code is on a separate page.
+        // The first page is left intact; the QR is on a separate page.
         String text = new com.lowagie.text.pdf.parser.PdfTextExtractor(reader).getTextFromPage(1);
         assertThat(text).contains("SR092026-001");
         String lookupPage = new com.lowagie.text.pdf.parser.PdfTextExtractor(reader).getTextFromPage(2);
-        assertThat(lookupPage).contains("ABCD-EFGH-JKLM-NPQR");
+        assertThat(lookupPage).doesNotContain("Mã tra cứu", "ABCD-EFGH-JKLM-NPQR", "ABCDEFGHJKLMNPQR");
+        reader.close();
+
+        try (var pdf = Loader.loadPDF(stamped)) {
+            var resources = pdf.getPage(1).getResources();
+            BufferedImage qr = null;
+            for (var name : resources.getXObjectNames()) {
+                if (resources.getXObject(name) instanceof PDImageXObject image) qr = image.getImage();
+            }
+            assertThat(qr).isNotNull();
+            int[] pixels = qr.getRGB(0, 0, qr.getWidth(), qr.getHeight(), null, 0, qr.getWidth());
+            var bitmap = new BinaryBitmap(new HybridBinarizer(new RGBLuminanceSource(qr.getWidth(), qr.getHeight(), pixels)));
+            assertThat(new MultiFormatReader().decode(bitmap).getText())
+                    .isEqualTo("http://192.168.1.132:5173/tracuu/?code=ABCDEFGHJKLMNPQR");
+        }
     }
 
     @Test
