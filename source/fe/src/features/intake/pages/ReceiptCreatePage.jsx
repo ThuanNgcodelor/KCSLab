@@ -8,6 +8,8 @@ import { getTestRequest, getTestRequestByNumber, listTestRequests } from '../../
 import { Chevron } from '../../sampling/components/SamplingParts';
 import { splitParameters } from '../../../shared/parameters';
 import { normalizeRequestNumber } from '../../../shared/requestNumber';
+import { CustomerNotificationFields } from '../components/CustomerNotificationFields';
+import { CustomerNotificationHistory } from '../components/CustomerNotificationHistory';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -70,6 +72,7 @@ export function ReceiptCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [form, setForm] = useState(initialForm);
+  const [customerNotification, setCustomerNotification] = useState({ enabled: false, recipientPhone: null, consentAccepted: false });
   const [samples, setSamples] = useState([newSample()]);
   const [files, setFiles] = useState({ form3: [], samples: [], lot: [] });
   const [saving, setSaving] = useState(false);
@@ -140,12 +143,18 @@ export function ReceiptCreatePage() {
       setError(validationMessage);
       return;
     }
+    if (customerNotification.enabled && (!customerNotification.consentAccepted
+      || !/^(?:0|\+?84)[1-9]\d{8,9}$/.test((customerNotification.recipientPhone ?? form.customerPhone).replace(/[\s().-]/g, '')))) {
+      setError('Kiểm tra số điện thoại nhận tin và xác nhận đồng ý nhận thông báo.');
+      return;
+    }
     setSaving(true); setError(''); setUploadWarning('');
     try {
       const primary = samples[0];
       const { temperatureOther, ...formPayload } = form;
       const receipt = await createReceipt({
         ...formPayload,
+        customerNotification: customerNotification.enabled ? { ...customerNotification, recipientPhone: customerNotification.recipientPhone ?? form.customerPhone } : undefined,
         storageCondition: form.storageCondition === 'Khác' && temperatureOther.trim() ? `Khác: ${temperatureOther.trim()}` : form.storageCondition,
         sampledAt: form.sampledAt ? new Date(form.sampledAt).toISOString() : null,
         receivedTemperature: form.receivedTemperature ? Number(form.receivedTemperature) : null,
@@ -197,10 +206,11 @@ export function ReceiptCreatePage() {
         {created.samples?.map((sample) => <strong key={sample.id}>{sample.sampleCode}</strong>)}
       </div>
       <p className="muted">Đã lưu {created.attachments?.length ?? 0} file/ảnh. Mở chi tiết phiếu, dán nhãn và xác nhận trước khi chuyển; KCS sẽ đối chiếu độc lập sau khi nhận.</p>
+      <CustomerNotificationHistory receiptId={created.id} />
       <div className="receipt-success-actions">
         {(created.samples?.length ? created.samples : [null]).map((item, index) => <button key={item?.id ?? 'all'} className="outline-button" onClick={() => downloadReceiptForm3(created.id, item?.id).catch((exception) => setUploadWarning(exception.message))}>{item ? `Xuất Phiếu 3 · Mẫu ${String(index + 1).padStart(2, '0')}` : 'Xuất phiếu tiếp nhận'}</button>)}
         <button className="outline-button" onClick={() => navigate('/admin/intake/receipts')}>Về danh sách</button>
-        <button className="primary-button" onClick={() => { setForm(initialForm); setSamples([newSample()]); setFiles({ form3: [], samples: [], lot: [] }); setCreated(null); }}>Tạo phiếu khác</button>
+        <button className="primary-button" onClick={() => { setForm(initialForm); setCustomerNotification({ enabled: false, recipientPhone: null, consentAccepted: false }); setSamples([newSample()]); setFiles({ form3: [], samples: [], lot: [] }); setCreated(null); }}>Tạo phiếu khác</button>
       </div>
     </div>
   </section>;
@@ -297,6 +307,7 @@ export function ReceiptCreatePage() {
       </div>
 
       <aside className="receipt-form-aside">
+        <CustomerNotificationFields value={customerNotification} defaultPhone={form.customerPhone} onChange={setCustomerNotification} />
         <FormCard number="V" en="Photos & documents" title="Ảnh và hồ sơ" copy="Ảnh được phân loại và ghi nhận người tải lên." className="upload-card">
           <PhotoPicker label="Biên bản tiếp nhận" hint="PDF, DOCX hoặc ảnh chụp phiếu" camera accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*" files={files.form3} onChange={updateFiles('form3')} />
           <PhotoPicker label="Ảnh mẫu" hint="Chụp trực tiếp hoặc chọn nhiều ảnh" files={files.samples} onChange={updateFiles('samples')} />

@@ -89,6 +89,7 @@ public class ReceiptService {
     private final TestRequestRepository testRequestRepository;
     private final FieldSamplingRepository fieldSamplingRepository;
     private final Path storageRoot;
+    private final com.example.app.notification.customer.service.IntakeCustomerNotificationService customerNotifications;
 
     public ReceiptService(ReceiptRepository receiptRepository,
                           ReceiptAttachmentRepository attachmentRepository,
@@ -97,6 +98,7 @@ public class ReceiptService {
                           SampleCodeSequence sampleCodeSequence,
                           StaffNotificationService notificationService,
                           ReceiptForm3Exporter form3Exporter,
+                          com.example.app.notification.customer.service.IntakeCustomerNotificationService customerNotifications,
                           TestRequestRepository testRequestRepository,
                           FieldSamplingRepository fieldSamplingRepository,
                           @Value("${app.storage.root:storage/receipts}") String storageRoot) {
@@ -107,6 +109,7 @@ public class ReceiptService {
         this.sampleCodeSequence = sampleCodeSequence;
         this.notificationService = notificationService;
         this.form3Exporter = form3Exporter;
+        this.customerNotifications = customerNotifications;
         this.testRequestRepository = testRequestRepository;
         this.fieldSamplingRepository = fieldSamplingRepository;
         this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
@@ -160,6 +163,7 @@ public class ReceiptService {
 
     @Transactional
     public ReceiptResponse create(CreateReceiptRequest request, User receivedBy) {
+        customerNotifications.validate(request.customerNotification());
         validateBusinessRules(request);
         String phone = request.customerPhone().trim();
         Customer customer = customerRepository.findByPhone(phone).orElseGet(() -> customerRepository.save(
@@ -241,6 +245,7 @@ public class ReceiptService {
                 "%s đã ghi nhận %d mẫu từ %s".formatted(
                         receivedBy.getDisplayName(), saved.getSamples().size(), saved.getCustomer().getName()),
                 "/admin/intake/" + saved.getId(), "RECEIPT", saved.getId());
+        customerNotifications.record(saved, request, receivedBy);
         return toResponse(saved);
     }
 

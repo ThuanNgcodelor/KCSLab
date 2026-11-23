@@ -14,6 +14,7 @@ Các module backend nằm trong `source/be/src/main/java/com/example/app`. Front
 | Kết quả / phiếu KQKN | `results` (`KqknDocxExporter`, `OfficeConverter`, `ReportFileStamper`, `ResultEntryService`) | `results` | `/admin/results`, `/api/v1/result-releases` |
 | Tra cứu khách | `publicapi` | `source/public/tracuu/` | `/tracuu/`, `/api/v1/public/results` |
 | Thông báo | `notification` | `notifications` | `/admin/notifications`, `/ws/notifications` |
+| Zalo tiếp nhận | `notification/customer` (outbox JDBC, fake/development/LIVE, webhook/status, token và vận hành) | `intake/components/CustomerNotificationFields`, `CustomerNotificationHistory`; `notifications/pages/CustomerNotificationOperationsPage` | `/api/v1/receipts/notification-settings`, `/api/v1/receipts/{id}/notification-deliveries`, `/api/v1/webhooks/zbs`, `/api/v1/admin/customer-notifications`; UI `/admin/customer-notifications` |
 
 Router ở `source/fe/src/app`, thành phần và HTTP client dùng chung ở `source/fe/src/shared`. PWA dùng manifest, service worker và trang mất mạng trong `source/fe/public`.
 

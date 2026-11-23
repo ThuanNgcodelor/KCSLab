@@ -12,5 +12,6 @@
 - Triển khai:
   - **Linux** dùng Docker Compose cho backend + frontend; MySQL/Redis ở ngoài và script chỉ kiểm tra kết nối.
   - **Windows server** không dùng Docker: Laragon + Java + LibreOffice cài trực tiếp.
-- Zalo/SMS là kênh riêng. Thiết kế dự kiến dùng outbox, idempotency và fallback sau lỗi vĩnh viễn của kênh trước. Xem [thiết kế thông báo khách](../INTAKE_NOTIFICATIONS.md).
+- Zalo tiếp nhận dùng outbox/snapshot theo phiếu và consent cùng transaction; gọi mạng ngoài transaction. `ACCEPTED` khác `DELIVERED`; timeout giữ UNKNOWN, không tự POST lại. Webhook lưu bền trước 2xx, polling có giới hạn. Token mã hóa ngoài bảng nghiệp vụ, refresh lease theo App/OA; mất kết quả refresh cần cấp lại quyền. LIVE có adapter và cổng bật riêng, không tái sử dụng queue test. SMS/fallback và thông báo phát hành kết quả chưa triển khai. Xem [runbook](../ZALO_OPERATIONS_RUNBOOK.md).
+- Cookie JWT vẫn cần CSRF cho thao tác ghi; Spring Security resource-server tự miễn cả token lấy từ cookie nên matcher cuối được cấu hình riêng và dùng SPA handler. Explicit Authorization Bearer và route webhook có chữ ký giữ ngoại lệ phù hợp.
 - Dùng [quy chuẩn frontend](../../source/fe/AGENTS.md) cho bố cục responsive. Lịch sử quyết định nằm trong Git.

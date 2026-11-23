@@ -1,6 +1,7 @@
 package com.example.app.intake.dto;
 
 import com.example.app.intake.entity.AcceptanceDecision;
+import com.example.app.notification.customer.dto.CustomerNotificationRequest;
 import com.example.app.intake.entity.SealStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -46,8 +47,49 @@ public record CreateReceiptRequest(
         String specialRequest,
         AcceptanceDecision acceptanceDecision,
         String acceptanceReason,
-        @NotEmpty List<@Valid SampleRequest> samples
+        @NotEmpty List<@Valid SampleRequest> samples,
+        @Valid CustomerNotificationRequest customerNotification
 ) {
+
+    /** Source compatibility for existing callers without customer notifications. */
+    public CreateReceiptRequest(
+            String customerName,
+            String customerPhone,
+            String requestNumber,
+            Long testRequestId,
+            Long fieldSamplingId,
+            String customerEmail,
+            String customerAddress,
+            String sampledBy,
+            Instant sampledAt,
+            String growingArea,
+            String packingFacility,
+            String vehicleNumber,
+            String trailerNumber,
+            String containerNumber,
+            String deliveredBy,
+            Instant receivedAt,
+            String sampleName,
+            String quantity,
+            String packaging,
+            String sealNumber,
+            String containerSealNumber,
+            SealStatus sealStatus,
+            String sampleCondition,
+            String conditionDetail,
+            String transportInfo,
+            Double receivedTemperature,
+            String storageCondition,
+            String storageAfterReceipt,
+            String requestedParameters,
+            LocalDate expectedDate,
+            String specialRequest,
+            AcceptanceDecision acceptanceDecision,
+            String acceptanceReason,
+            List<SampleRequest> samples
+    ) {
+        this(customerName, customerPhone, requestNumber, testRequestId, fieldSamplingId, customerEmail, customerAddress, sampledBy, sampledAt, growingArea, packingFacility, vehicleNumber, trailerNumber, containerNumber, deliveredBy, receivedAt, sampleName, quantity, packaging, sealNumber, containerSealNumber, sealStatus, sampleCondition, conditionDetail, transportInfo, receivedTemperature, storageCondition, storageAfterReceipt, requestedParameters, expectedDate, specialRequest, acceptanceDecision, acceptanceReason, samples, null);
+    }
     /** Keeps source compatibility for callers created before Phiếu 1/Phiếu 2 linkage was added. */
     public CreateReceiptRequest(
             String customerName, String customerPhone, String requestNumber, String customerEmail,

@@ -25,10 +25,31 @@ Cookie access JWT và refresh session phía server dùng cùng origin. Khởi t�
 - Xem trước PDF và `report-docx` đều tạo từ cùng mẫu Word; PDF cần LibreOffice. Khi phát hành, số phiếu = Số/No. của phiếu tiếp nhận. `regenerate-report` và `regenerate-reports` chỉ dành cho Admin, chỉ áp dụng cho phiếu do hệ thống tạo, giữ nguyên số và mã tra cứu.
 - Tra cứu và tải dùng `code`, `phoneLast4`; thêm `fileId` khi tải. Chỉ trả hồ sơ đã phát hành. Có giới hạn truy cập và `Cache-Control: no-store`. Xem [triển khai trang tra cứu](PUBLIC_LOOKUP_SEO.md).
 
-## Thông báo nội bộ
+## Thông báo tiếp nhận cho khách qua Zalo
+
+- `POST /receipts` thêm object tùy chọn `customerNotification: {enabled, recipientPhone, consentAccepted}`. Không có object hoặc tắt thì giữ luồng cũ, không gửi tin.
+- `GET /receipts/notification-settings`: ADMIN/RECEPTIONIST đọc mode, readiness, mã thiếu cấu hình và nội dung đồng ý; không trả token, allowlist hoặc đích nhận đầy đủ.
+- `GET /receipts/{id}/notification-deliveries?page=0&size=20`: ADMIN/RECEPTIONIST đọc lịch sử theo phiếu, số nhận đã mask; phân trang 0-based, size 1–100, sort cố định `createdAt,desc`.
+- `POST /receipts/{id}/notification-deliveries/{deliveryId}/retry`: chỉ ADMIN, body `{reason, requestId}`. Kiểm tra đúng phiếu, giới hạn attempt và trạng thái; trả 202 khi nhận yêu cầu, 409 khi chưa được retry.
+- Settings, lịch sử và retry dùng `Cache-Control: no-store`. Mutation giữ CSRF. Chưa có endpoint webhook công khai trong P0–P2.
+- Mặc định `OFF`; `FAKE` chỉ mô phỏng; `ZALO_DEVELOPMENT` bắt buộc allowlist và giới hạn số lần gọi theo đợt. `ACCEPTED` chưa phải `DELIVERED`. Chi tiết tại [hướng dẫn test](ZALO_INTAKE_TESTING.md).
+
+## API thông báo nội bộ
 
 - `GET /notifications?page=0&size=20&unread=false` hỗ trợ tìm kiếm và lọc. Kết quả có `unreadCount` cho toàn bộ thông báo của người nhận.
 - `PATCH /notifications/{id}` đánh dấu đã đọc và trả bản ghi cập nhật. `POST /notifications/read-all` đánh dấu tất cả của người đang đăng nhập.
 - WebSocket `/ws/notifications` xác thực bằng cookie. Cùng cấu trúc bản ghi như REST. Các trường gồm `id`, `type`, `title`, `message`, `targetUrl`, `entityType`, `entityId`, `createdAt`, `readAt` và `actor`.
 - `actor` có `displayName` và `avatarUrl`. Với tin lịch sử hoặc người thực hiện đã bị xóa, `actor` có thể là null. Tên và ảnh lấy từ hồ sơ hiện tại của người thực hiện.
 - Bản ghi được ghi trong transaction nghiệp vụ. WebSocket gửi sau commit đến các tab của người nhận. REST dùng để đồng bộ khi kết nối lại hoặc mất kênh trực tiếp.
+
+## Đối soát và vận hành Zalo P3/P4
+
+- `POST /webhooks/zbs`: public đúng route/method, không cần cookie/CSRF; bắt buộc chữ ký trên raw JSON, App/OA/header/timestamp hợp lệ, body <=16 KiB. Lưu inbox chống trùng trước 200; tắt/chưa cấu hình 503, chữ ký/scope sai 403, payload sai 400, quá lớn 413. DB lỗi không trả 2xx.
+- `GET /admin/customer-notifications`: ADMIN, tổng hợp mode/pause/count/warnings/expiry; không trả token/secret.
+- `GET /admin/customer-notifications/deliveries?status=&q=&page=0&size=20`: ADMIN, lọc trạng thái/Số/No.; q tối đa 80, size 1–100, số nhận mask, sort `createdAt,desc`.
+- `POST /admin/customer-notifications/pause`: ADMIN, body `{paused, requestId, reason}`, 204; ghi audit và chống lặp requestId, khác nội dung 409.
+- `POST /admin/customer-notifications/token`: ADMIN, body `{accessToken, refreshToken, expiresIn, requestId, reason}`, 204; không trả credentials. Mã hóa cặp token với khóa ngoài DB, 409 nếu cấu hình chưa đủ hoặc đang refresh. Không log body này.
+- API lịch sử theo phiếu bổ sung `deliveredAt`, `deliverySource`, `statusCheckCount`, `lastStatusCheckAt`, `lastStatusCode` trên attempt. HTTP nhận lệnh gửi chỉ là ACCEPTED; DELIVERED có bằng chứng từ callback/status, không phải đã đọc.
+- API có dữ liệu vận hành/token dùng `Cache-Control: no-store`. Request ghi bằng cookie JWT yêu cầu CSRF; SPA gửi `XSRF-TOKEN` cookie và header `X-XSRF-TOKEN`. Explicit Authorization Bearer không yêu cầu CSRF, webhook có chữ ký dùng ngoại lệ riêng.
+
+Xem [runbook Linux/Windows và cấu hình](ZALO_OPERATIONS_RUNBOOK.md).

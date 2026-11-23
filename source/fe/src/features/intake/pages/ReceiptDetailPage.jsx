@@ -5,6 +5,7 @@ import { getReceipt, uploadReceiptFile } from '../api/intakeApi';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import { PageLoader } from '../../../shared/components/Loading';
 import { SampleCodingPanel } from '../components/SampleCodingPanel';
+import { CustomerNotificationHistory } from '../components/CustomerNotificationHistory';
 
 const categoryLabels = {
   FORM_3: 'Phiếu tiếp nhận số 3', LOT_PHOTO: 'Ảnh lô hàng', SAMPLE_PHOTO: 'Ảnh mẫu',
@@ -52,6 +53,7 @@ export function ReceiptDetailPage() {
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <div className="receipt-detail-grid">
       <main className="receipt-form-main">
+        <CustomerNotificationHistory receiptId={id} />
         <section className="panel-card intake-form-card"><DetailHeading number="I" en="Source & chain of custody" title="Nguồn và chuỗi tiếp nhận" />
           <div className="receipt-source-grid">
             <Detail label="Khách hàng" value={`${receipt.customerName} · ${receipt.customerPhone}`} />

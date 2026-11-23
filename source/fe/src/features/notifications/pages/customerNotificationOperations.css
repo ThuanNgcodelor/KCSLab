@@ -1,0 +1,26 @@
+.customer-operations { display: grid; gap: 20px; }
+.customer-operations .admin-heading { margin-bottom: 0; }
+.customer-operations h2 { font-size: 18px; margin: 0 0 12px; }
+.customer-operations-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.customer-operations-summary article { padding: 20px; display: grid; gap: 8px; }
+.customer-operations-summary strong { font-size: 23px; }
+.customer-operations-summary small, .customer-operations-row small { color: var(--text-muted, #64748b); }
+.customer-operations-alerts, .customer-operations-control, .customer-operations-list { padding: 24px; }
+.customer-operations-alerts { border-left: 4px solid #b7791f; }
+.customer-operations-alerts li { margin: 8px 0; }
+.customer-operations-control form, .customer-operations-filters { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.customer-operations label { display: grid; gap: 6px; flex: 1; min-width: 180px; }
+.customer-operations input, .customer-operations select { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #17243a; font: inherit; }
+.customer-operations input:focus-visible, .customer-operations select:focus-visible { outline: 2px solid #2865af; outline-offset: 2px; }
+.customer-operations-row { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 20px; padding: 18px 0; border-bottom: 1px solid #e2e8f0; align-items: center; overflow-wrap: anywhere; }
+.customer-operations-row > div { display: grid; gap: 6px; min-width: 0; }
+.customer-operations-row a { color: #205f9d; font-weight: 600; }
+@media (max-width: 1000px) { .customer-operations-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .customer-operations-summary { gap: 10px; }
+  .customer-operations-summary article { padding: 14px; }
+  .customer-operations-summary strong { font-size: 18px; }
+  .customer-operations-alerts, .customer-operations-control, .customer-operations-list { padding: 16px; }
+  .customer-operations label { min-width: 0; width: 100%; flex-basis: 100%; }
+  .customer-operations-row { grid-template-columns: 1fr; gap: 10px; }
+}

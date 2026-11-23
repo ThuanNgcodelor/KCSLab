@@ -1,10 +1,21 @@
 # Kế hoạch thử gửi Zalo khi tiếp nhận mẫu
 
-**Ngày:** 23/11/2026 · **Trạng thái:** Plan, chưa triển khai tích hợp · **Mốc source đã rà:** `101a904`.
+**Ngày:** 23/11/2026 · **Trạng thái:** P1 đã có runtime/test; P0 còn thiếu dữ liệu tài khoản, P2 có adapter và mock HTTP nhưng chưa gửi Zalo thật.
+
+## Kết quả triển khai P0–P2 ngày 23/11/2026
+
+- P0: đã rà điều kiện test và source; DB/Redis kiểm thử cô lập. Các ảnh sau đó chỉ xác nhận App DEV, chưa có bằng chứng OA/template/token/đích nhận hoặc request gửi thành công. Chưa hoàn tất mapping template thật.
+- P1: migration V20, consent/outbox/attempt, worker claim có lease, fake provider, backoff cho lỗi fake, trạng thái theo phiếu, API/RBAC và UI đã triển khai. Nhiều phiếu cùng khách có sự kiện độc lập; xử lý lặp cùng phiếu không thêm tin.
+- P2: adapter ép `development`, kiểm tra allowlist hai lớp, mapping khai báo server, timeout→UNKNOWN, session/cap bền vững và audit retry đã triển khai/test bằng HTTP giả. Không dùng token thật và không gửi tin Zalo.
+- Mode mặc định OFF; chưa triển khai/restart app vận hành hoặc migrate database thật. Không tạo/mua dịch vụ Zalo.
+- Kiểm tra: toàn suite backend 125 đạt, 1 bỏ qua; sau sửa cuối 20 test notification/provider đạt với JVM giờ Việt Nam. Frontend build đạt; Playwright API giả kiểm tra form/lịch sử/retry và bốn breakpoint, không tràn ngang. Chưa E2E Zalo thật.
+- Hướng dẫn cấu hình và thử từng bước: [ZALO_INTAKE_TESTING.md](../docs/ZALO_INTAKE_TESTING.md).
+
+Các phần sau giữ yêu cầu nghiệm thu của plan; dấu hoàn thành chỉ phản ánh phần đã được kiểm tra.
 
 Mục tiêu trước mắt là tạo phiếu tiếp nhận bằng dữ liệu thử trên CFC Lab và nhận tin Zalo trên **tài khoản của chính người dùng**. Người dùng xác nhận đã thử gửi theo số điện thoại, bằng template của mình. Kết quả thử đó chưa được xem là đã nghiệm thu gửi cho khách thật.
 
-Kế hoạch này cụ thể hóa phần thử nghiệm Zalo trong [thiết kế thông báo khách hàng](../docs/INTAKE_NOTIFICATIONS.md). SMS và gửi kết quả kiểm nghiệm là giai đoạn sau. Lần lập plan chỉ cập nhật tài liệu; không gửi tin, gọi API bằng credential của người dùng, đổi cấu hình Zalo hoặc đọc/ghi `.env`.
+Kế hoạch này cụ thể hóa phần thử nghiệm Zalo trong [thiết kế thông báo khách hàng](../docs/INTAKE_NOTIFICATIONS.md). SMS và gửi kết quả kiểm nghiệm là giai đoạn sau. Code P1/P2 đã được thêm; không gửi tin, gọi API bằng credential của người dùng, đổi cấu hình Zalo hoặc đọc/ghi `.env`.
 
 ## 1. Phạm vi thử nghiệm đã chốt
 
@@ -191,37 +202,39 @@ Kho token dài hạn cần mã hóa hoặc secret store có khả năng cập nh
 - [ ] Nhận template ID, tên biến/kiểu/giới hạn và request test đã bỏ thông tin nhạy cảm.
 - [ ] Xác nhận SĐT của bạn có vai trò quản trị phù hợp; xác nhận mode và App/OA thực dùng.
 - [ ] Chốt mapping: Số/No., thời gian nghiệp vụ `Asia/Ho_Chi_Minh`, số lượng mẫu và lời xác nhận.
-- [ ] Chọn database, tài khoản CFC thử nghiệm và nguồn credential riêng; kiểm tra Git, giữ file người dùng.
+- [x] Kiểm tra Git và dùng DB/Redis, tài khoản CFC giả lập riêng cho test. Credential Zalo thật chưa được cấp.
 
 **Đạt khi:** có bảng mapping đầy đủ và một trường xác định đơn trong template; chưa cần gửi thêm tin để lập plan.
 
 ### P1 — Tạo case test với provider giả
 
-- [ ] Thêm schema, DTO tùy chọn, consent snapshot và service ghi outbox trong transaction tiếp nhận.
-- [ ] Thêm provider interface, fake provider, worker, unique key và lịch sử attempt.
-- [ ] Thêm UI chọn nhận tin, hiển thị số nhận và trạng thái trên kết quả tạo phiếu/chi tiết phiếu.
-- [ ] Hoàn thành test rollback, hai phiếu cùng khách, nhiều mẫu, request lặp và đồng thời.
+- [x] Thêm schema, DTO tùy chọn, consent snapshot và service ghi outbox trong transaction tiếp nhận.
+- [x] Thêm provider interface, fake provider, worker, unique key và lịch sử attempt.
+- [x] Thêm UI chọn nhận tin, hiển thị số nhận và trạng thái trên kết quả tạo phiếu/chi tiết phiếu.
+- [x] Hoàn thành test rollback, hai phiếu cùng khách, nhiều mẫu, request lặp và đồng thời.
 
 **Đạt khi:** có hai phiếu cùng khách → hai sự kiện; cùng một phiếu chạy lặp không thêm tin. Chưa có request gửi đến Zalo thật.
 
 ### P2 — Nối Zalo và thử với tài khoản của bạn
 
-- [ ] Thêm `ZaloTemplateProvider`, validate mapping, timeout, đọc lỗi nghiệp vụ trong JSON.
-- [ ] Mode server có `OFF`, `FAKE`, `ZALO_DEVELOPMENT`; mặc định `OFF`. Khi chọn mode Zalo test, allowlist rỗng làm cấu hình gửi không hợp lệ, không được hiểu là cho phép mọi số.
-- [ ] Kiểm tra allowlist sau chuẩn hóa và ngay trước mỗi lần gửi; adapter bắt buộc mode thử nghiệm. Không tự thay đích nhận của hồ sơ thật thành số test.
+- [x] Thêm `ZaloTemplateProvider`, validate mapping, timeout, đọc lỗi nghiệp vụ trong JSON; test bằng HTTP giả.
+- [x] Mode server có `OFF`, `FAKE`, `ZALO_DEVELOPMENT`; mặc định `OFF`. Khi chọn mode Zalo test, allowlist rỗng làm cấu hình gửi không hợp lệ, không được hiểu là cho phép mọi số.
+- [x] Kiểm tra allowlist sau chuẩn hóa và ngay trước mỗi lần gửi; adapter bắt buộc mode thử nghiệm. Không tự thay đích nhận của hồ sơ thật thành số test.
 - [ ] Bạn cấp token cho backend riêng; bắt đầu bằng một phiếu, sau đó hai phiếu khác Số/No. trên cùng số nhận.
 - [ ] Ghi trạng thái nhận API và đối chiếu tin đến app Zalo; bằng chứng thực tế được đánh dấu kiểm tra thủ công nếu chưa có callback/API trạng thái.
-- [ ] Đề xuất giới hạn 5 lần gọi thật/đợt test, tính cả retry; cần chỉnh con số theo quota/buổi test thực tế.
+- [x] Giới hạn mặc định 5 lần/đợt, bền vững trong DB; cấu hình 1–20. Chưa sử dụng lượt gửi Zalo thật nào.
 
 **Đạt khi:** bạn nhận đúng hai tin của hai phiếu; số khác không phát request. Tắt mode gửi là dừng việc lấy job mới và không tự gửi bù phiếu cũ.
 
 ### P3 — Theo dõi trạng thái tự động trong môi trường test
 
-- [ ] Dùng API trạng thái cho các attempt có `msg_id`, lưu bằng chứng và thời điểm đối soát; không bật polling vô hạn.
+Code và test mock/MySQL đã có ngày 23/11/2026. Callback/polling trên tài khoản thật và HTTPS test chưa nghiệm thu. Xem [runbook](../docs/ZALO_OPERATIONS_RUNBOOK.md).
+
+- [x] Dùng API trạng thái cho các attempt có `msg_id`, lưu bằng chứng và thời điểm đối soát; không bật polling vô hạn.
 - [ ] Nếu cần thử webhook: tạo một URL HTTPS/tunnel test chỉ mở `POST /api/v1/webhooks/zbs`. `localhost`/IP LAN không phải callback công khai.
-- [ ] Xác minh `X-ZEvent-Signature` theo raw body và thuật toán trong tài liệu đúng loại webhook; kiểm tra App/OA, đối chiếu `msg_id`/`tracking_id`, không serialize lại JSON trước khi tính chữ ký. Khóa dùng xác minh webhook phải được đối chiếu riêng, không mặc định giống App Secret.
-- [ ] Lưu và chống trùng sự kiện trước khi trả 2xx; callback trùng không tạo lại tin, callback đến sớm được lưu chờ khớp. Callback muộn không hạ trạng thái đã giao và không làm lùi trạng thái attempt mới.
-- [ ] Rule public và CSRF ngoại lệ chỉ áp dụng route webhook; bảo vệ các API quản trị như trước. Thử cả trường hợp cookie cũ/không có cookie ở webhook.
+- [x] Xác minh `X-ZEvent-Signature` theo raw body và thuật toán trong tài liệu đúng loại webhook; kiểm tra App/OA, đối chiếu `msg_id`/`tracking_id`, không serialize lại JSON trước khi tính chữ ký. Khóa dùng xác minh webhook phải được đối chiếu riêng, không mặc định giống App Secret.
+- [x] Lưu và chống trùng sự kiện trước khi trả 2xx; callback trùng không tạo lại tin, callback đến sớm được lưu chờ khớp. Callback muộn không hạ trạng thái đã giao và không làm lùi trạng thái attempt mới.
+- [x] Rule public và CSRF ngoại lệ chỉ áp dụng route webhook; bảo vệ các API quản trị như trước. Thử cả trường hợp cookie cũ/không có cookie ở webhook.
 
 Sự kiện cần nhận là `user_received_message`; `delivery_time` là thời điểm thiết bị nhận, không phải thời điểm server CFC nhận callback. [Webhook theo SĐT](https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-nguoi-dung-nhan-tin-qua-sdt).
 
@@ -229,10 +242,13 @@ Sự kiện cần nhận là `user_received_message`; `delivery_time` là thời
 
 ### P4 — Chuẩn bị gửi khách thật sau khi test đạt
 
+Phần mã nguồn vận hành đã có; không coi việc mua/cấp quyền, pilot, Windows hoặc gửi thật là đã hoàn thành.
+
 - [ ] LAB chốt điều kiện tài khoản/template, người nhận, nội dung và ngân sách nêu ở mục 4.
-- [ ] Triển khai token refresh bền vững, cảnh báo token/quota, retry theo mã lỗi và đối soát `UNKNOWN`.
-- [ ] Bổ sung màn hình lỗi, audit retry, chính sách lưu dữ liệu và quy trình tạm dừng; ghi runbook Linux/Windows đúng môi trường dùng thật.
-- [ ] Mở mode gửi thật bằng cấu hình/đợt triển khai riêng; không chỉ bỏ allowlist trên adapter test. Dữ liệu/queue test không được phát lại sang production.
+- [x] Triển khai token refresh bền vững, cảnh báo token/quota, retry theo mã lỗi và đối soát `UNKNOWN`.
+- [x] Bổ sung màn hình Admin, audit retry/pause/cấp token, quy trình tạm dừng và runbook Linux/Windows. Chính sách lưu đã có đề xuất, chưa tự xóa; thời hạn cần LAB chốt.
+- [x] Có adapter `ZALO_LIVE` và các điều kiện cấu hình riêng; dữ liệu/queue test không phát lại sang LIVE. Mặc định vẫn OFF/live gate false.
+- [ ] Bật gửi thật trong buổi triển khai riêng sau nghiệm thu; chưa thực hiện.
 - [ ] Pilot nhóm khách được phép, kiểm tra thời gian giao/số tin/chi phí, rồi mới mở rộng.
 - [ ] Khi cần gửi thông báo kết quả: thêm event `RESULT_PUBLISHED` theo hồ sơ/phiên bản, template riêng và link HTTPS tra cứu đã nghiệm thu. SMS dự phòng có provider và kế hoạch riêng.
 

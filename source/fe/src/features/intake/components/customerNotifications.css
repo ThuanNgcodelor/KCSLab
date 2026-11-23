@@ -1,0 +1,11 @@
+.customer-notification-panel { min-width: 0; text-align: left; }
+.customer-notification-panel h2 { margin: 0; font-size: 1rem; }
+.customer-notification-panel p { margin: .6rem 0; }
+.customer-notification-check { display: flex !important; align-items: flex-start; gap: .65rem; margin: .8rem 0; }
+.customer-notification-check input[type="checkbox"] { width: 1rem; height: 1rem; flex: 0 0 1rem; margin-top: .2rem; }
+.customer-notification-check span { min-width: 0; overflow-wrap: anywhere; }
+.customer-notification-heading { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
+.customer-delivery-card { padding: .9rem 0; border-top: 1px solid var(--border, #dce6e1); overflow-wrap: anywhere; }
+.customer-delivery-attempts { padding-left: 1.2rem; font-size: .9rem; }
+.customer-delivery-attempts li { margin: .45rem 0; }
+.customer-delivery-retry { display: grid; gap: .65rem; }

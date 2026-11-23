@@ -29,6 +29,11 @@ export async function downloadReceiptForm3(id, sampleId) {
   URL.revokeObjectURL(url);
 }
 export function createReceipt(data) { return request('/receipts', { method: 'POST', body: JSON.stringify(data) }); }
+export function getCustomerNotificationSettings() { return request('/receipts/notification-settings'); }
+export function getCustomerNotificationDeliveries(id) { return request(`/receipts/${id}/notification-deliveries?page=0&size=20`); }
+export function retryCustomerNotification(id, deliveryId, data) {
+  return request(`/receipts/${id}/notification-deliveries/${deliveryId}/retry`, { method: 'POST', body: JSON.stringify(data) });
+}
 export function uploadReceiptFile(id, file, metadata = {}) {
   const formData = new FormData(); formData.append('file', file);
   const search = new URLSearchParams({ category: metadata.category ?? 'OTHER' });

@@ -25,4 +25,8 @@ File hồ sơ lưu ở thư mục cấu hình của backend. Database giữ bả
 - Không có migration mới cho luồng nhập kết quả: dùng lại `testing_records`, `result_releases`, `result_release_items`. `result_releases.result_number` (unique) giờ lấy Số/No. của phiếu tiếp nhận; ảnh mẫu đọc từ `receipt_attachments`.
 - V19 thêm `staff_notifications.actor_id` có thể null, tham chiếu `users.id` và `ON DELETE SET NULL`. Tin cũ giữ nguyên. Query danh sách tải actor cùng bản ghi để phục vụ avatar qua API.
 
-Thông báo Zalo/SMS và các bảng outbox dành cho khách đang được thiết kế ở [INTAKE_NOTIFICATIONS.md](INTAKE_NOTIFICATIONS.md).
+Thiết kế tổng thể thông báo khách và các phần mở rộng Zalo/SMS nằm ở [INTAKE_NOTIFICATIONS.md](INTAKE_NOTIFICATIONS.md).
+
+V20 bổ sung phần thử nghiệm Zalo: `receipt_notification_consents` giữ đích nhận/đồng ý theo phiếu; `customer_notification_outbox` giữ snapshot và unique sự kiện theo phiếu; `notification_delivery_attempts` giữ từng lần xử lý, tracking/provider ID và audit retry; `customer_notification_test_budgets` giữ cap bền vững theo session. Worker dùng JDBC tham gia transaction tạo phiếu hiện có, không gọi mạng trong transaction đó. Không có token trong các bảng này. Thời điểm metadata mới lưu UTC trong `DATETIME(6)`, đọc UTC rồi hiển thị giờ Việt Nam. Mặc định tắt gửi; xem [hướng dẫn test](ZALO_INTAKE_TESTING.md).
+
+V21 thêm bằng chứng giao/đối soát vào `notification_delivery_attempts`; `zalo_delivery_inbox` chống trùng callback và chờ khớp, chỉ lưu recipient hash; `zalo_managed_tokens` giữ cặp token AES-GCM/expiry/lease theo App/OA (khóa ngoài DB); `customer_notification_controls` giữ pause bền vững; `customer_notification_operation_audit` ghi thao tác pause/resume/cấp token bằng fingerprint, không chứa token. Metadata mới dùng UTC `DATETIME(6)`. Chưa có tự xóa theo retention; xem [runbook](ZALO_OPERATIONS_RUNBOOK.md).

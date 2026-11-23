@@ -2,7 +2,7 @@
 
 Trạng thái hiện tại nằm ở [SYSTEM_STATUS.md](../docs/SYSTEM_STATUS.md). Nội dung bên dưới ghi lại các mốc lập kế hoạch trước đây.
 
-> **Kế hoạch mới 23/11/2026 — Zalo khi tiếp nhận:** [ZALO_INTAKE_TEST_PLAN.md](ZALO_INTAKE_TEST_PLAN.md). Phạm vi hiện tại chỉ tạo case test bằng template của người dùng, gửi theo SĐT đến tài khoản của chính người dùng; fake provider trước, sau đó development mode + allowlist. Một khách có nhiều phiếu thì mỗi phiếu một sự kiện/tin riêng. Chưa triển khai runtime, chưa bật gửi khách thật.
+> **23/11/2026 — Zalo khi tiếp nhận:** [plan](ZALO_INTAKE_TEST_PLAN.md). P1–P2 có outbox/fake/development; P3 có inbox webhook xác minh raw body + polling giới hạn; P4 có token mã hóa/refresh, Admin theo dõi/pause và adapter LIVE với cổng bật riêng. Mặc định OFF, chưa gửi thật, chưa deploy/migrate DB vận hành; OA/template/token và pilot còn chờ. [Runbook](../docs/ZALO_OPERATIONS_RUNBOOK.md).
 
 > **Cập nhật 20/11/2026 (chiều) — đã làm.**
 > - Luồng nhập kết quả KQKN ở `/admin/testing/new`; phiếu Word/PDF từ mẫu LAB (LibreOffice, font Times New Roman); trang ảnh mẫu; số phiếu = Số/No.

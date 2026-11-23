@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,7 +24,8 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import jakarta.servlet.http.HttpServletRequest;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -86,14 +88,24 @@ public class SecurityConfig {
                                             JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/public/**"))
+                        .spa()
+                        // Resource-server defaults exempt every resolved bearer token, including our cookie JWT.
+                        // Apply the final matcher after that default so browser cookies still require CSRF.
+                        .withObjectPostProcessor(new ObjectPostProcessor<CsrfFilter>() {
+                            @Override public <O extends CsrfFilter> O postProcess(O filter) {
+                                filter.setRequireCsrfProtectionMatcher(SecurityConfig::requiresCsrf);
+                                return filter;
+                            }
+                        }))
                 .cors(cors -> { })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/public/results/lookup", "/api/v1/public/results/download").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/webhooks/zbs").permitAll()
+                        .requestMatchers("/api/v1/webhooks/**").denyAll()
+                        .requestMatchers("/api/v1/admin/customer-notifications/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/public/**").denyAll()
                         .requestMatchers("/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                         .requestMatchers("/ws/notifications", "/api/v1/notifications/**").authenticated()
@@ -103,6 +115,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/intake/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/api/v1/intake/dashboard/receptionist").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/test-requests/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/receipts/*/notification-deliveries/*/retry").hasRole("ADMIN")
                         .requestMatchers("/api/v1/receipts/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/samples/**").hasAnyRole("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/v1/receiving/**").hasAnyRole("ADMIN", "TECHNICIAN")
@@ -135,6 +148,16 @@ public class SecurityConfig {
                         .bearerTokenResolver(bearerTokenResolver)
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
+    }
+
+    private static boolean requiresCsrf(HttpServletRequest request) {
+        if (!CsrfFilter.DEFAULT_CSRF_MATCHER.matches(request)) return false;
+        String uri = request.getRequestURI();
+        if (uri.equals("/api/v1/auth/login") || uri.equals("/api/v1/auth/refresh") || uri.startsWith("/api/v1/public/")) return false;
+        if (uri.equals("/api/v1/webhooks/zbs") && request.getMethod().equals("POST")) return false;
+        String authorization = request.getHeader("Authorization");
+        // Explicit bearer headers are not ambient browser credentials; they take precedence over cookies.
+        return authorization == null || !authorization.regionMatches(true, 0, "Bearer ", 0, 7);
     }
 
     private SecretKeySpec secretKey(String secret) {
