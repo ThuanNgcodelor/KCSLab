@@ -70,3 +70,13 @@ Khi tạo tiếp nhận từ Phiếu yêu cầu, UI lấy mã từ Phiếu hiệ
 - API có dữ liệu vận hành/token dùng `Cache-Control: no-store`. Request ghi bằng cookie JWT yêu cầu CSRF; SPA gửi `XSRF-TOKEN` cookie và header `X-XSRF-TOKEN`. Explicit Authorization Bearer không yêu cầu CSRF, webhook có chữ ký dùng ngoại lệ riêng.
 
 Xem [runbook Linux/Windows và cấu hình](ZALO_OPERATIONS_RUNBOOK.md).
+
+## Hồ sơ lưu trữ, export và ổ lưu (ADMIN)
+
+Mọi đường dẫn `/api/v1/admin/**` yêu cầu ADMIN ở cả filter chain và controller.
+
+- `GET /admin/dossiers?year&month&receiptId&q&page&size`, `/admin/dossiers/summary`, `/admin/dossiers/periods`: danh sách, tổng theo bộ lọc, cây năm/tháng. Tháng theo `receivedAt` giờ Việt Nam; `month` cần `year`.
+- `GET /admin/dossiers/{id}?page`: thông tin và file của hồ sơ, không trả đường dẫn máy chủ. `GET /admin/dossiers/{id}/files/{RECEIPT|RESULT}/{fileId}` tải file, có audit; `?preview=true` với ảnh không ghi audit.
+- `POST /admin/dossier-exports` `{year, month, receiptId, q, allowMissing, requestId}` trả 202. Lặp cùng `requestId` trả lại cùng job, khác nội dung 409, quá hạn mức 429. `GET /admin/dossier-exports[/{id}]`, `POST /{id}/cancel`, `GET /{id}/parts/{n}` (hỗ trợ `Range`, hết hạn 404/410).
+- `GET/POST /admin/storage-locations`, `POST /admin/storage-locations/{id}/validate`, `PUT /admin/storage-write-target` `{locationId, version}` (phiên bản cũ 409). Chỉ đăng ký được thư mục có sẵn trong `STORAGE_ALLOWED_ROOTS`.
+- Upload trả 507 khi thiếu dung lượng, 503 khi ổ nhận upload chưa sẵn sàng. Đọc file trả 503 khi ổ mất kết nối, 404 khi ổ còn mà file không còn.

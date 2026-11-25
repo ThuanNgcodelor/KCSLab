@@ -1,6 +1,29 @@
 # Quản lý hồ sơ 10 năm và export theo năm/tháng/Số CFC
 
-Ngày lập: 25/11/2026. **Trạng thái: đề xuất, chưa triển khai upload mới, di chuyển file hoặc trang quản lý hồ sơ.** Phần khóa thông báo đã làm/kiểm thử và chạy V23 trước khi lập plan này, đúng thứ tự người dùng yêu cầu.
+Ngày lập: 25/11/2026. **Trạng thái 25/11/2026: A1, A2, A3.1, A3.2 đã có code và kiểm thử trên môi trường cô lập; chưa commit, chưa triển khai, DB vận hành chưa chạy V24/V25.** A0 (quét dữ liệu thật), A4 (di chuyển file cũ) và A5 (chọn folder trực tiếp) chưa làm. Phần khóa thông báo đã chạy V23 trước khi lập plan này.
+
+## 0. Kết quả triển khai
+
+| Bước | Trạng thái | Ghi chú |
+|---|---|---|
+| A0 | Chưa chạy trên dữ liệu thật | Trang Admin có tổng hồ sơ/file/byte theo năm, tháng và theo ổ. Xuất với “Cho phép thiếu file” ghi từng file `THIEU_FILE`, `KHAC_CHECKSUM`, `DOC_DO_DANG` trong danh mục gói |
+| A1 | Đã code, đã thử | `/admin/dossiers`: cây năm/tháng, tìm Số/No., chi tiết file, xem ảnh, tải file |
+| A2 | Đã code, đã thử | Hàng đợi MySQL, lease 5 phút, 1 job/lúc trên luồng riêng, ZIP chia phần, hủy, tải range, hết hạn 7 ngày, audit |
+| A3.1 | Đã code, đã thử Linux/Docker | Vị trí từng file, đổi đích upload không cần restart, cảnh báo dung lượng |
+| A3.2 | Đã code, đã thử Linux/Docker | File mới trên ổ đã đăng ký nằm ở `năm/tháng/CFC/(intake, handover, results)`. Khi chưa chọn ổ, upload vẫn vào hai thư mục cũ |
+| A4, A5 | Chưa làm | A4 cần backup và buổi bảo trì; A5 cần HTTPS |
+
+Khác với đề xuất ban đầu:
+
+- Ổ được nhận diện bằng file `.cfc-storage-id`. Tên thiết bị đổi (ví dụ sda → sdb sau reboot) vẫn cho đọc, chỉ chặn upload đến khi Admin bấm “Kiểm tra đọc/ghi”.
+- Dữ liệu có cấu trúc nằm ở `05-du-lieu/`. Mỗi hồ sơ có `danh-muc-file.csv`; mỗi gói có `danh-muc-goi-N.csv` tên riêng để giải nén chung thư mục không ghi đè.
+- Mã tra cứu khách (`lookup_code`) và đường dẫn máy chủ bị loại khỏi JSON/CSV xuất. QR trong file PDF đã phát hành vẫn chứa mã như cũ.
+- Tạo lại PDF khi ổ chứa ảnh mất kết nối sẽ báo lỗi 503 thay vì âm thầm ra phiếu thiếu ảnh. Ảnh đã mất hẳn vẫn bỏ qua như trước.
+- Giới hạn 10 lượt chờ toàn hệ thống và 5 lượt mỗi Admin; job làm sập tiến trình 3 lần thì dừng.
+
+Kiểm thử ngày 25/11/2026: toàn suite backend 174 ca, 0 lỗi, 1 bỏ qua (MySQL/Redis cô lập); `npm run build` đạt; Chrome thật với backend/DB tạm ở 390/1024/1440/2560 px không tràn ngang, gồm đổi ổ, gỡ ổ, xuất chặt và xuất có cảnh báo; nâng V23 → V25 trên schema có dữ liệu đạt; xuất 2,4 GB với heap 256 MB và tắt backend giữa chừng hoàn tất, hai ZIP đọc được.
+
+Chưa kiểm thử: Windows, NAS thật, HTTPS, đầy đĩa thật (mới giả lập ngưỡng), tài khoản và dữ liệu thật. V24/V25 chỉ nâng lên, muốn lùi phải phục hồi backup.
 
 ## 1. Yêu cầu và hiện trạng đã xác minh
 

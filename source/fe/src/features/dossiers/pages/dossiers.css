@@ -1,0 +1,65 @@
+.dossier-page { color: var(--workspace-ink, #173d30); }
+.dossier-page .form-error { color: #a3271c; font-size: 14px; }
+.dossier-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--workspace-border, #d7e5dc); margin: 20px 0; flex-wrap: wrap; }
+.dossier-tabs button { border: 0; background: transparent; color: #52695d; font: inherit; padding: 13px 18px; cursor: pointer; border-bottom: 3px solid transparent; }
+.dossier-tabs button.current { color: #176747; border-bottom-color: #176747; font-weight: 700; }
+.dossier-page .panel-card { padding: clamp(18px, 2vw, 28px); min-width: 0; }
+.dossier-filters { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+.dossier-page label { display: grid; gap: 7px; font-size: 14px; font-weight: 600; }
+.dossier-page input, .dossier-page select { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid #bfd0c5; border-radius: 8px; background: white; color: #173d30; font: inherit; min-height: 44px; }
+.dossier-filters label { flex: 1 1 110px; }
+.dossier-filters .dossier-search { flex: 3 1 220px; }
+.dossier-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 18px 0; }
+.dossier-toolbar p { margin: 0; }
+.dossier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.dossier-card { display: flex; flex-direction: column; gap: 12px; }
+.dossier-card.selected { border-color: #27865c; box-shadow: 0 0 0 1px #27865c; }
+.dossier-card :is(h2, p), .dossier-export h2 { margin: 0; overflow-wrap: anywhere; }
+.dossier-page h2 { font-size: clamp(18px, 1.5vw, 23px); }
+.dossier-card > .outline-button { align-self: start; margin-top: auto; }
+.dossier-card small, .dossier-muted { color: #566d61; overflow-wrap: anywhere; }
+.dossier-pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 22px 0; }
+.dossier-detail, .dossier-register { margin-top: 24px; }
+.dossier-path { font-family: ui-monospace, monospace; overflow-wrap: anywhere; font-size: 13px; color: #52695d; }
+.dossier-file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 14px; }
+.dossier-file { border: 1px solid #d9e6df; border-radius: 9px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
+.dossier-file img { width: 100%; height: 150px; object-fit: contain; background: #f1f6f3; border-radius: 6px; }
+.dossier-badge { display: inline-block; align-self: start; color: #246a47; background: #eaf5ee; border-radius: 6px; padding: 5px 9px; font-size: 12px; font-weight: 700; }
+.dossier-badge.warning { color: #8b4c13; background: #fff1dd; }
+.dossier-storage-intro { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+.dossier-storage-intro > div { flex: 1 1 260px; }
+.dossier-storage-intro p { max-width: 75ch; line-height: 1.7; }
+.dossier-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+.dossier-register-fields { display: grid; grid-template-columns: 1fr 2fr auto; gap: 16px; align-items: end; }
+.dossier-page :is(meter, progress) { width: 100%; height: 12px; accent-color: #27865c; }
+.dossier-notice { padding: 14px; background: #edf7ef; border: 1px solid #c3ddcb; border-radius: 8px; }
+.dossier-export-list { display: grid; gap: 14px; }
+.dossier-export { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.dossier-export > div:first-child { flex: 1 1 270px; min-width: 0; }
+.dossier-export h2 { margin-top: 12px; }
+.dossier-export p { line-height: 1.7; overflow-wrap: anywhere; }
+.dossier-empty { padding-block: 45px !important; text-align: center; color: #566d61; }
+.dossier-parts { display: flex; flex-wrap: wrap; gap: 12px; flex: 1 1 100%; margin: 0; padding: 0; list-style: none; }
+.dossier-page :is(.primary-button, .outline-button) { min-height: 44px; padding-inline: 18px; font-size: 14px; border-radius: 9px; }
+.dossier-page :is(.primary-button, .outline-button):disabled { opacity: .6; cursor: not-allowed; }
+.dossier-tree { display: grid; gap: 16px; }
+.dossier-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.dossier-chips button { min-height: 44px; padding: 0 14px; border: 1px solid #bfd0c5; border-radius: 9px; background: #fff; color: #245640; font: inherit; font-size: 14px; cursor: pointer; }
+.dossier-chips button[aria-pressed="true"] { background: #176747; border-color: #176747; color: #fff; font-weight: 700; }
+.dossier-chips span { margin-left: 8px; opacity: .8; font-size: 13px; }
+.dossier-page :is(button, summary, input):focus-visible { outline: 3px solid #27865c; outline-offset: 2px; }
+.dossier-export-panel { margin-top: 18px; border-color: #27865c; }
+.dossier-export-panel p { line-height: 1.6; max-width: 80ch; }
+.dossier-estimate { font-size: 16px; }
+.dossier-page .dossier-check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 14px 0 18px; max-width: 80ch; line-height: 1.5; }
+.dossier-page .dossier-check input { width: 20px; min-height: 20px; height: 20px; flex: none; margin: 1px 0 0; }
+.dossier-link { display: inline-flex; align-items: center; min-height: 44px; color: #176747; font-weight: 600; }
+.dossier-file details { font-size: 13px; color: #52695d; }
+.dossier-file summary { cursor: pointer; padding-block: 4px; }
+.dossier-file code { overflow-wrap: anywhere; }
+.dossier-file .outline-button { margin-top: auto; align-self: start; }
+.dossier-areas { margin-top: 24px; }
+.dossier-alert { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 14px 18px; margin-bottom: 16px; border: 1px solid #ecc993; border-radius: 9px; background: #fff6e8; color: #74400f; }
+@media (max-width: 1080px) { .dossier-register-fields { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .dossier-tabs button { padding: 12px 10px; } .dossier-toolbar { align-items: stretch; } .dossier-toolbar > button { width: 100%; } .dossier-filters label { flex-basis: 100%; } .dossier-filters button, .dossier-actions button { width: 100%; } }
+@media (min-width: 2200px) { .dossier-page label, .dossier-path { font-size: 15px; } .dossier-badge { font-size: 14px; } }

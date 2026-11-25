@@ -13,6 +13,7 @@ Các module backend nằm trong `source/be/src/main/java/com/example/app`. Front
 | Biên bản thử nghiệm | `testing` | `testing` (form nhập kết quả: `components/ResultEntryForm.jsx`) | `/admin/testing` |
 | Kết quả / phiếu KQKN | `results` (`KqknDocxExporter`, `OfficeConverter`, `ReportFileStamper`, `ResultEntryService`) | `results` | `/admin/results`, `/api/v1/result-releases` |
 | Tra cứu khách | `publicapi` | `source/public/tracuu/` | `/tracuu/`, `/api/v1/public/results` |
+| Hồ sơ lưu trữ / export / ổ lưu | `dossier` (`storage`, `service`, `controller`) | `dossiers` | `/admin/dossiers`, `/api/v1/admin/dossiers`, `/dossier-exports`, `/storage-locations` |
 | Thông báo | `notification` | `notifications` | `/admin/notifications`, `/ws/notifications` |
 | Zalo tiếp nhận | `notification/customer` (outbox JDBC, fake/development/LIVE, webhook/status, token và vận hành) | `intake/components/CustomerNotificationFields`, `CustomerNotificationHistory`; `notifications/pages/CustomerNotificationOperationsPage` | `/api/v1/receipts/notification-settings`, `/api/v1/receipts/{id}/notification-deliveries`, `/api/v1/webhooks/zbs`, `/api/v1/admin/customer-notifications`; UI `/admin/customer-notifications` |
 

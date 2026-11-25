@@ -25,6 +25,12 @@ public class ResultReleaseFile {
     private Instant removedAt;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "removed_by_user_id") private User removedBy;
 
+    @Column(nullable = false) private long storageLocationId = 2;
+    @Column(length = 1024) private String relativePath;
+    public void locate(long locationId, String relativePath) { this.storageLocationId = locationId; this.relativePath = relativePath; }
+    public long getStorageLocationId() { return storageLocationId; }
+    public String getRelativePath() { return relativePath; }
+
     protected ResultReleaseFile() {}
     public ResultReleaseFile(ResultRelease release, String originalName, String contentType, String extension,
                              String storageName, long size, String checksum, User uploadedBy) {

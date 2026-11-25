@@ -31,17 +31,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -67,12 +62,11 @@ public class ResultReleaseService {
     private final ResultNumberSequence numbers;
     private final String defaultQualityHead;
     private final String defaultDirector;
-    private final Path storageRoot;
+    private final com.example.app.dossier.storage.DossierStorageService storage;
     private final com.example.app.transfer.repository.SampleTransferItemRepository transferItems;
     private final KqknDocxExporter docx;
     private final OfficeConverter converter;
     private final com.example.app.intake.repository.ReceiptAttachmentRepository attachments;
-    private final Path receiptStorage;
     private final SecureRandom random = new SecureRandom();
 
     public ResultReleaseService(ResultReleaseRepository releases, ResultReleaseFileRepository files,
@@ -81,17 +75,15 @@ public class ResultReleaseService {
                                 ReportFileStamper stamper, ResultNumberSequence numbers,
                                 @Value("${app.report.quality-head-name:}") String defaultQualityHead,
                                 @Value("${app.report.director-name:}") String defaultDirector,
-                                @Value("${app.storage.results-root:storage/results}") String storageRoot,
                                 com.example.app.transfer.repository.SampleTransferItemRepository transferItems,
                                 KqknDocxExporter docx, OfficeConverter converter,
                                 com.example.app.intake.repository.ReceiptAttachmentRepository attachments,
-                                @Value("${app.storage.root:storage/receipts}") String receiptStorage) {
+                                com.example.app.dossier.storage.DossierStorageService storage) {
         this.transferItems = transferItems; this.docx = docx; this.converter = converter; this.attachments = attachments;
-        this.receiptStorage = Paths.get(receiptStorage).toAbsolutePath().normalize();
         this.releases = releases; this.files = files; this.events = events;
         this.items = items; this.stamper = stamper; this.numbers = numbers;
         this.defaultQualityHead = defaultQualityHead; this.defaultDirector = defaultDirector;
-        this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
+        this.storage = storage;
     }
 
     private static final java.util.Map<String, String> SORT_FIELDS = java.util.Map.of(
@@ -173,7 +165,6 @@ public class ResultReleaseService {
         List<Path> written = new ArrayList<>();
         registerCleanupOnRollback(written);
         try {
-            Files.createDirectories(storageRoot);
             for (ResultFilePolicy.Validated item : validated) {
                 ResultReleaseFile saved = store(release, item.originalName(), item.contentType(), item.extension(),
                         item.content(), actor, written);
@@ -191,14 +182,16 @@ public class ResultReleaseService {
     /** Writes bytes under a random name and registers the file row; the file is removed again if the transaction fails. */
     private ResultReleaseFile store(ResultRelease release, String originalName, String contentType, String extension,
                                     byte[] content, User actor, List<Path> written) throws IOException {
-        Files.createDirectories(storageRoot);
         String storageName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
-        Path destination = storageRoot.resolve(storageName).normalize();
-        if (!destination.startsWith(storageRoot)) throw new IOException("Invalid storage path");
-        Files.write(destination, content, StandardOpenOption.CREATE_NEW);
-        written.add(destination);
-        return files.save(new ResultReleaseFile(release, originalName, contentType, extension, storageName,
-                content.length, sha256(content), actor));
+        var record = release.getTestingRecord();
+        var receipt = record.getTransferItem().getTransfer().getReceipt();
+        var stored = storage.write(2, receipt.getId(), "results/" + record.getTransferItem().getSample().getId() + "/" + release.getId(),
+                storageName, new java.io.ByteArrayInputStream(content), content.length);
+        written.add(stored.path());
+        ResultReleaseFile file = new ResultReleaseFile(release, originalName, contentType, extension, storageName,
+                stored.size(), stored.checksum(), actor);
+        file.locate(stored.locationId(), stored.relativePath());
+        return files.save(file);
     }
 
     /** A KQKN report delivered as a file, already validated and converted to PDF outside the transaction. */
@@ -270,9 +263,8 @@ public class ResultReleaseService {
     }
 
     private byte[] read(ResultReleaseFile file) {
-        Path path = storageRoot.resolve(file.getStorageName()).normalize();
+        Path path = storage.read(file.getStorageLocationId(), file.getRelativePath(), file.getStorageName());
         try {
-            if (!path.startsWith(storageRoot)) throw new IOException("Invalid storage path");
             return Files.readAllBytes(path);
         } catch (IOException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không đọc được file phiếu kết quả đã lưu", exception);
@@ -378,9 +370,8 @@ public class ResultReleaseService {
     private List<ReportData.Photo> loadPhotos(List<com.example.app.intake.entity.ReceiptAttachment> files) {
         List<ReportData.Photo> photos = new ArrayList<>();
         for (var file : files) {
-            Path path = receiptStorage.resolve(file.getStorageName()).normalize();
-            if (!path.startsWith(receiptStorage) || !Files.isRegularFile(path)) continue;
             try {
+                Path path = storage.read(file.getStorageLocationId(), file.getRelativePath(), file.getStorageName());
                 java.awt.image.BufferedImage source = javax.imageio.ImageIO.read(path.toFile());
                 if (source == null) continue;
                 double scale = Math.min(1.0, 1600.0 / Math.max(source.getWidth(), source.getHeight()));
@@ -396,6 +387,9 @@ public class ResultReleaseService {
                 var out = new java.io.ByteArrayOutputStream();
                 javax.imageio.ImageIO.write(image, "jpeg", out);
                 photos.add(new ReportData.Photo(caption(file), out.toByteArray(), width, height));
+            } catch (ResponseStatusException exception) {
+                // Offline disk (503): never issue a report that silently lost its photos. A missing file is skipped as before.
+                if (exception.getStatusCode().value() == 503) throw exception;
             } catch (IOException | RuntimeException exception) {
                 // A broken image must not block the report; the photo stays visible in the intake record.
             }
@@ -410,8 +404,8 @@ public class ResultReleaseService {
         var file = samplePhotos(release.getTestingRecord().getTransferItem().getTransfer().getReceipt().getId()).stream()
                 .filter(candidate -> candidate.getId().equals(attachmentId)).findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy ảnh mẫu"));
-        Path path = receiptStorage.resolve(file.getStorageName()).normalize();
-        if (!path.startsWith(receiptStorage) || !Files.isRegularFile(path)) {
+        Path path = storage.read(file.getStorageLocationId(), file.getRelativePath(), file.getStorageName());
+        if (!Files.isRegularFile(path)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File ảnh không còn trên máy chủ");
         }
         return new StoredFile(new FileSystemResource(path), file.getContentType(), file.getOriginalName(), file.getSize());
@@ -543,8 +537,8 @@ public class ResultReleaseService {
     }
 
     public StoredFile open(ResultReleaseFile file) {
-        Path path = storageRoot.resolve(file.getStorageName()).normalize();
-        if (!path.startsWith(storageRoot) || !Files.isRegularFile(path)) {
+        Path path = storage.read(file.getStorageLocationId(), file.getRelativePath(), file.getStorageName());
+        if (!Files.isRegularFile(path)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File không còn trên vùng lưu trữ");
         }
         return new StoredFile(new FileSystemResource(path), file.getContentType(), file.getOriginalName(), file.getSize());
@@ -816,13 +810,5 @@ public class ResultReleaseService {
                 }
             }
         });
-    }
-
-    private static String sha256(byte[] content) {
-        try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
-        } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException(exception);
-        }
     }
 }

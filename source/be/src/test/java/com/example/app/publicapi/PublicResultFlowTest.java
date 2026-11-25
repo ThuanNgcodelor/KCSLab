@@ -70,6 +70,10 @@ class PublicResultFlowTest {
     @Autowired private CustomerRepository customers;
     @Autowired private ReceiptRepository receipts;
     @Autowired private JdbcTemplate jdbc;
+    @Autowired private com.example.app.dossier.service.DossierExportJobs exportJobs;
+    @Autowired private com.example.app.dossier.service.DossierCatalog dossierCatalog;
+    @Autowired private com.example.app.dossier.storage.DossierStorageService dossierStorage;
+    @org.junit.jupiter.api.io.TempDir java.nio.file.Path exportRoot;
 
     @Autowired private org.springframework.transaction.PlatformTransactionManager txManager;
     private MockMvc mvc;
@@ -142,6 +146,31 @@ class PublicResultFlowTest {
     private org.springframework.test.web.servlet.ResultActions lookup(String code, String last4) throws Exception {
         return mvc.perform(post("/api/v1/public/results/lookup").contentType("application/json").content(body(code, last4))
                 .with(request -> { request.setRemoteAddr(clientAddress); return request; }));
+    }
+
+    @Test
+    void dossierExportContainsThePublishedReportButNeverTheCustomerLookupCode() throws Exception {
+        publish();
+        Long receiptId = jdbc.queryForObject("SELECT id FROM receipts WHERE receipt_code='TN-PUB-001'", Long.class);
+        String jobId = exportJobs.create(new com.example.app.dossier.service.DossierCatalog.Scope(null, null, receiptId, null),
+                java.util.UUID.randomUUID().toString(), admin.getId()).get("id").toString();
+        new com.example.app.dossier.service.DossierExportWorker(exportJobs, dossierCatalog, dossierStorage, exportRoot.toString(),
+                true, 100000000, 5000, 0, 100000000).runNext();
+        assertThat(exportJobs.detail(jobId)).containsEntry("status", "COMPLETED");
+        java.util.Map<String, byte[]> entries = new java.util.HashMap<>();
+        for (var part : jdbc.queryForList("SELECT relative_path FROM dossier_export_parts WHERE job_id=?", jobId)) {
+            try (var zip = new java.util.zip.ZipFile(exportRoot.resolve(part.get("relative_path").toString()).toFile())) {
+                for (var e : java.util.Collections.list(zip.entries())) entries.put(e.getName(), zip.getInputStream(e).readAllBytes());
+            }
+        }
+        assertThat(entries.keySet()).anyMatch(k -> k.contains("/05-du-lieu/result_releases/"));
+        assertThat(entries.keySet()).anyMatch(k -> k.contains("/03-ket-qua/mau-") && k.endsWith(".pdf"));
+        entries.forEach((name, content) -> {
+            if (!name.endsWith(".json") && !name.endsWith(".csv")) return;
+            assertThat(new String(content, java.nio.charset.StandardCharsets.UTF_8)).as(name).doesNotContain(code);
+        });
+        // The export is internal: what customers can see does not change.
+        lookup(code, "5678").andExpect(status().isOk()).andExpect(jsonPath("$.files.length()").value(1));
     }
 
     @Test

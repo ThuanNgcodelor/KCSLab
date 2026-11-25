@@ -31,5 +31,5 @@ docker run --rm --network "$NET" -v "$ROOT/source/be":/app -v "$HOME/.m2":/root/
   -e KCS_ISOLATED_DB=true \
   -e DB_URL='jdbc:mysql://'"$DB"':3306/cfc_lab_test?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true' \
   -e DB_USERNAME=cfc_test -e DB_PASSWORD=testpw -e REDIS_HOST="$RD" \
-  -e REPORT_OFFICE_COMMAND=soffice \
+  -e REPORT_OFFICE_COMMAND=soffice -e DOSSIER_EXPORT_WORKER_ENABLED=false \
   "$IMAGE" mvn -B test "$@"

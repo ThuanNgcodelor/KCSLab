@@ -27,7 +27,6 @@ import com.example.app.sampling.repository.FieldSamplingRepository;
 import com.example.app.sampling.repository.TestRequestRepository;
 import com.example.app.user.entity.Role;
 import com.example.app.user.entity.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -40,17 +39,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,7 +81,7 @@ public class ReceiptService {
     private final ReceiptForm3Exporter form3Exporter;
     private final TestRequestRepository testRequestRepository;
     private final FieldSamplingRepository fieldSamplingRepository;
-    private final Path storageRoot;
+    private final com.example.app.dossier.storage.DossierStorageService storage;
     private final com.example.app.notification.customer.service.IntakeCustomerNotificationService customerNotifications;
 
     public ReceiptService(ReceiptRepository receiptRepository,
@@ -101,7 +94,7 @@ public class ReceiptService {
                           com.example.app.notification.customer.service.IntakeCustomerNotificationService customerNotifications,
                           TestRequestRepository testRequestRepository,
                           FieldSamplingRepository fieldSamplingRepository,
-                          @Value("${app.storage.root:storage/receipts}") String storageRoot) {
+                          com.example.app.dossier.storage.DossierStorageService storage) {
         this.receiptRepository = receiptRepository;
         this.attachmentRepository = attachmentRepository;
         this.customerRepository = customerRepository;
@@ -112,7 +105,7 @@ public class ReceiptService {
         this.customerNotifications = customerNotifications;
         this.testRequestRepository = testRequestRepository;
         this.fieldSamplingRepository = fieldSamplingRepository;
-        this.storageRoot = Paths.get(storageRoot).toAbsolutePath().normalize();
+        this.storage = storage;
     }
 
     @Transactional(readOnly = true)
@@ -262,22 +255,21 @@ public class ReceiptService {
         }
 
         String contentType = file.getContentType().toLowerCase(Locale.ROOT);
-        String storageName = UUID.randomUUID() + "-" + original;
-        Path destination = storageRoot.resolve(storageName).normalize();
+        String storageName = UUID.randomUUID() + "." + storageExtension(original);
         try {
-            Files.createDirectories(storageRoot);
-            if (!destination.startsWith(storageRoot)) throw new IOException("Invalid storage path");
-            Files.copy(file.getInputStream(), destination);
+            var stored = storage.write(1, receiptId,
+                    category == ReceiptAttachmentCategory.TRANSFER_EVIDENCE ? "handover" : "intake",
+                    storageName, file.getInputStream(), file.getSize());
             ReceiptAttachment attachment = new ReceiptAttachment(
                     category == null ? ReceiptAttachmentCategory.OTHER : category,
-                    blankToNull(description), original, contentType, storageName, file.getSize(),
-                    sha256(destination), capturedAt, uploadedBy);
+                    blankToNull(description), original, contentType, storageName, stored.size(),
+                    stored.checksum(), capturedAt, uploadedBy);
+            attachment.locate(stored.locationId(), stored.relativePath());
             receipt.addAttachment(attachment);
             attachmentRepository.saveAndFlush(attachment);
             return toAttachmentResponse(attachment);
         } catch (IOException exception) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Không thể lưu file hồ sơ", exception);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không đọc được file tải lên", exception);
         }
     }
 
@@ -286,11 +278,7 @@ public class ReceiptService {
         ReceiptAttachment attachment = attachmentRepository.findByIdAndReceipt_Id(attachmentId, receiptId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Không tìm thấy file hồ sơ"));
-        Path path = storageRoot.resolve(attachment.getStorageName()).normalize();
-        if (!path.startsWith(storageRoot) || !Files.isRegularFile(path)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "File hồ sơ không còn trên vùng lưu trữ");
-        }
+        Path path = storage.read(attachment.getStorageLocationId(), attachment.getRelativePath(), attachment.getStorageName());
         return new ReceiptAttachmentContent(new FileSystemResource(path), attachment.getContentType(),
                 attachment.getOriginalName());
     }
@@ -353,16 +341,10 @@ public class ReceiptService {
 
     private record ReceiptSort(String property, Sort.Direction direction, String canonical) {}
 
-    private String sha256(Path file) throws IOException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (DigestInputStream input = new DigestInputStream(Files.newInputStream(file), digest)) {
-                input.transferTo(OutputStream.nullOutputStream());
-            }
-            return HexFormat.of().formatHex(digest.digest());
-        } catch (Exception exception) {
-            throw new IOException("Không thể tạo checksum", exception);
-        }
+    private static String storageExtension(String original) {
+        String extension = original.contains(".")
+                ? original.substring(original.lastIndexOf('.') + 1).replaceAll("[^a-zA-Z0-9]", "") : "";
+        return extension.isEmpty() || extension.length() > 10 ? "bin" : extension.toLowerCase(Locale.ROOT);
     }
 
     private ReceiptResponse toResponse(Receipt receipt) {

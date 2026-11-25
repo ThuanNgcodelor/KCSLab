@@ -30,6 +30,12 @@ public class ReceiptAttachment {
     private Instant capturedAt;
     @Column(nullable = false) private Instant uploadedAt;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "uploaded_by_user_id") private User uploadedBy;
+    @Column(nullable = false) private long storageLocationId = 1;
+    @Column(length = 1024) private String relativePath;
+    public void locate(long locationId, String relativePath) { this.storageLocationId = locationId; this.relativePath = relativePath; }
+    public long getStorageLocationId() { return storageLocationId; }
+    public String getRelativePath() { return relativePath; }
+
     protected ReceiptAttachment() {}
     public ReceiptAttachment(ReceiptAttachmentCategory category, String description, String originalName,
                              String contentType, String storageName, long size, String checksum,

@@ -3,6 +3,7 @@
 | Thao tác | Admin | Tiếp nhận | KCS |
 |---|---|---|---|
 | Quản lý tài khoản và danh mục phương pháp thử | Có | — | — |
+| Hồ sơ lưu trữ: duyệt, xuất ZIP, đổi nơi lưu upload | Có | — | — |
 | Tự sửa hồ sơ, avatar, mật khẩu | Có | Có | Có |
 | Lập yêu cầu, kế hoạch lấy mẫu, lấy mẫu hiện trường | Có | Có | — |
 | Tiếp nhận và nhập mã mẫu | Có | Có | — |

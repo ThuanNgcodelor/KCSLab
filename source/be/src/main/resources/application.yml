@@ -23,6 +23,22 @@ app:
     password: ${ADMIN_PASSWORD:}
   storage:
     avatar-root: ${AVATAR_STORAGE_ROOT:storage/avatars}
+    # Admin may only register upload locations inside these server directories (comma separated).
+    allowed-roots: ${STORAGE_ALLOWED_ROOTS:storage}
+    # An upload is refused (507) when it would leave less than this much free space.
+    reserve-bytes: ${STORAGE_RESERVE_BYTES:67108864}
+    # Early warning: free space below this many bytes or this percentage of the disk.
+    warn-bytes: ${STORAGE_WARN_BYTES:5368709120}
+    warn-percent: ${STORAGE_WARN_PERCENT:10}
+
+  # Dossier export packages are temporary copies; they are never the 10-year archive.
+  dossier-exports:
+    root: ${DOSSIER_EXPORT_ROOT:storage/exports}
+    worker-enabled: ${DOSSIER_EXPORT_WORKER_ENABLED:true}
+    part-bytes: ${DOSSIER_EXPORT_PART_BYTES:2147483648}
+    part-entries: ${DOSSIER_EXPORT_PART_ENTRIES:5000}
+    reserve-bytes: ${DOSSIER_EXPORT_RESERVE_BYTES:1073741824}
+    max-job-bytes: ${DOSSIER_EXPORT_MAX_JOB_BYTES:53687091200}
 
   # Customer messages are opt-in per receipt. Live sending requires a separate explicit gate.
   customer-notifications:

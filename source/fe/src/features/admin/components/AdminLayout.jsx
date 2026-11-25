@@ -96,6 +96,7 @@ export function AdminLayout() {
         </nav>
         <div className="sidebar-section-label">Hệ thống</div>
         <nav className="admin-nav">
+          {isAdmin && <NavLink title="Hồ sơ lưu trữ" to="/admin/dossiers" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="file" /><span>Hồ sơ lưu trữ</span></NavLink>}
           {isAdmin && <NavLink title="Thông báo Zalo" to="/admin/customer-notifications" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="bell" /><span>Thông báo Zalo</span></NavLink>}
           <NavLink title="Thông tin cá nhân" to="/admin/profile" onClick={() => setMobileOpen(false)} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}><Icon name="profile" /><span>Thông tin cá nhân</span></NavLink>
         </nav>
@@ -127,6 +128,7 @@ export function AdminLayout() {
 }
 
 function getPageTitle(pathname) {
+  if (pathname.includes('/dossiers')) return 'Hồ sơ lưu trữ';
   if (pathname.includes('/customer-notifications')) return 'Thông báo Zalo';
   if (pathname.includes('/profile')) return 'Thông tin cá nhân';
   if (pathname.includes('/notifications')) return 'Thông báo';

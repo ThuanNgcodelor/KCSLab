@@ -31,6 +31,8 @@ const SamplingPlanPage = lazy(() => import('../features/sampling/pages/SamplingP
 const FieldSamplingPage = lazy(() => import('../features/sampling/pages/FieldSamplingPage').then(m => ({ default: m.FieldSamplingPage })));
 const TestRequestFormPage = lazy(() => import('../features/sampling/pages/TestRequestFormPage').then(m => ({ default: m.TestRequestFormPage })));
 
+const DossiersPage = lazy(() => import('../features/dossiers/pages/DossiersPage').then(m => ({ default: m.DossiersPage })));
+
 const CustomerNotificationOperationsPage = lazy(() => import('../features/notifications/pages/CustomerNotificationOperationsPage').then(m => ({ default: m.CustomerNotificationOperationsPage })));
 
 function ProtectedRoute() {
@@ -67,6 +69,7 @@ export function App() {
         <Route path="/admin/notifications" element={<NotificationsPage />} />
         <Route path="/admin/profile" element={<ProfilePage />} />
         <Route element={<RoleRoute roles={['ADMIN']} />}>
+          <Route path="/admin/dossiers" element={<DossiersPage />} />
           <Route path="/admin/customer-notifications" element={<CustomerNotificationOperationsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/test-methods" element={<TestMethodsPage />} />

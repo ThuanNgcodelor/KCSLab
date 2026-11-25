@@ -105,7 +105,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/public/results/lookup", "/api/v1/public/results/download").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/webhooks/zbs").permitAll()
                         .requestMatchers("/api/v1/webhooks/**").denyAll()
-                        .requestMatchers("/api/v1/admin/customer-notifications/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/public/**").denyAll()
                         .requestMatchers("/api/v1/auth/logout", "/api/v1/auth/me").authenticated()
                         .requestMatchers("/ws/notifications", "/api/v1/notifications/**").authenticated()

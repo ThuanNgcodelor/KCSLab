@@ -9,6 +9,7 @@
 - QR trỏ tới `PUBLIC_LOOKUP_URL` + `?code=…`. Đường dẫn `/tracuu/?code=` phải giữ cố định; đổi tên miền chỉ thay phần host, rồi tạo lại PDF hàng loạt.
 - REST và MySQL là nguồn thông báo chính. WebSocket gửi từng người nhận sau commit. Dữ liệu actor dùng FK nullable và avatar qua API xác thực. Kết nối hiện tại nằm trong từng backend instance.
 - 25/11/2026: người dùng chốt khóa thông báo theo khâu. ADMIN nhận mọi loại/kể cả tự thao tác; Tiếp nhận nhận yêu cầu mới và phản hồi KCS cho phiếu mình chuyển; KCS chỉ nhận tin khi Phiếu 4 được gửi, có người chuyển + số CFC. Policy áp dụng server-side cả lịch sử, unread và realtime. Giữ bản ghi cũ để audit, ẩn sai khâu; không gửi tin tiếp nhận sớm tới KCS.
+- 25/11/2026: mỗi file hồ sơ tự nhớ ổ lưu; Admin chỉ đổi đích ghi mới, không di chuyển file cũ. Ổ nhận diện bằng file định danh, không tự tạo thư mục thay thế khi mất mount, không tự chuyển sang ổ chưa được chọn. Export là bản sao tạm 7 ngày, không thay backup; không tự xóa hồ sơ sau 10 năm. Mốc tính 10 năm cần LAB xác nhận.
 - PWA service worker giới hạn ở điều hướng và chỉ cache trang mất mạng. API, tài liệu, avatar và hồ sơ tiếp tục qua mạng.
 - Dữ liệu danh sách phân trang, lọc và sắp xếp phía server. Dashboard tổng hợp riêng. Không chia phòng KCS thành nhiều đơn vị trên UI.
 - Triển khai:

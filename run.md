@@ -18,7 +18,7 @@ Lệnh này:
    - API: http://localhost:8080
 3. Kiểm tra LibreOffice (nằm sẵn trong container backend) và báo nếu không dùng được.
 
-Database tự cập nhật bằng Flyway khi API khởi động. File tải lên nằm ở `source/be/storage`.
+Database tự cập nhật bằng Flyway khi API khởi động. File tải lên nằm ở `source/be/storage`. Muốn dùng thêm ổ cho hồ sơ: gắn ổ vào máy, thêm bind mount vào service backend trong `docker-compose.yml` (ví dụ `/mnt/lab-b/dossiers:/mnt/lab-b/dossiers`), đặt `STORAGE_ALLOWED_ROOTS=storage,/mnt/lab-b` trong cấu hình môi trường, chạy lại backend rồi đăng ký ở **Hồ sơ lưu trữ → Ổ lưu trữ**.
 
 ## Tắt
 
