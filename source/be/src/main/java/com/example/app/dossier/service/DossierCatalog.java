@@ -64,17 +64,24 @@ public class DossierCatalog {
         if (s.q != null && !s.q.isBlank()) { sql.append(" AND LOCATE(?,r.request_number)>0"); args.add(s.q.trim()); }
         return new Filter(sql.toString(),args);
     }
-    public Page<Map<String,Object>> list(Scope s, int page, int size) {
+    private static final Map<String,String> SORTS=Map.of(
+        "receivedAt,desc","r.received_at DESC,r.id DESC","receivedAt,asc","r.received_at,r.id",
+        "requestNumber,asc","r.request_number,r.id","requestNumber,desc","r.request_number DESC,r.id DESC");
+    public Page<Map<String,Object>> list(Scope s, int page, int size) { return list(s,"receivedAt,desc",page,size); }
+    public Page<Map<String,Object>> list(Scope s, String sort, int page, int size) {
         pagination(page,size); Filter f=filter(s);
+        String order=SORTS.get(sort);
+        if(order==null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Kiểu sắp xếp không hợp lệ");
         Long count=jdbc.queryForObject("SELECT COUNT(*) FROM receipts r WHERE "+f.sql,Long.class,f.args.toArray());
         List<Object> args=new ArrayList<>(f.args); args.add(size); args.add((long)page*size);
         List<Map<String,Object>> rows=jdbc.query("""
-            SELECT r.id,r.request_number,r.receipt_code,r.received_at,
+            SELECT r.id,r.request_number,r.receipt_code,r.received_at,r.sample_name,c.name customer_name,
               (SELECT COUNT(*) FROM samples s WHERE s.receipt_id=r.id) sample_count
-            FROM receipts r WHERE
-            """+f.sql+" ORDER BY r.received_at DESC,r.id DESC LIMIT ? OFFSET ?",(r,n)->{
+            FROM receipts r JOIN customers c ON c.id=r.customer_id WHERE
+            """+f.sql+" ORDER BY "+order+" LIMIT ? OFFSET ?",(r,n)->{
                 Map<String,Object> row=new LinkedHashMap<>();
                 row.put("id",r.getLong("id"));row.put("requestNumber",r.getString("request_number"));row.put("receiptCode",r.getString("receipt_code"));
+                row.put("customerName",r.getString("customer_name"));row.put("sampleName",r.getString("sample_name"));
                 row.put("receivedAt",r.getTimestamp("received_at").toInstant());row.put("sampleCount",r.getLong("sample_count"));
                 row.put("fileCount",0L);row.put("totalBytes",0L);return row;
             },args.toArray());
@@ -116,8 +123,13 @@ public class DossierCatalog {
         return rows.getFirst();
     }
     public String folder(Map<String,Object> receipt) {
-        return receipt.get("archive_path") != null ? receipt.get("archive_path").toString()
-            : ArchivePaths.folder(((Number)receipt.get("id")).longValue(),(String)receipt.get("request_number"),((Timestamp)receipt.get("received_at")).toInstant());
+        long id=((Number)receipt.get("id")).longValue();String number=(String)receipt.get("request_number");
+        boolean owner=ArchivePaths.owns(number,(String)receipt.get("request_number_unique"));
+        return receipt.get("archive_path") != null ? ArchivePaths.separate(receipt.get("archive_path").toString(),id,owner)
+            : ArchivePaths.folder(id,number,owner,((Timestamp)receipt.get("received_at")).toInstant());
+    }
+    public String customerName(long receiptId) {
+        return jdbc.queryForObject("SELECT c.name FROM receipts r JOIN customers c ON c.id=r.customer_id WHERE r.id=?",String.class,receiptId);
     }
     private static FileRow fileRow(ResultSet r) throws SQLException {
         return new FileRow(r.getString("source"),r.getLong("id"),r.getLong("receipt_id"),r.getLong("storage_location_id"),r.getString("relative_path"),

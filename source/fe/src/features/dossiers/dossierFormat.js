@@ -8,11 +8,6 @@ export const date = (v) => (v ? new Date(v).toLocaleString('vi-VN', { timeZone: 
 export const day = (v) => (v ? new Date(v).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '—');
 export const count = (n = 0) => n.toLocaleString('vi-VN');
 
-export const exportStatuses = {
-  QUEUED: 'Đang chờ', PREPARING: 'Chuẩn bị danh mục', PROCESSING: 'Đang đóng gói', COMPLETED: 'Hoàn tất',
-  COMPLETED_WITH_WARNINGS: 'Hoàn tất, có cảnh báo', FAILED: 'Có lỗi', CANCEL_REQUESTED: 'Đang hủy',
-  CANCELLED: 'Đã hủy', EXPIRED: 'Đã hết hạn',
-};
 export const runningStatuses = ['QUEUED', 'PREPARING', 'PROCESSING', 'CANCEL_REQUESTED'];
 export const readyStatuses = ['COMPLETED', 'COMPLETED_WITH_WARNINGS'];
 

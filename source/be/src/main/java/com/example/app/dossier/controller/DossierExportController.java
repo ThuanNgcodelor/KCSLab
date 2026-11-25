@@ -36,7 +36,7 @@ public class DossierExportController {
         return ResponseEntity.accepted().cacheControl(CacheControl.noStore()).body(jobs.create(new DossierCatalog.Scope(r.year,r.month,r.receiptId,r.q),Boolean.TRUE.equals(r.allowMissing),r.requestId,users.getByEmail(jwt.getSubject()).getId()));
     }
     @GetMapping
-    public List<Map<String,Object>> list(@RequestParam(defaultValue="0") int page) {return jobs.list(page);}
+    public DossierCatalog.Page<Map<String,Object>> list(@RequestParam(defaultValue="0") int page) {return jobs.page(page);}
     @GetMapping("/{id}")
     public Map<String,Object> detail(@PathVariable String id) {return jobs.detail(id);}
     @PostMapping("/{id}/cancel")

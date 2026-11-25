@@ -46,6 +46,9 @@ public class DossierExportJobs {
         if(page<0 || page>1000000) throw error(400,"Phân trang không hợp lệ");
         return jdbc.queryForList("SELECT id,status,scope_json,(SELECT COALESCE(r.request_number,r.receipt_code) FROM receipts r WHERE r.id=JSON_VALUE(scope_json,'$.receiptId' RETURNING UNSIGNED)) receipt_number,created_at,finished_at,expires_at,total_files,total_bytes,processed_files,processed_bytes,warning_count,allow_missing,error_code FROM dossier_export_jobs ORDER BY created_at DESC,id DESC LIMIT 20 OFFSET ?",page*20L);
     }
+    public DossierCatalog.Page<Map<String,Object>> page(int page) {
+        return new DossierCatalog.Page<>(list(page),jdbc.queryForObject("SELECT COUNT(*) FROM dossier_export_jobs",Long.class),page,20);
+    }
     public Map<String,Object> detail(String id) {
         var rows=jdbc.queryForList("SELECT id,status,scope_json,created_at,cutoff_at,snapshot_at,finished_at,expires_at,total_files,total_bytes,processed_files,processed_bytes,warning_count,allow_missing,error_code FROM dossier_export_jobs WHERE id=?",id);
         if(rows.isEmpty()) throw error(404,"Không tìm thấy lượt xuất");

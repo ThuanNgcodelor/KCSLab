@@ -1,91 +1,99 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Icon } from '../../../shared/components/Icon';
+import { ListToolbar, Pagination, emptyPage } from '../../../shared/components/ListToolbar';
+import { PageLoader } from '../../../shared/components/Loading';
 import * as api from '../api/dossierApi';
 import { bytes, count, day, scopeLabel } from '../dossierFormat';
-import { DossierDetail } from './DossierDetail';
-import { ExportPanel } from './ExportPanel';
-import { Pager } from './Pager';
+import { ExportDialog } from './ExportDialog';
 
-const SIZE = 20;
+const sortOptions = [
+  ['receivedAt,desc', 'Ngày nhận: mới nhất'], ['receivedAt,asc', 'Ngày nhận: cũ nhất'],
+  ['requestNumber,desc', 'Số/No.: mới nhất'], ['requestNumber,asc', 'Số/No.: cũ nhất'],
+];
+const ALL = 'all';
 
-export function CatalogTab({ onExported }) {
-  const [periods, setPeriods] = useState(null);
-  const [scope, setScope] = useState({ year: null, month: null, q: '' });
-  const [text, setText] = useState('');
-  const [page, setPage] = useState(0);
-  const [data, setData] = useState(null);
+/** The filter lives in the URL, so going back from a dossier returns to the same year, month and page. */
+export function CatalogTab({ periods, storage, onExported }) {
+  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const [data, setData] = useState(emptyPage);
   const [summary, setSummary] = useState(null);
-  const [selected, setSelected] = useState(null);
-  const [exporting, setExporting] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const [reload, setReload] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    api.getPeriods(controller.signal).then((list) => {
-      setPeriods(list);
-      if (list.length) setScope((s) => ({ ...s, year: list[0].year }));
-    }).catch((e) => { if (e.name !== 'AbortError') { setError(e.message); setPeriods([]); } });
-    return () => controller.abort();
-  }, []);
+  const year = params.get('year') === ALL ? null : Number(params.get('year')) || periods?.[0]?.year || null;
+  const month = year ? Number(params.get('month')) || null : null;
+  const q = params.get('q') ?? '';
+  const sort = params.get('sort') ?? 'receivedAt,desc';
+  const page = Number(params.get('page')) || 0;
+  const ready = periods != null;
+
+  function update(patch) {
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      Object.entries({ page: null, ...patch }).forEach(([key, value]) => { if (value) next.set(key, value); else next.delete(key); });
+      return next;
+    }, { replace: true });
+  }
 
   useEffect(() => {
-    if (!periods) return undefined;
+    if (!ready) return undefined;
     const controller = new AbortController(); setLoading(true); setError('');
-    api.listDossiers({ ...scope, page, size: SIZE }, controller.signal).then(setData)
+    api.listDossiers({ year, month, q, sort, page, size: 20 }, controller.signal).then(setData)
       .catch((e) => { if (e.name !== 'AbortError') setError(e.message); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [periods, scope, page]);
+  }, [ready, year, month, q, sort, page, reload]);
 
   useEffect(() => {
-    if (!periods) return undefined;
+    if (!ready) return undefined;
     const controller = new AbortController(); setSummary(null);
-    api.getSummary(scope, controller.signal).then(setSummary).catch(() => {});
+    api.getSummary({ year, month, q }, controller.signal).then(setSummary).catch(() => {});
     return () => controller.abort();
-  }, [periods, scope]);
+  }, [ready, year, month, q, reload]);
 
-  const years = useMemo(() => {
-    const totals = new Map();
-    (periods ?? []).forEach((p) => totals.set(p.year, (totals.get(p.year) ?? 0) + p.dossiers));
-    return [...totals];
-  }, [periods]);
-  const months = (periods ?? []).filter((p) => p.year === scope.year);
-
-  function choose(next) { setScope((s) => ({ ...s, ...next })); setPage(0); setSelected(null); setExporting(null); }
-  const exportScope = { year: scope.year, month: scope.month, q: scope.q || null };
+  const years = [...(periods ?? []).reduce((totals, p) => totals.set(p.year, (totals.get(p.year) ?? 0) + p.dossiers), new Map())];
+  const months = (periods ?? []).filter((p) => p.year === year);
+  const scope = { year, month, q };
+  const filtered = Boolean(q || month);
+  const receiving = storage?.locations.find((h) => (storage.settings.locationId == null ? h.location.legacyKey === 'RECEIPTS' : h.location.id === storage.settings.locationId));
 
   return <>
-    <section className="panel-card dossier-tree" aria-label="Chọn năm và tháng">
-      <div className="dossier-chips" role="group" aria-label="Năm">
-        <button type="button" aria-pressed={!scope.year} onClick={() => choose({ year: null, month: null })}>Tất cả năm</button>
-        {years.map(([year, total]) => <button type="button" key={year} aria-pressed={scope.year === year} onClick={() => choose({ year, month: null })}>{year}<span>{count(total)}</span></button>)}
-      </div>
-      {scope.year && <div className="dossier-chips" role="group" aria-label={`Tháng của năm ${scope.year}`}>
-        <button type="button" aria-pressed={!scope.month} onClick={() => choose({ month: null })}>Cả năm</button>
-        {months.map((p) => <button type="button" key={p.month} aria-pressed={scope.month === p.month} onClick={() => choose({ month: p.month })}>Tháng {String(p.month).padStart(2, '0')}<span>{count(p.dossiers)}</span></button>)}
-      </div>}
-      <form className="dossier-filters" onSubmit={(e) => { e.preventDefault(); choose({ q: text.trim() }); }}>
-        <label className="dossier-search">Số/No.<input value={text} maxLength={120} placeholder="CFC26.0003" onChange={(e) => setText(e.target.value)} /></label>
-        <button className="primary-button" disabled={loading}>Tìm hồ sơ</button>
-        {scope.q && <button type="button" className="outline-button" onClick={() => { setText(''); choose({ q: '' }); }}>Bỏ tìm kiếm</button>}
-      </form>
+    <section className="intake-command-strip" aria-label="Tổng quan hồ sơ lưu trữ">
+      <article><span>Hồ sơ</span><strong>{summary ? count(summary.dossiers) : '…'}</strong><small>{scopeLabel(scope)}</small></article>
+      <article><span>File đã lưu</span><strong>{summary ? count(summary.files) : '…'}</strong><small>Gồm cả bản cũ còn lưu</small></article>
+      <article><span>Dung lượng</span><strong>{summary ? bytes(summary.bytes) : '…'}</strong><small>Trong phạm vi đang xem</small></article>
+      <article><span>Ổ nhận upload còn trống</span><strong>{receiving?.totalBytes ? bytes(receiving.freeBytes) : '—'}</strong><small>{receiving?.location.label ?? 'Đang kiểm tra'}</small></article>
     </section>
-    {error && <p className="form-error" role="alert">{error}</p>}
-    {exporting && <ExportPanel scope={exporting} onClose={() => setExporting(null)} onCreated={onExported} />}
-    {selected ? <DossierDetail key={selected} id={selected} onBack={() => setSelected(null)} onExport={(label) => setExporting({ receiptId: selected, label })} />
-      : <>
-        <div className="dossier-toolbar">
-          <p><strong>{scopeLabel(exportScope)}</strong>{summary && ` · ${count(summary.dossiers)} hồ sơ · ${count(summary.files)} file · ${bytes(summary.bytes)}`}</p>
-          <button type="button" className="outline-button" disabled={loading || !data?.totalElements} onClick={() => setExporting(exportScope)}>Xuất phạm vi đang xem</button>
-        </div>
-        {loading && <p role="status">Đang tải hồ sơ…</p>}
-        {!loading && !error && data?.content.length === 0 && <div className="panel-card dossier-empty">{scope.q ? `Không có hồ sơ khớp “${scope.q}” trong khoảng đã chọn.` : 'Chưa có hồ sơ trong khoảng đã chọn.'}</div>}
-        {!loading && data?.content.length > 0 && <div className="dossier-grid">{data.content.map((r) => <article className="panel-card dossier-card" key={r.id}>
-          <h2>{r.requestNumber || r.receiptCode}</h2>
-          <p>{r.sampleCount} mẫu · {r.fileCount} file · {bytes(r.totalBytes)}</p>
-          <small>Tiếp nhận: {day(r.receivedAt)}</small>
-          <button type="button" className="outline-button" aria-label={`Xem hồ sơ ${r.requestNumber || r.receiptCode}`} onClick={() => { setSelected(r.id); setExporting(null); }}>Xem hồ sơ</button>
-        </article>)}</div>}
-        {data && <Pager page={page} size={SIZE} total={data.totalElements} onChange={setPage} disabled={loading} />}
-      </>}
+
+    {months.length > 0 && <nav className="status-chips" aria-label={`Lọc theo tháng của năm ${year}`}>
+      <button type="button" className={`status-chip ${month ? '' : 'active'}`} aria-pressed={!month} onClick={() => update({ month: null })}>Cả năm {year}</button>
+      {months.map((p) => <button type="button" key={p.month} className={`status-chip ${month === p.month ? 'active' : ''}`} aria-pressed={month === p.month} onClick={() => update({ month: p.month })}>Tháng {String(p.month).padStart(2, '0')} ({count(p.dossiers)})</button>)}
+    </nav>}
+
+    {error && <p className="form-error intake-toast" role="alert">{error}</p>}
+    <section className="panel-card intake-list-card">
+      <div className="panel-heading intake-list-heading"><div><p className="section-kicker">Theo ngày tiếp nhận</p><h2>Danh sách hồ sơ</h2></div>
+        <div className="intake-list-tools">
+          <button type="button" className="outline-button small-button" onClick={() => setReload((n) => n + 1)}>↻ Làm mới</button>
+          <button type="button" className="outline-button small-button" disabled={loading || data.totalElements === 0} onClick={() => setExporting(true)}>Xuất {data.totalElements > 0 ? `${count(data.totalElements)} hồ sơ` : 'hồ sơ'}</button>
+        </div></div>
+      <ListToolbar q={q} onQ={(value) => update({ q: value })} searchLabel="Tìm hồ sơ" placeholder="Số/No., ví dụ CFC26.0003"
+        filters={[{ label: 'Năm tiếp nhận', value: year ? String(year) : ALL, onChange: (value) => update({ year: value, month: null }), options: [...years.map(([value, total]) => [String(value), `${value} (${count(total)} hồ sơ)`]), [ALL, 'Tất cả các năm']] }]}
+        sort={sort} sortOptions={sortOptions} onSort={(value) => update({ sort: value })} onReset={() => setParams({}, { replace: true })} />
+      {loading ? <PageLoader label="Đang tải hồ sơ…" rows={4} /> : data.content.length === 0
+        ? <div className="empty-intake"><span><Icon name="file" size={22} /></span>{filtered ? <><h3>Không có hồ sơ phù hợp</h3><p>Thử đổi hoặc xóa bộ lọc.</p></> : <><h3>Chưa có hồ sơ nào</h3><p>Hồ sơ xuất hiện ở đây sau khi tiếp nhận mẫu.</p></>}</div>
+        : <div className="table-wrap"><table className="staff-table intake-table" aria-label="Danh sách hồ sơ lưu trữ"><thead><tr><th scope="col">Số/No · khách hàng</th><th scope="col">Mẫu</th><th scope="col">File</th><th scope="col">Ngày nhận</th><th scope="col"><span className="dossier-hidden">Thao tác</span></th></tr></thead><tbody>{data.content.map((r) => <tr key={r.id}>
+          <td data-label="Hồ sơ"><span className="intake-cell-content"><strong className="receipt-code">{r.requestNumber || r.receiptCode}</strong><small>{r.customerName}</small></span></td>
+          <td data-label="Mẫu"><span className="intake-cell-content"><strong>{r.sampleCount} mẫu · {r.sampleName}</strong><small>Phiếu {r.receiptCode}</small></span></td>
+          <td data-label="File"><span className="intake-cell-content"><strong>{count(r.fileCount)} file</strong><small>{bytes(r.totalBytes)}</small></span></td>
+          <td data-label="Ngày nhận" className="muted-cell">{day(r.receivedAt)}</td>
+          <td data-label="Thao tác"><button type="button" className="table-action" aria-label={`Xem hồ sơ ${r.requestNumber || r.receiptCode}`} onClick={() => navigate(`/admin/dossiers/${r.id}`, { state: { back: `/admin/dossiers?${params}` } })}>Xem hồ sơ</button></td>
+        </tr>)}</tbody></table></div>}
+      <Pagination data={data} loading={loading} noun="hồ sơ" onPage={(value) => update({ page: value })} />
+    </section>
+    {exporting && <ExportDialog scope={scope} onClose={() => setExporting(false)} onCreated={onExported} />}
   </>;
 }

@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 
 /** A shared, accessible confirmation dialog for actions across the application. */
 export function ConfirmDialog({ title, description, confirmLabel = 'Xác nhận', cancelLabel = 'Quay lại',
-  tone = 'default', onConfirm, onCancel }) {
+  tone = 'default', confirmDisabled = false, children, onConfirm, onCancel }) {
   const dialog = useRef(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -24,10 +24,11 @@ export function ConfirmDialog({ title, description, confirmLabel = 'Xác nhận'
       <p className="cfc-confirm__eyebrow">CFC LAB · XÁC NHẬN THAO TÁC</p>
       <h2 id={titleId}>{title}</h2>
       <p id={descriptionId} className="cfc-confirm__description">{description}</p>
+      {children}
     </div>
     <div className="cfc-confirm__actions">
       <button type="button" className="cfc-confirm__cancel" autoFocus onClick={onCancel}>{cancelLabel}</button>
-      <button type="button" className="cfc-confirm__submit" onClick={onConfirm}>{confirmLabel}</button>
+      <button type="button" className="cfc-confirm__submit" disabled={confirmDisabled} onClick={onConfirm}>{confirmLabel}</button>
     </div>
   </dialog>;
 }

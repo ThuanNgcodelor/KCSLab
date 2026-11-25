@@ -1,13 +1,23 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { Icon } from '../../../shared/components/Icon';
+import { Pagination, emptyPage } from '../../../shared/components/ListToolbar';
+import { PageLoader } from '../../../shared/components/Loading';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
 import * as api from '../api/dossierApi';
-import { bytes, count, date, exportErrors, exportStatuses, readyStatuses, runningStatuses, scopeLabel } from '../dossierFormat';
+import { bytes, count, date, exportErrors, readyStatuses, runningStatuses, scopeLabel } from '../dossierFormat';
 
 const cancellable = ['QUEUED', 'PREPARING', 'PROCESSING'];
 function parseScope(text) { try { return JSON.parse(text); } catch { return {}; } }
 
+function note(job) {
+  if (job.status === 'FAILED') return exportErrors[job.error_code] || 'Chưa xuất đủ hồ sơ. Kiểm tra ổ lưu, dung lượng rồi tạo lượt mới.';
+  if (job.status === 'COMPLETED_WITH_WARNINGS') return `${count(job.warning_count)} file thiếu hoặc sai checksum, xem cột trang_thai trong danh-muc-goi của từng ZIP.`;
+  return '';
+}
+
 export function ExportsTab() {
   const [page, setPage] = useState(0);
-  const [rows, setRows] = useState(null);
+  const [data, setData] = useState(emptyPage);
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -19,10 +29,10 @@ export function ExportsTab() {
     async function refresh() {
       let again = 4000;
       try {
-        const data = await api.listExports(page, controller.signal);
+        const next = await api.listExports(page, controller.signal);
         if (controller.signal.aborted) return;
-        setRows(data); setError('');
-        if (!data.some((r) => runningStatuses.includes(r.status))) again = 0;
+        setData(next); setError('');
+        if (!next.content.some((r) => runningStatuses.includes(r.status))) again = 0;
       } catch (e) {
         if (controller.signal.aborted) return;
         setError(e.message); again = 15000; // keep watching a running job through a short network loss
@@ -40,38 +50,29 @@ export function ExportsTab() {
   }
 
   return <>
-    <div className="dossier-toolbar"><p>ZIP giữ cây năm/tháng/Số CFC · gói tải tạm được giữ 7 ngày.</p>
-      <button type="button" className="outline-button" disabled={loading} onClick={() => setReload((n) => n + 1)}>Làm mới</button></div>
-    <p className="dossier-muted">Tải từng phần rồi giải nén vào cùng một thư mục. Muốn chọn nơi lưu trên máy, bật “Hỏi nơi lưu mỗi lần tải” trong trình duyệt.</p>
-    {loading && <p role="status">Đang tải các lượt xuất…</p>}
-    {error && <p className="form-error" role="alert">{error}</p>}
-    {rows?.length === 0 && <div className="panel-card dossier-empty">{page ? 'Không còn lượt xuất cũ hơn.' : 'Chưa có lượt xuất. Chọn hồ sơ hoặc tháng/năm ở mục Hồ sơ để bắt đầu.'}</div>}
-    <div className="dossier-export-list">{rows?.map((job) => {
-      const open = detail?.id === job.id;
-      return <article className="panel-card dossier-export" key={job.id}>
-        <div>
-          <span className={`dossier-badge ${['FAILED', 'COMPLETED_WITH_WARNINGS'].includes(job.status) ? 'warning' : ''}`}>{exportStatuses[job.status] || job.status}</span>
-          <h2>{scopeLabel({ ...parseScope(job.scope_json), label: job.receipt_number })}</h2>
-          <p>{date(job.created_at)} · {count(job.processed_files)} / {count(job.total_files)} mục · {bytes(job.processed_bytes)} / {bytes(job.total_bytes)}</p>
-          {job.status === 'PROCESSING' && <progress value={job.processed_files} max={job.total_files || 1} aria-label="Tiến độ đóng gói" />}
-          {job.status === 'FAILED' && <p className="form-error">{exportErrors[job.error_code] || 'Chưa xuất đủ hồ sơ. Kiểm tra ổ lưu, dung lượng rồi tạo lượt mới.'}</p>}
-          {job.status === 'COMPLETED_WITH_WARNINGS' && <p>{count(job.warning_count)} file thiếu hoặc sai checksum, xem cột trang_thai trong danh-muc-goi-….csv của từng ZIP.</p>}
-          {readyStatuses.includes(job.status) && <p>Tải được đến {date(job.expires_at)}.</p>}
-        </div>
-        <div className="dossier-actions">
-          {readyStatuses.includes(job.status) && <button type="button" className="primary-button" aria-expanded={open} disabled={busy}
-            onClick={() => (open ? setDetail(null) : run(async () => setDetail(await api.getExport(job.id))))}>{open ? 'Ẩn các phần' : 'Các phần tải xuống'}</button>}
-          {cancellable.includes(job.status) && <button type="button" className="outline-button" disabled={busy}
-            onClick={() => run(async () => { await api.cancelExport(job.id); setReload((n) => n + 1); })}>Hủy lượt xuất</button>}
-        </div>
-        {open && <ul className="dossier-parts">{detail.parts.map((part) => <li key={part.part_number}>
-          <button type="button" className="outline-button" onClick={() => run(() => api.downloadPart(api.partUrl(detail.id, part.part_number)))}>Tải phần {part.part_number} / {detail.parts.length} · {bytes(part.size)}</button>
-        </li>)}</ul>}
-      </article>;
-    })}</div>
-    {rows && (page > 0 || rows.length === 20) && <div className="dossier-pager">
-      <button type="button" className="outline-button" disabled={page === 0 || loading} onClick={() => setPage(page - 1)}>Trước</button><span>Trang {page + 1}</span>
-      <button type="button" className="outline-button" disabled={rows.length < 20 || loading} onClick={() => setPage(page + 1)}>Sau</button>
-    </div>}
+    {error && <p className="form-error intake-toast" role="alert">{error}</p>}
+    <section className="panel-card intake-list-card">
+      <div className="panel-heading"><div><p className="section-kicker">Gói tải giữ 7 ngày</p><h2>Lượt xuất hồ sơ</h2><p className="dossier-note">Tải từng phần rồi giải nén vào cùng một thư mục. Để chọn nơi lưu trên máy, bật “Hỏi nơi lưu mỗi lần tải” trong trình duyệt.</p></div>
+        <button type="button" className="outline-button small-button" disabled={loading} onClick={() => setReload((n) => n + 1)}>↻ Làm mới</button></div>
+      {loading ? <PageLoader label="Đang tải các lượt xuất…" rows={3} /> : data.content.length === 0
+        ? <div className="empty-intake"><span><Icon name="inbox" size={22} /></span><h3>Chưa có lượt xuất</h3><p>Chọn hồ sơ, tháng hoặc năm ở mục Hồ sơ rồi bấm Xuất.</p></div>
+        : <div className="table-wrap"><table className="staff-table intake-table" aria-label="Lượt xuất hồ sơ"><thead><tr><th scope="col">Phạm vi</th><th scope="col">Trạng thái</th><th scope="col">Tiến độ</th><th scope="col">Tạo lúc</th><th scope="col">Tải đến</th><th scope="col"><span className="dossier-hidden">Thao tác</span></th></tr></thead><tbody>{data.content.map((job) => {
+          const open = detail?.id === job.id; const ready = readyStatuses.includes(job.status); const message = note(job);
+          return <Fragment key={job.id}><tr>
+            <td data-label="Phạm vi"><span className="intake-cell-content"><strong>{scopeLabel({ ...parseScope(job.scope_json), label: job.receipt_number })}</strong></span></td>
+            <td data-label="Trạng thái"><StatusBadge domain="dossierExport" value={job.status} /></td>
+            <td data-label="Tiến độ"><span className="intake-cell-content">{job.status === 'PROCESSING' && <progress value={job.processed_files} max={job.total_files || 1} aria-label="Tiến độ đóng gói" />}<strong>{count(job.processed_files)} / {count(job.total_files)} mục</strong><small>{bytes(job.processed_bytes)} / {bytes(job.total_bytes)}</small></span></td>
+            <td data-label="Tạo lúc" className="muted-cell">{date(job.created_at)}</td>
+            <td data-label="Tải đến" className="muted-cell">{ready ? date(job.expires_at) : '—'}</td>
+            <td data-label="Thao tác">{ready ? <button type="button" className="table-action" aria-expanded={open} disabled={busy} onClick={() => (open ? setDetail(null) : run(async () => setDetail(await api.getExport(job.id))))}>{open ? 'Ẩn các phần' : 'Tải xuống'}</button>
+              : cancellable.includes(job.status) ? <button type="button" className="table-action" disabled={busy} onClick={() => run(async () => { await api.cancelExport(job.id); setReload((n) => n + 1); })}>Hủy</button> : <span className="dossier-none" aria-hidden="true">—</span>}</td>
+          </tr>
+          {(open || message) && <tr className="dossier-subrow"><td colSpan={6}>
+            {message && <p className={job.status === 'FAILED' ? 'dossier-dialog-error' : 'dossier-note'}>{message}</p>}
+            {open && <ul className="dossier-parts">{detail.parts.map((part) => <li key={part.part_number}><button type="button" className="outline-button small-button" onClick={() => run(() => api.downloadPart(api.partUrl(detail.id, part.part_number)))}>Phần {part.part_number}/{detail.parts.length} · {bytes(part.size)}</button></li>)}</ul>}
+          </td></tr>}</Fragment>;
+        })}</tbody></table></div>}
+      <Pagination data={data} loading={loading} noun="lượt xuất" onPage={setPage} />
+    </section>
   </>;
 }

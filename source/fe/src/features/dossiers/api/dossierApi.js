@@ -4,17 +4,24 @@ const base = '/admin';
 const apiBase = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 const query = (values) => new URLSearchParams(Object.entries(values).filter(([, v]) => v !== '' && v != null)).toString();
 
-export const listDossiers = (filters, signal) => request(`${base}/dossiers?${query(filters)}`, { signal, silent: true });
+/** Adds the fields the shared Pagination needs. */
+function paged(data) {
+  const totalPages = Math.max(1, Math.ceil(data.totalElements / data.size));
+  return { ...data, totalPages, first: data.page === 0, last: data.page + 1 >= totalPages };
+}
+
+export const listDossiers = (filters, signal) => request(`${base}/dossiers?${query(filters)}`, { signal, silent: true }).then(paged);
 export const getSummary = (scope, signal) => request(`${base}/dossiers/summary?${query(scope)}`, { signal, silent: true });
 export const getPeriods = (signal) => request(`${base}/dossiers/periods`, { signal, silent: true });
-export const getDossier = (id, page, signal) => request(`${base}/dossiers/${id}?page=${page}`, { signal, silent: true });
+export const getDossier = (id, page, signal) => request(`${base}/dossiers/${id}?page=${page}`, { signal, silent: true })
+  .then((data) => ({ ...data, files: paged(data.files) }));
 
 export const getStorage = (signal) => request(`${base}/storage-locations`, { signal, silent: true });
 export const registerStorage = (data) => request(`${base}/storage-locations`, { method: 'POST', body: JSON.stringify(data) });
 export const validateStorage = (id) => request(`${base}/storage-locations/${id}/validate`, { method: 'POST' });
 export const activateStorage = (locationId, version) => request(`${base}/storage-write-target`, { method: 'PUT', body: JSON.stringify({ locationId, version }) });
 
-export const listExports = (page, signal) => request(`${base}/dossier-exports?page=${page}`, { signal, silent: true });
+export const listExports = (page, signal) => request(`${base}/dossier-exports?page=${page}`, { signal, silent: true }).then(paged);
 export const getExport = (id, signal) => request(`${base}/dossier-exports/${id}`, { signal, silent: true });
 export const createExport = (data) => request(`${base}/dossier-exports`, { method: 'POST', body: JSON.stringify(data) });
 export const cancelExport = (id) => request(`${base}/dossier-exports/${id}/cancel`, { method: 'POST' });

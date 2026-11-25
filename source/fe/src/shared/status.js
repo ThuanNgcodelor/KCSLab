@@ -19,6 +19,15 @@ const DOMAINS = {
     PENDING_CODING: ['Chờ mã hóa', 'neutral'], PENDING_VERIFICATION: ['Chờ đối chiếu', 'warning'], VERIFIED: ['Đã mã hóa', 'success'], CORRECTION_REQUIRED: ['Cần hiệu chỉnh', 'danger'],
   },
   testRequest: { DRAFT: ['Bản nháp', 'neutral'], COMPLETED: ['Đã hoàn tất', 'success'] },
+  dossierExport: {
+    QUEUED: ['Đang chờ', 'neutral'], PREPARING: ['Chuẩn bị danh mục', 'info'], PROCESSING: ['Đang đóng gói', 'info'],
+    COMPLETED: ['Hoàn tất', 'success'], COMPLETED_WITH_WARNINGS: ['Hoàn tất, có cảnh báo', 'warning'], FAILED: ['Có lỗi', 'danger'],
+    CANCEL_REQUESTED: ['Đang hủy', 'warning'], CANCELLED: ['Đã hủy', 'neutral'], EXPIRED: ['Đã hết hạn', 'neutral'],
+  },
+  storage: {
+    ONLINE: ['Sẵn sàng', 'success'], LOW: ['Gần đầy', 'warning'], EMPTY: ['Chưa có file', 'neutral'],
+    VOLUME_CHANGED: ['Cần kiểm tra lại', 'warning'], OFFLINE: ['Chưa truy cập được', 'danger'],
+  },
   account: { ACTIVE: ['Đang hoạt động', 'success'], DISABLED: ['Đã khóa', 'danger'] },
 };
 

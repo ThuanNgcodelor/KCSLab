@@ -33,6 +33,8 @@ const TestRequestFormPage = lazy(() => import('../features/sampling/pages/TestRe
 
 const DossiersPage = lazy(() => import('../features/dossiers/pages/DossiersPage').then(m => ({ default: m.DossiersPage })));
 
+const DossierDetailPage = lazy(() => import('../features/dossiers/pages/DossierDetailPage').then(m => ({ default: m.DossierDetailPage })));
+
 const CustomerNotificationOperationsPage = lazy(() => import('../features/notifications/pages/CustomerNotificationOperationsPage').then(m => ({ default: m.CustomerNotificationOperationsPage })));
 
 function ProtectedRoute() {
@@ -70,6 +72,7 @@ export function App() {
         <Route path="/admin/profile" element={<ProfilePage />} />
         <Route element={<RoleRoute roles={['ADMIN']} />}>
           <Route path="/admin/dossiers" element={<DossiersPage />} />
+          <Route path="/admin/dossiers/:id" element={<DossierDetailPage />} />
           <Route path="/admin/customer-notifications" element={<CustomerNotificationOperationsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/test-methods" element={<TestMethodsPage />} />

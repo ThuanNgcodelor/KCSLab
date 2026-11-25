@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
+import { Icon } from '../../../shared/components/Icon';
+import { PageLoader } from '../../../shared/components/Loading';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
 import * as api from '../api/dossierApi';
 import { bytes, count, date } from '../dossierFormat';
 
-const health = { ONLINE: 'Sẵn sàng', OFFLINE: 'Chưa truy cập được', VOLUME_CHANGED: 'Cần kiểm tra lại', EMPTY: 'Chưa có file' };
-const legacyPaths = { RECEIPTS: 'Thư mục tiếp nhận hiện tại', RESULTS: 'Thư mục kết quả hiện tại' };
+const legacyPaths = { RECEIPTS: 'Thư mục tiếp nhận cũ', RESULTS: 'Thư mục kết quả cũ' };
+const statusOf = (h) => (h.status === 'ONLINE' && h.warning ? 'LOW' : h.status);
 
-function Usage({ label, free, total }) {
-  return <><meter min="0" max={total || 1} value={Math.max(0, total - free)} aria-label={`Dung lượng đã dùng của ${label}`} /><p>Trống {bytes(free)} / {bytes(total)}</p></>;
+function Space({ label, free, total }) {
+  if (!total) return <span className="muted-cell">—</span>;
+  return <span className="intake-cell-content"><strong>Trống {bytes(free)}</strong><meter min="0" max={total} value={Math.max(0, total - free)} aria-label={`Dung lượng đã dùng của ${label}`} /><small>Tổng {bytes(total)}</small></span>;
 }
 
 export function StorageTab({ data, loading, error: loadError, onChange, onReload }) {
@@ -24,49 +28,47 @@ export function StorageTab({ data, loading, error: loadError, onChange, onReload
     catch (e) { setError(e.message); return false; } finally { setBusy(false); }
   }
 
-  const active = data?.locations.find((h) => h.location.id === data.settings.locationId);
+  const legacy = data?.settings.locationId == null;
   return <>
-    <div className="panel-card dossier-storage-intro">
-      <div><p className="section-kicker">Nơi lưu upload mới</p><h2>{active?.location.label || 'Theo thư mục tiếp nhận / kết quả hiện tại'}</h2>
-        <p>Đổi nơi ghi file mới khi ổ gần đầy. File cũ vẫn đọc từ ổ đã lưu và xuất chung trong hồ sơ; đổi nơi ghi không làm trống ổ cũ.</p></div>
-      <button type="button" className="outline-button" disabled={busy || loading} onClick={() => { setError(''); setNotice(''); onReload(); }}>Kiểm tra lại</button>
-    </div>
-    {loading && <p role="status">Đang kiểm tra các ổ lưu trữ…</p>}
-    {(error || loadError) && <p className="form-error" role="alert">{error || loadError}</p>}
-    {notice && <p className="dossier-notice" role="status">{notice}</p>}
+    {notice && <p className="success-note toast-note" role="status"><Icon name="checkCircle" size={14} /> {notice}</p>}
+    {(error || loadError) && <p className="form-error toast-note" role="alert">{error || loadError}</p>}
+    {!data && loading && <PageLoader label="Đang kiểm tra các ổ lưu trữ…" rows={3} />}
     {data && <>
-      <div className="dossier-grid">{data.locations.map((h) => {
-        const { location: l } = h; const receiving = data.settings.locationId === l.id;
-        const warn = h.warning || h.status === 'OFFLINE';
-        return <article className="panel-card dossier-card" key={l.id}>
-          <div className="dossier-toolbar"><h2>{l.label}</h2><span className={`dossier-badge ${warn ? 'warning' : ''}`}>{h.status === 'ONLINE' && h.warning ? 'Gần đầy' : health[h.status] || h.status}</span></div>
-          <p className="dossier-path">{l.rootPath || legacyPaths[l.legacyKey]}</p>
-          {h.totalBytes > 0 && <Usage label={l.label} free={h.freeBytes} total={h.totalBytes} />}
-          <p>Hồ sơ đang lưu: {count(h.files)} file · {bytes(h.bytes)}</p>
-          {h.status === 'VOLUME_CHANGED' && <p>Thiết bị của ổ này đã đổi. File cũ vẫn đọc được; bấm “Kiểm tra đọc/ghi” trước khi nhận upload tiếp.</p>}
-          {h.status === 'OFFLINE' && h.files > 0 && <p>File trên ổ này tạm thời chưa mở được, không phải đã bị xóa. Kiểm tra kết nối ổ.</p>}
-          {l.legacyKey ? <p className="dossier-muted">Vị trí của file cũ{data.settings.locationId == null ? ', đang nhận upload' : ', chỉ đọc'}.</p>
-            : <><small>Kiểm tra ghi gần nhất: {date(l.validatedAt)}</small>
-              <div className="dossier-actions">
-                <button type="button" className="outline-button" disabled={busy} onClick={() => action(() => api.validateStorage(l.id), 'Đã kiểm tra đọc/ghi và dung lượng.')}>Kiểm tra đọc/ghi</button>
-                <button type="button" className="primary-button" disabled={busy || receiving} onClick={() => setTarget(l)}>{receiving ? 'Đang nhận upload' : 'Dùng cho upload mới'}</button>
-              </div></>}
-        </article>;
-      })}</div>
-      <section className="panel-card dossier-areas" aria-label="Vùng hệ thống"><h2>Vùng hệ thống cần theo dõi</h2>
-        <p className="dossier-muted">Đổi nơi lưu upload không giải phóng các vùng này. Dung lượng ổ chứa MySQL cần theo dõi riêng trên máy chủ.</p>
-        <div className="dossier-grid">{data.areas.map((a) => <div key={a.label}><strong>{a.label}</strong> {a.warning && <span className="dossier-badge warning">{a.status === 'ONLINE' ? 'Gần đầy' : 'Chưa truy cập được'}</span>}
-          {a.status === 'ONLINE' && <Usage label={a.label} free={a.freeBytes} total={a.totalBytes} />}</div>)}</div>
+      <section className="panel-card intake-list-card dossier-group">
+        <div className="panel-heading"><div><p className="section-kicker">Nơi lưu file hồ sơ</p><h2>Ổ lưu trữ</h2><p className="dossier-note">Đổi nơi nhận upload khi ổ gần đầy. File cũ vẫn đọc từ ổ đã lưu, vì vậy ổ cũ cần tiếp tục kết nối.</p></div>
+          <button type="button" className="outline-button small-button" disabled={busy || loading} onClick={() => { setError(''); setNotice(''); onReload(); }}>↻ Kiểm tra lại</button></div>
+        <div className="table-wrap"><table className="staff-table intake-table" aria-label="Ổ lưu trữ"><thead><tr><th scope="col">Ổ lưu</th><th scope="col">Trạng thái</th><th scope="col">Dung lượng</th><th scope="col">Đang lưu</th><th scope="col">Kiểm tra ghi</th><th scope="col"><span className="dossier-hidden">Thao tác</span></th></tr></thead><tbody>{data.locations.map((h) => {
+          const { location: l } = h; const receiving = legacy ? Boolean(l.legacyKey) : data.settings.locationId === l.id;
+          return <tr key={l.id}>
+            <td data-label="Ổ lưu"><span className="intake-cell-content"><strong>{l.label}</strong><small>{l.rootPath || legacyPaths[l.legacyKey]}</small></span></td>
+            <td data-label="Trạng thái"><span className="dossier-badges"><StatusBadge domain="storage" value={statusOf(h)} />{receiving && <span className="status-badge status-badge--info">Đang nhận upload</span>}</span>
+              {h.status === 'VOLUME_CHANGED' && <small className="dossier-note">Thiết bị đã đổi. File cũ vẫn đọc được; cần kiểm tra lại trước khi nhận upload.</small>}
+              {h.status === 'OFFLINE' && h.files > 0 && <small className="dossier-note">File tạm thời chưa mở được, không phải đã bị xóa.</small>}</td>
+            <td data-label="Dung lượng"><Space label={l.label} free={h.freeBytes} total={h.totalBytes} /></td>
+            <td data-label="Đang lưu"><span className="intake-cell-content"><strong>{count(h.files)} file</strong><small>{bytes(h.bytes)}</small></span></td>
+            <td data-label="Kiểm tra ghi" className="muted-cell">{l.legacyKey ? '—' : date(l.validatedAt)}</td>
+            <td data-label="Thao tác">{l.legacyKey ? <span className="muted-cell">{receiving ? 'Mặc định' : 'Chỉ đọc'}</span> : <div className="method-row-actions">
+              <button type="button" className="table-action" disabled={busy} onClick={() => action(() => api.validateStorage(l.id), 'Đã kiểm tra đọc/ghi và dung lượng.')}>Kiểm tra</button>
+              {!receiving && <button type="button" className="table-action" disabled={busy} onClick={() => setTarget(l)}>Dùng cho upload</button>}
+            </div>}</td>
+          </tr>;
+        })}
+        {data.areas.map((a) => <tr key={a.label}>
+          <td data-label="Vùng"><span className="intake-cell-content"><strong>{a.label}</strong><small>Vùng hệ thống, không đổi theo nơi upload</small></span></td>
+          <td data-label="Trạng thái"><StatusBadge domain="storage" value={statusOf(a)} /></td>
+          <td data-label="Dung lượng"><Space label={a.label} free={a.freeBytes} total={a.totalBytes} /></td>
+          <td data-label="Đang lưu" className="muted-cell">—</td><td data-label="Kiểm tra ghi" className="muted-cell">—</td><td data-label="Thao tác" className="muted-cell">—</td>
+        </tr>)}</tbody></table></div>
+        <p className="dossier-note">Ổ chứa MySQL cần theo dõi riêng trên máy chủ.</p>
       </section>
       <form className="panel-card dossier-register" onSubmit={async (e) => {
         e.preventDefault();
-        if (await action(() => api.registerStorage(form), 'Đã đăng ký và kiểm tra nơi lưu. Bạn có thể chọn dùng cho upload mới.')) setForm({ label: '', path: '' });
+        if (await action(() => api.registerStorage(form), 'Đã đăng ký và kiểm tra nơi lưu. Bạn có thể chọn dùng cho upload.')) setForm({ label: '', path: '' });
       }}>
-        <h2>Thêm nơi lưu</h2><p>Ổ hoặc NAS cần được gắn sẵn vào máy chủ, có quyền đọc/ghi cho ứng dụng. Với Docker, dùng đường dẫn bên trong container đã được mount.</p>
-        <p className="dossier-muted">Vùng máy chủ cho phép: {data.allowedRoots.join(', ') || 'chưa cấu hình'}. Thư mục phải có sẵn và nằm riêng với các nơi đã đăng ký.</p>
-        <div className="dossier-register-fields">
-          <label>Tên hiển thị<input required maxLength={120} value={form.label} placeholder="Ổ hồ sơ B" onChange={(e) => setForm({ ...form, label: e.target.value })} /></label>
-          <label>Đường dẫn trên máy chủ<input required maxLength={700} value={form.path} placeholder="/app/storage/dossiers-b" onChange={(e) => setForm({ ...form, path: e.target.value })} /></label>
+        <div className="panel-heading"><div><p className="section-kicker">Sau khi gắn ổ hoặc NAS vào máy chủ</p><h2>Thêm nơi lưu</h2><p className="dossier-note">Thư mục phải có sẵn, ghi được và nằm trong: {data.allowedRoots.join(', ') || 'chưa cấu hình'}. Với Docker, nhập đường dẫn bên trong container.</p></div></div>
+        <div className="list-toolbar dossier-register-fields">
+          <label><small>Tên hiển thị</small><input required maxLength={120} value={form.label} placeholder="Ổ hồ sơ B" onChange={(e) => setForm({ ...form, label: e.target.value })} /></label>
+          <label><small>Đường dẫn trên máy chủ</small><input required maxLength={700} value={form.path} placeholder="/app/storage/dossiers-b" onChange={(e) => setForm({ ...form, path: e.target.value })} /></label>
           <button className="primary-button" disabled={busy}>Đăng ký và kiểm tra</button>
         </div>
       </form>

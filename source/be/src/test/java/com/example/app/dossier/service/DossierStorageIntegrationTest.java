@@ -280,6 +280,29 @@ class DossierStorageIntegrationTest {
         worker(temp.resolve("none")).cleanup();
         assertThat(jobs.detail("fresh")).containsEntry("status","EXPIRED");
     }
+    @Test void legacyDuplicateNumbersGetSeparateFoldersAndExportTogether() throws Exception {
+        long first=receipt("CFC26.9919"),second=receipt("CFC26.9920");upload(first,"one");upload(second,"two");
+        // V16 keeps old duplicates: only the first dossier owns the number.
+        jdbc.update("UPDATE receipts SET request_number='CFC26.9919',request_number_unique=NULL WHERE id=?",second);
+        assertThat(catalog.folder(catalog.receipt(first))).isEqualTo("2026/11/CFC26.9919");
+        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.9919-r"+second);
+        assertThat(storage.folder(second)).isEqualTo("2026/11/CFC26.9919-r"+second);
+        String jobId=jobs.create(new DossierCatalog.Scope(2026,11,null,"CFC26.9919"),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
+        Path exports=Files.createDirectory(temp.resolve("duplicate-exports"));worker(exports).runNext();
+        assertThat(jobs.detail(jobId)).containsEntry("status","COMPLETED");
+        assertThat(unzip(exports,jobId)).containsKeys("2026/11/CFC26.9919/ho-so.json","2026/11/CFC26.9919-r"+second+"/ho-so.json");
+        // A folder that was already fixed on disk before this rule must still not collide inside a package.
+        jdbc.update("UPDATE receipts SET archive_path='2026/11/CFC26.9919' WHERE id=?",second);
+        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.9919-r"+second);
+    }
+    @Test void listShowsCustomerAndSupportsSorting() {
+        long a=receipt("CFC26.9921"),b=receipt("CFC26.9922");
+        var scope=new DossierCatalog.Scope(2026,11,null,"CFC26.992");
+        assertThat(catalog.list(scope,"requestNumber,asc",0,20).content()).extracting(r->r.get("id")).containsExactly(a,b);
+        assertThat(catalog.list(scope,"requestNumber,desc",0,20).content()).extracting(r->r.get("id")).containsExactly(b,a);
+        assertThat(catalog.list(scope,0,20).content().getFirst()).containsEntry("customerName","Khach test").containsEntry("sampleName","Mau test");
+        assertThatThrownBy(()->catalog.list(scope,"id;DROP,asc",0,20)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400");
+    }
     @Test void perAdminQueueLimit() {
         long id=receipt("CFC26.9916");
         for(int i=0;i<5;i++) jobs.create(new DossierCatalog.Scope(null,null,id,null),"r"+i,admin.getId());

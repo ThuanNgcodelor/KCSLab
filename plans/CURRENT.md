@@ -1,6 +1,6 @@
 # Kế hoạch tiếp nhận và phát hành kết quả
 
-> **25/11/2026 — hồ sơ lưu trữ/export/đổi ổ upload:** đã code và kiểm thử cô lập (174 test backend, build, Chrome thật), chưa commit/triển khai; DB vận hành chưa chạy V24/V25. Chi tiết và phần còn lại: [plan](DOSSIER_ARCHIVE_EXPORT_PLAN.md).
+> **25/11/2026 — hồ sơ lưu trữ/export/đổi ổ upload:** đã commit `8a286d1` và đang chạy; bản chỉnh giao diện + hồ sơ trùng số đã kiểm thử cô lập (176 test backend, build, Chrome thật), chưa commit/triển khai. Chi tiết và phần còn lại: [plan](DOSSIER_ARCHIVE_EXPORT_PLAN.md).
 
 > **25/11/2026 — thông báo đã khóa và chạy V23:** ADMIN thấy mọi sự kiện; Tiếp nhận nhận yêu cầu và phản hồi đúng phiếu mình chuyển; KCS chỉ nhận chuyển mẫu có người chuyển + Số CFC. Test routing/realtime và migration đạt, backend/frontend mới đã chạy. **Tiếp theo chỉ là plan** [Quản lý hồ sơ 10 năm và export](DOSSIER_ARCHIVE_EXPORT_PLAN.md): cây năm/tháng/CFC, trang Admin, queue export có giới hạn, upload phân folder ở bước sau. Plan bổ sung A3.1 quản lý nhiều ổ: Admin đổi đích upload khi gần đầy, file cũ tiếp tục đọc qua vị trí đã lưu; A3.2 tổ chức folder mới. Chưa di chuyển file, đổi root đang chạy hoặc tạo chức năng export.
 

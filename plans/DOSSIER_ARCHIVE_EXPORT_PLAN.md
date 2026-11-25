@@ -1,6 +1,6 @@
 # Quản lý hồ sơ 10 năm và export theo năm/tháng/Số CFC
 
-Ngày lập: 25/11/2026. **Trạng thái 25/11/2026: A1, A2, A3.1, A3.2 đã có code và kiểm thử trên môi trường cô lập; chưa commit, chưa triển khai, DB vận hành chưa chạy V24/V25.** A0 (quét dữ liệu thật), A4 (di chuyển file cũ) và A5 (chọn folder trực tiếp) chưa làm. Phần khóa thông báo đã chạy V23 trước khi lập plan này.
+Ngày lập: 25/11/2026. **Trạng thái 25/11/2026: A1, A2, A3.1, A3.2 đã commit (`8a286d1`) và người dùng đã chạy với dữ liệu thật, vì vậy không sửa V24/V25 nữa. Bản chỉnh giao diện và tách folder hồ sơ trùng số (cùng ngày) đã kiểm thử cô lập, chưa commit/triển khai.** A0 (quét dữ liệu thật), A4 (di chuyển file cũ) và A5 (chọn folder trực tiếp) chưa làm. Phần khóa thông báo đã chạy V23 trước khi lập plan này.
 
 ## 0. Kết quả triển khai
 
@@ -19,9 +19,11 @@ Khác với đề xuất ban đầu:
 - Dữ liệu có cấu trúc nằm ở `05-du-lieu/`. Mỗi hồ sơ có `danh-muc-file.csv`; mỗi gói có `danh-muc-goi-N.csv` tên riêng để giải nén chung thư mục không ghi đè.
 - Mã tra cứu khách (`lookup_code`) và đường dẫn máy chủ bị loại khỏi JSON/CSV xuất. QR trong file PDF đã phát hành vẫn chứa mã như cũ.
 - Tạo lại PDF khi ổ chứa ảnh mất kết nối sẽ báo lỗi 503 thay vì âm thầm ra phiếu thiếu ảnh. Ảnh đã mất hẳn vẫn bỏ qua như trước.
+- Hồ sơ cũ trùng Số/No. (V16 cho phép) dùng folder riêng `CFC…-r<id>`; chỉ hồ sơ giữ số dùng tên folder không hậu tố. Trước đó xuất tháng có hai hồ sơ trùng số sẽ lỗi.
+- Giao diện dùng bộ thành phần chung (`intake-command-strip`, `status-chips`, `ListToolbar`, `staff-table`, `StatusBadge`, `Pagination`, `ConfirmDialog`); chi tiết hồ sơ là trang riêng `/admin/dossiers/:id`.
 - Giới hạn 10 lượt chờ toàn hệ thống và 5 lượt mỗi Admin; job làm sập tiến trình 3 lần thì dừng.
 
-Kiểm thử ngày 25/11/2026: toàn suite backend 174 ca, 0 lỗi, 1 bỏ qua (MySQL/Redis cô lập); `npm run build` đạt; Chrome thật với backend/DB tạm ở 390/1024/1440/2560 px không tràn ngang, gồm đổi ổ, gỡ ổ, xuất chặt và xuất có cảnh báo; nâng V23 → V25 trên schema có dữ liệu đạt; xuất 2,4 GB với heap 256 MB và tắt backend giữa chừng hoàn tất, hai ZIP đọc được.
+Kiểm thử ngày 25/11/2026: toàn suite backend 176 ca, 0 lỗi, 1 bỏ qua (MySQL/Redis cô lập); `npm run build` đạt; Chrome thật với backend/DB tạm ở 390/1024/1440/2560 px không tràn ngang, gồm đổi ổ, gỡ ổ, xuất chặt và xuất có cảnh báo; nâng V23 → V25 trên schema có dữ liệu đạt; xuất 2,4 GB với heap 256 MB và tắt backend giữa chừng hoàn tất, hai ZIP đọc được.
 
 Chưa kiểm thử: Windows, NAS thật, HTTPS, đầy đĩa thật (mới giả lập ngưỡng), tài khoản và dữ liệu thật. V24/V25 chỉ nâng lên, muốn lùi phải phục hồi backup.
 

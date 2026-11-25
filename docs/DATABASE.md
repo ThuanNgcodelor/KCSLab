@@ -18,7 +18,7 @@ File hồ sơ lưu ở thư mục cấu hình của backend. Database giữ bả
 
 ## Migration nghiệp vụ
 
-- V24 thêm `storage_locations` (1 = tiếp nhận cũ, 2 = kết quả cũ), `storage_write_settings` (đích ghi và phiên bản), `dossier_audit`, `receipts.archive_path`; thêm `storage_location_id`/`relative_path` vào `receipt_attachments` và `result_release_files`. File cũ giữ nguyên tên và vị trí (`relative_path` null). V25 thêm hàng đợi export `dossier_export_jobs/entries/parts/worker`. Đã thử nâng từ V23 có dữ liệu trên MySQL cô lập; chưa chạy DB vận hành.
+- V24 thêm `storage_locations` (1 = tiếp nhận cũ, 2 = kết quả cũ), `storage_write_settings` (đích ghi và phiên bản), `dossier_audit`, `receipts.archive_path`; thêm `storage_location_id`/`relative_path` vào `receipt_attachments` và `result_release_files`. File cũ giữ nguyên tên và vị trí (`relative_path` null). V25 thêm hàng đợi export `dossier_export_jobs/entries/parts/worker`. Đã thử nâng từ V23 có dữ liệu trên MySQL cô lập; đã phát hành, không sửa hai file này.
 
 - V23 chuẩn hóa nội dung `TRANSFER_SUBMITTED` cũ theo phiếu chuyển/Số CFC; bổ sung bản thông báo lịch sử cho từng Admin đang hoạt động nếu thiếu theo dedupe key. Không xóa tin sai khâu hoặc đổi readAt đã có. Quyền xem theo loại được khóa ở service; không phụ thuộc việc xóa bản ghi cũ. Đã kiểm tra trên MySQL cô lập và triển khai DB vận hành ngày 25/11/2026.
 

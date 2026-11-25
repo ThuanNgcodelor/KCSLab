@@ -201,10 +201,11 @@ public class DossierStorageService {
     }
     @Transactional
     public String folder(long receiptId) {
-        var row = jdbc.queryForMap("SELECT archive_path,request_number,received_at FROM receipts WHERE id=? FOR UPDATE",receiptId);
+        var row = jdbc.queryForMap("SELECT archive_path,request_number,request_number_unique,received_at FROM receipts WHERE id=? FOR UPDATE",receiptId);
         String folder = (String) row.get("archive_path");
         if (folder == null) {
-            folder = ArchivePaths.folder(receiptId,(String)row.get("request_number"),((java.sql.Timestamp)row.get("received_at")).toInstant());
+            folder = ArchivePaths.folder(receiptId,(String)row.get("request_number"),
+                    ArchivePaths.owns((String)row.get("request_number"),(String)row.get("request_number_unique")),((java.sql.Timestamp)row.get("received_at")).toInstant());
             jdbc.update("UPDATE receipts SET archive_path=? WHERE id=?",folder,receiptId);
         }
         return folder;

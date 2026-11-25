@@ -23,8 +23,9 @@ public class DossierAdminController {
     public DossierAdminController(DossierCatalog catalog,DossierStorageService storage,UserService users) { this.catalog=catalog;this.storage=storage;this.users=users; }
     @GetMapping
     public DossierCatalog.Page<Map<String,Object>> list(@RequestParam(required=false) Integer year,@RequestParam(required=false) Integer month,
-            @RequestParam(required=false) Long receiptId,@RequestParam(required=false) String q,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size) {
-        return catalog.list(new DossierCatalog.Scope(year,month,receiptId,q),page,size);
+            @RequestParam(required=false) Long receiptId,@RequestParam(required=false) String q,
+            @RequestParam(defaultValue="receivedAt,desc") String sort,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size) {
+        return catalog.list(new DossierCatalog.Scope(year,month,receiptId,q),sort,page,size);
     }
     @GetMapping("/summary")
     public DossierCatalog.Summary summary(@RequestParam(required=false) Integer year,@RequestParam(required=false) Integer month,
@@ -36,11 +37,12 @@ public class DossierAdminController {
     /** Physical paths and storage ids stay on the server. */
     public record FileView(String source,long id,String originalName,String contentType,long size,String checksum,String category,
             Long sampleId,Integer version,boolean historical,Instant uploadedAt,String uploadedBy) {}
-    public record Detail(long id,String requestNumber,String receiptCode,String folder,DossierCatalog.Page<FileView> files) {}
+    public record Detail(long id,String requestNumber,String receiptCode,String customerName,String sampleName,Instant receivedAt,String folder,DossierCatalog.Page<FileView> files) {}
     @GetMapping("/{id}")
     public Detail detail(@PathVariable long id,@RequestParam(defaultValue="0") int page) {
         var r=catalog.receipt(id); var files=catalog.files(id,page,50);
-        return new Detail(id,(String)r.get("request_number"),(String)r.get("receipt_code"),catalog.folder(r),
+        return new Detail(id,(String)r.get("request_number"),(String)r.get("receipt_code"),catalog.customerName(id),(String)r.get("sample_name"),
+            ((java.sql.Timestamp)r.get("received_at")).toInstant(),catalog.folder(r),
             new DossierCatalog.Page<>(files.content().stream().map(f->new FileView(f.source(),f.id(),f.originalName(),f.contentType(),f.size(),f.checksum(),
                 f.category(),f.sampleId(),f.version(),f.historical(),f.uploadedAt(),f.uploadedBy())).toList(),files.totalElements(),page,50));
     }
