@@ -80,6 +80,8 @@ public class ReceiptForm3Exporter {
         String packaging = sample == null ? receipt.getPackaging() : sample.getPackaging();
         String condition = sample == null ? receipt.getSampleCondition() : sample.getCondition();
         String parameters = sample == null ? receipt.getRequestedParameters() : sample.getRequestedParameters();
+        String quantity = sample == null ? receipt.getQuantity() : java.util.stream.Stream.of(sample.getQuantity(), sample.getWeight())
+                .filter(value -> value != null && !value.isBlank()).distinct().collect(java.util.stream.Collectors.joining(" / "));
 
         // Tick the checkbox content controls first (anchors are template labels), then fill the text placeholders.
         Choice pack = packagingChoice(packaging);
@@ -108,7 +110,7 @@ public class ReceiptForm3Exporter {
                 .replace("{{deliveredBy}}", xmlValue(receipt.getDeliveredBy()))
                 .replace("{{receivedBy}}", xmlValue(receipt.getReceivedBy().getDisplayName()))
                 .replace("{{sampleName}}", sample == null ? xmlValue(receipt.getSampleName()) : xmlValue(sample.getName()))
-                .replace("{{quantity}}", xmlValue(sample == null ? receipt.getQuantity() : sample.getQuantity()))
+                .replace("{{quantity}}", xmlValue(quantity))
                 .replace("{{packagingOther}}", xmlValue(pack.other()))
                 .replace("{{sealNumber}}", xmlValue(receipt.getSealNumber()))
                 .replace("{{conditionOther}}", xmlValue(cond.other()))

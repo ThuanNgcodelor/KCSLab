@@ -226,7 +226,7 @@ public class ReceiptService {
             }
             Sample sample = new Sample(code, source, productType, date, sequence, sampleRequest.name().trim(),
                     sampleRequest.quantity(), sampleRequest.packaging(), sampleRequest.condition(),
-                    sampleRequest.requestedParameters());
+                    sampleRequest.requestedParameters(), blankToNull(sampleRequest.weight()));
             if (sampleRequest.sampleCode() != null && !sampleRequest.sampleCode().isBlank()) {
                 sample.markManuallyCoded(receivedBy);
             }
@@ -387,7 +387,7 @@ public class ReceiptService {
                         sample.getId(), sample.getSampleCode(), sample.getSourceCode(), sample.getProductType(),
                         sample.getName(), sample.getQuantity(), sample.getPackaging(), sample.getCondition(),
                         sample.getRequestedParameters(), sample.getStatus(), sample.getCodingStatus(),
-                        sample.getVerifiedAt())).toList(),
+                        sample.getVerifiedAt(), sample.getWeight())).toList(),
                 receipt.getAttachments().stream().map(this::toAttachmentResponse).toList());
     }
 

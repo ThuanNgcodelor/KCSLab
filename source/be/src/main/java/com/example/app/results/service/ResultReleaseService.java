@@ -425,11 +425,13 @@ public class ResultReleaseService {
         var customer = receipt.getCustomer();
         String condition = java.util.stream.Stream.of(receipt.getSampleCondition(), receipt.getConditionDetail())
                 .filter(value -> value != null && !value.isBlank()).collect(java.util.stream.Collectors.joining(". "));
+        String quantity = java.util.stream.Stream.of(item.getQuantity() != null ? item.getQuantity() : receipt.getQuantity(), item.getWeight())
+                .filter(value -> value != null && !value.isBlank()).distinct().collect(java.util.stream.Collectors.joining(" / "));
         return new ReportData(resultNumber, lookupCode, reportDate, customer.getName(), customer.getAddress(),
                 receipt.getSampleName(), receipt.getGrowingArea(), receipt.getPackingFacility(),
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getSealNumber(), item.getSampleCode(), receipt.getSampledBy(), toDate(receipt.getSampledAt()),
-                condition, item.getQuantity() != null ? item.getQuantity() : receipt.getQuantity(),
+                condition, quantity,
                 toDate(receipt.getReceivedAt()), testingDate, rows, qualityHead, director, preview, photos);
     }
 

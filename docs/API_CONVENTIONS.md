@@ -40,7 +40,15 @@ Khi tạo tiếp nhận từ Phiếu yêu cầu, UI lấy mã từ Phiếu hiệ
 - Settings, lịch sử và retry dùng `Cache-Control: no-store`. Mutation giữ CSRF. Chưa có endpoint webhook công khai trong P0–P2.
 - Mặc định `OFF`; `FAKE` chỉ mô phỏng; `ZALO_DEVELOPMENT` bắt buộc allowlist và giới hạn số lần gọi theo đợt. `ACCEPTED` chưa phải `DELIVERED`. Chi tiết tại [hướng dẫn test](ZALO_INTAKE_TESTING.md).
 
+## Số lượng và khối lượng mẫu
+
+`POST /receipts` nhận thêm `samples[].weight` tùy chọn, chuỗi tối đa 80 ký tự, ghi kèm đơn vị (ví dụ `500 g`, `2 kg`). `quantity` giữ nguyên contract cũ và độc lập với weight; bỏ weight vẫn hợp lệ. Response chi tiết/danh sách tiếp nhận trả weight theo mẫu. Phiếu chuyển dùng `weight` từ mẫu nếu client chưa nhập, không dùng quantity để tự suy ra weight. Giá trị lượng lấy từ hiện trường được giữ nguyên; mẫu không khớp hoặc tổng lượng nhiều mẫu không được tự phân chia. Word Phiếu 3 và KQKN thể hiện cả hai giá trị khi có. Hồ sơ cũ không tự được gán khối lượng/đơn vị.
+
 ## API thông báo nội bộ
+
+- `TEST_REQUEST_CREATED`: tạo Phiếu yêu cầu báo cho ADMIN/RECEPTIONIST đang hoạt động, trừ chính người lập; target `/admin/requests/{id}`. Không phát lại khi chỉ cập nhật phiếu.
+- `INTAKE_RECORDED`: tin KCS không chứa công ty, target `/admin/receiving`. Tin lịch sử của KCS được bỏ đuôi công ty trên phản hồi và khi lọc tìm kiếm; không cập nhật nội dung gốc trong DB.
+- `TRANSFER_SUBMITTED`: có người chuyển, số mẫu và Số/No. (phiếu cũ thiếu Số/No. dùng mã chuyển), target KCS `/admin/receiving/transfers/{id}`.
 
 - `GET /notifications?page=0&size=20&unread=false` hỗ trợ tìm kiếm và lọc. Kết quả có `unreadCount` cho toàn bộ thông báo của người nhận.
 - `PATCH /notifications/{id}` đánh dấu đã đọc và trả bản ghi cập nhật. `POST /notifications/read-all` đánh dấu tất cả của người đang đăng nhập.

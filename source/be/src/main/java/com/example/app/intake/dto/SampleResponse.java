@@ -17,5 +17,6 @@ public record SampleResponse(
         String requestedParameters,
         ReceiptStatus status,
         SampleCodingStatus codingStatus,
-        Instant codingVerifiedAt
+        Instant codingVerifiedAt,
+        String weight
 ) {}

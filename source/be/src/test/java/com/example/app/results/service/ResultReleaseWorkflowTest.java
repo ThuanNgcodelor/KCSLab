@@ -409,7 +409,8 @@ class ResultReleaseWorkflowTest {
         assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, "không-khớp", null, null, null).content()).isEmpty();
         assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, null,
                 com.example.app.notification.entity.StaffNotificationType.TRANSFER_REJECTED, null, null).content()).isEmpty();
-        assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, null, null, LocalDate.now().plusDays(1), null).content()).isEmpty();
+        assertThat(notifications.findFor(technician, 0, 10, "createdAt,desc", false, null, null,
+                LocalDate.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).plusDays(1), null).content()).isEmpty();
         // Another user never sees it, whatever the filter.
         assertThat(notifications.findFor(otherTechnician, 0, 10, "createdAt,desc", false, "Có mẫu sầu riêng", null, null, null).content()).isEmpty();
         expect(400, () -> notifications.findFor(technician, 0, 10, "message,asc", false, null, null, null, null));

@@ -1,5 +1,7 @@
 # Kế hoạch tiếp nhận và phát hành kết quả
 
+> **25/11/2026 — đã triển khai nội bộ bản sửa thông báo/khối lượng:** backend/frontend mới đang chạy, DB vận hành V22. Khối lượng tách với số lượng, KCS nhận thông báo người chuyển + Số/No.; giữ nguyên dữ liệu cũ và Zalo OFF. Backup `/home/kali/backups/cfc-lab-before-weight-20261125-1a805ac4/`. Cần nghiệm thu màn hình bằng tài khoản Tiếp nhận/KCS thật; chi tiết kiểm tra ở `docs/ai/CONTEXT.md`.
+
 Trạng thái hiện tại nằm ở [SYSTEM_STATUS.md](../docs/SYSTEM_STATUS.md). Nội dung bên dưới ghi lại các mốc lập kế hoạch trước đây.
 
 > **23/11/2026 — Zalo khi tiếp nhận:** [plan](ZALO_INTAKE_TEST_PLAN.md). P1–P2 có outbox/fake/development; P3 có inbox webhook xác minh raw body + polling giới hạn; P4 có token mã hóa/refresh, Admin theo dõi/pause và adapter LIVE với cổng bật riêng. Mặc định OFF, chưa gửi thật, chưa deploy/migrate DB vận hành; OA/template/token và pilot còn chờ. [Runbook](../docs/ZALO_OPERATIONS_RUNBOOK.md).

@@ -204,12 +204,15 @@ public class TransferService {
         transfer.getItems().forEach(item -> item.getSample().markTransferPending());
         transfer.submit();
         SampleTransfer saved = transferRepository.save(transfer);
+        String requestNumber = saved.getReceipt().getRequestNumber();
+        String reference = requestNumber == null || requestNumber.isBlank()
+                ? "phiếu " + saved.getTransferCode() : "Số/No. " + requestNumber;
         notificationService.notifyRoles(Set.of(Role.TECHNICIAN), submittedBy,
                 StaffNotificationType.TRANSFER_SUBMITTED,
                 "Phiếu chuyển mẫu mới",
-                "%s đã chuyển %d mẫu đến phòng KCS".formatted(
-                        submittedBy.getDisplayName(), transfer.getItems().size()),
-                "/admin/transfers/" + saved.getId(), "TRANSFER", saved.getId());
+                "%s đã chuyển %d mẫu của %s đến KCS".formatted(
+                        submittedBy.getDisplayName(), transfer.getItems().size(), reference),
+                "/admin/receiving/transfers/" + saved.getId(), "TRANSFER", saved.getId());
         return toResponse(saved);
     }
 
@@ -328,7 +331,7 @@ public class TransferService {
         List<SampleTransferItem> items = new ArrayList<>();
         for (CreateTransferItemRequest itemRequest : request.items()) {
             Sample sample = samples.get(itemRequest.sampleId());
-            items.add(new SampleTransferItem(sample, blankToNull(itemRequest.weight()),
+            items.add(new SampleTransferItem(sample, defaultValue(itemRequest.weight(), sample.getWeight()),
                     defaultValue(itemRequest.quantity(), sample.getQuantity()),
                     defaultValue(itemRequest.sampleCondition(), sample.getCondition()),
                     defaultValue(itemRequest.requestedParameters(), sample.getRequestedParameters()),

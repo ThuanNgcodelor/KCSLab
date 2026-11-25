@@ -11,8 +11,13 @@ public record SampleRequest(
         @Size(max = 80) String quantity,
         @Size(max = 80) String packaging,
         @Size(max = 255) String condition,
-        String requestedParameters
+        String requestedParameters,
+        @Size(max = 80) String weight
 ) {
+    public SampleRequest(String sampleCode, String sourceCode, String productType, String name, String quantity,
+                         String packaging, String condition, String requestedParameters) {
+        this(sampleCode, sourceCode, productType, name, quantity, packaging, condition, requestedParameters, null);
+    }
     public SampleRequest(String sourceCode, String productType, String name, String quantity,
                          String packaging, String condition, String requestedParameters) {
         this(null, sourceCode, productType, name, quantity, packaging, condition, requestedParameters);

@@ -10,6 +10,7 @@ import { splitParameters } from '../../../shared/parameters';
 import { normalizeRequestNumber } from '../../../shared/requestNumber';
 import { CustomerNotificationFields } from '../components/CustomerNotificationFields';
 import { CustomerNotificationHistory } from '../components/CustomerNotificationHistory';
+import { fieldQuantityForSample } from '../intakeModel';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -20,7 +21,7 @@ const initialForm = {
 };
 
 const newSample = () => ({
-  sampleCode: '', sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', packaging: 'Túi PE',
+  sampleCode: '', sourceCode: 'CT001', productType: 'Sầu riêng', name: '', quantity: '', weight: '', packaging: 'Túi PE',
   packagingOther: '', parameterOther: '', parameterOtherEnabled: false, condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
@@ -63,9 +64,9 @@ function samplesFromRequest(data) {
   const rows = [...byName].map(([name, parameters]) => {
     const known = parameters.filter((parameter) => parameterOptions.includes(parameter));
     const other = parameters.filter((parameter) => !parameterOptions.includes(parameter));
-    return { ...newSample(), name, requestedParameters: known.join(', '), parameterOtherEnabled: other.length > 0, parameterOther: other.join(', ') };
+    return { ...newSample(), name, quantity: fieldQuantityForSample(data.fieldSampling, name, byName.size), requestedParameters: known.join(', '), parameterOtherEnabled: other.length > 0, parameterOther: other.join(', ') };
   });
-  return rows.length ? rows : [{ ...newSample(), name: data.sampleName }];
+  return rows.length ? rows : [{ ...newSample(), name: data.sampleName, quantity: fieldQuantityForSample(data.fieldSampling, data.sampleName, 1) }];
 }
 
 export function ReceiptCreatePage() {
@@ -262,7 +263,8 @@ export function ReceiptCreatePage() {
                 <label>Mã hóa mẫu<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
                 <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
-                <label>Số lượng / khối lượng<input value={sample.quantity} onChange={updateSample(index, 'quantity')} /></label>
+                <label>Số lượng / lượng mẫu<input value={sample.quantity} onChange={updateSample(index, 'quantity')} maxLength={80} placeholder="Ví dụ: 2 quả" /></label>
+                <label>Khối lượng<input value={sample.weight} onChange={updateSample(index, 'weight')} maxLength={80} placeholder="Ví dụ: 500 g hoặc 2 kg" /></label>
                 <label>Loại bao bì<select value={packagingOptions.includes(sample.packaging) ? sample.packaging : sample.packaging ? 'Khác' : ''} onChange={updateSample(index, 'packaging')}><option value="">Chọn loại bao bì</option>{packagingOptions.map((option) => <option value={option} key={option}>{option}</option>)}<option value="Khác">Khác</option></select></label>
                 {sample.packaging === 'Khác' && <label>Loại bao bì khác<input value={sample.packagingOther} onChange={updateSample(index, 'packagingOther')} placeholder="Nhập loại bao bì" required /></label>}
                 <ConditionChecklist value={sample.condition} onChange={(condition) => setSamples((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, condition } : item)))} name={`condition-${index}`} />
@@ -329,6 +331,7 @@ function validateForm(form, samples) {
   if (form.customerEmail.trim() && !/^\S+@\S+\.\S+$/.test(form.customerEmail.trim())) return 'Email khách hàng không đúng định dạng.';
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
+  if (samples.some((sample) => sample.quantity.length > 80 || sample.weight.length > 80)) return 'Số lượng và khối lượng mỗi mẫu tối đa 80 ký tự. Vui lòng kiểm tra lại thông tin lấy từ phiếu hiện trường.';
   if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim()
     || !sample.sourceCode.trim()
     || (!sample.requestedParameters.trim() && !(sample.parameterOtherEnabled && sample.parameterOther.trim()))

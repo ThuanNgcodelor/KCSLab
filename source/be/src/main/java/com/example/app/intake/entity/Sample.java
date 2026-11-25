@@ -28,6 +28,7 @@ public class Sample {
     @Column(nullable = false) private Integer dailySequence;
     @Column(nullable = false, length = 160) private String name;
     @Column(length = 80) private String quantity;
+    @Column(length = 80) private String weight;
     @Column(length = 80) private String packaging;
     @Column(name = "sample_condition", length = 255) private String sampleCondition;
     @Column(columnDefinition = "TEXT") private String requestedParameters;
@@ -44,9 +45,14 @@ public class Sample {
     protected Sample() {}
     public Sample(String sampleCode, String sourceCode, String productType, LocalDate receivedDate, Integer dailySequence,
                    String name, String quantity, String packaging, String condition, String requestedParameters) {
+        this(sampleCode, sourceCode, productType, receivedDate, dailySequence, name, quantity, packaging, condition, requestedParameters, null);
+    }
+    public Sample(String sampleCode, String sourceCode, String productType, LocalDate receivedDate, Integer dailySequence,
+                  String name, String quantity, String packaging, String condition, String requestedParameters, String weight) {
         this.sampleCode = sampleCode; this.sourceCode = sourceCode; this.productType = productType;
         this.receivedDate = receivedDate; this.dailySequence = dailySequence; this.name = name; this.quantity = quantity;
         this.packaging = packaging; this.sampleCondition = condition; this.requestedParameters = requestedParameters;
+        this.weight = weight;
         this.status = ReceiptStatus.RECEIVED;
     }
     public void markManuallyCoded(User coder) {
@@ -98,6 +104,7 @@ public class Sample {
     public Integer getDailySequence() { return dailySequence; }
     public String getName() { return name; }
     public String getQuantity() { return quantity; }
+    public String getWeight() { return weight; }
     public String getPackaging() { return packaging; }
     public String getCondition() { return sampleCondition; }
     public String getRequestedParameters() { return requestedParameters; }

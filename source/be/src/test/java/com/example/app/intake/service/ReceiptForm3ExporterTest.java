@@ -37,7 +37,7 @@ class ReceiptForm3ExporterTest {
         receipt.setSealStatus(SealStatus.INTACT);
         receipt.addSample(new Sample(
                 "CT001-SR-16112026-001", "CT001", "SR", LocalDate.of(2026, 11, 16), 1,
-                "Mẫu & <đặc biệt>", "1 kg", "Túi PE", "Nguyên vẹn", "Cadimi & Auramin O"));
+                "Mẫu & <đặc biệt>", "2 quả", "Túi PE", "Nguyên vẹn", "Cadimi & Auramin O", "500 g"));
 
         byte[] documentXml = readDocumentXml(exporter.export(receipt));
         Document document = DocumentBuilderFactory.newInstance()
@@ -46,6 +46,7 @@ class ReceiptForm3ExporterTest {
         String text = document.getDocumentElement().getTextContent();
 
         assertThat(text).contains("TN-20261116-TEST", "REQ-001", "Đơn vị giao <mẫu>", "Người nhận & KCS");
+        assertThat(text).contains("2 quả / 500 g");
         assertThat(new String(documentXml, StandardCharsets.UTF_8)).doesNotContain("{{", "d5p1:", "d8p1:");
     }
 

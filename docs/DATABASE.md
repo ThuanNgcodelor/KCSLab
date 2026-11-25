@@ -18,6 +18,8 @@ File hồ sơ lưu ở thư mục cấu hình của backend. Database giữ bả
 
 ## Migration nghiệp vụ
 
+- V22 bổ sung `samples.weight VARCHAR(80)` nullable (utf8mb4), độc lập với `samples.quantity`. Không backfill từ quantity vì số lượng/đơn vị cũ có thể không phải khối lượng. API nhận mẫu cũ bỏ weight vẫn hợp lệ; snapshot phiếu chuyển dùng weight riêng. Migration đã kiểm tra trên MySQL cô lập; chưa chạy trên DB vận hành.
+
 - V1–V5 thiết lập nền, dữ liệu tiếp nhận, chuyển mẫu, thông báo và các chỉ mục truy vấn.
 - V6–V10 bổ sung hồ sơ kết quả, lịch sử mã, phiên bản phát hành, file và nội dung phiếu.
 - V11–V15 bổ sung yêu cầu, kế hoạch, phiếu lấy mẫu và điều chỉnh cấu trúc tiếp nhận. V14 đồng bộ số kế hoạch và phiếu lấy mẫu theo số yêu cầu.

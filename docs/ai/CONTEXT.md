@@ -1,13 +1,20 @@
 # Ngữ cảnh CFC Lab
 
-Cập nhật 23/11/2026. Đọc file này để bắt đầu. Khi cần chi tiết, chọn tài liệu theo tác vụ ở [START_HERE.md](START_HERE.md).
+Cập nhật 25/11/2026. Đọc file này để bắt đầu. Khi cần chi tiết, chọn tài liệu theo tác vụ ở [START_HERE.md](START_HERE.md).
 
 ## Hệ thống đang chạy
+
+- **Triển khai nội bộ 25/11/2026:** đã build/recreate đúng hai container `cfc-lab-prod-backend`/`cfc-lab-prod-frontend` từ working tree hiện tại (base `290bab8` + sửa khối lượng/thông báo). Flyway nâng DB vận hành từ V21 lên V22, thêm `samples.weight` nullable. Bản frontend đang phục vụ có ô weight riêng ở tạo tiếp nhận/chi tiết/chuyển mẫu; backend khởi động thành công, hai container không restart lỗi. HTTP app/tra cứu 200; API auth không đăng nhập 401 như thiết kế. Không đổi cấu hình gửi Zalo: vẫn OFF/live gate false.
+  - Backup trước triển khai: `/home/kali/backups/cfc-lab-before-weight-20261125-1a805ac4/` (database SQL, storage tar đã kiểm tra đọc được, JAR backend cũ và frontend cũ). Không đọc/ghi `.env` hoặc log dữ liệu khách. Không sửa MySQL/Redis service, không tự đổi khối lượng/đơn vị của hồ sơ cũ.
+  - Kiểm tra nghiệp vụ trước triển khai: 146 test backend đạt, 1 skip; 4 test mapping frontend đạt; production build và Playwright mock đã đạt ở các breakpoint. Sau triển khai chỉ kiểm tra dịch vụ/schema/bundle, chưa thao tác bằng tài khoản thật chị Thúy/chị Thảo; không tạo phiếu/tin giả trong DB vận hành. Các ghi chú “chưa deploy” bên dưới là trạng thái lịch sử trước lần triển khai này.
 
 - Backend modular monolith Java 21, Spring Boot 4, MySQL/Flyway và Redis. Frontend React/Vite. API và WebSocket chạy cùng origin: lúc dev qua Vite proxy, bản build qua nginx (Linux) hoặc Apache Laragon (Windows).
 - Ba quyền `ADMIN`, `RECEPTIONIST` và `TECHNICIAN`. Xem [RBAC](../RBAC.md) và [bản đồ module](MODULE_MAP.md).
 - Luồng chính: yêu cầu kiểm nghiệm → (tùy chọn) kế hoạch lấy mẫu và lấy mẫu hiện trường → tiếp nhận (Phiếu 3) → chuyển mẫu (Phiếu 4) → KCS nhận mẫu → thử nghiệm và phiếu KQKN → Admin duyệt và phát hành → khách tra cứu.
 - **Số/No.** (dạng `CFC26.0001`) là định danh duy nhất của yêu cầu và phiếu tiếp nhận. Mã hóa mẫu do người tiếp nhận nhập tay.
+- **Thông báo/khối lượng (24/11):** tạo Phiếu yêu cầu phát `TEST_REQUEST_CREATED` cho ADMIN/RECEPTIONIST đang bật, trừ người lập; cập nhật không tạo lại tin. KCS nhận tin tiếp nhận không có tên công ty; phản hồi lịch sử và tìm kiếm cũng bỏ phần công ty của tin cũ. Tin chuyển mẫu ghi người chuyển + số mẫu + Số/No., mở `/admin/receiving/transfers/{id}`. Thông báo tiếp nhận KCS mở dashboard nhận mẫu, không mở route Tiếp nhận bị cấm cho TECHNICIAN.
+  - V22 thêm `samples.weight` tùy chọn, tách với `quantity`. Form tiếp nhận nhập khối lượng kèm đơn vị; API trả `samples[].weight`; Phiếu chuyển kế thừa weight riêng, không chép quantity vào weight. KCS nhận đúng snapshot; Phiếu 3/KQKN có cả lượng và khối lượng khi đã nhập. Dữ liệu quantity cũ giữ nguyên, weight cũ để null, không đoán đơn vị hay sửa phiếu đã nhận/phát hành.
+  - Số lượng hiện trường kế thừa theo tên mẫu, không chép tổng lượng vào mọi mẫu. Giữ nguyên đơn vị/chữ đã nhập và cho nhân viên sửa trước lưu. Kiểm tra: toàn suite backend 146 đạt, 1 bỏ qua (MySQL/Redis cô lập, V22); 4 test Node mapping đạt; frontend build đạt; Playwright API giả kiểm tra lưu amount riêng → chuyển mẫu → KCS, 4 màn ở 390/1024/1440/2560 px không tràn ngang. Chưa restart/migrate DB vận hành; cần bản backend/frontend mới và V22 khi triển khai.
 - **Mã vùng trồng**: người dùng chốt ngày 23/11/2026 dùng tên này xuyên suốt Phiếu yêu cầu → Kế hoạch lấy mẫu → Lấy mẫu hiện trường → Tiếp nhận → KQKN, thay các nhãn “Nguồn gốc”, “Vùng trồng / nguồn mẫu”. Model frontend dùng `growingArea`; API/DB Phiếu yêu cầu giữ khóa `origin` cũ và KQKN giữ `orchardCode` để tương thích. Tiếp nhận điền sẵn ưu tiên hiện trường → kế hoạch → yêu cầu; giá trị rỗng đã lưu ở bước trước được giữ nguyên. `sourceCode` (Mã nguồn tạo mã mẫu) vẫn là thông tin riêng. Không tự cập nhật dây chuyền hồ sơ/PDF đã lưu. Kiểm tra: frontend build đạt; ánh xạ API cũ/giá trị rỗng và kế thừa đạt; Playwright API giả trên 5 màn ở 390/1024/1440/2560 px không tràn ngang. Chưa deploy lại bản vận hành hoặc sửa dữ liệu thật.
 
 ## Thử nghiệm và phiếu kết quả (KQKN)
