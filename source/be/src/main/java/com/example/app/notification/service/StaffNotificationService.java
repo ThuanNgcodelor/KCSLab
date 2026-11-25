@@ -54,7 +54,8 @@ public class StaffNotificationService {
         com.example.app.common.query.ListQuery.requireOrderedRange(from, to);
         var parsed = com.example.app.common.query.ListQuery.parseSort(sort, LIST_SORT, "createdAt,desc");
         org.springframework.data.jpa.domain.Specification<StaffNotification> spec =
-                (root, query, builder) -> builder.equal(root.get("recipient").get("id"), viewer.getId());
+                (root, query, builder) -> builder.and(builder.equal(root.get("recipient").get("id"), viewer.getId()),
+                        root.get("type").in(StaffNotificationPolicy.typesFor(viewer.getRole())));
         if (unreadOnly) spec = spec.and((root, query, builder) -> builder.isNull(root.get("readAt")));
         if (type != null) spec = spec.and((root, query, builder) -> builder.equal(root.get("type"), type));
         if (from != null) {
@@ -67,30 +68,21 @@ public class StaffNotificationService {
         }
         if (com.example.app.common.query.ListQuery.hasText(q)) {
             String pattern = com.example.app.common.query.ListQuery.contains(q);
-            spec = spec.and((root, query, builder) -> {
-                jakarta.persistence.criteria.Expression<String> message = root.get("message");
-                if (viewer.getRole() == Role.TECHNICIAN) {
-                    var marker = builder.locate(message, " mẫu từ ");
-                    // Match what KCS can read, including historical intake notices containing a customer name.
-                    message = builder.<String>selectCase().when(builder.and(
-                            builder.equal(root.get("type"), StaffNotificationType.INTAKE_RECORDED), builder.gt(marker, 0)),
-                            builder.substring(message, builder.literal(1), builder.sum(marker, 3))).otherwise(message);
-                }
-                return builder.or(builder.like(builder.lower(root.get("title")), pattern, '\\'),
-                        builder.like(builder.lower(message), pattern, '\\'));
-            });
+            spec = spec.and((root, query, builder) -> builder.or(builder.like(builder.lower(root.get("title")), pattern, '\\'),
+                    builder.like(builder.lower(root.get("message")), pattern, '\\')));
         }
         Page<StaffNotification> result = notificationRepository.findAll(spec,
                 com.example.app.common.query.ListQuery.page(page, size, parsed));
         return new StaffNotificationPageResponse(result.getContent().stream().map(this::toResponse).toList(),
                 result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages(),
                 result.isFirst(), result.isLast(), parsed.canonical(),
-                notificationRepository.countByRecipient_IdAndReadAtIsNull(viewer.getId()));
+                notificationRepository.countByRecipient_IdAndTypeInAndReadAtIsNull(viewer.getId(), StaffNotificationPolicy.typesFor(viewer.getRole())));
     }
 
     @Transactional
     public StaffNotificationResponse markRead(Long id, User viewer) {
         StaffNotification notification = notificationRepository.findByIdAndRecipient_Id(id, viewer.getId())
+                .filter(row -> StaffNotificationPolicy.allows(viewer.getRole(), row.getType()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Không tìm thấy thông báo"));
         notification.markRead();
@@ -99,7 +91,7 @@ public class StaffNotificationService {
 
     @Transactional
     public int markAllRead(User viewer) {
-        return notificationRepository.markAllRead(viewer.getId(), Instant.now());
+        return notificationRepository.markAllRead(viewer.getId(), Instant.now(), StaffNotificationPolicy.typesFor(viewer.getRole()));
     }
 
     @Transactional
@@ -114,8 +106,13 @@ public class StaffNotificationService {
     public void notifyUsers(Collection<User> recipients, User actor,
                             StaffNotificationType type, String title, String message,
                             String targetUrl, String entityType, Long entityId) {
-        for (User recipient : recipients) {
-            if (actor != null && actor.getId().equals(recipient.getId())) continue;
+        var targets = new java.util.LinkedHashMap<Long, User>();
+        recipients.forEach(recipient -> targets.put(recipient.getId(), recipient));
+        // Admin sees every workflow event, even events they performed themselves.
+        userRepository.findByRoleInAndEnabledTrue(java.util.Set.of(Role.ADMIN))
+                .forEach(admin -> targets.put(admin.getId(), admin));
+        for (User recipient : targets.values()) {
+            if (!recipient.isEnabled() || !StaffNotificationPolicy.allows(recipient.getRole(), type)) continue;
             String dedupeKey = "%s:%s:%s:%d".formatted(type, entityType, entityId, recipient.getId());
             if (notificationRepository.existsByDedupeKey(dedupeKey)) continue;
             StaffNotification saved = notificationRepository.save(new StaffNotification(
@@ -129,11 +126,9 @@ public class StaffNotificationService {
         User actor = notification.getActor();
         String message = notification.getMessage();
         String target = notification.getTargetUrl();
-        if (notification.getRecipient().getRole() == Role.TECHNICIAN && notification.getType() == StaffNotificationType.INTAKE_RECORDED) {
-            int marker = message.indexOf(" mẫu từ ");
-            if (marker >= 0) message = message.substring(0, marker + " mẫu".length());
-            // KCS cannot open the reception-only detail route used by historical notices.
-            target = "/admin/receiving";
+        if (notification.getType() == StaffNotificationType.TRANSFER_SUBMITTED && notification.getEntityId() != null) {
+            target = notification.getRecipient().getRole() == Role.ADMIN ? "/admin/transfers/" + notification.getEntityId()
+                    : "/admin/receiving/transfers/" + notification.getEntityId();
         }
         return new StaffNotificationResponse(notification.getId(), notification.getType(),
                 notification.getTitle(), message, target,

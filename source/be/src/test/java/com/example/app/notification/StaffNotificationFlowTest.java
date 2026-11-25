@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -50,7 +51,7 @@ class StaffNotificationFlowTest {
                 """, TestRequestDtos.SaveRequest.class);
     }
 
-    @Test void requestCreationNotifiesReceptionistsAndOtherAdminsOnceButNotKcsOrTheCreator() {
+    @Test void requestCreationNotifiesReceptionistsAndAllAdminsIncludingCreatorOnceButNotKcs() {
         var actor = user("creator", Role.ADMIN);
         var receptionist = user("receptionist", Role.RECEPTIONIST);
         var otherAdmin = user("other-admin", Role.ADMIN);
@@ -65,27 +66,57 @@ class StaffNotificationFlowTest {
             assertThat(notice.message()).contains("creator", created.requestNumber());
         });
         assertThat(notifications.findFor(otherAdmin, 0, 100, null, false, created.requestNumber(), StaffNotificationType.TEST_REQUEST_CREATED, null, null).content()).hasSize(1);
-        for (var excluded : List.of(actor, technician, disabled)) {
+        assertThat(notifications.findFor(actor, 0, 100, null, false, created.requestNumber(), StaffNotificationType.TEST_REQUEST_CREATED, null, null).content()).hasSize(1);
+        for (var excluded : List.of(technician, disabled)) {
             assertThat(notifications.findFor(excluded, 0, 100, null, false, created.requestNumber(), StaffNotificationType.TEST_REQUEST_CREATED, null, null).content()).isEmpty();
         }
     }
 
-    @Test void historicalKcsNoticesHideCompanyInListReadResponseAndSearch() {
+    @Test void historicalKcsIntakeNoticesAreHiddenFromListCountReadAndSearch() {
         var actor = user("old-receptionist", Role.RECEPTIONIST);
         var technician = user("old-technician", Role.TECHNICIAN);
         var old = rows.saveAndFlush(new StaffNotification(technician, actor, StaffNotificationType.INTAKE_RECORDED,
                 "Phiếu tiếp nhận mới", "old-receptionist đã ghi nhận 2 mẫu từ PRIVATE-COMPANY-TEST", "/admin/intake/99", "RECEIPT", 99L, "legacy-test"));
         var visible = notifications.findFor(technician, 0, 20, null, false, "ghi nhận 2 mẫu", null, null, null);
-        assertThat(visible.content()).singleElement().satisfies(notice -> {
-            assertThat(notice.message()).isEqualTo("old-receptionist đã ghi nhận 2 mẫu");
-            assertThat(notice.targetUrl()).isEqualTo("/admin/receiving");
-        });
+        assertThat(visible.content()).isEmpty();
+        assertThat(visible.unreadCount()).isZero();
         assertThat(notifications.findFor(technician, 0, 20, null, false, "PRIVATE-COMPANY-TEST", null, null, null).content()).isEmpty();
-        assertThat(notifications.markRead(old.getId(), technician).message()).doesNotContain("PRIVATE-COMPANY-TEST");
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> notifications.markRead(old.getId(), technician)).hasMessageContaining("404");
+        assertThat(notifications.markAllRead(technician)).isZero();
+        assertThat(rows.findById(old.getId()).orElseThrow().getReadAt()).isNull();
     }
 
-    @Test void weightAndCountRemainSeparateFromIntakeThroughTransferAndKcsAndNoticeIdentifiesRequest() {
+    @Test void routingIsEnforcedEvenIfACallerSuppliesWrongRecipientsAndAdminSeesEveryEventOnce() {
+        var sender = user("policy-sender", Role.RECEPTIONIST);
+        var technician = user("policy-kcs", Role.TECHNICIAN);
+        var admin = user("policy-admin", Role.ADMIN);
+        var disabledAdmin = user("policy-disabled-admin", Role.ADMIN);
+        disabledAdmin.updateProfile(disabledAdmin.getDisplayName(), Role.ADMIN, false); users.saveAndFlush(disabledAdmin);
+        var targets = List.of(sender, technician, admin, disabledAdmin);
+        for (var type : StaffNotificationType.values()) {
+            notifications.notifyUsers(targets, admin, type, "Policy test", "Policy routing test", "/x", "ROUTING_TEST", 789001L);
+            notifications.notifyUsers(targets, admin, type, "Policy test", "Policy routing test", "/x", "ROUTING_TEST", 789001L);
+        }
+        var adminPage = notifications.findFor(admin, 0, 100, null, false);
+        assertThat(adminPage.content()).hasSize(StaffNotificationType.values().length);
+        assertThat(adminPage.unreadCount()).isEqualTo(StaffNotificationType.values().length);
+        assertThat(notifications.findFor(technician, 0, 100, null, false).content()).extracting(row -> row.type())
+                .containsExactly(StaffNotificationType.TRANSFER_SUBMITTED);
+        assertThat(notifications.findFor(sender, 0, 100, null, false).content()).extracting(row -> row.type())
+                .containsExactlyInAnyOrder(StaffNotificationType.TEST_REQUEST_CREATED, StaffNotificationType.TRANSFER_ACCEPTED, StaffNotificationType.TRANSFER_REJECTED);
+        assertThat(notifications.findFor(disabledAdmin, 0, 100, null, false).content()).isEmpty();
+        // A role change must not reveal the previous inbox through counts, IDs, filters or mark-all.
+        technician.updateProfile(technician.getDisplayName(), Role.RECEPTIONIST, true); users.saveAndFlush(technician);
+        assertThat(notifications.findFor(technician, 0, 100, null, false).unreadCount()).isZero();
+        assertThat(notifications.findFor(technician, 0, 100, null, false, null, StaffNotificationType.TRANSFER_SUBMITTED, null, null).content()).isEmpty();
+        assertThat(notifications.markAllRead(technician)).isZero();
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(value = com.example.app.transfer.entity.TransferStatus.class, names = {"ACCEPTED", "REJECTED"})
+    void weightAndCountRemainSeparateFromIntakeThroughTransferAndKcsAndNoticeIdentifiesRequest(com.example.app.transfer.entity.TransferStatus decision) {
         var receptionist = user("sender", Role.RECEPTIONIST);
+        var otherReceptionist = user("uninvolved-sender", Role.RECEPTIONIST);
         var technician = user("receiver", Role.TECHNICIAN);
         var admin = user("admin", Role.ADMIN);
         var request = json.readValue("""
@@ -99,10 +130,7 @@ class StaffNotificationFlowTest {
         assertThat(receipts.findById(receipt.id()).samples().getFirst().quantity()).isEqualTo("2 quả");
         assertThat(receipts.findById(receipt.id()).samples().getFirst().weight()).isEqualTo("500 g");
         var kcsNotice = notifications.findFor(technician, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.INTAKE_RECORDED, null, null).content();
-        assertThat(kcsNotice).singleElement().satisfies(notice -> {
-            assertThat(notice.message()).contains("sender", receipt.requestNumber()).doesNotContain("PRIVATE-COMPANY-TEST");
-            assertThat(notice.targetUrl()).isEqualTo("/admin/receiving");
-        });
+        assertThat(kcsNotice).isEmpty();
         assertThat(notifications.findFor(admin, 0, 100, null, false, "PRIVATE-COMPANY-TEST", StaffNotificationType.INTAKE_RECORDED, null, null).content()).hasSize(1);
         long sampleId = receipt.samples().getFirst().id();
         var transfer = transfers.create(new CreateTransferRequest(receipt.id(), "KCS", LocalDate.now(), LocalDate.now().plusDays(3),
@@ -119,5 +147,33 @@ class StaffNotificationFlowTest {
                     assertThat(notice.message()).contains("sender đã chuyển 1 mẫu", "Số/No. CFC88.9002").doesNotContain("PRIVATE-COMPANY-TEST");
                     assertThat(notice.targetUrl()).isEqualTo("/admin/receiving/transfers/" + transfer.id());
                 });
+        var adminTransfers = notifications.findFor(admin, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content();
+        assertThat(adminTransfers).singleElement().satisfies(notice -> assertThat(notice.targetUrl()).isEqualTo("/admin/transfers/" + transfer.id()));
+        transfers.decide(transfer.id(), new com.example.app.transfer.dto.TransferDecisionRequest(
+                decision, decision == com.example.app.transfer.entity.TransferStatus.REJECTED ? "Test refusal" : null, null, false, null), technician);
+        var feedbackType = decision == com.example.app.transfer.entity.TransferStatus.ACCEPTED ? StaffNotificationType.TRANSFER_ACCEPTED : StaffNotificationType.TRANSFER_REJECTED;
+        assertThat(notifications.findFor(receptionist, 0, 100, null, false, receipt.requestNumber(), feedbackType, null, null).content()).hasSize(1);
+        assertThat(notifications.findFor(admin, 0, 100, null, false, receipt.requestNumber(), feedbackType, null, null).content()).hasSize(1);
+        assertThat(notifications.findFor(otherReceptionist, 0, 100, null, false, receipt.requestNumber(), feedbackType, null, null).content()).isEmpty();
+        assertThat(notifications.findFor(technician, 0, 100, null, false, receipt.requestNumber(), feedbackType, null, null).content()).isEmpty();
+
+        // Simulate a historical transfer notice without its CFC reference or Admin copy, then rerun V23 twice.
+        var techRow = rows.findById(notifications.findFor(technician, 0, 100, null, false).content().getFirst().id()).orElseThrow();
+        techRow.markRead();
+        ReflectionTestUtils.setField(techRow, "message", "sender đã chuyển mẫu đến phòng KCS"); rows.saveAndFlush(techRow);
+        rows.deleteById(adminTransfers.getFirst().id()); rows.flush();
+        var script = new org.springframework.jdbc.datasource.init.ResourceDatabasePopulator(
+                new org.springframework.core.io.ClassPathResource("db/migration/V23__staff_notification_routing.sql"));
+        script.setSqlScriptEncoding("UTF-8");
+        script.execute(dataSource); script.execute(dataSource);
+        entityManager.clear();
+        var repaired = notifications.findFor(technician, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content();
+        assertThat(repaired).singleElement().satisfies(notice -> {
+            assertThat(notice.message()).contains("sender", "Số/No. CFC88.9002"); assertThat(notice.readAt()).isNotNull();
+        });
+        assertThat(notifications.findFor(admin, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content()).hasSize(1);
     }
+
+    @Autowired javax.sql.DataSource dataSource;
+    @Autowired jakarta.persistence.EntityManager entityManager;
 }

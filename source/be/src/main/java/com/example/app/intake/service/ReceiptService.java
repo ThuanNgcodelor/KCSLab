@@ -245,11 +245,6 @@ public class ReceiptService {
                 "%s đã ghi nhận %d mẫu từ %s".formatted(
                         receivedBy.getDisplayName(), saved.getSamples().size(), saved.getCustomer().getName()),
                 "/admin/intake/" + saved.getId(), "RECEIPT", saved.getId());
-        notificationService.notifyRoles(Set.of(Role.TECHNICIAN), receivedBy,
-                StaffNotificationType.INTAKE_RECORDED, "Phiếu tiếp nhận mới",
-                "%s đã ghi nhận %d mẫu cho Số/No. %s".formatted(
-                        receivedBy.getDisplayName(), saved.getSamples().size(), saved.getRequestNumber()),
-                "/admin/receiving", "RECEIPT", saved.getId());
         customerNotifications.record(saved, request, receivedBy);
         return toResponse(saved);
     }

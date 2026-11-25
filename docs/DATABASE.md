@@ -18,6 +18,8 @@ File hồ sơ lưu ở thư mục cấu hình của backend. Database giữ bả
 
 ## Migration nghiệp vụ
 
+- V23 chuẩn hóa nội dung `TRANSFER_SUBMITTED` cũ theo phiếu chuyển/Số CFC; bổ sung bản thông báo lịch sử cho từng Admin đang hoạt động nếu thiếu theo dedupe key. Không xóa tin sai khâu hoặc đổi readAt đã có. Quyền xem theo loại được khóa ở service; không phụ thuộc việc xóa bản ghi cũ. Đã kiểm tra trên MySQL cô lập và triển khai DB vận hành ngày 25/11/2026.
+
 - V22 bổ sung `samples.weight VARCHAR(80)` nullable (utf8mb4), độc lập với `samples.quantity`. Không backfill từ quantity vì số lượng/đơn vị cũ có thể không phải khối lượng. API nhận mẫu cũ bỏ weight vẫn hợp lệ; snapshot phiếu chuyển dùng weight riêng. Migration đã kiểm tra trên MySQL cô lập; chưa chạy trên DB vận hành.
 
 - V1–V5 thiết lập nền, dữ liệu tiếp nhận, chuyển mẫu, thông báo và các chỉ mục truy vấn.

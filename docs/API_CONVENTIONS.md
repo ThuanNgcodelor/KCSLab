@@ -46,9 +46,12 @@ Khi tạo tiếp nhận từ Phiếu yêu cầu, UI lấy mã từ Phiếu hiệ
 
 ## API thông báo nội bộ
 
-- `TEST_REQUEST_CREATED`: tạo Phiếu yêu cầu báo cho ADMIN/RECEPTIONIST đang hoạt động, trừ chính người lập; target `/admin/requests/{id}`. Không phát lại khi chỉ cập nhật phiếu.
-- `INTAKE_RECORDED`: tin KCS không chứa công ty, target `/admin/receiving`. Tin lịch sử của KCS được bỏ đuôi công ty trên phản hồi và khi lọc tìm kiếm; không cập nhật nội dung gốc trong DB.
-- `TRANSFER_SUBMITTED`: có người chuyển, số mẫu và Số/No. (phiếu cũ thiếu Số/No. dùng mã chuyển), target KCS `/admin/receiving/transfers/{id}`.
+- `TEST_REQUEST_CREATED`: tạo Phiếu yêu cầu báo cho ADMIN/RECEPTIONIST đang hoạt động, gồm người lập nếu thuộc khâu nhận; target `/admin/requests/{id}`. Không phát lại khi chỉ cập nhật phiếu.
+- `INTAKE_RECORDED`: chỉ ADMIN, target `/admin/intake/{id}`; TECHNICIAN không nhận tin ở bước tiếp nhận.
+- `TRANSFER_SUBMITTED`: TECHNICIAN + ADMIN, có người chuyển, số mẫu và Số/No. (phiếu cũ thiếu Số/No. dùng mã chuyển), target KCS `/admin/receiving/transfers/{id}`, Admin `/admin/transfers/{id}`. Không chứa công ty.
+- `TRANSFER_ACCEPTED`/`TRANSFER_REJECTED`: chỉ Tiếp nhận đã chuyển + toàn bộ ADMIN; mở phiếu chuyển. Không gửi cho Tiếp nhận không liên quan hoặc KCS khác.
+- Backend khóa loại thông báo theo role ở tạo tin, list/search, tổng/unread, markRead/markAll và realtime. Admin có bản riêng mọi sự kiện, kể cả do chính mình thao tác. ID sai người/sai khâu trả 404; filter loại ngoài quyền trả danh sách rỗng và không làm lộ số lượng tin đó. Tin cũ sai khâu được giữ DB nhưng không trả qua các API này.
+- V23 chuẩn hóa tin chuyển mẫu lịch sử để có số CFC và bổ sung bản còn thiếu cho Admin đang hoạt động, chống trùng theo event/recipient, không đổi readAt của bản cũ. Không phát lại event realtime từ migration.
 
 - `GET /notifications?page=0&size=20&unread=false` hỗ trợ tìm kiếm và lọc. Kết quả có `unreadCount` cho toàn bộ thông báo của người nhận.
 - `PATCH /notifications/{id}` đánh dấu đã đọc và trả bản ghi cập nhật. `POST /notifications/read-all` đánh dấu tất cả của người đang đăng nhập.

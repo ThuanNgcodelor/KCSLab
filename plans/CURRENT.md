@@ -1,5 +1,7 @@
 # Kế hoạch tiếp nhận và phát hành kết quả
 
+> **25/11/2026 — thông báo đã khóa và chạy V23:** ADMIN thấy mọi sự kiện; Tiếp nhận nhận yêu cầu và phản hồi đúng phiếu mình chuyển; KCS chỉ nhận chuyển mẫu có người chuyển + Số CFC. Test routing/realtime và migration đạt, backend/frontend mới đã chạy. **Tiếp theo chỉ là plan** [Quản lý hồ sơ 10 năm và export](DOSSIER_ARCHIVE_EXPORT_PLAN.md): cây năm/tháng/CFC, trang Admin, queue export có giới hạn, upload phân folder ở bước sau. Plan bổ sung A3.1 quản lý nhiều ổ: Admin đổi đích upload khi gần đầy, file cũ tiếp tục đọc qua vị trí đã lưu; A3.2 tổ chức folder mới. Chưa di chuyển file, đổi root đang chạy hoặc tạo chức năng export.
+
 > **25/11/2026 — đã triển khai nội bộ bản sửa thông báo/khối lượng:** backend/frontend mới đang chạy, DB vận hành V22. Khối lượng tách với số lượng, KCS nhận thông báo người chuyển + Số/No.; giữ nguyên dữ liệu cũ và Zalo OFF. Backup `/home/kali/backups/cfc-lab-before-weight-20261125-1a805ac4/`. Cần nghiệm thu màn hình bằng tài khoản Tiếp nhận/KCS thật; chi tiết kiểm tra ở `docs/ai/CONTEXT.md`.
 
 Trạng thái hiện tại nằm ở [SYSTEM_STATUS.md](../docs/SYSTEM_STATUS.md). Nội dung bên dưới ghi lại các mốc lập kế hoạch trước đây.

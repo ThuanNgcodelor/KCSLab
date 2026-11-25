@@ -8,6 +8,7 @@
 - Có 2 cách lập phiếu kết quả: nhập kết quả trên hệ thống (mặc định) hoặc tải file DOCX/PDF có sẵn. Admin duyệt và phát hành; người duyệt độc lập với người lập và người phân tích.
 - QR trỏ tới `PUBLIC_LOOKUP_URL` + `?code=…`. Đường dẫn `/tracuu/?code=` phải giữ cố định; đổi tên miền chỉ thay phần host, rồi tạo lại PDF hàng loạt.
 - REST và MySQL là nguồn thông báo chính. WebSocket gửi từng người nhận sau commit. Dữ liệu actor dùng FK nullable và avatar qua API xác thực. Kết nối hiện tại nằm trong từng backend instance.
+- 25/11/2026: người dùng chốt khóa thông báo theo khâu. ADMIN nhận mọi loại/kể cả tự thao tác; Tiếp nhận nhận yêu cầu mới và phản hồi KCS cho phiếu mình chuyển; KCS chỉ nhận tin khi Phiếu 4 được gửi, có người chuyển + số CFC. Policy áp dụng server-side cả lịch sử, unread và realtime. Giữ bản ghi cũ để audit, ẩn sai khâu; không gửi tin tiếp nhận sớm tới KCS.
 - PWA service worker giới hạn ở điều hướng và chỉ cache trang mất mạng. API, tài liệu, avatar và hồ sơ tiếp tục qua mạng.
 - Dữ liệu danh sách phân trang, lọc và sắp xếp phía server. Dashboard tổng hợp riêng. Không chia phòng KCS thành nhiều đơn vị trên UI.
 - Triển khai:
