@@ -14,3 +14,7 @@ export function decideReceivingTransfer(id, decision) {
 export function verifyReceivingSample(id, sampleId) {
   return request(`/receiving/transfers/${id}/samples/${sampleId}/coding/verify`, { method: 'POST' });
 }
+export function listReceivingTechnicians() { return request('/receiving/technicians'); }
+export function assignReceivingTransfer(id, userIds) {
+  return request(`/receiving/transfers/${id}/assignees`, { method: 'PUT', body: JSON.stringify({ userIds }) });
+}

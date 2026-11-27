@@ -6,6 +6,7 @@ const typeIcons = {
   INTAKE_RECORDED: 'inbox',
   TRANSFER_SUBMITTED: 'send',
   TRANSFER_ACCEPTED: 'checkCircle',
+  TRANSFER_ASSIGNED: 'flask',
 };
 
 export function NotificationAvatar({ notification }) {

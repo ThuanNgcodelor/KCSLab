@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,10 +34,12 @@ import java.util.List;
 public class ReceivingController {
     private final ReceivingService receiving;
     private final UserService users;
+    private final TransferAssignmentService assignments;
 
-    public ReceivingController(ReceivingService receiving, UserService users) {
+    public ReceivingController(ReceivingService receiving, UserService users, TransferAssignmentService assignments) {
         this.receiving = receiving;
         this.users = users;
+        this.assignments = assignments;
     }
 
     @GetMapping("/dashboard")
@@ -54,12 +57,13 @@ public class ReceivingController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(required = false) String sort, @AuthenticationPrincipal Jwt jwt) {
-        return receiving.list(users.getByEmail(jwt.getSubject()), page, size, status, q, from, to, sort);
+        PagedResponse<ReceivingTransferResponse> result = receiving.list(users.getByEmail(jwt.getSubject()), page, size, status, q, from, to, sort);
+        return new PagedResponse<>(assignments.attachAll(result.content()), result.page(), result.size(), result.totalElements(), result.totalPages(), result.first(), result.last(), result.sort());
     }
 
     @GetMapping("/transfers/{id}")
     public ReceivingTransferResponse detail(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        return receiving.detail(id, users.getByEmail(jwt.getSubject()));
+        return assignments.attach(receiving.detail(id, users.getByEmail(jwt.getSubject())));
     }
 
     @GetMapping("/transfers/{id}/evidence")
@@ -83,12 +87,25 @@ public class ReceivingController {
     @PostMapping("/transfers/{id}/decision")
     public ReceivingTransferResponse decide(@PathVariable Long id, @Valid @RequestBody TransferDecisionRequest request,
                                             @AuthenticationPrincipal Jwt jwt) {
-        return receiving.decide(id, request, users.getByEmail(jwt.getSubject()));
+        return assignments.attach(receiving.decide(id, request, users.getByEmail(jwt.getSubject())));
     }
 
     @PostMapping("/transfers/{id}/samples/{sampleId}/coding/verify")
     public ReceivingTransferResponse verifyCoding(@PathVariable Long id, @PathVariable Long sampleId,
                                                    @AuthenticationPrincipal Jwt jwt) {
-        return receiving.verifyCoding(id, sampleId, users.getByEmail(jwt.getSubject()));
+        return assignments.attach(receiving.verifyCoding(id, sampleId, users.getByEmail(jwt.getSubject())));
+    }
+
+    public record AssignRequest(List<Long> userIds) {}
+
+    @GetMapping("/technicians")
+    public List<ReceivingTransferResponse.Assignee> technicians() {
+        return assignments.technicians();
+    }
+
+    @PutMapping("/transfers/{id}/assignees")
+    public List<ReceivingTransferResponse.Assignee> assign(@PathVariable Long id, @RequestBody AssignRequest request,
+                                                           @AuthenticationPrincipal Jwt jwt) {
+        return assignments.assign(id, request.userIds(), users.getByEmail(jwt.getSubject()));
     }
 }

@@ -101,7 +101,7 @@ class StaffNotificationFlowTest {
         assertThat(adminPage.content()).hasSize(StaffNotificationType.values().length);
         assertThat(adminPage.unreadCount()).isEqualTo(StaffNotificationType.values().length);
         assertThat(notifications.findFor(technician, 0, 100, null, false).content()).extracting(row -> row.type())
-                .containsExactly(StaffNotificationType.TRANSFER_SUBMITTED);
+                .containsExactlyInAnyOrder(StaffNotificationType.TRANSFER_SUBMITTED, StaffNotificationType.TRANSFER_ASSIGNED);
         assertThat(notifications.findFor(sender, 0, 100, null, false).content()).extracting(row -> row.type())
                 .containsExactlyInAnyOrder(StaffNotificationType.TEST_REQUEST_CREATED, StaffNotificationType.TRANSFER_ACCEPTED, StaffNotificationType.TRANSFER_REJECTED);
         assertThat(notifications.findFor(disabledAdmin, 0, 100, null, false).content()).isEmpty();

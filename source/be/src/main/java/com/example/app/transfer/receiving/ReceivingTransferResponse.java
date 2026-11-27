@@ -15,7 +15,16 @@ public record ReceivingTransferResponse(
         boolean returnToCustomer, LocalDate customerReturnDate, String changesNote,
         TransferStatus status, String receivingNote, String labOpinion, boolean labRetain,
         LocalDate labRetentionUntil, Instant submittedAt, Instant receivedAt, Instant createdAt,
-        List<TransferItemResponse> items) {
+        List<TransferItemResponse> items, List<Assignee> assignees) {
+    /** A technician tagged on the transfer to run the tests. */
+    public record Assignee(Long id, String displayName, String avatarUrl) {}
+
+    public ReceivingTransferResponse withAssignees(List<Assignee> list) {
+        return new ReceivingTransferResponse(id, transferCode, receiptCode, requestNumber, receivingDepartment, deliveredBy,
+                receivedBy, transferDate, resultsDueDate, returnToCustomer, customerReturnDate, changesNote, status,
+                receivingNote, labOpinion, labRetain, labRetentionUntil, submittedAt, receivedAt, createdAt, items, list);
+    }
+
     public static ReceivingTransferResponse from(TransferResponse transfer) {
         return new ReceivingTransferResponse(transfer.id(), transfer.transferCode(), transfer.receiptCode(),
                 transfer.requestNumber(), transfer.receivingDepartment(), transfer.deliveredBy(), transfer.receivedBy(),
@@ -23,6 +32,6 @@ public record ReceivingTransferResponse(
                 transfer.customerReturnDate(), transfer.changesNote(), transfer.status(),
                 transfer.receivingNote(), transfer.labOpinion(), transfer.labRetain(),
                 transfer.labRetentionUntil(), transfer.submittedAt(), transfer.receivedAt(),
-                transfer.createdAt(), transfer.items());
+                transfer.createdAt(), transfer.items(), List.of());
     }
 }

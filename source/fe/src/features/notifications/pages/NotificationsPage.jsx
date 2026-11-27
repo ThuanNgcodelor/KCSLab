@@ -11,7 +11,7 @@ import { Icon } from '../../../shared/components/Icon';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { notificationTypesFor } from '../notificationPolicy';
 
-const allTypeOptions = [['', 'Tất cả loại'], ['TEST_REQUEST_CREATED', 'Yêu cầu kiểm nghiệm mới'], ['INTAKE_RECORDED', 'Tiếp nhận mới'], ['TRANSFER_SUBMITTED', 'Gửi chuyển mẫu'], ['TRANSFER_ACCEPTED', 'KCS đã nhận'], ['TRANSFER_REJECTED', 'KCS từ chối']];
+const allTypeOptions = [['', 'Tất cả loại'], ['TEST_REQUEST_CREATED', 'Yêu cầu kiểm nghiệm mới'], ['INTAKE_RECORDED', 'Tiếp nhận mới'], ['TRANSFER_SUBMITTED', 'Gửi chuyển mẫu'], ['TRANSFER_ACCEPTED', 'KCS đã nhận'], ['TRANSFER_REJECTED', 'KCS từ chối'], ['TRANSFER_ASSIGNED', 'Được giao thử nghiệm']];
 const sortOptions = [['createdAt,desc', 'Mới nhất'], ['createdAt,asc', 'Cũ nhất'], ['type,asc', 'Loại: A → Z'], ['title,asc', 'Tiêu đề: A → Z'], ['readAt,desc', 'Đã đọc gần nhất']];
 const defaults = { q: '', from: '', to: '', type: '', sort: 'createdAt,desc' };
 const emptyPage = { content: [], page: 0, totalElements: 0, totalPages: 0, first: true, last: true };

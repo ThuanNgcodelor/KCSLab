@@ -15,7 +15,7 @@ public final class StaffNotificationPolicy {
             case ADMIN -> EnumSet.allOf(StaffNotificationType.class);
             case RECEPTIONIST -> EnumSet.of(StaffNotificationType.TEST_REQUEST_CREATED,
                     StaffNotificationType.TRANSFER_ACCEPTED, StaffNotificationType.TRANSFER_REJECTED);
-            case TECHNICIAN -> EnumSet.of(StaffNotificationType.TRANSFER_SUBMITTED);
+            case TECHNICIAN -> EnumSet.of(StaffNotificationType.TRANSFER_SUBMITTED, StaffNotificationType.TRANSFER_ASSIGNED);
         };
     }
 
