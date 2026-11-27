@@ -66,6 +66,18 @@ public class SampleTransferItem {
     public Long getId() { return id; }
     public SampleTransfer getTransfer() { return transfer; }
     public Sample getSample() { return sample; }
+    /**
+     * Brings the Phiếu 4 snapshot in line with a corrected sample. The name always follows; quantity, weight,
+     * condition and parameters follow only when the transfer row still equals the old sample value, so values that
+     * were edited on the transfer itself are kept.
+     */
+    public void syncFromSample(Sample sample, String oldQuantity, String oldWeight, String oldCondition, String oldParameters) {
+        this.sampleName = sample.getName();
+        if (java.util.Objects.equals(quantity, oldQuantity)) this.quantity = sample.getQuantity();
+        if (java.util.Objects.equals(weight, oldWeight)) this.weight = sample.getWeight();
+        if (java.util.Objects.equals(sampleCondition, oldCondition)) this.sampleCondition = sample.getCondition();
+        if (java.util.Objects.equals(requestedParameters, oldParameters)) this.requestedParameters = sample.getRequestedParameters();
+    }
     public String getSampleName() { return sampleName; }
     public String getSampleCode() { return sampleCode; }
     public String getWeight() { return weight; }

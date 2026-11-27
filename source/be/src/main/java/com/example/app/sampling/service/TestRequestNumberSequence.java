@@ -12,15 +12,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Test request numbers: {@code CFC{YY}.{NNNN}} (e.g. CFC26.0001). The sequence has at least four
- * digits and simply grows a digit after 9999. It is counted per two-digit year code, which defaults
+ * Test request numbers: {@code CFC{YY}.{NNNNN}} (e.g. CFC26.00001). The sequence has at least five
+ * digits and simply grows a digit after 99999. It is counted per two-digit year code, which defaults
  * to the current year but may be chosen by the user. Allocation uses one atomic
  * {@code INSERT ... ON DUPLICATE KEY UPDATE}, so concurrent requests never share a number; a number
  * typed by hand raises the counter so automatic numbers never collide with it.
  */
 @Component
 public class TestRequestNumberSequence {
-    public static final Pattern FORMAT = Pattern.compile("^CFC(\\d{2})\\.(\\d{4,6})$");
+    public static final Pattern FORMAT = Pattern.compile("^CFC(\\d{2})\\.(\\d{5,9})$");
     private static final ZoneId ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final JdbcTemplate jdbc;
@@ -33,13 +33,13 @@ public class TestRequestNumberSequence {
 
     public String currentYearCode() { return String.format("%02d", clock.instant().atZone(ZONE).getYear() % 100); }
 
-    public static String format(String yearCode, long sequence) { return String.format("CFC%s.%04d", yearCode, sequence); }
+    public static String format(String yearCode, long sequence) { return String.format("CFC%s.%05d", yearCode, sequence); }
 
     private static final Pattern TYPED = Pattern.compile("^CFC(\\d{2})\\.(\\d{1,9})$");
 
     /**
-     * Canonical form of a typed number: {@code cfc26.00001} or {@code CFC26.1} become {@code CFC26.0001}
-     * (four digits, more only after 9999). Returns {@code null} when the text is not a CFC number at all.
+     * Canonical form of a typed number: {@code cfc26.0001} or {@code CFC26.1} become {@code CFC26.00001}
+     * (five digits, more only after 99999). Returns {@code null} when the text is not a CFC number at all.
      */
     public static String normalize(String typed) {
         if (typed == null) return null;

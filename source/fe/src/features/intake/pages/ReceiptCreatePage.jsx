@@ -10,7 +10,7 @@ import { splitParameters } from '../../../shared/parameters';
 import { normalizeRequestNumber } from '../../../shared/requestNumber';
 import { CustomerNotificationFields } from '../components/CustomerNotificationFields';
 import { CustomerNotificationHistory } from '../components/CustomerNotificationHistory';
-import { fieldQuantityForSample } from '../intakeModel';
+import { buildCondition, conditionOptions, fieldQuantityForSample, parameterOptions, parseCondition } from '../intakeModel';
 
 const initialForm = {
   customerName: '', customerPhone: '', requestNumber: '', customerEmail: '', customerAddress: '', deliveredBy: '',
@@ -25,18 +25,6 @@ const newSample = () => ({
   packagingOther: '', parameterOther: '', parameterOtherEnabled: false, condition: 'Nguyên vẹn', requestedParameters: '',
 });
 
-const parameterOptions = ['Cadimi (Cd)', 'Auramine O (Vỏ)', 'Auramine O (Ruột)', 'Dư lượng thuốc BVTV'];
-const conditionOptions = ['Nguyên vẹn', 'Rò rỉ', 'Dập nát', 'Thiếu lượng'];
-const ABNORMAL = 'Dấu hiệu bất thường';
-// Tình trạng mẫu là checklist theo mẫu Word, lưu thành chuỗi "Rò rỉ; Dập nát; Dấu hiệu bất thường: mốc".
-function parseCondition(value) {
-  const tokens = (value || '').split(';').map((item) => item.trim()).filter(Boolean);
-  const abnormal = tokens.find((item) => item.startsWith(ABNORMAL));
-  return { picked: tokens.filter((item) => conditionOptions.includes(item)), abnormal: abnormal !== undefined, abnormalText: abnormal ? abnormal.slice(ABNORMAL.length).replace(/^:\s*/, '') : '' };
-}
-function buildCondition({ picked, abnormal, abnormalText }) {
-  return [...picked, ...(abnormal ? [`${ABNORMAL}:${abnormalText ? ` ${abnormalText}` : ''}`] : [])].join('; ');
-}
 const packagingOptions = ['Túi PE', 'Hộp/thùng', 'Chai/lọ'];
 const temperatureOptions = ['Thường', 'Lạnh', 'Khác'];
 
@@ -51,7 +39,8 @@ function nextSampleCode(code) {
 }
 function cloneSample(previous) {
   if (!previous) return newSample();
-  return { ...previous, sampleCode: nextSampleCode(previous.sampleCode), requestedParameters: '', parameterOther: '', parameterOtherEnabled: false };
+  // Tên và khối lượng là của riêng từng mẫu nên không sao chép (sao chép tên làm hai mẫu cùng tên "Mẫu 1" trên phiếu chuyển và kết quả).
+  return { ...previous, sampleCode: nextSampleCode(previous.sampleCode), name: '', weight: '', requestedParameters: '', parameterOther: '', parameterOtherEnabled: false };
 }
 // Phiếu yêu cầu lưu mỗi (mẫu, chỉ tiêu, nền mẫu) một dòng; Phiếu 3 gộp lại: một mẫu thật = một mã, nhiều chỉ tiêu.
 function samplesFromRequest(data) {
@@ -262,7 +251,7 @@ export function ReceiptCreatePage() {
               <div className="form-two-columns">
                 <label>Mã hóa mẫu<input value={sample.sampleCode} onChange={updateSample(index, 'sampleCode')} placeholder="Ví dụ: CT001-SR-19112026-001" required /></label>
                 <label>Tên mẫu<input value={sample.name} onChange={updateSample(index, 'name')} required /></label>
-                <label>Mã nguồn<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
+                <label>Mã vùng trồng<input value={sample.sourceCode} onChange={updateSample(index, 'sourceCode')} required /></label>
                 <label>Số lượng / lượng mẫu<input value={sample.quantity} onChange={updateSample(index, 'quantity')} maxLength={80} placeholder="Ví dụ: 2 quả" /></label>
                 <label>Khối lượng<input value={sample.weight} onChange={updateSample(index, 'weight')} maxLength={80} placeholder="Ví dụ: 500 g hoặc 2 kg" /></label>
                 <label>Loại bao bì<select value={packagingOptions.includes(sample.packaging) ? sample.packaging : sample.packaging ? 'Khác' : ''} onChange={updateSample(index, 'packaging')}><option value="">Chọn loại bao bì</option>{packagingOptions.map((option) => <option value={option} key={option}>{option}</option>)}<option value="Khác">Khác</option></select></label>
@@ -331,6 +320,12 @@ function validateForm(form, samples) {
   if (form.customerEmail.trim() && !/^\S+@\S+\.\S+$/.test(form.customerEmail.trim())) return 'Email khách hàng không đúng định dạng.';
   if (!form.sealStatus) return 'Vui lòng chọn trạng thái niêm phong.';
   if (!samples.length) return 'Phiếu phải có ít nhất một mẫu.';
+  const seenNames = new Set();
+  for (const sample of samples) {
+    const key = sample.name.trim().toLowerCase().replace(/\s+/g, ' ');
+    if (key && seenNames.has(key)) return `Tên mẫu "${sample.name.trim()}" bị trùng. Mỗi mẫu cần một tên riêng (ví dụ Mẫu 1, Mẫu 2 hoặc Ruột, Vỏ) để phân biệt trên phiếu chuyển và phiếu kết quả.`;
+    seenNames.add(key);
+  }
   if (samples.some((sample) => sample.quantity.length > 80 || sample.weight.length > 80)) return 'Số lượng và khối lượng mỗi mẫu tối đa 80 ký tự. Vui lòng kiểm tra lại thông tin lấy từ phiếu hiện trường.';
   if (samples.some((sample) => !sample.sampleCode.trim() || !sample.name.trim()
     || !sample.sourceCode.trim()
@@ -433,7 +428,7 @@ function RequestPicker({ value, linked, onChange, onPick, onUnlink }) {
     const typed = normalizeRequestNumber(event.target.value).toUpperCase();
     if (options.some((item) => item.requestNumber === typed)) onPick(typed);
   }
-  // Rời ô nhập: đưa về dạng chuẩn CFC26.0001 rồi tự liên kết nếu đúng một Phiếu yêu cầu có sẵn.
+  // Rời ô nhập: đưa về dạng chuẩn CFC26.00001 rồi tự liên kết nếu đúng một Phiếu yêu cầu có sẵn.
   function handleBlur(event) {
     const canonical = normalizeRequestNumber(event.target.value);
     if (canonical === event.target.value) return;
@@ -442,7 +437,7 @@ function RequestPicker({ value, linked, onChange, onPick, onUnlink }) {
   }
   return <label className="request-picker full-span">Số/No. Phiếu yêu cầu
     <span className="request-picker-row">
-      <input value={value} onChange={handle} onBlur={handleBlur} list={listId} required readOnly={linked} placeholder="Chọn hoặc gõ số, ví dụ CFC26.0001" autoComplete="off" spellCheck="false" />
+      <input value={value} onChange={handle} onBlur={handleBlur} list={listId} required readOnly={linked} placeholder="Chọn hoặc gõ số, ví dụ CFC26.00001" autoComplete="off" spellCheck="false" />
       {linked && <button type="button" className="outline-button" onClick={onUnlink}>Đổi phiếu</button>}
     </span>
     <datalist id={listId}>{options.map((item) => <option key={item.id} value={item.requestNumber}>{item.customerName} · {item.sampleName}</option>)}</datalist>

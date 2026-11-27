@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getReceipt, listReceipts } from '../../intake/api/intakeApi';
 import { createTransfer, getTransfer, updateTransfer, uploadTransferEvidence } from '../api/transferApi';
 import { PageLoader } from '../../../shared/components/Loading';
 import { DateInput } from '../../../shared/components/DateInput';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
+import { methodCodesForParameters } from '../../../shared/parameters';
 import { MethodPicker } from '../../methods/components/MethodPicker';
 
 const today = businessDate();
@@ -28,6 +29,17 @@ export function TransferCreatePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [evidenceFiles, setEvidenceFiles] = useState([]);
+
+  // Mở từ danh sách "Hồ sơ chờ chuyển KCS": chọn sẵn hồ sơ theo ?receiptId=.
+  const [searchParams] = useSearchParams();
+  const presetReceiptId = searchParams.get('receiptId');
+  useEffect(() => {
+    if (editing || !presetReceiptId) return undefined;
+    let active = true;
+    getReceipt(presetReceiptId).then((preset) => { if (active) { setReceipt(preset); setItems(buildItems(preset.samples ?? [])); setPickerOpen(false); } })
+      .catch((exception) => { if (active) setError(exception.message); });
+    return () => { active = false; };
+  }, [editing, presetReceiptId]);
 
   useEffect(() => {
     if (!editing) return undefined;
@@ -150,7 +162,7 @@ export function TransferCreatePage() {
         </section>
         <section className="panel-card intake-form-card">
           <FormHeading number="II" en="Samples" title="Danh sách mẫu" copy="Thông tin được chụp lại tại thời điểm tạo hồ sơ chuyển mẫu." />
-          {!receipt ? <div className="transfer-sample-placeholder"><strong>Chưa chọn phiếu tiếp nhận</strong><span>Tìm theo Số/No., mã hóa mẫu, khách hàng hoặc số điện thoại ở bước 01.</span></div> : <div className="transfer-sample-list">{availableSamples.map((sample) => <article className={`transfer-sample-card ${items[sample.id]?.selected ? 'selected' : ''}`} key={sample.id}><label className="sample-select"><input type="checkbox" checked={items[sample.id]?.selected ?? false} onChange={updateItem(sample.id, 'selected')} /><span><strong>{sample.sampleCode}</strong><small>{sample.name}</small></span></label>{items[sample.id]?.selected && <div className="form-two-columns sample-transfer-fields"><label>Khối lượng<input value={items[sample.id]?.weight ?? ''} onChange={updateItem(sample.id, 'weight')} placeholder="Ví dụ: 500 g hoặc 2 kg" /></label><label>Số lượng<input value={items[sample.id]?.quantity ?? ''} onChange={updateItem(sample.id, 'quantity')} /></label><label>Tình trạng<input value={items[sample.id]?.sampleCondition ?? ''} onChange={updateItem(sample.id, 'sampleCondition')} /></label><div className="method-field"><span className="method-field-label">Phương pháp thử</span><MethodPicker value={items[sample.id]?.testMethod ?? ''} onChange={(testMethod) => setItems((current) => ({ ...current, [sample.id]: { ...current[sample.id], testMethod } }))} required /></div><label className="full-span">Chỉ tiêu yêu cầu<input value={items[sample.id]?.requestedParameters ?? ''} onChange={updateItem(sample.id, 'requestedParameters')} required /></label></div>}</article>)}</div>}
+          {!receipt ? <div className="transfer-sample-placeholder"><strong>Chưa chọn phiếu tiếp nhận</strong><span>Tìm theo Số/No., mã hóa mẫu, khách hàng hoặc số điện thoại ở bước 01.</span></div> : <div className="transfer-sample-list">{availableSamples.map((sample) => <article className={`transfer-sample-card ${items[sample.id]?.selected ? 'selected' : ''}`} key={sample.id}><label className="sample-select"><input type="checkbox" checked={items[sample.id]?.selected ?? false} onChange={updateItem(sample.id, 'selected')} /><span><strong>{sample.sampleCode}</strong><small>{sample.name}</small></span></label>{items[sample.id]?.selected && <div className="form-two-columns sample-transfer-fields"><label>Khối lượng<input value={items[sample.id]?.weight ?? ''} onChange={updateItem(sample.id, 'weight')} placeholder="Ví dụ: 500 g hoặc 2 kg" /></label><label>Số lượng<input value={items[sample.id]?.quantity ?? ''} onChange={updateItem(sample.id, 'quantity')} /></label><label>Tình trạng<input value={items[sample.id]?.sampleCondition ?? ''} onChange={updateItem(sample.id, 'sampleCondition')} /></label><div className="method-field"><span className="method-field-label">Phương pháp thử <small>(tự gợi ý theo chỉ tiêu, có thể đổi)</small></span><MethodPicker value={items[sample.id]?.testMethod ?? ''} onChange={(testMethod) => setItems((current) => ({ ...current, [sample.id]: { ...current[sample.id], testMethod } }))} required /></div><label className="full-span">Chỉ tiêu yêu cầu<input value={items[sample.id]?.requestedParameters ?? ''} onChange={updateItem(sample.id, 'requestedParameters')} required /></label></div>}</article>)}</div>}
         </section>
       </div>
       <aside className="receipt-form-aside transfer-form-aside">
@@ -205,7 +217,8 @@ function buildItems(samples, draftItems = []) {
       quantity: draft?.quantity ?? sample.quantity ?? '',
       sampleCondition: draft?.sampleCondition ?? sample.sampleCondition ?? 'Nguyên vẹn',
       requestedParameters: draft?.requestedParameters ?? sample.requestedParameters ?? '',
-      testMethod: draft?.testMethod ?? '',
+      // Phiếu nháp giữ phương pháp đã lưu; phiếu mới tự gợi ý theo chỉ tiêu (Cd → CFC-TN-17-2026, Auramine O → CFC-TN-16-2026), vẫn sửa được.
+      testMethod: draft?.testMethod ?? methodCodesForParameters(draft?.requestedParameters ?? sample.requestedParameters).join(', '),
     }];
   }));
 }

@@ -86,7 +86,8 @@ public class PublicResultService {
                         row.getNote())).toList();
         var item = release.getTestingRecord().getTransferItem();
         return new PublicResult(release.getDisplayNumber(), release.getVersion(), item.getSampleCode(),
-                item.getTransfer().getReceipt().getSampleName(), release.getPublishedAt(), rows, publicFiles);
+                item.getSampleName() != null && !item.getSampleName().isBlank() ? item.getSampleName()
+                        : item.getTransfer().getReceipt().getSampleName(), release.getPublishedAt(), rows, publicFiles);
     }
 
     @Transactional(readOnly = true)

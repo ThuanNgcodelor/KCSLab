@@ -80,7 +80,7 @@ export function CatalogTab({ periods, storage, onExported }) {
           <button type="button" className="outline-button small-button" onClick={() => setReload((n) => n + 1)}>↻ Làm mới</button>
           <button type="button" className="outline-button small-button" disabled={loading || data.totalElements === 0} onClick={() => setExporting(true)}>Xuất {data.totalElements > 0 ? `${count(data.totalElements)} hồ sơ` : 'hồ sơ'}</button>
         </div></div>
-      <ListToolbar q={q} onQ={(value) => update({ q: value })} searchLabel="Tìm hồ sơ" placeholder="Số/No., ví dụ CFC26.0003"
+      <ListToolbar q={q} onQ={(value) => update({ q: value })} searchLabel="Tìm hồ sơ" placeholder="Số/No., ví dụ CFC26.00003"
         filters={[{ label: 'Năm tiếp nhận', value: year ? String(year) : ALL, onChange: (value) => update({ year: value, month: null }), options: [...years.map(([value, total]) => [String(value), `${value} (${count(total)} hồ sơ)`]), [ALL, 'Tất cả các năm']] }]}
         sort={sort} sortOptions={sortOptions} onSort={(value) => update({ sort: value })} onReset={() => setParams({}, { replace: true })} />
       {loading ? <PageLoader label="Đang tải hồ sơ…" rows={4} /> : data.content.length === 0

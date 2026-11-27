@@ -71,10 +71,27 @@ export function ResultEntryForm({ options, transferItemId, setTransferItemId, er
   }
 
   const selected = options.find((item) => String(item.id) === String(transferItemId));
+  // Gom theo Số/No. để chọn Số/No. trước rồi chọn từng mẫu của nó (một Số/No. thường có nhiều mẫu).
+  const groups = useMemo(() => {
+    const map = new Map();
+    options.forEach((item) => { const key = item.requestNumber || '—'; map.set(key, [...(map.get(key) ?? []), item]); });
+    return map;
+  }, [options]);
+  const requestKey = selected ? (selected.requestNumber || '—') : [...groups.keys()][0] ?? '';
+  const requestItems = groups.get(requestKey) ?? [];
 
   return <form className="result-entry-form" onSubmit={(event) => { event.preventDefault(); save(true); }}>
     <section className="panel-card intake-form-card"><FormHeading number="I" title="Mẫu thử nghiệm" en="Sample" copy="Chỉ mẫu đã được KCS nhận mới có trong danh sách." />
-      <label>Mẫu đã bàn giao<select value={transferItemId} onChange={(event) => setTransferItemId(event.target.value)} required>{options.map((item) => <option key={item.id} value={item.id}>{item.sampleCode} · Số/No. {item.requestNumber || '—'} — {item.sampleName}</option>)}</select></label>
+      <label>Số/No.<select value={requestKey} onChange={(event) => { const first = groups.get(event.target.value)?.[0]; if (first) setTransferItemId(String(first.id)); }} required>
+        {[...groups].map(([key, items]) => <option key={key} value={key}>{key} · {items.length} mẫu</option>)}</select></label>
+      <fieldset className="sample-choice-group"><legend>Chọn mẫu của {requestKey || 'Số/No.'} ({requestItems.length})</legend>
+        <div className="sample-choice-list">{requestItems.map((item) => <label className={`sample-choice ${String(item.id) === String(transferItemId) ? 'checked' : ''}`} key={item.id}>
+          <input type="radio" name="sample-choice" value={item.id} checked={String(item.id) === String(transferItemId)} onChange={() => setTransferItemId(String(item.id))} />
+          <span className="sample-choice-body"><strong>{item.sampleName || 'Mẫu'}</strong><code>{item.sampleCode}</code>
+            <small>{[item.quantity, item.weight].filter(Boolean).join(' · ') || 'Chưa có số lượng'}</small>
+            <span className="sample-choice-params">{splitParameters(item.requestedParameters).map((parameter) => <em key={parameter}>{parameter}</em>)}</span></span>
+        </label>)}</div>
+      </fieldset>
       {selected && <div className="testing-sample-summary"><span><small>Số/No.</small><strong>{selected.requestNumber || '—'}</strong></span><span><small>Mã hóa mẫu</small><strong>{selected.sampleCode}</strong></span><span><small>Hạn trả</small><strong>{formatDate(selected.dueDate) || '—'}</strong></span><span><small>Chỉ tiêu</small><strong>{splitParameters(selected.requestedParameters).length || '—'}</strong></span></div>}
     </section>
 

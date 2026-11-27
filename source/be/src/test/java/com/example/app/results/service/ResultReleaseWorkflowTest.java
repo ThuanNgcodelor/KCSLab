@@ -471,7 +471,7 @@ class ResultReleaseWorkflowTest {
     @Test
     void resultNumberIsTheReceiptRequestNumberAndPhotosComeFromTheReceipt() throws Exception {
         entityManager.flush();
-        jdbc.update("update receipts set request_number = 'CFC26.0099' where id = (select st.receipt_id from result_releases rr "
+        jdbc.update("update receipts set request_number = 'CFC26.00099' where id = (select st.receipt_id from result_releases rr "
                 + "join testing_records t on t.id = rr.testing_record_id join sample_transfer_items ti on ti.id = t.transfer_item_id "
                 + "join sample_transfers st on st.id = ti.transfer_id where rr.id = ?)", releaseId);
         entityManager.clear();
@@ -479,10 +479,10 @@ class ResultReleaseWorkflowTest {
         assertThat(workflow.detail(releaseId).samplePhotos()).isEmpty(); // receipt in setUp has no photos
         workflow.submit(releaseId, technician);
         var published = workflow.publish(releaseId, null, admin);
-        assertThat(published.resultNumber()).isEqualTo("CFC26.0099");
+        assertThat(published.resultNumber()).isEqualTo("CFC26.00099");
         assertThat(pdfText(workflow.loadFile(releaseId, published.files().stream()
                 .filter(f -> f.kind().equals("GENERATED_REPORT")).findFirst().orElseThrow().id()).resource()
-                .getInputStream().readAllBytes())).contains("CFC26.0099");
+                .getInputStream().readAllBytes())).contains("CFC26.00099");
     }
 
     @Test

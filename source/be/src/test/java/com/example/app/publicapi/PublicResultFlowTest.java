@@ -184,7 +184,7 @@ class PublicResultFlowTest {
                 .andExpect(jsonPath("$.files[0].name").value(org.hamcrest.Matchers.startsWith("KQKN-")))
                 .andExpect(jsonPath("$.items[0].parameter").value("Cadimium (Cd)"))
                 .andExpect(jsonPath("$.items[0].result").value("< LOQ"))
-                .andExpect(jsonPath("$.sampleName").value("Sầu riêng"))
+                .andExpect(jsonPath("$.sampleName").value("Mẫu")) // tên của chính mẫu (dòng Phiếu 4), không phải mẫu đầu tiên của Phiếu 3
                 .andExpect(header().string("Cache-Control", containsString("no-store")))
                 .andExpect(header().string("X-Robots-Tag", containsString("noindex")))
                 .andExpect(content().string(not(containsString("Bí Mật"))))

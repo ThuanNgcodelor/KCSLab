@@ -67,6 +67,12 @@ public class Sample {
         this.verifiedBy = null; this.verifiedAt = null;
     }
     void attachTo(Receipt receipt) { this.receipt = receipt; }
+    /** Corrects the descriptive fields of a sample. The code and source never change here. */
+    public void updateDetails(String name, String quantity, String weight, String packaging, String condition,
+                              String requestedParameters) {
+        this.name = name; this.quantity = quantity; this.weight = weight; this.packaging = packaging;
+        this.sampleCondition = condition; this.requestedParameters = requestedParameters;
+    }
     public void markTransferPending() { this.status = ReceiptStatus.TRANSFER_PENDING; }
     public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; }
     public void markTransferRejected() { this.status = ReceiptStatus.RECEIVED; }

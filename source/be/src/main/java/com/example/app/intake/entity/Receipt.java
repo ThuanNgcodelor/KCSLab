@@ -110,6 +110,28 @@ public class Receipt {
 
     public void addSample(Sample sample) { samples.add(sample); sample.attachTo(this); }
     public void addAttachment(ReceiptAttachment attachment) { attachments.add(attachment); attachment.attachTo(this); }
+    /** Corrects receipt-level data after saving. Codes, Số/No., customer and acceptance decision are not touched. */
+    public void updateDetails(String deliveredBy, String sampledBy, Instant sampledAt, String growingArea,
+                              String packingFacility, String vehicleNumber, String trailerNumber, String containerNumber,
+                              String sealNumber, String containerSealNumber, SealStatus sealStatus, String conditionDetail,
+                              String transportInfo, Double receivedTemperature, String storageCondition,
+                              String storageAfterReceipt, LocalDate expectedDate, String specialRequest) {
+        this.deliveredBy = deliveredBy; this.sampledBy = sampledBy; this.sampledAt = sampledAt;
+        this.growingArea = growingArea; this.packingFacility = packingFacility; this.vehicleNumber = vehicleNumber;
+        this.trailerNumber = trailerNumber; this.containerNumber = containerNumber; this.sealNumber = sealNumber;
+        this.containerSealNumber = containerSealNumber;
+        if (sealStatus != null) setSealStatus(sealStatus);
+        this.conditionDetail = conditionDetail; this.transportInfo = transportInfo;
+        this.receivedTemperature = receivedTemperature; this.storageCondition = storageCondition;
+        this.storageAfterReceipt = storageAfterReceipt; this.expectedDate = expectedDate; this.specialRequest = specialRequest;
+        this.updatedAt = Instant.now();
+    }
+    /** Receipt-level sample columns mirror the first sample (kept for the Phiếu 3 export and lists). */
+    public void mirrorPrimarySample(Sample primary) {
+        this.sampleName = primary.getName(); this.quantity = primary.getQuantity(); this.packaging = primary.getPackaging();
+        this.sampleCondition = primary.getCondition(); this.requestedParameters = primary.getRequestedParameters();
+        this.updatedAt = Instant.now();
+    }
     public void markTransferred() { this.status = ReceiptStatus.TRANSFERRED; this.updatedAt = Instant.now(); }
     public Long getId() { return id; }
     public String getReceiptCode() { return receiptCode; }

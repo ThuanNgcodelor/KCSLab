@@ -35,7 +35,7 @@ export function ReceivingListPage() {
     <WorkflowGuide stage="handover" />
     <nav className="receiving-filter receiving-status-tabs" aria-label="Trạng thái phiếu">{receivingStatuses.map((key) => <button key={key} className={status === key ? 'primary-button' : 'outline-button'} aria-pressed={status === key} onClick={() => update('status',key)}>{labels[key]}</button>)}</nav>
     <ListToolbar q={q} onQ={(value) => update('q', value)} searchLabel="Tìm Số/No. hoặc mã hóa mẫu"
-      placeholder="Ví dụ: CFC26.0001" from={from} to={to}
+      placeholder="Ví dụ: CFC26.00001" from={from} to={to}
       onFrom={(value) => update('from', value)} onTo={(value) => update('to', value)}
       sort={sort} onSort={(value) => update('sort', value)} sortOptions={[
         ['', 'Mặc định'], ['submittedAt,desc', 'Gửi: mới nhất'], ['submittedAt,asc', 'Gửi: cũ nhất'],

@@ -47,7 +47,7 @@ export function TestRequestFormPage() {
     <form onSubmit={saveRequest} className="sampling-workflow">
       <FormSection number="I" title="Thông tin khách hàng" en="Customer information" copy="Số/No. và ngày lập phiếu, thông tin khách hàng.">
         <div className="form-two-columns">
-          <label>Số/ No.<input value={form.requestNumber} onChange={change(setForm, 'requestNumber')} onBlur={(event) => { const canonical = normalizeRequestNumber(event.target.value); if (canonical !== event.target.value) setForm((current) => ({ ...current, requestNumber: canonical })); }} disabled={editing} placeholder="CFC26.0001" autoComplete="off" spellCheck="false" />
+          <label>Số/ No.<input value={form.requestNumber} onChange={change(setForm, 'requestNumber')} onBlur={(event) => { const canonical = normalizeRequestNumber(event.target.value); if (canonical !== event.target.value) setForm((current) => ({ ...current, requestNumber: canonical })); }} disabled={editing} placeholder="CFC26.00001" autoComplete="off" spellCheck="false" />
             {!editing && <small className="field-hint">Tự điền số kế tiếp, có thể sửa (CFC + 2 số năm + số thứ tự). Số trùng sẽ báo lỗi. <button type="button" className="inline-link" onClick={refreshNumber}>Lấy số kế tiếp</button></small>}
           </label>
           <Field type="date" label="Ngày/ Date" value={form.requestDate} onChange={change(setForm, 'requestDate')} required />

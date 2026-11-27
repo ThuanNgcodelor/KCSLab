@@ -51,7 +51,7 @@ public class TestRequestService {
  private String resolveNumber(String typed){
   if(typed==null||typed.isBlank())return numbers.allocate(numbers.currentYearCode());
   String number=TestRequestNumberSequence.normalize(typed);
-  if(number==null||!TestRequestNumberSequence.FORMAT.matcher(number).matches())throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số phiếu phải theo dạng CFC26.0001 (CFC, 2 số năm, dấu chấm, tối thiểu 4 số thứ tự)");
+  if(number==null||!TestRequestNumberSequence.FORMAT.matcher(number).matches())throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Số phiếu phải theo dạng CFC26.00001 (CFC, 2 số năm, dấu chấm, tối thiểu 5 số thứ tự)");
   numbers.register(number);
   if(requests.existsByRequestNumberIgnoreCase(number))throw new ResponseStatusException(HttpStatus.CONFLICT,"Số "+number+" đã tồn tại. Số kế tiếp là "+numbers.nextAfter(number));
   return number;}

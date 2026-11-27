@@ -34,6 +34,8 @@ export function IntakePage() {
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({ from: '', to: '', status: '', productType: '' });
   const [refreshKey, setRefreshKey] = useState(0);
+  // Người tiếp nhận mặc định thấy mọi hồ sơ của phòng (hồ sơ của đồng nghiệp cũng cần lập phiếu chuyển); có thể lọc "Của tôi".
+  const [scope, setScope] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -51,7 +53,7 @@ export function IntakePage() {
     Promise.all([
       listReceipts({
         page, size: 20, sort, q: query, ...filters,
-        receivedBy: user?.role === 'RECEPTIONIST' ? user.id : '',
+        receivedBy: user?.role === 'RECEPTIONIST' && scope === 'mine' ? user.id : '',
       }),
       dashboardRequest,
     ])
@@ -59,7 +61,7 @@ export function IntakePage() {
       .catch((exception) => { if (active) setError(exception.message); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [filters, page, query, refreshKey, sort, user?.id, user?.role]);
+  }, [filters, page, query, refreshKey, scope, sort, user?.id, user?.role]);
 
   const updateFilter = (field) => (event) => {
     setFilters((current) => ({ ...current, [field]: event.target.value }));
@@ -96,12 +98,18 @@ export function IntakePage() {
       <button className="filter-reset" type="button" onClick={resetFilters}>Xóa bộ lọc</button>
     </section>
 
-    <section className="panel-card intake-list-card"><div className="panel-heading intake-list-heading"><div><p className="section-kicker">Phân trang từ máy chủ · 20 phiếu/trang</p><h2>Danh sách phiếu tiếp nhận</h2></div><div className="intake-list-tools"><label>Sắp xếp<select value={sort} onChange={(event) => { setSort(event.target.value); setPage(0); }}>{sortOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><button className="outline-button small-button" onClick={() => setRefreshKey((value) => value + 1)}>↻ Làm mới</button></div></div>
+    <section className="panel-card intake-list-card"><div className="panel-heading intake-list-heading"><div><p className="section-kicker">Phân trang từ máy chủ · 20 phiếu/trang</p><h2>Danh sách phiếu tiếp nhận</h2></div><div className="intake-list-tools">{user?.role === 'RECEPTIONIST' && <div className="scope-toggle" role="group" aria-label="Phạm vi hồ sơ">{[['all', 'Tất cả hồ sơ'], ['mine', 'Của tôi']].map(([value, label]) => <button type="button" key={value} className={scope === value ? 'active' : ''} aria-pressed={scope === value} onClick={() => { setScope(value); setPage(0); }}>{label}</button>)}</div>}<label>Sắp xếp<select value={sort} onChange={(event) => { setSort(event.target.value); setPage(0); }}>{sortOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><button className="outline-button small-button" onClick={() => setRefreshKey((value) => value + 1)}>↻ Làm mới</button></div></div>
       {loading ? <PageLoader label="Đang tải phiếu từ hệ thống…" rows={4} /> : receipts.length === 0
         ? <div className="empty-intake"><span><Icon name="search" size={22} /></span><h3>Không tìm thấy phiếu phù hợp</h3><p>Thử xóa bộ lọc hoặc tạo phiếu tiếp nhận mới.</p><button className="outline-button" onClick={resetFilters}>Xóa bộ lọc</button></div>
-        : <><div className="table-wrap"><table className="staff-table intake-table"><thead><tr><th>Số/No · khách hàng</th><th>Mẫu</th><th>Người tiếp nhận</th><th>Trạng thái</th><th>Ngày nhận</th><th /></tr></thead><tbody>{receipts.map((receipt) => <tr key={receipt.id}><td data-label="Phiếu"><span className="intake-cell-content"><strong className="receipt-code">{receipt.requestNumber || 'Chưa có Số/No'}</strong><small>{receipt.customerName} · {receipt.customerPhone}</small></span></td><td data-label="Mẫu"><span className="intake-cell-content"><strong>{receipt.samples?.length ?? 0} mẫu · {receipt.sampleName}</strong><small>Mã hóa: {receipt.samples?.map((sample) => sample.sampleCode).join(', ')}</small></span></td><td data-label="Tiếp nhận"><span className="intake-cell-content"><strong>{receipt.receivedByName}</strong><small>Nhận từ {receipt.deliveredBy}</small></span></td><td data-label="Trạng thái"><StatusBadge domain="receipt" value={receipt.status} /></td><td data-label="Ngày nhận" className="muted-cell">{new Date(receipt.receivedAt).toLocaleDateString('vi-VN')}</td><td data-label="Hồ sơ"><button className="table-action" onClick={() => navigate(`/admin/intake/${receipt.id}`)}>Xem hồ sơ</button></td></tr>)}</tbody></table></div><div className="list-pagination"><p>Hiển thị <strong>{firstItem}–{lastItem}</strong> trong <strong>{receiptPage.totalElements}</strong> phiếu · 20 phiếu/trang</p><nav aria-label="Phân trang phiếu tiếp nhận"><button type="button" className="pagination-button" disabled={receiptPage.first || loading} onClick={() => setPage((value) => Math.max(0, value - 1))}>← Trước</button>{pageWindow(receiptPage.page, receiptPage.totalPages).map((pageNumber) => <button type="button" className={`pagination-button page-number ${pageNumber === receiptPage.page ? 'current' : ''}`} aria-current={pageNumber === receiptPage.page ? 'page' : undefined} key={pageNumber} onClick={() => setPage(pageNumber)}>{pageNumber + 1}</button>)}<button type="button" className="pagination-button" disabled={receiptPage.last || loading} onClick={() => setPage((value) => value + 1)}>Sau →</button></nav></div></>}
+        : <><div className="table-wrap"><table className="staff-table intake-table"><thead><tr><th>Số/No · khách hàng</th><th>Mẫu</th><th>Người tiếp nhận</th><th>Trạng thái</th><th>Ngày nhận</th><th /></tr></thead><tbody>{receipts.map((receipt) => <tr key={receipt.id}><td data-label="Phiếu"><span className="intake-cell-content"><strong className="receipt-code">{receipt.requestNumber || 'Chưa có Số/No'}</strong><small>{receipt.customerName} · {receipt.customerPhone}</small></span></td><td data-label="Mẫu"><span className="intake-cell-content"><strong>{receipt.samples?.length ?? 0} mẫu · {receipt.sampleName}</strong><small>Mã hóa: {receipt.samples?.map((sample) => sample.sampleCode).join(', ')}</small></span></td><td data-label="Tiếp nhận"><span className="intake-cell-content"><strong>{receipt.receivedByName}</strong><small>Nhận từ {receipt.deliveredBy}</small></span></td><td data-label="Trạng thái"><StatusBadge domain="receipt" value={receipt.status} /></td><td data-label="Ngày nhận" className="muted-cell">{new Date(receipt.receivedAt).toLocaleDateString('vi-VN')}</td><td data-label="Hồ sơ"><span className="table-actions"><button className="table-action" onClick={() => navigate(`/admin/intake/${receipt.id}`)}>Xem hồ sơ</button>{canEditReceipt(user, receipt) && <button className="table-action" onClick={() => navigate(`/admin/intake/${receipt.id}/edit`)}>Sửa</button>}</span></td></tr>)}</tbody></table></div><div className="list-pagination"><p>Hiển thị <strong>{firstItem}–{lastItem}</strong> trong <strong>{receiptPage.totalElements}</strong> phiếu · 20 phiếu/trang</p><nav aria-label="Phân trang phiếu tiếp nhận"><button type="button" className="pagination-button" disabled={receiptPage.first || loading} onClick={() => setPage((value) => Math.max(0, value - 1))}>← Trước</button>{pageWindow(receiptPage.page, receiptPage.totalPages).map((pageNumber) => <button type="button" className={`pagination-button page-number ${pageNumber === receiptPage.page ? 'current' : ''}`} aria-current={pageNumber === receiptPage.page ? 'page' : undefined} key={pageNumber} onClick={() => setPage(pageNumber)}>{pageNumber + 1}</button>)}<button type="button" className="pagination-button" disabled={receiptPage.last || loading} onClick={() => setPage((value) => value + 1)}>Sau →</button></nav></div></>}
     </section>
   </section>;
+}
+
+// Khớp quy tắc backend: nhân viên tiếp nhận sửa đến khi gửi KCS; Admin sửa mọi lúc.
+function canEditReceipt(user, receipt) {
+  if (user?.role === 'ADMIN') return true;
+  return user?.role === 'RECEPTIONIST' && (receipt.samples ?? []).every((sample) => sample.status === 'RECEIVED');
 }
 
 function pageWindow(currentPage, totalPages) {

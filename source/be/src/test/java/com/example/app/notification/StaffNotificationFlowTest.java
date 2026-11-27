@@ -45,7 +45,7 @@ class StaffNotificationFlowTest {
 
     private TestRequestDtos.SaveRequest request() {
         return json.readValue("""
-                {"requestNumber":"CFC88.9001","requestDate":"2026-11-24","customerName":"Khach thu",
+                {"requestNumber":"CFC88.09001","requestDate":"2026-11-24","customerName":"Khach thu",
                  "customerPhone":"0900000099","sampleName":"Mau thu","samplingMode":"CUSTOMER","completed":false,
                  "items":[{"sampleNameOrId":"Mau 1","parameters":"Cadimi (Cd)","matrix":"Ruột"}]}
                 """, TestRequestDtos.SaveRequest.class);
@@ -120,7 +120,7 @@ class StaffNotificationFlowTest {
         var technician = user("receiver", Role.TECHNICIAN);
         var admin = user("admin", Role.ADMIN);
         var request = json.readValue("""
-                {"customerName":"PRIVATE-COMPANY-TEST","customerPhone":"0900000099","requestNumber":"CFC88.9002",
+                {"customerName":"PRIVATE-COMPANY-TEST","customerPhone":"0900000099","requestNumber":"CFC88.09002",
                  "deliveredBy":"Nguoi giao thu","sampleName":"Mau thu","quantity":"2 quả","sealStatus":"INTACT",
                  "sampleCondition":"Nguyên vẹn","acceptanceDecision":"ACCEPTED",
                  "samples":[{"sampleCode":"TEST-NOTIFY-WEIGHT-001","sourceCode":"CT901","productType":"SR","name":"Mau thu",
@@ -144,7 +144,7 @@ class StaffNotificationFlowTest {
         assertThat(reports.header(transfer.items().getFirst().id()).sampleQuantity()).isEqualTo("2 quả / 500 g");
         assertThat(notifications.findFor(technician, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content())
                 .singleElement().satisfies(notice -> {
-                    assertThat(notice.message()).contains("sender đã chuyển 1 mẫu", "Số/No. CFC88.9002").doesNotContain("PRIVATE-COMPANY-TEST");
+                    assertThat(notice.message()).contains("sender đã chuyển 1 mẫu", "Số/No. CFC88.09002").doesNotContain("PRIVATE-COMPANY-TEST");
                     assertThat(notice.targetUrl()).isEqualTo("/admin/receiving/transfers/" + transfer.id());
                 });
         var adminTransfers = notifications.findFor(admin, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content();
@@ -169,7 +169,7 @@ class StaffNotificationFlowTest {
         entityManager.clear();
         var repaired = notifications.findFor(technician, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content();
         assertThat(repaired).singleElement().satisfies(notice -> {
-            assertThat(notice.message()).contains("sender", "Số/No. CFC88.9002"); assertThat(notice.readAt()).isNotNull();
+            assertThat(notice.message()).contains("sender", "Số/No. CFC88.09002"); assertThat(notice.readAt()).isNotNull();
         });
         assertThat(notifications.findFor(admin, 0, 100, null, false, receipt.requestNumber(), StaffNotificationType.TRANSFER_SUBMITTED, null, null).content()).hasSize(1);
     }

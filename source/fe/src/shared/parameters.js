@@ -29,3 +29,18 @@ export function splitParameters(value, matrix) {
 export function splitMethods(value) {
   return (value || '').split(/[,;\n]/).map((item) => item.trim()).filter(Boolean);
 }
+
+// Phương pháp thử mặc định theo chỉ tiêu (danh mục phương pháp của LAB):
+// Cadimi (Cd) → CFC-TN-17-2026; Auramine O (Vàng O, vỏ/ruột) → CFC-TN-16-2026.
+export const CADMIUM_METHOD = 'CFC-TN-17-2026';
+export const AURAMINE_METHOD = 'CFC-TN-16-2026';
+
+/** Mã phương pháp gợi ý cho chuỗi chỉ tiêu của một mẫu, không trùng và theo thứ tự chỉ tiêu. Chỉ tiêu lạ không được gợi ý. */
+export function methodCodesForParameters(value) {
+  const codes = [];
+  splitParameters(value).forEach((name) => {
+    const code = name.startsWith('Cadimi') ? CADMIUM_METHOD : name.startsWith('Auramine') ? AURAMINE_METHOD : null;
+    if (code && !codes.includes(code)) codes.push(code);
+  });
+  return codes;
+}

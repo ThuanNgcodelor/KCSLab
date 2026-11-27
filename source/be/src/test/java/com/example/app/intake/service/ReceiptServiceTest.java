@@ -140,12 +140,12 @@ class ReceiptServiceTest {
     }
 
     @Test
-    void cfcRequestNumberIsStoredInCanonicalFourDigitForm() {
+    void cfcRequestNumberIsStoredInCanonicalFiveDigitForm() {
         User receptionist = userRepository.save(new User(
                 "canon@test.local", "Nhan vien so chuan", "unused", Role.RECEPTIONIST));
-        ReceiptResponse first = receiptService.create(receiptRequest("Canon", "0900000111", Instant.now(), " cfc92.00005 "), receptionist);
-        assertThat(first.requestNumber()).isEqualTo("CFC92.0005");
-        assertThatThrownBy(() -> receiptService.create(receiptRequest("Canon2", "0900000112", Instant.now(), "CFC92.0005"), receptionist))
+        ReceiptResponse first = receiptService.create(receiptRequest("Canon", "0900000111", Instant.now(), " cfc92.0005 "), receptionist);
+        assertThat(first.requestNumber()).isEqualTo("CFC92.00005");
+        assertThatThrownBy(() -> receiptService.create(receiptRequest("Canon2", "0900000112", Instant.now(), "CFC92.00005"), receptionist))
                 .isInstanceOf(ResponseStatusException.class).hasMessageContaining("đã có hồ sơ tiếp nhận");
     }
 

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { listTransfers } from '../api/transferApi';
+import { listReceipts } from '../../intake/api/intakeApi';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { labelsOf } from '../../../shared/status';
 import { PageLoader } from '../../../shared/components/Loading';
@@ -28,6 +29,7 @@ export function TransfersPage() {
   const location = useLocation();
   const [list, setList] = useListState(defaults);
   const [data, setData] = useState(emptyPage);
+  const [ready, setReady] = useState({ content: [], totalElements: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const canCreate = ['ADMIN', 'RECEPTIONIST'].includes(user?.role);
@@ -40,6 +42,12 @@ export function TransfersPage() {
   }, [list]);
 
   useEffect(() => { loadTransfers(); }, [loadTransfers]);
+  useEffect(() => {
+    if (!canCreate) return undefined;
+    let active = true;
+    listReceipts({ transferable: true, size: 5, sort: 'receivedAt,asc' }).then((page) => { if (active) setReady(page); }).catch(() => {});
+    return () => { active = false; };
+  }, [canCreate, data]);
   const transfers = data.content;
 
   return <section className="intake-page transfer-page">
@@ -47,6 +55,13 @@ export function TransfersPage() {
     {location.state?.message && <p className="success-note intake-toast" role="status">✓ {location.state.message}</p>}
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <WorkflowGuide stage="handover" />
+    {canCreate && ready.totalElements > 0 && <section className="panel-card ready-transfer-card" aria-label="Hồ sơ chờ lập phiếu chuyển">
+      <div className="panel-heading"><div><p className="section-kicker">Cần lập phiếu chuyển</p><h2>Hồ sơ tiếp nhận chờ chuyển KCS ({ready.totalElements})</h2></div></div>
+      <ul className="ready-transfer-list">{ready.content.map((receipt) => <li key={receipt.id}>
+        <span><strong>{receipt.requestNumber || receipt.receiptCode}</strong><small>{receipt.customerName} · {(receipt.samples ?? []).filter((sample) => sample.status === 'RECEIVED').length} mẫu sẵn sàng</small></span>
+        <button type="button" className="outline-button small-button" onClick={() => navigate(`/admin/transfers/new?receiptId=${receipt.id}`)}>Lập phiếu chuyển</button></li>)}</ul>
+      {ready.totalElements > ready.content.length && <p className="muted">Còn {ready.totalElements - ready.content.length} hồ sơ khác: bấm "Tạo hồ sơ chuyển mẫu" để tìm.</p>}
+    </section>}
     <section className="panel-card intake-list-card">
       <div className="panel-heading"><div><p className="section-kicker">Chuỗi bàn giao</p><h2>Phiếu chuyển mẫu</h2></div><button className="outline-button small-button" onClick={loadTransfers}>↻ Làm mới</button></div>
       <ListToolbar q={list.q} onQ={(q) => setList({ q })} searchLabel="Tìm phiếu" placeholder="Số/No., mã hóa mẫu, khách hàng…" dateLabel="Ngày chuyển" from={list.from} to={list.to} onFrom={(from) => setList({ from })} onTo={(to) => setList({ to })}

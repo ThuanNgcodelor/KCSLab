@@ -1806,3 +1806,49 @@ h1 .status-badge, .admin-heading > .status-badge { margin-left: 10px; }
 .lookup-qr-panel strong { color: #1d4a35; font-size: 14px; overflow-wrap: anywhere; }
 .lookup-qr-panel small { color: #5f7a6a; font-size: 12px; line-height: 1.45; }
 .lookup-qr-panel .lookup-qr-message { color: #0b6b3a; font-weight: 600; }
+
+/* Sửa hồ sơ tiếp nhận: lưới 2 cột trên desktop, 1 cột trên điện thoại; nút lưu dính đáy để không phải cuộn lên. */
+.receipt-edit-form { display: grid; gap: 16px; }
+.receipt-edit-form .intake-form-card { display: grid; gap: 14px; }
+.receipt-edit-notice { border-color: #efd49b; background: #fffaf0; }
+.receipt-edit-actions { position: sticky; bottom: 0; z-index: 5; display: flex; justify-content: flex-end; gap: 10px; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, transparent, var(--page-bg, #f6faf5) 35%); }
+@media (max-width: 520px) { .receipt-edit-actions > button { flex: 1 1 0; } .receipt-edit-form .form-two-columns { grid-template-columns: minmax(0, 1fr); } }
+.receipt-edit-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.receipt-edit-list li { padding-bottom: 12px; border-bottom: 1px solid #e7efe8; }
+.receipt-edit-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.receipt-edit-list pre { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 13px; color: #456654; }
+.receipt-edit-list p { margin: 4px 0 0; }
+
+/* Nhập kết quả: chọn Số/No. rồi chọn mẫu của Số/No. đó. */
+.sample-choice-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+.sample-choice-group legend { padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.sample-choice-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+.sample-choice { position: relative; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1.5px solid #d5e5d8; border-radius: 12px; background: #fbfdfb; cursor: pointer; transition: border-color .15s, background .15s; }
+.sample-choice:hover { border-color: #8cc79c; }
+.sample-choice.checked { border-color: #2f9e5a; background: #eaf7ee; box-shadow: 0 0 0 3px rgba(47, 158, 90, .15); }
+.sample-choice input { margin-top: 3px; width: auto; min-height: 0; accent-color: #2f9e5a; }
+.sample-choice-body { display: grid; gap: 3px; min-width: 0; }
+.sample-choice-body strong { font-size: 14px; color: #153524; }
+.sample-choice-body code { font-size: 12px; color: #456654; overflow-wrap: anywhere; }
+.sample-choice-body small { color: #6c8576; font-size: 12px; }
+.sample-choice-params { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.sample-choice-params em { padding: 2px 8px; border-radius: 999px; background: #dff3e1; color: #1d5a35; font-size: 11px; font-style: normal; font-weight: 600; }
+.edit-badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border: 1px solid #efd49b; border-radius: 999px; color: #8a5a10; background: #fff4d9; font-size: 11px; font-weight: 700; vertical-align: middle; }
+.receipt-edit-notice textarea { margin-top: 6px; }
+.receipt-edit-notice label { display: grid; gap: 6px; margin-top: 10px; font-size: 13px; font-weight: 600; color: #6b4a10; }
+.receipt-edit-notice { display: grid; gap: 4px; font-size: 13px; color: #5c4a22; }
+.receipt-edit-form .choice-fieldset { grid-column: 1 / -1; }
+.receipt-edit-form .choice-other-field { display: grid; gap: 6px; margin-top: 10px; font-size: 12px; font-weight: 600; color: #456654; }
+.receipt-edit-list li > strong { color: #153524; }
+.receipt-edit-list time { color: #6c8576; font-size: 13px; }
+@media (max-width: 520px) { .receipt-form-page .choice-grid { grid-template-columns: minmax(0, 1fr); } }
+.receipt-edit-form .form-two-columns { align-items: start; }
+.receipt-edit-form small.form-error { color: #b3261e; font-weight: 600; }
+.scope-toggle { display: inline-flex; padding: 3px; border: 1px solid #d5e5d8; border-radius: 10px; background: #f4faf5; }
+.scope-toggle button { padding: 6px 12px; border: 0; border-radius: 8px; color: #456654; background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; }
+.scope-toggle button.active { color: #fff; background: #2f7d4d; }
+.ready-transfer-card { display: grid; gap: 10px; margin-bottom: 16px; border-color: #bfe0c8; background: #f3fbf5; }
+.ready-transfer-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ready-transfer-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid #dbe8dd; border-radius: 10px; background: #fff; }
+.ready-transfer-list span { display: grid; gap: 2px; min-width: 0; }
+.ready-transfer-list small { color: #6c8576; font-size: 12px; overflow-wrap: anywhere; }

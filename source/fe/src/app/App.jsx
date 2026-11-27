@@ -11,6 +11,7 @@ const UserFormPage = lazy(() => import('../features/users/pages/UserFormPage').t
 const ReceptionistDashboardPage = lazy(() => import('../features/intake/pages/ReceptionistDashboardPage').then(m => ({ default: m.ReceptionistDashboardPage })));
 const IntakePage = lazy(() => import('../features/intake/pages/IntakePage').then(m => ({ default: m.IntakePage })));
 const ReceiptCreatePage = lazy(() => import('../features/intake/pages/ReceiptCreatePage').then(m => ({ default: m.ReceiptCreatePage })));
+const ReceiptEditPage = lazy(() => import('../features/intake/pages/ReceiptEditPage').then(m => ({ default: m.ReceiptEditPage })));
 const ReceiptDetailPage = lazy(() => import('../features/intake/pages/ReceiptDetailPage').then(m => ({ default: m.ReceiptDetailPage })));
 const DashboardPage = lazy(() => import('../features/admin/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const TransfersPage = lazy(() => import('../features/transfer/pages/TransfersPage').then(m => ({ default: m.TransfersPage })));
@@ -89,6 +90,7 @@ export function App() {
           <Route path="/admin/intake/receipts" element={<IntakePage />} />
           <Route path="/admin/intake/new" element={<ReceiptCreatePage />} />
           <Route path="/admin/intake/:id" element={<ReceiptDetailPage />} />
+          <Route path="/admin/intake/:id/edit" element={<ReceiptEditPage />} />
           <Route path="/admin/transfers/new" element={<TransferCreatePage />} />
           <Route path="/admin/transfers/:id/edit" element={<TransferCreatePage />} />
         </Route>

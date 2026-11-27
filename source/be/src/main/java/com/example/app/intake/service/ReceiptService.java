@@ -175,7 +175,7 @@ public class ReceiptService {
                 request.conditionDetail(), request.transportInfo(), request.receivedTemperature(),
                 request.storageCondition(), request.requestedParameters(), request.expectedDate(),
                 request.specialRequest(), decision, request.acceptanceReason());
-        // Số/No. dạng CFC luôn lưu dạng chuẩn CFC26.0001 (gõ CFC26.00001 hay cfc26.1 đều được chuyển).
+        // Số/No. dạng CFC luôn lưu dạng chuẩn CFC26.00001 (gõ CFC26.0001 hay cfc26.1 đều được chuyển).
         String typedNumber = request.requestNumber().trim();
         String canonicalNumber = com.example.app.sampling.service.TestRequestNumberSequence.normalize(typedNumber);
         String requestNumber = canonicalNumber != null ? canonicalNumber : typedNumber;

@@ -1,7 +1,8 @@
 import { ParameterList } from '../../../shared/components/ParameterRows';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getReceipt, uploadReceiptFile } from '../api/intakeApi';
+import { getReceipt, getReceiptEdits, uploadReceiptFile } from '../api/intakeApi';
+import { useAuth } from '../../auth/hooks/useAuth';
 import { PhotoPicker } from '../../../shared/components/PhotoPicker';
 import { PageLoader } from '../../../shared/components/Loading';
 import { SampleCodingPanel } from '../components/SampleCodingPanel';
@@ -16,7 +17,9 @@ const categoryLabels = {
 export function ReceiptDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [receipt, setReceipt] = useState(null);
+  const [edits, setEdits] = useState([]);
   const [category, setCategory] = useState('SAMPLE_PHOTO');
   const [description, setDescription] = useState('');
   const [selected, setSelected] = useState([]);
@@ -24,6 +27,7 @@ export function ReceiptDetailPage() {
   const [error, setError] = useState('');
 
   useEffect(() => { getReceipt(id).then(setReceipt).catch((exception) => setError(exception.message)); }, [id]);
+  useEffect(() => { getReceiptEdits(id).then(setEdits).catch(() => setEdits([])); }, [id]);
 
   async function handleUpload(event) {
     event.preventDefault();
@@ -47,13 +51,22 @@ export function ReceiptDetailPage() {
 
   if (!receipt) return <section className="staff-page">{error ? <p className="form-error" role="alert">{error}</p> : <PageLoader label="Đang tải hồ sơ tiếp nhận…" rows={4} />}</section>;
   const photoCategory = category !== 'FORM_3' && category !== 'OTHER';
+  // Nhân viên tiếp nhận sửa đến khi gửi KCS; Admin sửa mọi lúc (có ghi lý do). Backend kiểm tra lại quyền này.
+  const locked = receipt.samples.some((sample) => sample.status !== 'RECEIVED');
+  const canEdit = user?.role === 'ADMIN' || (user?.role === 'RECEPTIONIST' && !locked);
 
   return <section className="staff-page receipt-detail-page">
-    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Hồ sơ tiếp nhận / {receipt.requestNumber || receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div></header>
+    <header className="admin-heading staff-heading"><div><button className="back-link" onClick={() => navigate('/admin/intake/receipts')}>← Danh sách tiếp nhận</button><p className="section-kicker">Hồ sơ tiếp nhận / {receipt.requestNumber || receipt.receiptCode}</p><h1>{receipt.sampleName}</h1><p className="heading-copy">Tiếp nhận bởi {receipt.receivedByName} · {formatDateTime(receipt.receivedAt)}</p></div>{canEdit && <button className="primary-button" type="button" onClick={() => navigate(`/admin/intake/${id}/edit`)}>✎ Sửa hồ sơ</button>}</header>
     {error && <p className="form-error intake-toast" role="alert">{error}</p>}
     <div className="receipt-detail-grid">
       <main className="receipt-form-main">
         <CustomerNotificationHistory receiptId={id} />
+        {edits.length > 0 && <section className="panel-card intake-form-card receipt-edit-history"><DetailHeading number="↺" en="Edit history" title="Lịch sử chỉnh sửa" />
+          <ol className="receipt-edit-list">{edits.map((edit) => <li key={edit.id}>
+            <strong>{edit.editedBy}</strong> · <time dateTime={edit.editedAt}>{formatDateTime(edit.editedAt)}</time>{edit.afterTransfer && <span className="edit-badge">Sau khi gửi KCS</span>}
+            {edit.reason && <p>Lý do: {edit.reason}</p>}
+            <pre>{edit.summary}</pre></li>)}</ol>
+        </section>}
         <section className="panel-card intake-form-card"><DetailHeading number="I" en="Source & chain of custody" title="Nguồn và chuỗi tiếp nhận" />
           <div className="receipt-source-grid">
             <Detail label="Khách hàng" value={`${receipt.customerName} · ${receipt.customerPhone}`} />

@@ -417,12 +417,15 @@ public class ResultReleaseService {
                                   String qualityHead, String director, boolean preview, List<ReportData.Photo> photos) {
         var receipt = item.getTransfer().getReceipt();
         var customer = receipt.getCustomer();
-        String condition = java.util.stream.Stream.of(receipt.getSampleCondition(), receipt.getConditionDetail())
-                .filter(value -> value != null && !value.isBlank()).collect(java.util.stream.Collectors.joining(". "));
+        // Tên và tình trạng là của TỪNG mẫu (dòng Phiếu 4), không phải của mẫu đầu tiên trên Phiếu 3.
+        String sampleName = item.getSampleName() != null && !item.getSampleName().isBlank() ? item.getSampleName() : receipt.getSampleName();
+        String itemCondition = item.getSampleCondition() != null && !item.getSampleCondition().isBlank() ? item.getSampleCondition() : receipt.getSampleCondition();
+        String condition = java.util.stream.Stream.of(itemCondition, receipt.getConditionDetail())
+                .filter(value -> value != null && !value.isBlank()).distinct().collect(java.util.stream.Collectors.joining(". "));
         String quantity = java.util.stream.Stream.of(item.getQuantity() != null ? item.getQuantity() : receipt.getQuantity(), item.getWeight())
                 .filter(value -> value != null && !value.isBlank()).distinct().collect(java.util.stream.Collectors.joining(" / "));
         return new ReportData(resultNumber, lookupCode, reportDate, customer.getName(), customer.getAddress(),
-                receipt.getSampleName(), receipt.getGrowingArea(), receipt.getPackingFacility(),
+                sampleName, receipt.getGrowingArea(), receipt.getPackingFacility(),
                 receipt.getVehicleNumber(), receipt.getTrailerNumber(), receipt.getContainerNumber(),
                 receipt.getSealNumber(), item.getSampleCode(), receipt.getSampledBy(), toDate(receipt.getSampledAt()),
                 condition, quantity,
@@ -689,7 +692,7 @@ public class ResultReleaseService {
     }
 
     /**
-     * Số/No. of the KQKN = Số/No. of the receipt (CFC26.0001). A revision gets "/R1", "/R2"…; a second sample of the
+     * Số/No. of the KQKN = Số/No. of the receipt (CFC26.00001). A revision gets "/R1", "/R2"…; a second sample of the
      * same receipt gets "-2", "-3"… so the number stays unique. Receipts without a Số/No. keep the old sequence.
      */
     private String resultNumber(ResultRelease release, com.example.app.intake.entity.Sample sample, LocalDate today) {

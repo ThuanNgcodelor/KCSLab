@@ -55,21 +55,21 @@ class TestRequestNumberingTest {
 
     @Test
     @Transactional
-    void allocatesSequentiallyWithFourDigitsAndPerYearCounter() {
-        assertThat(numbers.allocate("98")).isEqualTo("CFC98.0001");
-        assertThat(numbers.allocate("98")).isEqualTo("CFC98.0002");
-        assertThat(numbers.allocate("99")).isEqualTo("CFC99.0001");
+    void allocatesSequentiallyWithFiveDigitsAndPerYearCounter() {
+        assertThat(numbers.allocate("98")).isEqualTo("CFC98.00001");
+        assertThat(numbers.allocate("98")).isEqualTo("CFC98.00002");
+        assertThat(numbers.allocate("99")).isEqualTo("CFC99.00001");
     }
 
     @Test
     @Transactional
-    void handTypedNumberRaisesTheCounterAndGrowsADigitAfter9999() {
-        numbers.register("CFC97.0010");
-        assertThat(numbers.allocate("97")).isEqualTo("CFC97.0011");
-        numbers.register("CFC96.9999");
-        assertThat(numbers.allocate("96")).isEqualTo("CFC96.10000");
-        numbers.register("CFC96.0005"); // lower numbers never move the counter back
-        assertThat(numbers.allocate("96")).isEqualTo("CFC96.10001");
+    void handTypedNumberRaisesTheCounterAndGrowsADigitAfter99999() {
+        numbers.register("CFC97.00010");
+        assertThat(numbers.allocate("97")).isEqualTo("CFC97.00011");
+        numbers.register("CFC96.99999");
+        assertThat(numbers.allocate("96")).isEqualTo("CFC96.100000");
+        numbers.register("CFC96.00005"); // lower numbers never move the counter back
+        assertThat(numbers.allocate("96")).isEqualTo("CFC96.100001");
     }
 
     @Test
@@ -78,31 +78,33 @@ class TestRequestNumberingTest {
         Clock inYear = Clock.fixed(Instant.parse("2026-06-01T00:00:00Z"), ZoneOffset.UTC);
         assertThat(new TestRequestNumberSequence(jdbc, newYear).currentYearCode()).isEqualTo("27");
         assertThat(new TestRequestNumberSequence(jdbc, inYear).currentYearCode()).isEqualTo("26");
-        assertThat(TestRequestNumberSequence.format("27", 1)).isEqualTo("CFC27.0001");
+        assertThat(TestRequestNumberSequence.format("27", 1)).isEqualTo("CFC27.00001");
     }
 
     @Test
     @Transactional
     void blankNumberIsAllocatedAutomaticallyAndTypedNumbersAreValidated() {
         Response auto = service.create(request(" "), actor);
-        assertThat(auto.requestNumber()).matches("^CFC\\d{2}\\.\\d{4,}$");
+        assertThat(auto.requestNumber()).matches("^CFC\\d{2}\\.\\d{5,}$");
 
-        Response typed = service.create(request("cfc95.0007"), actor);
-        assertThat(typed.requestNumber()).isEqualTo("CFC95.0007");
+        Response typed = service.create(request("cfc95.00007"), actor);
+        assertThat(typed.requestNumber()).isEqualTo("CFC95.00007");
 
-        assertThatThrownBy(() -> service.create(request("cfc95.0007"), actor))
+        assertThatThrownBy(() -> service.create(request("cfc95.00007"), actor))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> {
                     assertThat(e.getStatusCode().value()).isEqualTo(409);
-                    assertThat(e.getReason()).contains("CFC95.0007").contains("CFC95.0008");
+                    assertThat(e.getReason()).contains("CFC95.00007").contains("CFC95.00008");
                 });
         assertThatThrownBy(() -> service.create(request("PHIEU-1"), actor))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(400));
-        // Typed numbers are converted to the canonical four-digit form.
-        assertThat(service.create(request("cfc93.12"), actor).requestNumber()).isEqualTo("CFC93.0012");
-        assertThat(service.create(request("CFC93.00013"), actor).requestNumber()).isEqualTo("CFC93.0013");
-        assertThatThrownBy(() -> service.create(request("CFC93.0013"), actor))
+        // Typed numbers are converted to the canonical five-digit form.
+        assertThat(service.create(request("cfc93.12"), actor).requestNumber()).isEqualTo("CFC93.00012");
+        assertThat(service.create(request("CFC93.00013"), actor).requestNumber()).isEqualTo("CFC93.00013");
+        assertThatThrownBy(() -> service.create(request("CFC93.00013"), actor))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(409));
-        assertThat(TestRequestNumberSequence.normalize(" cfc26.00001 ")).isEqualTo("CFC26.0001");
+        assertThat(TestRequestNumberSequence.normalize(" cfc26.00001 ")).isEqualTo("CFC26.00001");
+        assertThat(TestRequestNumberSequence.normalize("CFC26.0005")).isEqualTo("CFC26.00005");
+        assertThat(TestRequestNumberSequence.normalize("cfc26.5")).isEqualTo("CFC26.00005");
         assertThat(TestRequestNumberSequence.normalize("CFC26.12345")).isEqualTo("CFC26.12345");
         assertThat(TestRequestNumberSequence.normalize("CFC26.0")).isNull();
         assertThat(TestRequestNumberSequence.normalize("REQ-1")).isNull();
@@ -114,28 +116,28 @@ class TestRequestNumberingTest {
     @Test
     @Transactional
     void requestNumberCannotChangeButMayBeOmittedOnUpdate() {
-        Response created = service.create(request("CFC94.0001"), actor);
-        assertThat(service.update(created.id(), request(""), actor).requestNumber()).isEqualTo("CFC94.0001");
-        assertThatThrownBy(() -> service.update(created.id(), request("CFC94.0002"), actor))
+        Response created = service.create(request("CFC94.00001"), actor);
+        assertThat(service.update(created.id(), request(""), actor).requestNumber()).isEqualTo("CFC94.00001");
+        assertThatThrownBy(() -> service.update(created.id(), request("CFC94.00002"), actor))
                 .isInstanceOfSatisfying(ResponseStatusException.class, e -> assertThat(e.getStatusCode().value()).isEqualTo(400));
     }
 
     @Test
     @Transactional
     void planAndFieldSamplingShareTheRequestNumberWhateverTheClientSends() {
-        Response created = service.create(request("CFC93.0001"), actor);
+        Response created = service.create(request("CFC93.00001"), actor);
         Response withPlan = service.savePlan(created.id(), plan("OTHER-1"), actor);
         Response withField = service.saveField(created.id(), field(null), actor);
-        assertThat(withPlan.samplingPlan().formNumber()).isEqualTo("CFC93.0001");
-        assertThat(withField.fieldSampling().formNumber()).isEqualTo("CFC93.0001");
+        assertThat(withPlan.samplingPlan().formNumber()).isEqualTo("CFC93.00001");
+        assertThat(withField.fieldSampling().formNumber()).isEqualTo("CFC93.00001");
         // a second save keeps the stored number and does not collide with itself
-        assertThat(service.savePlan(created.id(), plan(null), actor).samplingPlan().formNumber()).isEqualTo("CFC93.0001");
+        assertThat(service.savePlan(created.id(), plan(null), actor).samplingPlan().formNumber()).isEqualTo("CFC93.00001");
     }
 
     @Test
     @Transactional
     void checklistsOfPlanAndFieldSamplingRoundTrip() {
-        Response created = service.create(request("CFC90.0001"), actor);
+        Response created = service.create(request("CFC90.00001"), actor);
         SavePlan plan = new SavePlan(null, LocalDate.of(2026, 11, 19), "Anh Hưng", "QLCLSP", null, null, null, null, null, null, null, null, null, null, null,
                 "0939740009", "WHOLE,FLESH", "1_5", "WHOLE_AMBIENT,FRESH_COLD");
         PlanResponse p = service.savePlan(created.id(), plan, actor).samplingPlan();
@@ -162,14 +164,14 @@ class TestRequestNumberingTest {
     @Transactional
     void listIsPagedSearchedFilteredAndSortedInTheDatabase() {
         for (int i = 1; i <= 3; i++) service.create(request("CFC89.000" + i), actor);
-        Response done = service.create(new SaveRequest("CFC89.0004", LocalDate.of(2026, 11, 20), "Công ty Xuất Khẩu ZZ", null, null, null, "0911111111", null,
+        Response done = service.create(new SaveRequest("CFC89.00004", LocalDate.of(2026, 11, 20), "Công ty Xuất Khẩu ZZ", null, null, null, "0911111111", null,
                 "Sầu riêng", "LOT-ZZ", null, null, null, null, "CUSTOMER", null, null, null, null, null, true,
                 List.of(new ItemRequest("", "Cadimi (Cd)", "Ruột", null))), actor);
 
         var page = service.search("CFC89", null, null, null, null, 0, 2, "requestNumber,asc");
         assertThat(page.totalElements()).isEqualTo(4);
         assertThat(page.content()).hasSize(2);
-        assertThat(page.content().getFirst().requestNumber()).isEqualTo("CFC89.0001");
+        assertThat(page.content().getFirst().requestNumber()).isEqualTo("CFC89.00001");
         assertThat(page.totalPages()).isEqualTo(2);
 
         assertThat(service.search("xuất khẩu", null, null, null, null, 0, 20, null).content()).extracting(Response::id).containsExactly(done.id());
@@ -191,7 +193,7 @@ class TestRequestNumberingTest {
     @Test
     @Transactional
     void blankSampleLabelGetsADefaultName() {
-        Response created = service.create(request("CFC92.0001"), actor);
+        Response created = service.create(request("CFC92.00001"), actor);
         assertThat(created.items().getFirst().sampleNameOrId()).isEqualTo("Mẫu 1");
     }
 

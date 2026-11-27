@@ -9,6 +9,9 @@ import com.example.app.intake.dto.ReceiptSearchCriteria;
 import com.example.app.intake.entity.AcceptanceDecision;
 import com.example.app.intake.entity.ReceiptAttachmentCategory;
 import com.example.app.intake.entity.ReceiptStatus;
+import com.example.app.intake.dto.ReceiptEditResponse;
+import com.example.app.intake.dto.UpdateReceiptRequest;
+import com.example.app.intake.service.ReceiptEditService;
 import com.example.app.intake.service.ReceiptService;
 import com.example.app.user.service.UserService;
 import jakarta.validation.Valid;
@@ -24,6 +27,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +47,8 @@ import java.nio.charset.StandardCharsets;
 public class ReceiptController {
     private final ReceiptService receiptService;
     private final UserService userService;
-    public ReceiptController(ReceiptService receiptService, UserService userService) { this.receiptService = receiptService; this.userService = userService; }
+    private final ReceiptEditService receiptEditService;
+    public ReceiptController(ReceiptService receiptService, UserService userService, ReceiptEditService receiptEditService) { this.receiptService = receiptService; this.userService = userService; this.receiptEditService = receiptEditService; }
     @GetMapping
     public PagedResponse<ReceiptResponse> list(
             @RequestParam(defaultValue = "0") int page,
@@ -71,6 +76,11 @@ public class ReceiptController {
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString()).body(resource);
     }
+    @PutMapping("/{id}") public ReceiptResponse update(@PathVariable Long id, @Valid @RequestBody UpdateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) {
+        receiptEditService.update(id, request, userService.getByEmail(jwt.getSubject()));
+        return receiptService.findById(id);
+    }
+    @GetMapping("/{id}/edits") public java.util.List<ReceiptEditResponse> edits(@PathVariable Long id) { return receiptEditService.history(id); }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) public ReceiptResponse create(@Valid @RequestBody CreateReceiptRequest request, @AuthenticationPrincipal Jwt jwt) { return receiptService.create(request, userService.getByEmail(jwt.getSubject())); }
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ReceiptAttachmentResponse attach(

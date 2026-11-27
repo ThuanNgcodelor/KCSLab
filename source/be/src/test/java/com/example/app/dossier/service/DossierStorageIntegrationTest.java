@@ -70,11 +70,11 @@ class DossierStorageIntegrationTest {
         var e=attachments.findById(a.id()).orElseThrow();return storage.read(e.getStorageLocationId(),e.getRelativePath(),e.getStorageName());
     }
     @Test void switchingDisksPreservesLegacyAndPreviousFilesAndOneLogicalDossier() throws Exception {
-        long id=receipt("CFC26.9901");var legacy=upload(id,"legacy");
+        long id=receipt("CFC26.09901");var legacy=upload(id,"legacy");
         long a=register("A");storage.activate(a,0,admin.getId());var first=upload(id,"diskA");
         long b=register("B");storage.activate(b,1,admin.getId());var second=upload(id,"diskB");
         assertThat(Files.readString(path(legacy))).isEqualTo("legacy");assertThat(Files.readString(path(first))).isEqualTo("diskA");
-        assertThat(path(second).toString()).contains("2026/11/CFC26.9901/intake");
+        assertThat(path(second).toString()).contains("2026/11/CFC26.09901/intake");
         assertThat(attachments.findById(first.id()).orElseThrow().getStorageLocationId()).isEqualTo(a);
         assertThat(attachments.findById(second.id()).orElseThrow().getStorageLocationId()).isEqualTo(b);
         assertThat(catalog.files(id,0,20).totalElements()).isEqualTo(3);
@@ -83,7 +83,7 @@ class DossierStorageIntegrationTest {
         assertThatThrownBy(()->catalog.file(id+99999,"RECEIPT",first.id())).isInstanceOf(ResponseStatusException.class);
     }
     @Test void staleConfigAndMissingMountAreRejectedWithoutRedirectingOldFiles() throws Exception {
-        long id=receipt("CFC26.9902"),a=register("A"),b=register("B");
+        long id=receipt("CFC26.09902"),a=register("A"),b=register("B");
         storage.activate(a,0,admin.getId());var old=upload(id,"safe");
         assertThatThrownBy(()->storage.activate(b,0,admin.getId())).isInstanceOf(ResponseStatusException.class).hasMessageContaining("409");
         Path root=Path.of(storage.overview().locations().stream().filter(h->h.location().id()==a).findFirst().orElseThrow().location().rootPath());
@@ -106,11 +106,11 @@ class DossierStorageIntegrationTest {
         } finally {Files.deleteIfExists(outside.resolve("secret"));Files.deleteIfExists(outside);}
     }
     @Test void rolledBackUploadDoesNotLeaveAnUnreferencedFile() throws Exception {
-        var file=upload(receipt("CFC26.9903"),"rolled-back");Path path=path(file);assertThat(path).exists();
+        var file=upload(receipt("CFC26.09903"),"rolled-back");Path path=path(file);assertThat(path).exists();
         TestTransaction.flagForRollback();TestTransaction.end();assertThat(path).doesNotExist();TestTransaction.start();
     }
     @Test void exportCombinesDisksAndSplitsParts() throws Exception {
-        long id=receipt("CFC26.9904"),a=register("A");storage.activate(a,0,admin.getId());upload(id,"data-from-A");
+        long id=receipt("CFC26.09904"),a=register("A");storage.activate(a,0,admin.getId());upload(id,"data-from-A");
         long b=register("B");storage.activate(b,1,admin.getId());upload(id,"data-from-B");
         var scope=new DossierCatalog.Scope(2026,11,id,null);String request=UUID.randomUUID().toString();
         var job=jobs.create(scope,request,admin.getId());String jobId=job.get("id").toString();
@@ -126,9 +126,9 @@ class DossierStorageIntegrationTest {
             assertThat(zip.getEntry("danh-muc-goi-"+part.get("part_number")+".csv")).isNotNull();
         }
         assertThat(binary).containsExactlyInAnyOrder("data-from-A","data-from-B");
-        assertThat(entries).contains("2026/11/CFC26.9904/ho-so.json","2026/11/CFC26.9904/danh-muc-file.csv");
+        assertThat(entries).contains("2026/11/CFC26.09904/ho-so.json","2026/11/CFC26.09904/danh-muc-file.csv");
         assertThat(entries).doesNotHaveDuplicates();
-        assertThat(jobs.list(0)).anyMatch(j->jobId.equals(j.get("id")) && "CFC26.9904".equals(j.get("receipt_number")));
+        assertThat(jobs.list(0)).anyMatch(j->jobId.equals(j.get("id")) && "CFC26.09904".equals(j.get("receipt_number")));
         assertThat(entries).noneMatch(s->s.contains("users/") || s.contains("auth_sessions"));
         jdbc.update("UPDATE dossier_export_jobs SET expires_at=DATE_SUB(CURRENT_TIMESTAMP(6),INTERVAL 1 DAY) WHERE id=?",jobId);
         worker.cleanup();assertThat(jobs.detail(jobId).get("status")).isEqualTo("EXPIRED");
@@ -136,7 +136,7 @@ class DossierStorageIntegrationTest {
     }
     private ReceiptAttachmentResponse attachmentsResponse(long id) {return receipts.findById(id).attachments().getFirst();}
     @Test void corruptSourceFailsExportAndQueuedCancelDoesNotRun() throws Exception {
-        long id=receipt("CFC26.9905");var attachment=upload(id,"original");Files.writeString(path(attachment),"corrupt!");
+        long id=receipt("CFC26.09905");var attachment=upload(id,"original");Files.writeString(path(attachment),"corrupt!");
         var scope=new DossierCatalog.Scope(null,null,id,null);String jobId=jobs.create(scope,UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Path exports=Files.createDirectory(temp.resolve("broken-exports"));
         new DossierExportWorker(jobs,catalog,storage,exports.toString(),true,1000000,100,0,100000000).runNext();
@@ -172,12 +172,12 @@ class DossierStorageIntegrationTest {
         jdbc.update("UPDATE receipt_attachments SET storage_name=?,relative_path=NULL WHERE id=?",name,a.id());
     }
     @Test void legacyNamesWithColonStayReadable() throws Exception {
-        long id=receipt("CFC26.9906");var file=upload(id,"phone-photo");Path old=path(file);
+        long id=receipt("CFC26.09906");var file=upload(id,"phone-photo");Path old=path(file);
         String name=UUID.randomUUID()+"-Anh 10:30.jpg";Files.move(old,old.resolveSibling(name));rename(file,name);
         assertThat(Files.readString(catalog.open(catalog.file(id,"RECEIPT",file.id())))).isEqualTo("phone-photo");
     }
     @Test void fullDiskRejectsUploadWith507AndLeavesNothingBehind() throws Exception {
-        long id=receipt("CFC26.9907"),a=register("Full");storage.activate(a,0,admin.getId());
+        long id=receipt("CFC26.09907"),a=register("Full");storage.activate(a,0,admin.getId());
         Path root=Path.of(location(a).rootPath());
         var full=new DossierStorageService(jdbc,temp.resolve("receipts").toString(),temp.resolve("results").toString(),temp.toString(),
             Long.MAX_VALUE/4,0,0,temp.resolve("x").toString(),temp.resolve("y").toString());
@@ -187,7 +187,7 @@ class DossierStorageIntegrationTest {
         assertThat(full.overview().locations()).filteredOn(h->h.location().id()==a).allMatch(DossierStorageService.Health::warning);
     }
     @Test void truncatedUploadIsNotKept() throws Exception {
-        long id=receipt("CFC26.9908"),a=register("Cut");storage.activate(a,0,admin.getId());
+        long id=receipt("CFC26.09908"),a=register("Cut");storage.activate(a,0,admin.getId());
         assertThatThrownBy(()->storage.write(1,id,"intake","a.bin",new java.io.ByteArrayInputStream(new byte[]{1,2}),5)).isInstanceOf(ResponseStatusException.class);
         assertThat(files(Path.of(location(a).rootPath()))).hasSize(1);
     }
@@ -195,7 +195,7 @@ class DossierStorageIntegrationTest {
         return storage.overview().locations().stream().map(DossierStorageService.Health::location).filter(l->l.id()==id).findFirst().orElseThrow();
     }
     @Test void renamedDeviceKeepsReadingButBlocksUploadUntilValidated() throws Exception {
-        long id=receipt("CFC26.9909"),a=register("Dev");storage.activate(a,0,admin.getId());var old=upload(id,"still-here");
+        long id=receipt("CFC26.09909"),a=register("Dev");storage.activate(a,0,admin.getId());var old=upload(id,"still-here");
         jdbc.update("UPDATE storage_locations SET volume_identity='/dev/old|ext4' WHERE id=?",a);
         assertThat(Files.readString(path(old))).isEqualTo("still-here");
         assertThat(storage.overview().locations()).filteredOn(h->h.location().id()==a).extracting(DossierStorageService.Health::status).containsExactly("VOLUME_CHANGED");
@@ -204,10 +204,10 @@ class DossierStorageIntegrationTest {
         assertThat(upload(id,"after")).isNotNull();
     }
     @Test void resultFilesFollowTheSelectedDiskAndDossierFolder() throws Exception {
-        long id=receipt("CFC26.9910"),a=register("Res");storage.activate(a,0,admin.getId());
+        long id=receipt("CFC26.09910"),a=register("Res");storage.activate(a,0,admin.getId());
         var written=storage.write(2,id,"results/7/9","r.pdf",new java.io.ByteArrayInputStream("pdf".getBytes()),3);
         assertThat(written.locationId()).isEqualTo(a);
-        assertThat(written.relativePath()).isEqualTo("2026/11/CFC26.9910/results/7/9/r.pdf");
+        assertThat(written.relativePath()).isEqualTo("2026/11/CFC26.09910/results/7/9/r.pdf");
         assertThat(Files.readString(storage.read(a,written.relativePath(),"ignored"))).isEqualTo("pdf");
     }
     @Test void invalidPathsAndReservedAreasAreRejectedAsBadRequest() throws Exception {
@@ -219,7 +219,7 @@ class DossierStorageIntegrationTest {
         assertThatThrownBy(()->guarded.register("exports",exports.toString(),admin.getId())).hasMessageContaining("400");
     }
     @Test void missingFileFailsExportUnlessAdminAllowsAWarningPackage() throws Exception {
-        long id=receipt("CFC26.9911");var kept=upload(id,"kept");var lost=upload(id,"lost");var changed=upload(id,"original");
+        long id=receipt("CFC26.09911");var kept=upload(id,"kept");var lost=upload(id,"lost");var changed=upload(id,"original");
         Files.delete(path(lost));Files.writeString(path(changed),"tampered-content");assertThat(kept).isNotNull();
         var scope=new DossierCatalog.Scope(null,null,id,null);Path exports=Files.createDirectory(temp.resolve("warn-exports"));
         String strict=jobs.create(scope,UUID.randomUUID().toString(),admin.getId()).get("id").toString();worker(exports).runNext();
@@ -231,7 +231,7 @@ class DossierStorageIntegrationTest {
         assertThat(zip.keySet()).noneMatch(k->k.contains("receipt-"+lost.id()+"-"));
     }
     @Test void exportHidesLookupCodeAndServerPathsAndNeutralisesSpreadsheetFormulas() throws Exception {
-        long id=receipt("CFC26.9912");upload(id,"x");
+        long id=receipt("CFC26.09912");upload(id,"x");
         String jobId=jobs.create(new DossierCatalog.Scope(null,null,id,null),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Path exports=Files.createDirectory(temp.resolve("hidden-exports"));worker(exports).runNext();
         var zip=unzip(exports,jobId);
@@ -240,14 +240,14 @@ class DossierStorageIntegrationTest {
         assertThat(DossierExportWorker.csv("=HYPERLINK(1)")).isEqualTo("\"'=HYPERLINK(1)\"");
     }
     @Test void fileUploadedAfterTheRequestIsNotInTheSnapshot() throws Exception {
-        long id=receipt("CFC26.9913");upload(id,"before");
+        long id=receipt("CFC26.09913");upload(id,"before");
         String jobId=jobs.create(new DossierCatalog.Scope(null,null,id,null),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Thread.sleep(5);upload(id,"after-cutoff");
         Path exports=Files.createDirectory(temp.resolve("cutoff-exports"));worker(exports).runNext();
         assertThat(unzip(exports,jobId).values()).contains("before").doesNotContain("after-cutoff");
     }
     @Test void plannedRestartRequeuesAndCrashedJobStopsAfterThreeAttempts() throws Exception {
-        long id=receipt("CFC26.9914");var scope=new DossierCatalog.Scope(null,null,id,null);
+        long id=receipt("CFC26.09914");var scope=new DossierCatalog.Scope(null,null,id,null);
         String jobId=jobs.create(scope,UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Path exports=Files.createDirectory(temp.resolve("restart-exports"));
         var stopped=worker(exports);stopped.stop();stopped.runNext();
@@ -262,7 +262,7 @@ class DossierStorageIntegrationTest {
         assertThat(jobs.detail(jobId)).containsEntry("status","FAILED").containsEntry("error_code","TOO_MANY_ATTEMPTS");
     }
     @Test void cancelDuringPackingEndsCancelledWithoutLeftovers() throws Exception {
-        long id=receipt("CFC26.9915");upload(id,"x");
+        long id=receipt("CFC26.09915");upload(id,"x");
         String jobId=jobs.create(new DossierCatalog.Scope(null,null,id,null),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Path exports=Files.createDirectory(temp.resolve("cancel-exports"));
         var cancelling=new DossierCatalog(jdbc,storage) {
@@ -281,36 +281,36 @@ class DossierStorageIntegrationTest {
         assertThat(jobs.detail("fresh")).containsEntry("status","EXPIRED");
     }
     @Test void legacyDuplicateNumbersGetSeparateFoldersAndExportTogether() throws Exception {
-        long first=receipt("CFC26.9919"),second=receipt("CFC26.9920");upload(first,"one");upload(second,"two");
+        long first=receipt("CFC26.09919"),second=receipt("CFC26.09920");upload(first,"one");upload(second,"two");
         // V16 keeps old duplicates: only the first dossier owns the number.
-        jdbc.update("UPDATE receipts SET request_number='CFC26.9919',request_number_unique=NULL WHERE id=?",second);
-        assertThat(catalog.folder(catalog.receipt(first))).isEqualTo("2026/11/CFC26.9919");
-        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.9919-r"+second);
-        assertThat(storage.folder(second)).isEqualTo("2026/11/CFC26.9919-r"+second);
-        String jobId=jobs.create(new DossierCatalog.Scope(2026,11,null,"CFC26.9919"),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
+        jdbc.update("UPDATE receipts SET request_number='CFC26.09919',request_number_unique=NULL WHERE id=?",second);
+        assertThat(catalog.folder(catalog.receipt(first))).isEqualTo("2026/11/CFC26.09919");
+        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.09919-r"+second);
+        assertThat(storage.folder(second)).isEqualTo("2026/11/CFC26.09919-r"+second);
+        String jobId=jobs.create(new DossierCatalog.Scope(2026,11,null,"CFC26.09919"),UUID.randomUUID().toString(),admin.getId()).get("id").toString();
         Path exports=Files.createDirectory(temp.resolve("duplicate-exports"));worker(exports).runNext();
         assertThat(jobs.detail(jobId)).containsEntry("status","COMPLETED");
-        assertThat(unzip(exports,jobId)).containsKeys("2026/11/CFC26.9919/ho-so.json","2026/11/CFC26.9919-r"+second+"/ho-so.json");
+        assertThat(unzip(exports,jobId)).containsKeys("2026/11/CFC26.09919/ho-so.json","2026/11/CFC26.09919-r"+second+"/ho-so.json");
         // A folder that was already fixed on disk before this rule must still not collide inside a package.
-        jdbc.update("UPDATE receipts SET archive_path='2026/11/CFC26.9919' WHERE id=?",second);
-        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.9919-r"+second);
+        jdbc.update("UPDATE receipts SET archive_path='2026/11/CFC26.09919' WHERE id=?",second);
+        assertThat(catalog.folder(catalog.receipt(second))).isEqualTo("2026/11/CFC26.09919-r"+second);
     }
     @Test void listShowsCustomerAndSupportsSorting() {
-        long a=receipt("CFC26.9921"),b=receipt("CFC26.9922");
-        var scope=new DossierCatalog.Scope(2026,11,null,"CFC26.992");
+        long a=receipt("CFC26.09921"),b=receipt("CFC26.09922");
+        var scope=new DossierCatalog.Scope(2026,11,null,"CFC26.0992");
         assertThat(catalog.list(scope,"requestNumber,asc",0,20).content()).extracting(r->r.get("id")).containsExactly(a,b);
         assertThat(catalog.list(scope,"requestNumber,desc",0,20).content()).extracting(r->r.get("id")).containsExactly(b,a);
         assertThat(catalog.list(scope,0,20).content().getFirst()).containsEntry("customerName","Khach test").containsEntry("sampleName","Mau test");
         assertThatThrownBy(()->catalog.list(scope,"id;DROP,asc",0,20)).isInstanceOf(ResponseStatusException.class).hasMessageContaining("400");
     }
     @Test void perAdminQueueLimit() {
-        long id=receipt("CFC26.9916");
+        long id=receipt("CFC26.09916");
         for(int i=0;i<5;i++) jobs.create(new DossierCatalog.Scope(null,null,id,null),"r"+i,admin.getId());
         assertThatThrownBy(()->jobs.create(new DossierCatalog.Scope(null,null,id,null),"r5",admin.getId())).hasMessageContaining("429");
         assertThatThrownBy(()->jobs.create(new DossierCatalog.Scope(null,null,id,null),true,"r0",admin.getId())).hasMessageContaining("409");
     }
     @Test void summaryAndPeriodsUseVietnamReceivingMonthForTheWholeFilter() {
-        long id=receipt("CFC26.9917");upload(id,"12345");
+        long id=receipt("CFC26.09917");upload(id,"12345");
         assertThat(catalog.summary(new DossierCatalog.Scope(2026,11,id,null))).isEqualTo(new DossierCatalog.Summary(1,1,5));
         assertThat(catalog.summary(new DossierCatalog.Scope(2026,10,id,null))).isEqualTo(new DossierCatalog.Summary(0,0,0));
         jobs.create(new DossierCatalog.Scope(2026,11,null,null),UUID.randomUUID().toString(),admin.getId());
@@ -321,11 +321,11 @@ class DossierStorageIntegrationTest {
         assertThat(catalog.file(id,"RECEIPT",catalog.files(id,0,10).content().getFirst().id()).uploadedBy()).isEqualTo("Admin test");
     }
     @Test void partDownloadSupportsRangesAndDetailHidesServerPaths() throws Exception {
-        long id=receipt("CFC26.9918");var file=upload(id,"x");
+        long id=receipt("CFC26.09918");var file=upload(id,"x");
         var mvc=MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
         var asAdmin=jwt().jwt(j->j.subject(admin.getEmail())).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
         String detail=mvc.perform(get("/api/v1/admin/dossiers/"+id).with(asAdmin)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(detail).contains("\"folder\":\"2026/11/CFC26.9918\"").contains("checksum").doesNotContain("storageName").doesNotContain("relativePath").doesNotContain("locationId");
+        assertThat(detail).contains("\"folder\":\"2026/11/CFC26.09918\"").contains("checksum").doesNotContain("storageName").doesNotContain("relativePath").doesNotContain("locationId");
         mvc.perform(get("/api/v1/admin/dossiers/"+id+"/files/RECEIPT/"+file.id()).with(asAdmin)).andExpect(status().isOk());
         assertThat(catalog.audit(0)).anyMatch(a->"DOSSIER_DOWNLOAD".equals(a.get("action")) && ("RECEIPT:"+file.id()).equals(a.get("object_id")));
         for(String uri:List.of("/api/v1/admin/dossiers/summary?year=2026","/api/v1/admin/dossiers/periods","/api/v1/admin/dossiers?year=2026"))

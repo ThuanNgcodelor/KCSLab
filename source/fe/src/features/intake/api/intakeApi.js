@@ -28,6 +28,8 @@ export async function downloadReceiptForm3(id, sampleId) {
   anchor.click();
   URL.revokeObjectURL(url);
 }
+export function updateReceipt(id, data) { return request(`/receipts/${id}`, { method: 'PUT', body: JSON.stringify(data) }); }
+export function getReceiptEdits(id) { return request(`/receipts/${id}/edits`); }
 export function createReceipt(data) { return request('/receipts', { method: 'POST', body: JSON.stringify(data) }); }
 export function getCustomerNotificationSettings() { return request('/receipts/notification-settings'); }
 export function getCustomerNotificationDeliveries(id) { return request(`/receipts/${id}/notification-deliveries?page=0&size=20`); }
