@@ -2,7 +2,11 @@
 // (theo Phiếu KQKN của LAB: một mã mẫu, mỗi chỉ tiêu một hàng), nên các màn hình tách chuỗi này thành từng dòng.
 function canonical(name, matrix) {
   const key = name.toLowerCase().normalize('NFC').replace(/\s+/g, ' ').trim();
-  if (/^cadi?mi?/.test(key) || key.startsWith('cadmium')) return 'Cadimi (Cd)';
+  if (/^cadi?mi?/.test(key) || key.startsWith('cadmium')) {
+    // "Cadimi (Cd) Ruột + vỏ" là một chỉ tiêu đặc biệt (một dòng kết quả cho cả ruột và vỏ): giữ phần ghi thêm phía sau.
+    const extra = name.trim().replace(/^cadi?mi?u?m?\s*(\(\s*cd\s*\))?/i, '').replace(/^[\s:\-–]+/, '').trim();
+    return extra ? `Cadimi (Cd) ${extra}` : 'Cadimi (Cd)';
+  }
   if (/^(vàng o|auramin)/.test(key)) {
     const part = `${key} ${(matrix || '').toLowerCase()}`;
     if (/vỏ/.test(part)) return 'Auramine O (Vỏ)';
