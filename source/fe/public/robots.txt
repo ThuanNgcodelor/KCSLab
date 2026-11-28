@@ -1,6 +1,9 @@
 # Chỉ trang tra cứu công khai /tracuu/ được index. Workspace nhân viên và API không được index.
+# Allow được ưu tiên theo đường dẫn dài hơn, nên sitemap.xml vẫn đọc được dù có Disallow: /
 User-agent: *
 Allow: /tracuu/
+Allow: /sitemap.xml
+Allow: /robots.txt
 Disallow: /
 
 Sitemap: https://lab.cfc.io.vn/sitemap.xml
