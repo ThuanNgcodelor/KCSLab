@@ -1,7 +1,11 @@
 # Only the public lookup page /tracuu/ may be indexed. Staff workspace and API must not be.
-# The longer Allow rule wins over Disallow: /, so sitemap.xml stays readable.
+# Longer Allow rules win over "Disallow: /". The host home page and favicons stay crawlable
+# (Google reads the favicon and site name from the home page); the home page itself is noindex.
 User-agent: *
 Allow: /tracuu/
+Allow: /$
+Allow: /favicon
+Allow: /apple-touch-icon.png
 Allow: /sitemap.xml
 Allow: /robots.txt
 Disallow: /
