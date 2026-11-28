@@ -1,5 +1,5 @@
-# Chỉ trang tra cứu công khai /tracuu/ được index. Workspace nhân viên và API không được index.
-# Allow được ưu tiên theo đường dẫn dài hơn, nên sitemap.xml vẫn đọc được dù có Disallow: /
+# Only the public lookup page /tracuu/ may be indexed. Staff workspace and API must not be.
+# The longer Allow rule wins over Disallow: /, so sitemap.xml stays readable.
 User-agent: *
 Allow: /tracuu/
 Allow: /sitemap.xml
