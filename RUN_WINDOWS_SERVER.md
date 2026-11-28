@@ -83,18 +83,18 @@ Cập nhật code mới: build lại (bước 5) → đóng cửa sổ backend �
 
 ### Chạy FE, backend và Cloudflare Tunnel bằng launcher
 
-Để chạy theo cấu hình hiện tại (Vite dev trên cổng 5173, backend trên cổng 8080), bấm đúp [scripts/windows/Run-CFC-Lab.cmd](scripts/windows/Run-CFC-Lab.cmd). Launcher sẽ:
+Để chạy theo cấu hình hiện tại (Vite preview bản build trên cổng 5173, backend trên cổng 8080), bấm đúp [scripts/windows/Run-CFC-Lab.cmd](scripts/windows/Run-CFC-Lab.cmd). Launcher sẽ:
 
 - hỏi có muốn `git pull` trước khi build không; chỉ pull kiểu fast-forward, để Git từ chối nếu có thay đổi cục bộ bị ảnh hưởng, không tự stash/reset/ghi đè;
-- kiểm tra Java 21+, Node/npm, khả năng kết nối cổng MySQL và Redis, LibreOffice, Cloudflared service và cổng ứng dụng;
-- build FE/backend bằng `scripts\windows\build.ps1`, sau đó mở backend và Vite trong hai cửa sổ riêng; Cloudflared chạy dưới dạng Windows service.
+- kiểm tra Java 21+, Node/npm, khả năng kết nối cổng MySQL và Redis, LibreOffice, Cloudflared service và cổng ứng dụng; nếu Cloudflared cần quyền Administrator để khởi động, launcher sẽ yêu cầu xác nhận UAC. Nếu UAC bị hủy hoặc tunnel vẫn lỗi, launcher báo rõ tunnel chưa chạy;
+- build FE (`npm run build`) và backend bằng `scripts\windows\build.ps1`, sau đó mở backend và `npx vite preview --host 0.0.0.0 --port 5173` trong hai cửa sổ riêng; Cloudflared chạy dưới dạng Windows service.
 - lưu thông tin định danh hai cửa sổ để file stop chỉ dừng đúng tiến trình do launcher tạo.
 
 Trước lần chạy đầu, đóng các cửa sổ FE/backend đang chạy thủ công và mở Laragon > **Start All**. Nếu Git từ chối pull vì thay đổi cục bộ, launcher hỏi có build code hiện tại không; chọn `Y` chỉ khi muốn chạy phiên bản đang có trên máy. Nếu vừa `git pull` thủ công, launcher sẽ build code hiện tại; backend đang chạy phải được dừng trước để nạp JAR mới. Kiểm tra MySQL/Redis ở đây chỉ xác nhận cổng dịch vụ có phản hồi; backend mới xác nhận thông tin đăng nhập DB.
 
-Để dừng, bấm đúp [scripts/windows/Stop-CFC-Lab.cmd](scripts/windows/Stop-CFC-Lab.cmd). File này dừng cây tiến trình backend/frontend được tạo bởi phiên launcher gần nhất và yêu cầu Windows dừng service `Cloudflared`; có thể cần chạy với quyền Administrator. Các cửa sổ FE/backend mở thủ công không bị dừng. Laragon/MySQL/Redis không bị tắt.
+Để dừng, bấm đúp [scripts/windows/Stop-CFC-Lab.cmd](scripts/windows/Stop-CFC-Lab.cmd). File này dừng cây tiến trình backend/frontend được tạo bởi phiên launcher gần nhất, sau đó tự yêu cầu quyền Administrator để dừng service `Cloudflared`. Nếu hủy hộp thoại UAC hoặc service không dừng được, cửa sổ sẽ báo rõ và trả mã lỗi; backend/frontend vẫn đã dừng. Các cửa sổ FE/backend mở thủ công không bị dừng. Laragon/MySQL/Redis không bị tắt.
 
-Launcher chạy Vite development server, phù hợp để thử nghiệm Tunnel, không phải cấu hình production. Không nên để dev server mở công khai lâu dài; triển khai production cần build `dist` và dùng Apache Laragon theo các bước bên trên.
+Launcher phục vụ bản FE đã build bằng Vite preview, không bật dev server/HMR. `vite preview` vẫn là server xem trước, không thay thế Apache production; triển khai chính thức nên cấu hình Apache Laragon phục vụ `dist` theo các bước bên trên.
 
 ## 7. Cho backend tự chạy khi bật máy (không bắt buộc)
 

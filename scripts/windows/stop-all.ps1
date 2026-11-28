@@ -93,12 +93,36 @@ if (-not $cloudflaredService) {
     Write-Host 'Cloudflared service is not installed.' -ForegroundColor DarkGray
 }
 elseif ($cloudflaredService.Status -ne 'Stopped') {
-    try {
-        Stop-Service -Name 'Cloudflared' -ErrorAction Stop
-        Write-Host 'Stopped Cloudflared service.' -ForegroundColor Green
+    $currentUser = [Security.Principal.WindowsPrincipal]::new(
+        [Security.Principal.WindowsIdentity]::GetCurrent()
+    )
+    $isAdministrator = $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    if ($isAdministrator) {
+        try {
+            Stop-Service -Name 'Cloudflared' -ErrorAction Stop
+            Write-Host 'Stopped Cloudflared service.' -ForegroundColor Green
+        }
+        catch {
+            Write-Warning "Could not stop Cloudflared service: $($_.Exception.Message)"
+            exit 1
+        }
     }
-    catch {
-        Write-Warning "Could not stop Cloudflared service. Run this stop file as Administrator if you also want to stop the tunnel. $($_.Exception.Message)"
+    else {
+        try {
+            Write-Host 'Requesting Administrator permission to stop the Cloudflared service...' -ForegroundColor Yellow
+            $scriptPath = $PSCommandPath.Replace('"', '""')
+            $elevatedProcess = Start-Process -FilePath 'powershell.exe' `
+                -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" `
+                -Verb RunAs -Wait -PassThru -ErrorAction Stop
+            if ($elevatedProcess.ExitCode -ne 0) {
+                throw "Elevated stop process exited with code $($elevatedProcess.ExitCode)."
+            }
+        }
+        catch {
+            Write-Warning "Backend and frontend were stopped, but Cloudflared may still be running. Administrator permission was not granted or the service could not be stopped: $($_.Exception.Message)"
+            exit 1
+        }
     }
 }
 else {

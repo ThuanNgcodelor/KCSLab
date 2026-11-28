@@ -11,6 +11,7 @@ $BuildScript = Join-Path $PSScriptRoot 'build.ps1'
 $BackendScript = Join-Path $PSScriptRoot 'start-backend.ps1'
 $FrontendDirectory = Join-Path $Root 'source\fe'
 $RunStateFile = Join-Path $env:LOCALAPPDATA 'CFC-Lab\KCSLab-run.json'
+$tunnelRunning = $false
 
 function Write-Step {
     param([string]$Message)
@@ -304,6 +305,7 @@ if (-not $cloudflaredService) {
     Write-Warning 'Cloudflared Windows service was not found. The app can run locally, but the tunnel is not started.'
 }
 elseif ($cloudflaredService.Status -eq 'Running') {
+    $tunnelRunning = $true
     Write-Host 'Cloudflared service is running.' -ForegroundColor Green
 }
 elseif ($CheckOnly) {
@@ -315,6 +317,7 @@ else {
         Start-Sleep -Seconds 2
         $cloudflaredService = Get-Service -Name 'Cloudflared'
         if ($cloudflaredService.Status -eq 'Running') {
+            $tunnelRunning = $true
             Write-Host 'Started the Cloudflared service.' -ForegroundColor Green
         }
         else {
@@ -322,7 +325,44 @@ else {
         }
     }
     catch {
-        Write-Warning "Could not start Cloudflared service: $($_.Exception.Message). Run the launcher as Administrator if needed."
+        try {
+            $currentUser = [Security.Principal.WindowsPrincipal]::new(
+                [Security.Principal.WindowsIdentity]::GetCurrent()
+            )
+            $isAdministrator = $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+            if ($isAdministrator) {
+                throw
+            }
+
+            Write-Host 'Requesting Administrator permission to start the Cloudflared service...' -ForegroundColor Yellow
+            $elevatedCommand = @'
+Start-Service -Name 'Cloudflared' -ErrorAction Stop
+$deadline = (Get-Date).AddSeconds(15)
+do {
+    $service = Get-Service -Name 'Cloudflared' -ErrorAction Stop
+    if ($service.Status -eq 'Running') { exit 0 }
+    Start-Sleep -Milliseconds 500
+} while ((Get-Date) -lt $deadline)
+exit 1
+'@
+            $encodedCommand = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($elevatedCommand))
+            $elevatedProcess = Start-Process -FilePath 'powershell.exe' `
+                -ArgumentList "-NoProfile -ExecutionPolicy Bypass -EncodedCommand $encodedCommand" `
+                -Verb RunAs -Wait -PassThru -ErrorAction Stop
+            if ($elevatedProcess.ExitCode -ne 0) {
+                throw "Elevated start process exited with code $($elevatedProcess.ExitCode)."
+            }
+
+            $cloudflaredService = Get-Service -Name 'Cloudflared'
+            $tunnelRunning = $cloudflaredService.Status -eq 'Running'
+            if (-not $tunnelRunning) {
+                throw "Cloudflared service is not running (status: $($cloudflaredService.Status))."
+            }
+            Write-Host 'Started the Cloudflared service with Administrator permission.' -ForegroundColor Green
+        }
+        catch {
+            Write-Warning "Could not start Cloudflared service: $($_.Exception.Message). The app can still run locally, but the public tunnel is unavailable."
+        }
     }
 }
 
@@ -332,7 +372,7 @@ if (Test-TcpPort -HostName '127.0.0.1' -Port $backendPort) {
     throw "Backend port $backendPort is already in use. Close the manually started backend window, then rerun the launcher to build and start the new version."
 }
 if (Test-TcpPort -HostName '127.0.0.1' -Port $frontendPort) {
-    throw "Frontend port $frontendPort is already in use. Close the manually started npm run dev or Apache process, then rerun the launcher."
+    throw "Frontend port $frontendPort is already in use. Close the manually started Vite preview or Apache process, then rerun the launcher."
 }
 Write-Host "Backend port $backendPort and frontend port $frontendPort are available." -ForegroundColor Green
 
@@ -351,7 +391,7 @@ $backendCommandText = '& ' + "'" + $escapedBackendScript + "'"
 $backendWindow = Start-PowerShellWindow -CommandText $backendCommandText
 
 $escapedFrontendDirectory = $FrontendDirectory.Replace("'", "''")
-$frontendCommandText = "Set-Location -LiteralPath '$escapedFrontendDirectory'; npm run dev"
+$frontendCommandText = "Set-Location -LiteralPath '$escapedFrontendDirectory'; npx vite preview --host 0.0.0.0 --port 5173"
 $frontendWindow = Start-PowerShellWindow -CommandText $frontendCommandText
 Save-RunState -BackendWindow $backendWindow -BackendCommand $backendCommandText `
     -FrontendWindow $frontendWindow -FrontendCommand $frontendCommandText
@@ -375,5 +415,10 @@ else {
 Write-Host "`nLauncher started the application windows." -ForegroundColor Green
 Write-Host "Frontend: http://localhost:$frontendPort"
 Write-Host "Backend:  http://localhost:$backendPort"
-Write-Host 'Tunnel:   https://lab.cfc.io.vn'
+if ($tunnelRunning) {
+    Write-Host 'Tunnel:   https://lab.cfc.io.vn'
+}
+else {
+    Write-Warning 'Tunnel:   not running. The app is only available locally until Cloudflared is started.'
+}
 Write-Host 'Keep both backend/frontend windows open. If the backend reports a DB error, check the credentials in .env.'
