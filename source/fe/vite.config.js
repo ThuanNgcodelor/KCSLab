@@ -20,7 +20,7 @@ function quietProxy(proxy) {
 // so the QR printed on the PDF (PUBLIC_LOOKUP_URL, e.g. http://192.168.1.132:5173/tracuu/) works on the LAN
 // and its relative /api calls go through the proxy below. `vite build` copies it to dist/tracuu.
 const landingRoot = resolve(__dirname, '../public/tracuu');
-const landingTypes = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+const landingTypes = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
 // Only the public lookup landing (and the files crawlers need to discover it) may be indexed.
 // Everything else - staff login/workspace, internal API, WebSocket - is sent with noindex.
 function isIndexablePath(path) {

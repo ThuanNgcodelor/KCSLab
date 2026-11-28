@@ -3,25 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tra cứu kết quả kiểm nghiệm | CFC Lab Cần Thơ</title>
-  <meta name="description" content="Tra cứu kết quả kiểm nghiệm và tải phiếu kết quả PDF do CFC Lab (CFC Cò Bay, Cần Thơ) phát hành, bằng mã tra cứu in trên phiếu và 4 số cuối điện thoại.">
+  <title>Tra cứu kết quả kiểm nghiệm CFC Lab | CFC Cò Bay Cần Thơ</title>
+  <meta name="description" content="Tra cứu và tải phiếu kết quả kiểm nghiệm PDF của CFC Lab bằng mã tra cứu in trên phiếu và 4 số cuối điện thoại.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#f4faf6">
-  <!-- Canonical tương đối: đổi sang URL HTTPS tuyệt đối khi có hostname công khai (cần xác nhận). -->
-  <link rel="canonical" href="/tracuu/">
+  <link rel="canonical" href="https://lab.cfc.io.vn/tracuu/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="vi_VN">
   <meta property="og:site_name" content="CFC Lab">
-  <meta property="og:title" content="Tra cứu kết quả kiểm nghiệm | CFC Lab Cần Thơ">
-  <meta property="og:description" content="Nhập mã tra cứu in trên phiếu và 4 số cuối điện thoại để xem và tải phiếu kết quả kiểm nghiệm của CFC Lab.">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:url" content="https://lab.cfc.io.vn/tracuu/">
+  <meta property="og:title" content="Tra cứu kết quả kiểm nghiệm CFC Lab | CFC Cò Bay Cần Thơ">
+  <meta property="og:description" content="Tra cứu và tải phiếu kết quả kiểm nghiệm PDF của CFC Lab bằng mã tra cứu in trên phiếu và 4 số cuối điện thoại.">
+  <meta property="og:image" content="https://lab.cfc.io.vn/tracuu/og-image.jpg?v=1">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="CFC Lab - Tra cứu kết quả kiểm nghiệm">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tra cứu kết quả kiểm nghiệm CFC Lab | CFC Cò Bay Cần Thơ">
+  <meta name="twitter:description" content="Tra cứu và tải phiếu kết quả kiểm nghiệm PDF của CFC Lab bằng mã tra cứu in trên phiếu và 4 số cuối điện thoại.">
+  <meta name="twitter:image" content="https://lab.cfc.io.vn/tracuu/og-image.jpg?v=1">
   <link rel="icon" href="./favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="./favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Be Vietnam Pro chỉ dùng làm font dự phòng cho các chữ tiếng Việt mà DM Sans không có (ế, ữ, ộ…). -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap"></noscript>
   <link rel="stylesheet" href="./styles.css">
   <script type="application/ld+json">
   {
@@ -29,29 +38,108 @@
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "#cfc",
+        "@id": "https://lab.cfc.io.vn/#organization",
         "name": "Công ty CP Phân bón và Hóa chất Cần Thơ",
-        "alternateName": ["CFC Cò Bay", "CFC Lab"],
+        "alternateName": [
+          "CFC Cò Bay",
+          "CFC Lab"
+        ],
         "url": "https://www.cfccobay.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://lab.cfc.io.vn/tracuu/cfc-logo.png",
+          "width": 232,
+          "height": 160
+        },
         "telephone": "1900 5307",
         "email": "info@cfccobay.com",
-        "address": { "@type": "PostalAddress", "streetAddress": "Khu công nghiệp Trà Nóc 1", "addressLocality": "Cần Thơ", "addressCountry": "VN" }
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+84-1900-5307",
+          "contactType": "customer support",
+          "areaServed": "VN",
+          "availableLanguage": "vi"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Khu công nghiệp Trà Nóc 1",
+          "addressLocality": "Cần Thơ",
+          "addressCountry": "VN"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://lab.cfc.io.vn/#website",
+        "url": "https://lab.cfc.io.vn/tracuu/",
+        "name": "CFC Lab - Tra cứu kết quả kiểm nghiệm",
+        "inLanguage": "vi-VN",
+        "publisher": {
+          "@id": "https://lab.cfc.io.vn/#organization"
+        }
       },
       {
         "@type": "WebPage",
-        "name": "Tra cứu kết quả kiểm nghiệm",
-        "description": "Tra cứu và tải phiếu kết quả kiểm nghiệm do CFC Lab phát hành.",
+        "@id": "https://lab.cfc.io.vn/tracuu/#webpage",
+        "url": "https://lab.cfc.io.vn/tracuu/",
+        "name": "Tra cứu kết quả kiểm nghiệm CFC Lab",
+        "description": "Tra cứu và tải phiếu kết quả kiểm nghiệm PDF của CFC Lab bằng mã tra cứu in trên phiếu và 4 số cuối điện thoại.",
         "inLanguage": "vi-VN",
-        "publisher": { "@id": "#cfc" }
+        "isPartOf": {
+          "@id": "https://lab.cfc.io.vn/#website"
+        },
+        "publisher": {
+          "@id": "https://lab.cfc.io.vn/#organization"
+        },
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://lab.cfc.io.vn/tracuu/og-image.jpg",
+          "width": 1200,
+          "height": 630
+        }
       },
       {
         "@type": "FAQPage",
         "mainEntity": [
-          { "@type": "Question", "name": "Mã tra cứu nằm ở đâu?", "acceptedAnswer": { "@type": "Answer", "text": "Mã tra cứu gồm 16 ký tự, in trên phiếu kết quả kiểm nghiệm do CFC Lab phát hành, cạnh mã QR. Quét mã QR bằng camera điện thoại sẽ mở trang này và điền sẵn mã." } },
-          { "@type": "Question", "name": "Vì sao phải nhập 4 số cuối điện thoại?", "acceptedAnswer": { "@type": "Answer", "text": "Để chỉ người gửi mẫu xem được kết quả. Hãy dùng số điện thoại đã cung cấp khi gửi mẫu. Trang tra cứu không hiển thị tên, địa chỉ hay số điện thoại của khách hàng." } },
-          { "@type": "Question", "name": "Vì sao không tìm thấy kết quả?", "acceptedAnswer": { "@type": "Answer", "text": "Hãy kiểm tra lại mã tra cứu (không phân biệt chữ hoa, chữ thường; có thể bỏ dấu gạch) và 4 số cuối điện thoại. Chỉ phiếu đã được phát hành mới tra cứu được." } },
-          { "@type": "Question", "name": "Nhập sai nhiều lần thì sao?", "acceptedAnswer": { "@type": "Answer", "text": "Để bảo vệ dữ liệu, hệ thống tạm dừng tra cứu một thời gian sau nhiều lần nhập sai. Thông báo trên trang cho biết thời gian cần chờ." } },
-          { "@type": "Question", "name": "Tôi tải được những tài liệu nào?", "acceptedAnswer": { "@type": "Answer", "text": "Bạn tải được các tệp mà CFC Lab đã phát hành công khai cho phiếu, như phiếu kết quả PDF. Nếu phiếu chưa có tệp, hãy liên hệ CFC qua 1900 5307." } }
+          {
+            "@type": "Question",
+            "name": "Mã tra cứu nằm ở đâu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Mã tra cứu gồm 16 ký tự, in trên phiếu kết quả kiểm nghiệm do CFC Lab phát hành, cạnh mã QR. Quét mã QR bằng camera điện thoại sẽ mở trang này và điền sẵn mã."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Vì sao phải nhập 4 số cuối điện thoại?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Để chỉ người gửi mẫu xem được kết quả. Hãy dùng số điện thoại đã cung cấp khi gửi mẫu. Trang tra cứu không hiển thị tên, địa chỉ hay số điện thoại của khách hàng."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Vì sao không tìm thấy kết quả?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hãy kiểm tra lại mã tra cứu (không phân biệt chữ hoa, chữ thường; có thể bỏ dấu gạch) và 4 số cuối điện thoại. Chỉ phiếu đã được phát hành mới tra cứu được."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Nhập sai nhiều lần thì sao?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Để bảo vệ dữ liệu, hệ thống tạm dừng tra cứu một thời gian sau nhiều lần nhập sai. Thông báo trên trang cho biết thời gian cần chờ."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Tôi tải được những tài liệu nào?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bạn tải được các tệp mà CFC Lab đã phát hành công khai cho phiếu, như phiếu kết quả PDF. Nếu phiếu chưa có tệp, hãy liên hệ CFC qua 1900 5307."
+            }
+          }
         ]
       }
     ]
@@ -84,7 +172,7 @@
     <section class="shell hero" aria-labelledby="hero-heading">
       <div class="hero-head">
         <p class="kicker"><i aria-hidden="true"></i>Dành cho khách hàng gửi mẫu</p>
-        <h1 id="hero-heading">Tra cứu <span class="grad">kết quả kiểm nghiệm</span></h1>
+        <h1 id="hero-heading">Tra cứu <span class="grad">kết quả kiểm nghiệm</span> CFC Lab</h1>
         <p class="lead">Nhập mã tra cứu in trên phiếu và 4 số cuối điện thoại để xem kết quả, tải phiếu PDF do CFC Lab phát hành.</p>
       </div>
 
@@ -187,7 +275,7 @@
         </ol>
         <figure class="sheet-demo" aria-labelledby="sheet-demo-caption">
           <div class="sheet-paper" aria-hidden="true">
-            <div class="sheet-top"><img src="./cfc-logo.png" alt="" width="40" height="28"><span><b>PHIẾU KẾT QUẢ KIỂM NGHIỆM</b><i></i><i></i></span></div>
+            <div class="sheet-top"><img src="./cfc-logo.png" alt="" width="40" height="28" loading="lazy"><span><b>PHIẾU KẾT QUẢ KIỂM NGHIỆM</b><i></i><i></i></span></div>
             <div class="sheet-lines"><i></i><i></i><i></i><i></i><i></i></div>
             <div class="sheet-code">
               <span class="sheet-qr"></span>
@@ -197,6 +285,15 @@
           <figcaption id="sheet-demo-caption">Hình minh họa: mã tra cứu và mã QR nằm cạnh nhau trên phiếu kết quả.</figcaption>
         </figure>
       </div>
+    </section>
+
+    <section class="shell section about" id="gioi-thieu" aria-labelledby="about-title">
+      <div class="section-head">
+        <p class="kicker kicker--plain">Giới thiệu</p>
+        <h2 id="about-title">CFC Lab - Phòng kiểm nghiệm CFC Cò Bay</h2>
+      </div>
+      <p>CFC Lab là phòng kiểm nghiệm của CFC Cò Bay (Công ty CP Phân bón và Hóa chất Cần Thơ), đặt tại Khu công nghiệp Trà Nóc 1, Cần Thơ. Trang này dành cho khách hàng đã gửi mẫu: khi phiếu kết quả kiểm nghiệm được phát hành, bạn dùng mã tra cứu in trên phiếu cùng 4 số cuối điện thoại để xem kết quả và tải bản PDF.</p>
+      <p>Cần hỗ trợ, vui lòng gọi <a href="tel:19005307">1900 5307</a> hoặc gửi email tới <a href="mailto:info@cfccobay.com">info@cfccobay.com</a>.</p>
     </section>
 
     <section class="shell section faq" id="hoi-dap" aria-labelledby="faq-title">
