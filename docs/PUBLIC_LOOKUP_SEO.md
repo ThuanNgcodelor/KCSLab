@@ -10,7 +10,7 @@ Trang khách nằm ở `source/public/tracuu/`. Dùng hostname công khai riêng
 | `POST /api/v1/public/results/lookup` | Tra cứu bằng mã và bốn số cuối điện thoại |
 | `POST /api/v1/public/results/download` | Tải file được công khai của phiếu, có kiểm tra lại mã, bốn số và file |
 
-Landing `/tracuu/` được index: có `robots` index, JSON-LD (`Organization`, `WebPage`, `FAQPage`) và `source/fe/public/robots.txt` chỉ cho `/tracuu/`. Canonical đang để tương đối, chờ tên miền.
+Landing `/tracuu/` được index: có `robots` index, JSON-LD (`Organization`, `WebPage`, `FAQPage`) và `source/fe/public/robots.txt` chỉ cho `/tracuu/`. Canonical đang để tương đối (chưa làm S2). Từ 28/11/2026 middleware Vite không còn gửi `X-Robots-Tag: noindex` cho `/tracuu/` (trước đó header này chặn index dù HTML ghi `index`), còn mọi đường dẫn khác gửi `noindex`; có `sitemap.xml` và dòng `Sitemap:` trong `robots.txt`. Host công khai: `lab.cfc.io.vn`. Kế hoạch còn lại: [PUBLIC_LOOKUP_SEO_PLAN.md](../plans/PUBLIC_LOOKUP_SEO_PLAN.md).
 
 QR trên PDF = `PUBLIC_LOOKUP_URL` + `?code=…`. Hiện là IP nội bộ. Khi có tên miền, làm theo mục 8 của [RUN_WINDOWS_SERVER.md](../RUN_WINDOWS_SERVER.md): Cloudflare Tunnel, đổi biến, tạo lại PDF hàng loạt. Giữ đường dẫn `/tracuu/?code=` cố định.
 
