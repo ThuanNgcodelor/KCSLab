@@ -49,7 +49,7 @@ Cập nhật 25/11/2026. Đọc file này để bắt đầu. Khi cần chi ti�
   - frontend nginx ở cổng 5173.
 
   Lệnh `stop` chỉ tắt 2 container này. Xem [run.md](../../run.md).
-- **Windows server:** không dùng Docker. Laragon (MySQL, Redis, Apache phục vụ `dist`), Java 21 chạy `.jar`, LibreOffice cài trên Windows. Script ở `scripts/windows/`. Xem [RUN_WINDOWS_SERVER.md](../../RUN_WINDOWS_SERVER.md).
+- **Windows server:** không dùng Docker. Laragon (MySQL, Redis, Apache phục vụ `dist`), Java 21 chạy `.jar`, LibreOffice cài trên Windows. Có launcher thử nghiệm `scripts/windows/Run-CFC-Lab.cmd` và stop `scripts/windows/Stop-CFC-Lab.cmd`; launcher build/chạy Vite dev + backend và Cloudflared service, stop chỉ dừng tiến trình được ghi nhận của launcher cùng thử dừng service Tunnel. Production vẫn dùng Apache phục vụ `dist`. Xem [RUN_WINDOWS_SERVER.md](../../RUN_WINDOWS_SERVER.md).
 - Test backend: `./scripts/run-be-tests-docker.sh` chạy trong image có LibreOffice. Lần chạy 20/11/2026: 107 đạt, 1 bỏ qua.
   - Sửa quyền build ngày 23/11/2026: output `build/` và `target/` cũ do Docker tạo với owner root khiến Java IDE không ghi được `.class`. Đã trả quyền về user máy dev; script test có EXIT cleanup trả quyền `build/` về UID/GID người chạy (không theo symlink). Compile main/test bằng Maven Wrapper với user `kali` đạt; chạy script với 2 test resolver đạt và output sau Docker đều ghi được. Nếu IDE còn giữ lỗi cũ, chạy `Java: Clean Java Language Server Workspace` để nạp lại.
   - Kiểm tra phạm vi sửa QR ngày 23/11/2026: `ReportFileStamperTest`, `KqknDocxExporterTest`, `ResultReleaseWorkflowTest`, `PublicResultFlowTest`: 34 đạt, 1 bỏ qua (test tùy chọn PDF thật). Đã giải mã ảnh QR từ PDF thử nghiệm để xác nhận đúng URL và kiểm tra không in mã dưới QR. Không chạy lại toàn bộ suite hoặc nghiệm thu tài khoản thật trong lần này.
@@ -57,7 +57,7 @@ Cập nhật 25/11/2026. Đọc file này để bắt đầu. Khi cần chi ti�
 ## Điểm còn mở
 
 - Chưa thử trên Windows thật: các script PowerShell, cấu hình Apache, `soffice.com`.
-- Chưa có tên miền. Cần dựng Cloudflare Tunnel, cập nhật canonical/sitemap, rồi tạo lại PDF.
+- Domain `cfc.io.vn` đã được thêm vào Cloudflare Free; Cloudflare Tunnel Windows có một replica Healthy và route đang được cấu hình tới `http://localhost:5173`. Chưa xác nhận truy cập HTTPS từ mạng ngoài, chưa chuyển Vite dev sang Apache production, chưa cập nhật canonical/sitemap hoặc QR PDF theo hostname mới.
 - **Cần LAB xác nhận:**
   - quy ước số phiếu `/R1` và `-2`;
   - có công khai ảnh mẫu trong PDF cho khách không;

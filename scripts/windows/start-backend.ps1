@@ -42,4 +42,5 @@ if (-not $Jar) { throw 'Chưa có file .jar. Chạy scripts\windows\build.ps1 tr
 Set-Location $Backend
 $port = if ($env:PORT) { $env:PORT } else { '8080' }
 Write-Host "==> Backend: http://localhost:$port  (LibreOffice: $env:REPORT_OFFICE_COMMAND)  · Ctrl+C để dừng" -ForegroundColor Green
-java -Duser.timezone=Asia/Ho_Chi_Minh -Dfile.encoding=UTF-8 -jar $Jar.FullName
+& java '-Duser.timezone=Asia/Ho_Chi_Minh' '-Dfile.encoding=UTF-8' '-jar' $Jar.FullName
+if ($LASTEXITCODE -ne 0) { throw "Backend exited with code $LASTEXITCODE." }
